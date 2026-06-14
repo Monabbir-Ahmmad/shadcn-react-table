@@ -51,6 +51,7 @@ jobs:
           path: apps/web/out
 
   deploy:
+    if: ${{ github.event.repository.has_pages }}
     needs: build
     runs-on: ubuntu-latest
     environment:
