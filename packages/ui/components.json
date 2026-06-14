@@ -11,11 +11,11 @@
   },
   "iconLibrary": "remixicon",
   "aliases": {
-    "components": "@workspace/ui/components",
-    "utils": "@workspace/ui/lib/utils",
-    "hooks": "@workspace/ui/hooks",
-    "lib": "@workspace/ui/lib",
-    "ui": "@workspace/ui/components"
+    "components": "@monabbir/tablecn/components",
+    "utils": "@monabbir/tablecn/lib/utils",
+    "hooks": "@monabbir/tablecn/hooks",
+    "lib": "@monabbir/tablecn/lib",
+    "ui": "@monabbir/tablecn/components"
   },
   "rtl": false,
   "menuColor": "inverted-translucent",

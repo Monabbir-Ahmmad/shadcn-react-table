@@ -1,8 +1,13 @@
 {
   "extends": "@workspace/typescript-config/react-library.json",
   "compilerOptions": {
+    // This package is consumed as source through a bundler (Next's
+    // `transpilePackages`), so use bundler-style resolution: extensionless
+    // relative imports that Turbopack/webpack resolve to .ts/.tsx.
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "paths": {
-      "@workspace/ui/*": ["./src/*"]
+      "@monabbir/tablecn/*": ["./src/*"]
     }
   },
   "include": ["."],

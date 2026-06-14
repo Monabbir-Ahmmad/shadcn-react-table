@@ -32,6 +32,8 @@
     --chart-4: oklch(0.532 0.157 131.589);
     --chart-5: oklch(0.453 0.124 130.933);
     --radius: 0.45rem;
+    --highlight: oklch(0.905 0.158 96.5);
+    --highlight-foreground: oklch(0.35 0.07 72);
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0.008 326);
     --sidebar-primary: oklch(0.648 0.2 131.684);
@@ -58,6 +60,8 @@
     --accent: oklch(0.263 0.024 320.12);
     --accent-foreground: oklch(0.985 0 0);
     --destructive: oklch(0.704 0.191 22.216);
+    --highlight: oklch(0.85 0.16 96.5);
+    --highlight-foreground: oklch(0.26 0.05 72);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.542 0.034 322.5);
@@ -95,6 +99,13 @@
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+    /* Match-highlight token. Falls back to the always-present accent token so a
+       regenerated theme that drops --highlight degrades gracefully. */
+    --color-highlight: var(--highlight, var(--accent));
+    --color-highlight-foreground: var(
+      --highlight-foreground,
+      var(--accent-foreground)
+    );
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
@@ -126,4 +137,20 @@
   body {
     @apply bg-background text-foreground;
     }
+}
+
+/* data-table: indeterminate loading bar */
+@keyframes cn-table-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[cn-table-progress_1\.1s_ease-in-out_infinite\] {
+    animation: none;
+  }
 }

@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono, Raleway, Noto_Serif } from "next/font/google"
 
-import "@workspace/ui/globals.css"
+import "@monabbir/tablecn/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@monabbir/tablecn/lib/utils";
 
 const notoSerifHeading = Noto_Serif({subsets:['latin'],variable:'--font-heading'});
 
