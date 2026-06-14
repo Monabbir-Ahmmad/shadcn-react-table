@@ -177,7 +177,8 @@ Pass these to `useDataTable`:
 | Global fuzzy search | on by default; `enableGlobalFilter: false` to hide |
 | Column drag / pin / resize | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing` |
 | Row drag / pin / numbers | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers` |
-| Grouping + aggregation | `enableGrouping`, `enableStickyFooter` + column `footer`/`aggregationFn` |
+| Grouping + aggregation | `enableGrouping` + column `footer`/`aggregationFn` |
+| Sticky header / footer | on by default; scrolls within a bounded surface (`max-h`) or virtualized list |
 | Detail panel / tree | `renderDetailPanel` / `getSubRows` |
 | Inline editing | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`) + `onEditCellSave`/`onSaveRow`/`onCreateRow` |
 | Row / cell actions | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy` |

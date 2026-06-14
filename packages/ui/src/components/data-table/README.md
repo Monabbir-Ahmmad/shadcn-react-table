@@ -18,14 +18,15 @@ through. Our presentation/feature options and UI state live on `table.cnTable`.
 | --- | --- |
 | Sorting | TanStack defaults; `enableMultiSort`, `sortDescFirst` per column |
 | Selection | `enableRowSelection`, `enableMultiRowSelection` (auto select column + alert banner) |
-| Density / fullscreen / sticky header | on by default (`enableStickyHeader`) |
+| Density / fullscreen | on by default |
+| Sticky header / footer | on by default (`enableStickyHeader` / `enableStickyFooter`); engages when the surface scrolls (give it a `max-h` or virtualize) |
 | Column filters | `meta.variant`, `meta.filterMode`, `enableColumnFilterModes`, `enableFilterMatchHighlighting` |
 | Global search | `enableGlobalFilter` (fuzzy via match-sorter), `enableGlobalFilterModes` |
 | Column mgmt | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing` |
 | Row mgmt | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers` |
 | Grouping | `enableGrouping` (drop-zone + menu + aggregation rows) |
 | Expansion | `renderDetailPanel`, `getSubRows` (tree); `enableExpanding` auto-derives |
-| Sticky footer | `enableStickyFooter` + per-column `footer` |
+| Footer row | per-column `footer` (rendered whenever defined; sticky by default) |
 | Editing | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditCellSave`/`onSaveRow`/`onCreateRow` |
 | Actions / copy | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy` |
 | Virtualization | `enableRowVirtualization` and `enableColumnVirtualization` (give the surface a bounded height) |

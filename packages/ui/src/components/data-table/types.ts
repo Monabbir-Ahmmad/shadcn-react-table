@@ -262,7 +262,8 @@ export interface UseDataTableOptions<TData extends RowData>
   /** Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping
    *  or when `renderDetailPanel`/`getSubRows` is provided. */
   enableExpanding?: boolean
-  /** Pin the footer (aggregation/footer cells) to the bottom of the surface. */
+  /** Pin the footer (aggregation/footer cells) to the bottom of the surface.
+   *  Default true (matches the sticky header). */
   enableStickyFooter?: boolean
   /** Render an expanding detail panel for each row. */
   renderDetailPanel?: (props: {

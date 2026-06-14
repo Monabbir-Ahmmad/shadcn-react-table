@@ -88,7 +88,7 @@ export function useDataTable<TData extends RowData>(
     onRowOrderChange,
     enableGrouping = false,
     enableExpanding: enableExpandingProp,
-    enableStickyFooter = false,
+    enableStickyFooter = true,
     renderDetailPanel,
     enableEditing = false,
     editDisplayMode = "cell",

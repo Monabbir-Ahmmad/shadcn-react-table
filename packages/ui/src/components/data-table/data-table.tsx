@@ -156,9 +156,11 @@ export function DataTable<TData extends RowData>({
   const filterRowVisible =
     enableColumnFilters && showColumnFilters && anyFilterable
 
-  const showFooter =
-    enableStickyFooter &&
-    table.getAllLeafColumns().some((c) => c.columnDef.footer != null)
+  // Render a footer whenever any column defines one; stickiness is separate
+  // (controlled by enableStickyFooter, on by default).
+  const showFooter = table
+    .getAllLeafColumns()
+    .some((c) => c.columnDef.footer != null)
 
   const columnSizing = table.getState().columnSizing
   const columnSizingInfo = table.getState().columnSizingInfo
@@ -462,7 +464,12 @@ export function DataTable<TData extends RowData>({
             ref={gridRef}
             onKeyDown={onKeyDown}
             className={cn(
-              "relative overflow-auto rounded-md border",
+              // This surface is the single scroll container for both axes, so
+              // the sticky header/footer engage and the horizontal scrollbar
+              // stays pinned to the visible bottom. Neutralize the shadcn
+              // <Table> wrapper's own overflow so it doesn't become a second
+              // (unbounded) scroll container that breaks sticky positioning.
+              "relative overflow-auto rounded-md border [&>[data-slot=table-container]]:overflow-visible",
               enableRowVirtualization && "max-h-[600px]",
               surfaceClassName
             )}
