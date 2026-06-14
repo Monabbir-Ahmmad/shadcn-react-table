@@ -1,0 +1,7 @@
+# Code owners are automatically requested for review on pull requests.
+# https://docs.github.com/en/repositories/managing-your-repos-settings-and-features/customizing-your-repository/about-code-owners
+#
+# The owner must approve before a PR targeting a protected branch can merge
+# (when "Require review from Code Owners" is enabled in branch protection).
+
+* @Monabbir-Ahmmad
