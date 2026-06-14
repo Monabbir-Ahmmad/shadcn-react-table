@@ -17,7 +17,10 @@ export function ThemeToggle() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   React.useEffect(() => setMounted(true), [])
 
-  const isDark = resolvedTheme === "dark"
+  // Theme is unknown during SSR, so treat as light until mounted — this keeps
+  // the label, icon, and handler identical on the server and the first client
+  // render (avoids a hydration mismatch); they update once mounted.
+  const isDark = mounted && resolvedTheme === "dark"
 
   return (
     <Button
@@ -27,7 +30,7 @@ export function ThemeToggle() {
       title="Toggle theme (d)"
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {mounted && isDark ? <RiSunLine /> : <RiMoonLine />}
+      {isDark ? <RiSunLine /> : <RiMoonLine />}
     </Button>
   )
 }
