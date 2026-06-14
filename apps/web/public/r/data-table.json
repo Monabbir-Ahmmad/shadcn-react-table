@@ -17,6 +17,9 @@
     "radix-ui",
     "@remixicon/react"
   ],
+  "devDependencies": [
+    "@types/papaparse"
+  ],
   "registryDependencies": [
     "badge",
     "button",

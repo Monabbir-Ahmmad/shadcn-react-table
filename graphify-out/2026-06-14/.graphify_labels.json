@@ -1,8 +1,10 @@
 {
   "0": "Feature Set & Roadmap",
   "1": "Core Render & Injected Columns",
+  "2": "Community 2",
   "3": "Demo App & Monorepo Wiring",
   "4": "shadcn Primitives & Styling",
+  "5": "Community 5",
   "6": "Cell Rendering & Highlighting",
   "7": "App Shell & Theming",
   "8": "Root & Web Config",

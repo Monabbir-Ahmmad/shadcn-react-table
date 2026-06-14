@@ -31,6 +31,11 @@ const NPM_DEPENDENCIES = [
   "@remixicon/react",
 ]
 
+// Type-only packages for deps that don't ship their own declarations. Without
+// these the consumer's `tsc --noEmit` fails (e.g. papaparse has no bundled
+// types). shadcn installs these into the consumer's devDependencies.
+const DEV_DEPENDENCIES = ["@types/papaparse"]
+
 // shadcn primitives the table imports. Declared as registryDependencies (bare
 // names) so the consumer's `shadcn add` installs them from the shadcn registry
 // in THEIR configured style/baseColor — and skips any they already have. The
@@ -106,6 +111,7 @@ const item = {
   description:
     "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
   dependencies: NPM_DEPENDENCIES,
+  devDependencies: DEV_DEPENDENCIES,
   registryDependencies: REGISTRY_DEPENDENCIES,
   files,
   cssVars,
@@ -131,5 +137,6 @@ writeFileSync(join(OUT, "registry.json"), JSON.stringify(registry, null, 2))
 
 console.log(
   `registry built → apps/web/public/r/data-table.json (${files.length} files, ` +
-    `${item.dependencies.length} npm deps, ${item.registryDependencies.length} registry deps)`
+    `${item.dependencies.length} npm deps, ${item.devDependencies.length} dev deps, ` +
+    `${item.registryDependencies.length} registry deps)`
 )
