@@ -1,7 +1,7 @@
 # Graph Report - cn-table  (2026-06-14)
 
 ## Corpus Check
-- 147 files · ~62,982 words
+- 147 files · ~63,202 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c6ae52c9`
+- Built from commit: `30e26ad0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -132,10 +132,10 @@
 ## Surprising Connections (you probably didn't know these)
 - `Swatch()` --calls--> `cn()`  [EXTRACTED]
   apps/web/components/theme-customizer.tsx → packages/ui/src/lib/utils.ts
-- `Callout()` --calls--> `cn()`  [EXTRACTED]
-  apps/web/components/docs/callout.tsx → packages/ui/src/lib/utils.ts
 - `RootLayout()` --calls--> `cn()`  [EXTRACTED]
   apps/web/app/layout.tsx → packages/ui/src/lib/utils.ts
+- `Callout()` --calls--> `cn()`  [EXTRACTED]
+  apps/web/components/docs/callout.tsx → packages/ui/src/lib/utils.ts
 - `TreeExample()` --calls--> `useDataTable()`  [EXTRACTED]
   apps/web/components/examples/registry.tsx → packages/ui/src/components/data-table/use-data-table.ts
 - `ColumnVirtualizationExample()` --calls--> `useDataTable()`  [EXTRACTED]
@@ -467,7 +467,7 @@ Cohesion: 0.25
 Nodes (6): Popover(), PopoverContent(), PopoverDescription(), PopoverHeader(), PopoverTitle(), PopoverTrigger()
 
 ## Knowledge Gaps
-- **497 isolated node(s):** `Column options`, `DataTable props`, `Icons`, `Localization`, `Table instance (`table.cnTable`)` (+492 more)
+- **497 isolated node(s):** `metadata`, `geist`, `raleway`, `notoSerif`, `geistMono` (+492 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -475,12 +475,12 @@ Nodes (6): Popover(), PopoverContent(), PopoverDescription(), PopoverHeader(), P
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `cn()` connect `Community 99` to `Core Render & Injected Columns`, `Community 100`, `Community 101`, `shadcn Primitives & Styling`, `Community 103`, `App Shell & Theming`, `Toolbar Controls`, `Community 104`, `Community 102`, `Cell Rendering & Highlighting`, `Root & Web Config`, `Community 11`, `Community 15`, `CommandDialog`, `Community 82`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
-- **Why does `useDataTable()` connect `Demo App & Monorepo Wiring` to `shadcn Primitives & Styling`, `Root & Web Config`, `Community 15`, `Community 82`, `Community 30`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+  _High betweenness centrality (0.071) - this node is a cross-community bridge._
 - **Why does `Button()` connect `Community 100` to `Community 99`, `shadcn Primitives & Styling`, `Community 101`, `Community 102`, `Community 103`, `Demo App & Monorepo Wiring`, `Toolbar Controls`, `Community 15`, `CommandDialog`, `Community 58`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Why does `useDataTable()` connect `Demo App & Monorepo Wiring` to `shadcn Primitives & Styling`, `Root & Web Config`, `Community 15`, `Community 82`, `Community 30`?**
   _High betweenness centrality (0.007) - this node is a cross-community bridge._
-- **What connects `Column options`, `DataTable props`, `Icons` to the rest of the system?**
+- **What connects `metadata`, `geist`, `raleway` to the rest of the system?**
   _500 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Feature Set & Roadmap` be split into smaller, more focused modules?**
   _Cohesion score 0.0748663101604278 - nodes in this community are weakly interconnected._

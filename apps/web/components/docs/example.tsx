@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 
 import { EXAMPLES } from "@/components/examples/registry"
 
@@ -25,12 +26,12 @@ export function Example({ slug }: { slug: string }) {
     <div className="my-6 overflow-hidden rounded-lg border">
       <div className="flex items-center justify-between gap-2 border-b bg-muted/40 px-3 py-1.5">
         <span className="text-xs font-medium">{example.title}</span>
-        <a
+        <Link
           href={`/#${example.slug}`}
           className="text-xs text-muted-foreground underline-offset-2 hover:underline"
         >
           Open in examples ↗
-        </a>
+        </Link>
       </div>
       <div className="p-4">
         <Component />
