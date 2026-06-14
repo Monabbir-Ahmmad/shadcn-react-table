@@ -58,7 +58,12 @@ import {
 } from "./data-table-grouping"
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableAlertBanner, DataTableToolbar } from "./data-table-toolbar"
-import { ROW_DRAG_COLUMN_ID, ROW_NUMBER_COLUMN_ID } from "./display-columns"
+import {
+  EXPAND_COLUMN_ID,
+  ROW_DRAG_COLUMN_ID,
+  ROW_NUMBER_COLUMN_ID,
+} from "./display-columns"
+import { ROW_ACTIONS_COLUMN_ID } from "./data-table-row-actions"
 import { SUBSTRING_MODES } from "./filter-fns"
 import { Highlight } from "./highlight"
 import { SELECTION_COLUMN_ID } from "./selection-column"
@@ -85,6 +90,16 @@ const DISPLAY_COLUMN_IDS = new Set([
   SELECTION_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
+])
+
+// All injected (non-user) columns, used to find the first real data column so
+// tree (sub-row) rows can be indented by depth there.
+const NON_DATA_COLUMN_IDS = new Set([
+  SELECTION_COLUMN_ID,
+  ROW_NUMBER_COLUMN_ID,
+  ROW_DRAG_COLUMN_ID,
+  EXPAND_COLUMN_ID,
+  ROW_ACTIONS_COLUMN_ID,
 ])
 
 /**
@@ -217,6 +232,13 @@ export function DataTable<TData extends RowData>({
     table.setColumnOrder(arrayMove(base, oldIndex, newIndex))
   }
 
+  // Tree data (getSubRows) indents the first real data column by row depth so
+  // the hierarchy is visible (grouped rows self-indent via the group cell).
+  const isTreeData = table.options.getSubRows != null
+  const firstDataColumnId = table
+    .getVisibleLeafColumns()
+    .find((c) => !NON_DATA_COLUMN_IDS.has(c.id))?.id
+
   const renderCell = (
     cell: Cell<TData, unknown>,
     row: Row<TData>,
@@ -224,6 +246,13 @@ export function DataTable<TData extends RowData>({
     colIndex: number
   ) => {
     const align = cell.column.columnDef.meta?.align ?? "left"
+    const treeIndent =
+      isTreeData &&
+      cell.column.id === firstDataColumnId &&
+      !cell.getIsGrouped() &&
+      row.depth > 0
+        ? row.depth
+        : 0
     return (
       <TableCell
         key={cell.id}
@@ -260,12 +289,27 @@ export function DataTable<TData extends RowData>({
             "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none focus-visible:-outline-offset-2"
         )}
       >
-        {renderBodyCell(
-          cell,
-          table,
-          enableFilterMatchHighlighting,
-          columnsWithCustomCell,
-          localization
+        {treeIndent > 0 ? (
+          <span
+            className="flex items-center"
+            style={{ paddingInlineStart: `${treeIndent}rem` }}
+          >
+            {renderBodyCell(
+              cell,
+              table,
+              enableFilterMatchHighlighting,
+              columnsWithCustomCell,
+              localization
+            )}
+          </span>
+        ) : (
+          renderBodyCell(
+            cell,
+            table,
+            enableFilterMatchHighlighting,
+            columnsWithCustomCell,
+            localization
+          )
         )}
       </TableCell>
     )
@@ -776,7 +820,13 @@ function renderBodyCell<TData extends RowData>(
   const { row, column } = cell
   const icons = table.cnTable.icons
 
-  if (cell.getIsGrouped()) {
+  // Grouped/aggregated/placeholder cells are a grouping concept. Tree data
+  // (getSubRows) also marks parent rows' cells as "aggregated", which would
+  // bypass normal cell rendering (e.g. the expand chevron). Only take these
+  // branches when grouping is actually active.
+  const isGrouping = table.getState().grouping.length > 0
+
+  if (isGrouping && cell.getIsGrouped()) {
     return (
       <button
         type="button"
@@ -801,14 +851,14 @@ function renderBodyCell<TData extends RowData>(
     )
   }
 
-  if (cell.getIsAggregated()) {
+  if (isGrouping && cell.getIsAggregated()) {
     return flexRender(
       column.columnDef.aggregatedCell ?? column.columnDef.cell,
       cell.getContext()
     )
   }
 
-  if (cell.getIsPlaceholder()) return null
+  if (isGrouping && cell.getIsPlaceholder()) return null
 
   return (
     <DataTableBodyCellContent

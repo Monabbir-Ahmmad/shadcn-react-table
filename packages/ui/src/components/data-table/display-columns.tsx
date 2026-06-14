@@ -49,7 +49,6 @@ export function createExpandColumn<TData extends RowData>(
           aria-label={localization.toggleRowExpanded}
           aria-expanded={row.getIsExpanded()}
           onClick={row.getToggleExpandedHandler()}
-          style={{ marginInlineStart: `${row.depth * 1}rem` }}
           className="flex items-center justify-center text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40"
         >
           {row.getIsExpanded() ? (

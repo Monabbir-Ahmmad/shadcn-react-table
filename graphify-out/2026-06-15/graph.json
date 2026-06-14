@@ -5872,7 +5872,7 @@
       "label": "renderCellContent()",
       "file_type": "code",
       "source_file": "packages/ui/src/components/data-table/data-table.tsx",
-      "source_location": "L881",
+      "source_location": "L875",
       "_origin": "ast",
       "id": "data_table_data_table_rendercellcontent",
       "community": 6,
@@ -5882,7 +5882,7 @@
       "label": "resolveHighlightQuery()",
       "file_type": "code",
       "source_file": "packages/ui/src/components/data-table/data-table.tsx",
-      "source_location": "L906",
+      "source_location": "L900",
       "_origin": "ast",
       "id": "data_table_data_table_resolvehighlightquery",
       "community": 6,
@@ -22944,9 +22944,9 @@
       "source_file": "packages/ui/src/components/data-table/data-table.tsx",
       "source_location": "L66",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "data_table_data_table",
-      "target": "data_table_data_table_row_actions"
+      "target": "data_table_data_table_row_actions",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -23889,9 +23889,9 @@
       "source_file": "packages/ui/src/components/data-table/data-table.tsx",
       "source_location": "L97",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "data_table_data_table",
-      "target": "data_table_data_table_non_data_column_ids"
+      "target": "data_table_data_table_non_data_column_ids",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
