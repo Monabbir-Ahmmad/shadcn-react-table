@@ -34,6 +34,12 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          # Auto-enable Pages (Actions source) if it isn't already.
+          enablement: true
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
