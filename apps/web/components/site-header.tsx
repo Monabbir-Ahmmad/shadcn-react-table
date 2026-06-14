@@ -24,17 +24,17 @@ export function SiteHeader() {
   const pathname = usePathname()
   const { iconLibrary, setIconLibrary } = useIconLibrary()
 
-  const isDocs = pathname?.startsWith("/docs") ?? false
+  const isExamples = pathname?.startsWith("/examples") ?? false
 
   const links = [
-    { href: "/", label: "Examples", active: !isDocs },
-    { href: "/docs", label: "Docs", active: isDocs },
+    { href: "/docs", label: "Docs", active: !isExamples },
+    { href: "/examples", label: "Examples", active: isExamples },
   ]
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b bg-background/80 px-4 py-3 backdrop-blur md:px-6">
       <div className="flex items-center gap-6">
-        <Link href="/" className="text-base font-semibold tracking-tight">
+        <Link href="/docs" className="text-base font-semibold tracking-tight">
           tablecn
         </Link>
         <nav className="hidden items-center gap-4 text-sm md:flex">

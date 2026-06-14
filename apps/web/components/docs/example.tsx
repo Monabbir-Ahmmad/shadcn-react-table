@@ -27,7 +27,7 @@ export function Example({ slug }: { slug: string }) {
       <div className="flex items-center justify-between gap-2 border-b bg-muted/40 px-3 py-1.5">
         <span className="text-xs font-medium">{example.title}</span>
         <Link
-          href={`/#${example.slug}`}
+          href={`/examples#${example.slug}`}
           className="text-xs text-muted-foreground underline-offset-2 hover:underline"
         >
           Open in examples ↗
