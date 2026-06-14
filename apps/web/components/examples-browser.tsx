@@ -3,10 +3,13 @@
 import * as React from "react"
 
 import { Button } from "@monabbir/tablecn/components/button"
+import { DataTableConfigProvider } from "@monabbir/tablecn/components/data-table"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
 import { EXAMPLES, type ExampleDef } from "./examples/registry"
-import { ThemeToggle } from "./theme-toggle"
+import { lucideIcons, type IconLibrary } from "./examples/icon-sets"
+import { ThemeCustomizer } from "./theme-customizer"
+import { readPrefs } from "@/lib/theme-store"
 
 const CATEGORY_ORDER = [
   "Basics",
@@ -35,6 +38,14 @@ function groupByCategory(items: ExampleDef[]) {
 
 export function ExamplesBrowser() {
   const [slug, setSlug] = React.useState(EXAMPLES[0]!.slug)
+  // Default to "remix" for SSR + first client render to avoid an icon
+  // hydration mismatch; sync the saved preference after mount.
+  const [iconLibrary, setIconLibrary] = React.useState<IconLibrary>("remix")
+  React.useEffect(() => {
+    const saved = readPrefs().icons
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (saved !== "remix") setIconLibrary(saved)
+  }, [])
   const groups = React.useMemo(() => groupByCategory(EXAMPLES), [])
   const active = EXAMPLES.find((e) => e.slug === slug) ?? EXAMPLES[0]!
   const ActiveComponent = active.Component
@@ -64,7 +75,10 @@ export function ExamplesBrowser() {
             examples.
           </p>
         </div>
-        <ThemeToggle />
+        <ThemeCustomizer
+          iconLibrary={iconLibrary}
+          onIconLibraryChange={setIconLibrary}
+        />
       </header>
 
       <div className="flex flex-1 flex-col md:flex-row">
@@ -104,7 +118,11 @@ export function ExamplesBrowser() {
             <p className="text-sm text-muted-foreground">{active.description}</p>
           </div>
           {/* Remount per example so each starts from a clean state. */}
-          <ActiveComponent key={active.slug} />
+          <DataTableConfigProvider
+            icons={iconLibrary === "lucide" ? lucideIcons : undefined}
+          >
+            <ActiveComponent key={active.slug} />
+          </DataTableConfigProvider>
         </main>
       </div>
     </div>

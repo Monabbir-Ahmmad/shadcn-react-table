@@ -99,6 +99,11 @@ export { defaultLocalization } from "./localization"
 export type { DataTableLocalization } from "./localization"
 export { defaultIcons } from "./icons"
 export type { DataTableIcons, IconComponent } from "./icons"
+export {
+  DataTableConfigProvider,
+  useDataTableConfigContext,
+} from "./config-context"
+export type { DataTableConfigContextValue } from "./config-context"
 
 // Types
 export {

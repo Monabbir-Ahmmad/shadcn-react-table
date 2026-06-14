@@ -30,6 +30,7 @@ import {
   createRowNumberColumn,
 } from "./display-columns"
 import { createRowActionsColumn } from "./data-table-row-actions"
+import { useDataTableConfigContext } from "./config-context"
 import { defaultIcons } from "./icons"
 import { defaultLocalization } from "./localization"
 import { createSelectionColumn } from "./selection-column"
@@ -116,13 +117,20 @@ export function useDataTable<TData extends RowData>(
     ...tableOptions
   } = options
 
+  // App-wide defaults from a surrounding DataTableConfigProvider (if any) sit
+  // between the built-in defaults and per-call options.
+  const configCtx = useDataTableConfigContext()
   const localization = React.useMemo(
-    () => ({ ...defaultLocalization, ...localizationProp }),
-    [localizationProp]
+    () => ({
+      ...defaultLocalization,
+      ...configCtx.localization,
+      ...localizationProp,
+    }),
+    [configCtx.localization, localizationProp]
   )
   const icons = React.useMemo(
-    () => ({ ...defaultIcons, ...iconsProp }),
-    [iconsProp]
+    () => ({ ...defaultIcons, ...configCtx.icons, ...iconsProp }),
+    [configCtx.icons, iconsProp]
   )
 
   // Expansion turns on for tree data (getSubRows), detail panels, or grouping.

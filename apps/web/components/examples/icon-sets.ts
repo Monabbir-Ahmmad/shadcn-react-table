@@ -1,0 +1,75 @@
+import {
+  ArrowDown,
+  ArrowUp,
+  Calendar,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  ChevronsUpDown,
+  Columns3,
+  Download,
+  EyeOff,
+  FileSpreadsheet,
+  FileText,
+  Filter,
+  FilterX,
+  GripVertical,
+  Group,
+  Maximize2,
+  Minimize2,
+  MoreVertical,
+  Pencil,
+  Pin,
+  PinOff,
+  RotateCcw,
+  Rows3,
+  Search,
+  X,
+} from "lucide-react"
+
+import type { DataTableIcons } from "@monabbir/tablecn/components/data-table"
+
+/**
+ * A full Lucide mapping for every `DataTableIcons` slot, so the customizer can
+ * swap the table's icon set at runtime (via DataTableConfigProvider). Passing
+ * `undefined` instead uses the package default (Remix Icon).
+ */
+export const lucideIcons: DataTableIcons = {
+  sortAscending: ArrowUp,
+  sortDescending: ArrowDown,
+  sortUnsorted: ChevronsUpDown,
+  columnActions: MoreVertical,
+  filter: Filter,
+  filterOff: FilterX,
+  clearAll: RotateCcw,
+  hide: EyeOff,
+  pin: Pin,
+  pinnedRow: Pin,
+  unpin: PinOff,
+  group: Group,
+  columnVisibility: Columns3,
+  density: Rows3,
+  fullscreenEnter: Maximize2,
+  fullscreenExit: Minimize2,
+  search: Search,
+  clear: X,
+  pageFirst: ChevronsLeft,
+  pagePrev: ChevronLeft,
+  pageNext: ChevronRight,
+  pageLast: ChevronsRight,
+  expanded: ChevronDown,
+  collapsed: ChevronRight,
+  dragHandle: GripVertical,
+  edit: Pencil,
+  save: Check,
+  cancel: X,
+  export: Download,
+  fileCsv: FileText,
+  fileExcel: FileSpreadsheet,
+  calendar: Calendar,
+}
+
+export type IconLibrary = "remix" | "lucide"
