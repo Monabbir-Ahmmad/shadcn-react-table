@@ -56,8 +56,9 @@ function RowActionsCell<TData extends RowData>({
       <div className="flex items-center justify-end gap-1">
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon"
           aria-label={localization.save}
+          className="size-7"
           onClick={() =>
             onSaveRow?.({ row, values: rowDraft, table, exit: cancelEdit })
           }
@@ -66,8 +67,9 @@ function RowActionsCell<TData extends RowData>({
         </Button>
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon"
           aria-label={localization.cancel}
+          className="size-7"
           onClick={cancelEdit}
         >
           <icons.cancel />
@@ -85,8 +87,9 @@ function RowActionsCell<TData extends RowData>({
       {canInlineEdit && (
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon"
           aria-label={localization.edit}
+          className="size-7"
           onClick={() => beginRowEdit(row)}
         >
           <icons.edit />

@@ -29,10 +29,14 @@ npx shadcn@latest add https://<your-deployment>/r/data-table.json
 (Deploy `apps/web` anywhere — e.g. Vercel — and the descriptor is served at
 `/r/data-table.json`.)
 
-That copies the data table **and the primitives it needs** into your
-`@/components/ui` (rewriting the import aliases to match your project),
-installs the npm dependencies, and injects the `--highlight` theme token (it
-falls back to `--accent` if dropped). No manual wiring.
+That copies the data-table files into your `@/components/ui/data-table/`
+(rewriting import aliases to match your project), installs the npm
+dependencies, and injects the `--highlight` theme token (falls back to
+`--accent` if dropped). The shadcn **primitives** it relies on (button, table,
+select, …) are pulled from the shadcn registry **in your own configured style**
+(Vega / Nova / Sera / …) and base color — and any you already have are reused,
+not overwritten. The table only uses standard primitive APIs, so it inherits
+whatever look your project uses. No manual wiring.
 
 > **Trying it from this repo:** run the demo (`pnpm dev`) and point the CLI at
 > the locally served descriptor:
@@ -47,11 +51,18 @@ falls back to `--accent` if dropped). No manual wiring.
 <details>
 <summary>Prefer to install manually?</summary>
 
-Copy `packages/ui/src/components/data-table/` (plus the shadcn primitives it
-imports and `lib/utils`) into your `@/components/ui` setup, then add the deps:
+First make sure the shadcn primitives the table uses are in your project (this
+also pulls their own deps like `react-day-picker`, `cmdk`, `radix-ui`):
 
 ```bash
-pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities react-day-picker@^9 date-fns cmdk papaparse xlsx
+npx shadcn@latest add badge button calendar checkbox command context-menu dialog dropdown-menu input label popover select skeleton slider table tooltip
+```
+
+Copy `packages/ui/src/components/data-table/` into your `@/components/ui/data-table/`,
+then add the table's own npm deps:
+
+```bash
+pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns papaparse xlsx @remixicon/react radix-ui
 ```
 
 Only `@tanstack/react-table` is strictly required; the rest are per-feature:
@@ -61,9 +72,10 @@ Only `@tanstack/react-table` is strictly required; the rest are per-feature:
 | `@tanstack/match-sorter-utils` | fuzzy global search |
 | `@tanstack/react-virtual` | row / column virtualization |
 | `@dnd-kit/core` `@dnd-kit/sortable` `@dnd-kit/utilities` | column / row drag-and-drop |
-| `react-day-picker@^9` `date-fns` | date / date-range filters |
-| `cmdk` | faceted multi-select filter |
+| `date-fns` | date / date-range filters |
 | `papaparse` `xlsx` | CSV / Excel export |
+| `@remixicon/react` | default icons (override via the `icons` prop) |
+| `radix-ui` | the indeterminate select-all checkbox |
 
 Tailwind v4 + the shadcn token theme are required. Import the stylesheet **once**
 in your root layout (it ships the `--highlight` token, falling back to
@@ -90,7 +102,8 @@ aggregation, click-to-copy, …) is configured via `columnDef.meta`.
 
 import * as React from "react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { DataTable, useDataTable } from "@monabbir/tablecn/components/data-table"
+// after `shadcn add` it lands here; inside this monorepo it's @monabbir/tablecn/components/data-table
+import { DataTable, useDataTable } from "@/components/ui/data-table"
 
 type Payment = {
   id: string

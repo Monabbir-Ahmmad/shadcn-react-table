@@ -122,10 +122,11 @@ function PaginationButton({
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          size="icon-sm"
+          size="icon"
           aria-label={label}
           onClick={onClick}
           disabled={disabled}
+          className="size-8"
         >
           {children}
         </Button>

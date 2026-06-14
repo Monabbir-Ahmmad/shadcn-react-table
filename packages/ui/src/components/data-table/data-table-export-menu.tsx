@@ -37,8 +37,9 @@ export function DataTableExportMenu<TData extends RowData>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              size="icon-sm"
+              size="icon"
               aria-label={localization.export}
+              className="size-8"
             >
               <icons.export />
             </Button>

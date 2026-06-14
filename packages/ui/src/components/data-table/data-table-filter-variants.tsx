@@ -232,9 +232,10 @@ export function SelectFilterField<TData extends RowData, TValue>({
       {value && (
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon"
           aria-label={localization.clearFilter}
           onClick={() => column.setFilterValue(undefined)}
+          className="size-7"
         >
           <icons.clear />
         </Button>

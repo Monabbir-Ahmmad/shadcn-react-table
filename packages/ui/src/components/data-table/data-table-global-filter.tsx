@@ -77,8 +77,9 @@ export function DataTableGlobalFilter<TData extends RowData>({
         <TooltipTrigger asChild>
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon"
             aria-label={localization.search}
+            className="size-8"
             onClick={() => {
               setExpanded(true)
               requestAnimationFrame(() => inputRef.current?.focus())
@@ -117,9 +118,10 @@ export function DataTableGlobalFilter<TData extends RowData>({
       {value && (
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon"
           aria-label={localization.clearSearch}
           onClick={clear}
+          className="size-7"
         >
           <icons.clear />
         </Button>
@@ -131,8 +133,9 @@ export function DataTableGlobalFilter<TData extends RowData>({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon-xs"
+                  size="icon"
                   aria-label={localization.globalFilterMode}
+                  className="size-7"
                 >
                   <icons.search className="size-3" />
                 </Button>

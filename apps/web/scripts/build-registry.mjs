@@ -14,6 +14,9 @@ const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
 const UI_SRC = join(REPO, "packages/ui/src")
 const OUT = join(REPO, "apps/web/public/r")
 
+// npm packages the data-table source imports directly. The shadcn primitives
+// (below) bring their own deps (radix, cmdk, react-day-picker, cva, …) when the
+// consumer's CLI installs them, so those are intentionally NOT listed here.
 const NPM_DEPENDENCIES = [
   "@tanstack/react-table",
   "@tanstack/match-sorter-utils",
@@ -21,16 +24,34 @@ const NPM_DEPENDENCIES = [
   "@dnd-kit/core",
   "@dnd-kit/sortable",
   "@dnd-kit/utilities",
-  "react-day-picker@^9",
   "date-fns",
-  "cmdk",
   "papaparse",
   "xlsx",
   "radix-ui",
-  "class-variance-authority",
-  "clsx",
-  "tailwind-merge",
   "@remixicon/react",
+]
+
+// shadcn primitives the table imports. Declared as registryDependencies (bare
+// names) so the consumer's `shadcn add` installs them from the shadcn registry
+// in THEIR configured style/baseColor — and skips any they already have. The
+// table only uses standard primitive APIs, so it adapts to any style.
+const REGISTRY_DEPENDENCIES = [
+  "badge",
+  "button",
+  "calendar",
+  "checkbox",
+  "command",
+  "context-menu",
+  "dialog",
+  "dropdown-menu",
+  "input",
+  "label",
+  "popover",
+  "select",
+  "skeleton",
+  "slider",
+  "table",
+  "tooltip",
 ]
 
 // New design tokens this component introduces (shipped via cssVars so the CLI
@@ -62,29 +83,10 @@ function read(relPath) {
   return rewrite(readFileSync(join(UI_SRC, relPath), "utf8"))
 }
 
+// Ship only the data-table module. Primitives + lib/utils come from the
+// consumer's own shadcn setup (via registryDependencies and the standard
+// `@/lib/utils`), so the table inherits their style and nothing is overwritten.
 const files = []
-
-// 1. cn() helper
-files.push({
-  path: "lib/utils.ts",
-  type: "registry:lib",
-  target: "lib/utils.ts",
-  content: read("lib/utils.ts"),
-})
-
-// 2. shadcn primitives the table depends on (radix-sera styled)
-for (const f of readdirSync(join(UI_SRC, "components")).filter((f) =>
-  f.endsWith(".tsx")
-)) {
-  files.push({
-    path: `ui/${f}`,
-    type: "registry:ui",
-    target: `components/ui/${f}`,
-    content: read(`components/${f}`),
-  })
-}
-
-// 3. the data-table module
 for (const f of readdirSync(join(UI_SRC, "components/data-table")).filter(
   (f) => f.endsWith(".ts") || f.endsWith(".tsx")
 )) {
@@ -104,7 +106,7 @@ const item = {
   description:
     "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
   dependencies: NPM_DEPENDENCIES,
-  registryDependencies: [],
+  registryDependencies: REGISTRY_DEPENDENCIES,
   files,
   cssVars,
 }
@@ -128,5 +130,6 @@ writeFileSync(join(OUT, "data-table.json"), JSON.stringify(item, null, 2))
 writeFileSync(join(OUT, "registry.json"), JSON.stringify(registry, null, 2))
 
 console.log(
-  `registry built → apps/web/public/r/data-table.json (${files.length} files, ${item.dependencies.length} deps)`
+  `registry built → apps/web/public/r/data-table.json (${files.length} files, ` +
+    `${item.dependencies.length} npm deps, ${item.registryDependencies.length} registry deps)`
 )

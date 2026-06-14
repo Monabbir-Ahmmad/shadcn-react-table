@@ -29,11 +29,11 @@ export function DataTableFilterToggle<TData extends RowData>({
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          size="icon-sm"
+          size="icon"
           aria-label={label}
           aria-pressed={showColumnFilters}
           onClick={() => setShowColumnFilters((prev) => !prev)}
-          className={cn(showColumnFilters && "bg-muted text-foreground")}
+          className={cn("size-8", showColumnFilters && "bg-muted text-foreground")}
         >
           <icons.filter />
         </Button>
@@ -63,8 +63,9 @@ export function DataTableDensityToggle<TData extends RowData>({
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          size="icon-sm"
+          size="icon"
           aria-label={label}
+          className="size-8"
           onClick={() =>
             setDensity((prev) => {
               const next =
@@ -98,10 +99,11 @@ export function DataTableFullscreenToggle<TData extends RowData>({
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          size="icon-sm"
+          size="icon"
           aria-label={label}
           aria-pressed={isFullscreen}
           onClick={() => setIsFullscreen((prev) => !prev)}
+          className="size-8"
         >
           {isFullscreen ? <icons.fullscreenExit /> : <icons.fullscreenEnter />}
         </Button>

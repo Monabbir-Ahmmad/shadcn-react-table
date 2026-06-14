@@ -43,8 +43,9 @@ export function DataTableViewOptions<TData extends RowData>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              size="icon-sm"
+              size="icon"
               aria-label={localization.columnVisibility}
+              className="size-8"
             >
               <icons.columnVisibility />
             </Button>
