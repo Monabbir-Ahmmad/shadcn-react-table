@@ -138,7 +138,10 @@ export interface DataTableConfig<TData extends RowData> {
   enableGrouping: boolean
   enableExpanding: boolean
   enableStickyFooter: boolean
-  renderDetailPanel?: (props: { row: Row<TData>; table: DataTableInstance<TData> }) => React.ReactNode
+  renderDetailPanel?: (props: {
+    row: Row<TData>
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
 
   // Editing / actions
   enableEditing: boolean
@@ -198,12 +201,24 @@ export interface DataTableConfig<TData extends RowData> {
   exportFileName?: string
   enableStickyHeader: boolean
   enablePagination: boolean
+  positionPagination: "top" | "bottom" | "both" | "none"
   enableRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
+  enableDensityToggle: boolean
+  enableFullscreenToggle: boolean
+  enableToolbarInternalActions: boolean
   enableKeyboardNavigation: boolean
   title?: React.ReactNode
   renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderBottomToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderToolbarInternalActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
+  renderBottomToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 
@@ -219,8 +234,10 @@ export type DataTableInstance<TData extends RowData = unknown> =
  * and adds our presentation/feature options. `getCoreRowModel` and the other
  * row models are supplied with sensible defaults but can be overridden.
  */
-export interface UseDataTableOptions<TData extends RowData>
-  extends Omit<TableOptions<TData>, "getCoreRowModel"> {
+export interface UseDataTableOptions<TData extends RowData> extends Omit<
+  TableOptions<TData>,
+  "getCoreRowModel"
+> {
   getCoreRowModel?: TableOptions<TData>["getCoreRowModel"]
   localization?: Partial<DataTableLocalization>
   /** Override any subset of the table's icons. */
@@ -241,6 +258,25 @@ export interface UseDataTableOptions<TData extends RowData>
   enableGlobalFilterModes?: boolean
   /** Initial global search mode. Default "fuzzy". */
   defaultGlobalFilterMode?: GlobalFilterMode
+  /** Controlled density. Pair with `onDensityChange`; omit for uncontrolled
+   *  (seed the initial value with `defaultDensity`). */
+  density?: Density
+  /** Called whenever the density changes (toolbar toggle or programmatic). */
+  onDensityChange?: (density: Density) => void
+  /** Controlled full-screen state. Pair with `onIsFullscreenChange`. */
+  isFullscreen?: boolean
+  /** Called whenever the full-screen state is toggled. */
+  onIsFullscreenChange?: (isFullscreen: boolean) => void
+  /** Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`;
+   *  omit for uncontrolled (seed with `defaultShowColumnFilters`). */
+  showColumnFilters?: boolean
+  /** Called whenever the filter row is shown or hidden. */
+  onShowColumnFiltersChange?: (showColumnFilters: boolean) => void
+  /** Controlled global search mode. Pair with `onGlobalFilterModeChange`;
+   *  omit for uncontrolled (seed with `defaultGlobalFilterMode`). */
+  globalFilterMode?: GlobalFilterMode
+  /** Called whenever the global search mode changes. */
+  onGlobalFilterModeChange?: (mode: GlobalFilterMode) => void
   /** Drag-and-drop column reordering (adds a grip to each header). */
   enableColumnOrdering?: boolean
   /** Column pinning (left/right) via the column-actions menu + sticky columns. */
@@ -331,11 +367,37 @@ export interface UseDataTableOptions<TData extends RowData>
   exportFileName?: string
   enableStickyHeader?: boolean
   enablePagination?: boolean
+  /** Where the pagination controls render. Default "bottom". "none" keeps
+   *  pagination active but hides the controls. */
+  positionPagination?: "top" | "bottom" | "both" | "none"
   enableTopToolbar?: boolean
   enableBottomToolbar?: boolean
+  /** Show the density toggle in the toolbar. Default true. */
+  enableDensityToggle?: boolean
+  /** Show the full-screen toggle in the toolbar. Default true. */
+  enableFullscreenToggle?: boolean
+  /** Show the toolbar's internal icon-action cluster (search, filters, column
+   *  visibility, export, density, full screen). Default true. Hides the whole
+   *  cluster at once; use the per-item flags for finer control. */
+  enableToolbarInternalActions?: boolean
   enableKeyboardNavigation?: boolean
   title?: React.ReactNode
+  /** Custom content rendered in the top toolbar's left region (next to the
+   *  title), e.g. bulk-action buttons. */
   renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Replace the entire top toolbar with custom content. */
+  renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Replace the entire bottom toolbar (pagination region) with custom content. */
+  renderBottomToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Replace the top toolbar's internal icon-action cluster with custom content. */
+  renderToolbarInternalActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
+  /** Custom content rendered in the bottom toolbar's left region (next to
+   *  pagination), e.g. summary text or actions. */
+  renderBottomToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 

@@ -48,6 +48,17 @@ const FIELD_CLASS =
 
 const BETWEEN_MODES = new Set(["between", "betweenInclusive"])
 
+/**
+ * Shared Calendar props so the month/year dropdowns are usable regardless of
+ * which base Calendar component the consumer ships. The year dropdown derives
+ * its options from the startMonth/endMonth range.
+ */
+const CALENDAR_NAV_PROPS = {
+  captionLayout: "dropdown",
+  startMonth: new Date(new Date().getFullYear() - 100, 0),
+  endMonth: new Date(new Date().getFullYear() + 10, 11),
+} as const
+
 /** A muted pill shown for valueless modes (empty / not empty). */
 function ValuelessLabel({ label }: { label: string }) {
   return (
@@ -374,6 +385,7 @@ export function DateFilterField<TData extends RowData, TValue>({
           selected={value}
           onSelect={(date) => column.setFilterValue(date ?? undefined)}
           autoFocus
+          {...CALENDAR_NAV_PROPS}
         />
       </PopoverContent>
     </Popover>
@@ -419,6 +431,7 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
             )
           }
           autoFocus
+          {...CALENDAR_NAV_PROPS}
         />
       </PopoverContent>
     </Popover>

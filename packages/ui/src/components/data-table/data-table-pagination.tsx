@@ -41,7 +41,10 @@ export function DataTablePagination<TData extends RowData>({
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 py-1">
+    <div
+      data-slot="data-table-pagination"
+      className="flex flex-wrap items-center justify-between gap-4 py-1"
+    >
       <div className="flex items-center gap-2">
         <span className="text-xs font-medium tracking-wide text-muted-foreground">
           {localization.rowsPerPage}
@@ -68,7 +71,7 @@ export function DataTablePagination<TData extends RowData>({
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-xs font-medium tracking-wide tabular-nums text-muted-foreground">
+        <span className="text-xs font-medium tracking-wide text-muted-foreground tabular-nums">
           {localization.paginationRange(start, end, totalRows)}
         </span>
         <div className="flex items-center gap-1">

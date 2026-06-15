@@ -1,14 +1,12 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 
 import { EXAMPLES } from "@/components/examples/registry"
 
 /**
- * Embeds a live example from the shared example registry by slug, so docs and
- * the examples browser render the exact same component. Remounts on slug change
- * for a clean state.
+ * Embeds a live example from the shared example registry by slug. Remounts on
+ * slug change for a clean state.
  */
 export function Example({ slug }: { slug: string }) {
   const example = EXAMPLES.find((e) => e.slug === slug)
@@ -26,12 +24,6 @@ export function Example({ slug }: { slug: string }) {
     <div className="my-6 overflow-hidden rounded-lg border">
       <div className="flex items-center justify-between gap-2 border-b bg-muted/40 px-3 py-1.5">
         <span className="text-xs font-medium">{example.title}</span>
-        <Link
-          href={`/examples#${example.slug}`}
-          className="text-xs text-muted-foreground underline-offset-2 hover:underline"
-        >
-          Open in examples ↗
-        </Link>
       </div>
       <div className="p-4">
         <Component />

@@ -50,6 +50,34 @@ function columnKey(def: { id?: string; accessorKey?: unknown }): string | null {
 }
 
 /**
+ * State that is uncontrolled by default but becomes controlled when a value is
+ * supplied. Either way `onChange` fires, so consumers can observe a change
+ * without taking over ownership. Returns the same tuple shape as `useState` so
+ * existing `Dispatch<SetStateAction<T>>` consumers keep working.
+ */
+function useControllableState<T>(
+  controlled: T | undefined,
+  defaultValue: T,
+  onChange?: (value: T) => void
+): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [uncontrolled, setUncontrolled] = React.useState(defaultValue)
+  const isControlled = controlled !== undefined
+  const value = isControlled ? controlled : uncontrolled
+
+  const setValue = React.useCallback<React.Dispatch<React.SetStateAction<T>>>(
+    (next) => {
+      const resolved =
+        typeof next === "function" ? (next as (prev: T) => T)(value) : next
+      if (!isControlled) setUncontrolled(resolved)
+      onChange?.(resolved)
+    },
+    [isControlled, onChange, value]
+  )
+
+  return [value, setValue]
+}
+
+/**
  * Core hook. Wraps `useReactTable` with MRT-flavoured defaults (row models,
  * auto-injected selection column, localization) and attaches our presentation
  * state + feature flags to the instance as `table.cnTable`. Returns the
@@ -71,14 +99,25 @@ export function useDataTable<TData extends RowData>(
     enableColumnActions = true,
     enableStickyHeader = true,
     enablePagination = true,
+    positionPagination = "bottom",
     enableTopToolbar = true,
     enableBottomToolbar = true,
+    enableDensityToggle = true,
+    enableFullscreenToggle = true,
     enableKeyboardNavigation = true,
     enableColumnFilterModes = true,
     enableFilterMatchHighlighting = true,
     enableGlobalFilter = true,
     enableGlobalFilterModes = true,
     defaultGlobalFilterMode = "fuzzy",
+    density: densityProp,
+    onDensityChange,
+    isFullscreen: isFullscreenProp,
+    onIsFullscreenChange,
+    showColumnFilters: showColumnFiltersProp,
+    onShowColumnFiltersChange,
+    globalFilterMode: globalFilterModeProp,
+    onGlobalFilterModeChange,
     enableColumnOrdering = false,
     enableColumnPinning = false,
     enableColumnResizing = false,
@@ -110,8 +149,13 @@ export function useDataTable<TData extends RowData>(
     virtualOverscan = 8,
     enableExport = false,
     exportFileName,
+    enableToolbarInternalActions = true,
     title,
     renderToolbarActions,
+    renderTopToolbar,
+    renderBottomToolbar,
+    renderToolbarInternalActions,
+    renderBottomToolbarCustomActions,
     renderEmpty,
     columns,
     ...tableOptions
@@ -141,18 +185,27 @@ export function useDataTable<TData extends RowData>(
   // rows carry their own chevron in the grouping cell).
   const needsExpandColumn = !!renderDetailPanel || !!tableOptions.getSubRows
 
-  const [density, setDensity] = React.useState<Density>(defaultDensity)
-  const [isFullscreen, setIsFullscreen] = React.useState(false)
-  const [showColumnFilters, setShowColumnFilters] = React.useState(
-    defaultShowColumnFilters
+  const [density, setDensity] = useControllableState<Density>(
+    densityProp,
+    defaultDensity,
+    onDensityChange
+  )
+  const [isFullscreen, setIsFullscreen] = useControllableState(
+    isFullscreenProp,
+    false,
+    onIsFullscreenChange
+  )
+  const [showColumnFilters, setShowColumnFilters] = useControllableState(
+    showColumnFiltersProp,
+    defaultShowColumnFilters,
+    onShowColumnFiltersChange
   )
   const [columnFilterModes, setColumnFilterModes] = React.useState<
     Record<string, FilterMode>
   >({})
 
   // Editing state
-  const [editingCell, setEditingCell] =
-    React.useState<EditingCell | null>(null)
+  const [editingCell, setEditingCell] = React.useState<EditingCell | null>(null)
   const [editingRowId, setEditingRowId] = React.useState<string | null>(null)
   const [isCreating, setIsCreating] = React.useState(false)
   const [rowDraft, setRowDraft] = React.useState<Record<string, unknown>>({})
@@ -224,7 +277,11 @@ export function useDataTable<TData extends RowData>(
   )
 
   const [globalFilterMode, setGlobalFilterMode] =
-    React.useState<GlobalFilterMode>(defaultGlobalFilterMode)
+    useControllableState<GlobalFilterMode>(
+      globalFilterModeProp,
+      defaultGlobalFilterMode,
+      onGlobalFilterModeChange
+    )
   // Recreating the fn when the mode changes gives it a new identity, which
   // makes TanStack re-run global filtering with the new mode immediately.
   const dynamicGlobalFilterFn = React.useMemo(
@@ -232,9 +289,10 @@ export function useDataTable<TData extends RowData>(
     [globalFilterMode]
   )
 
-  const enableRowSelection = tableOptions.enableRowSelection != null
-    ? !!tableOptions.enableRowSelection
-    : false
+  const enableRowSelection =
+    tableOptions.enableRowSelection != null
+      ? !!tableOptions.enableRowSelection
+      : false
 
   // Columns with a consumer-provided cell renderer are left untouched by
   // auto-highlighting (the consumer owns their markup).
@@ -449,12 +507,20 @@ export function useDataTable<TData extends RowData>(
     exportFileName,
     enableStickyHeader,
     enablePagination,
+    positionPagination,
     enableRowSelection,
     enableTopToolbar,
     enableBottomToolbar,
+    enableDensityToggle,
+    enableFullscreenToggle,
+    enableToolbarInternalActions,
     enableKeyboardNavigation,
     title,
     renderToolbarActions,
+    renderTopToolbar,
+    renderBottomToolbar,
+    renderToolbarInternalActions,
+    renderBottomToolbarCustomActions,
     renderEmpty,
   }
 

@@ -88,6 +88,62 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Initial global search mode. Default \"fuzzy\"."
   },
   {
+    "name": "density",
+    "type": "Density",
+    "required": false,
+    "default": null,
+    "description": "Controlled density. Pair with `onDensityChange`; omit for uncontrolled (seed the initial value with `defaultDensity`)."
+  },
+  {
+    "name": "onDensityChange",
+    "type": "(density: Density) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the density changes (toolbar toggle or programmatic)."
+  },
+  {
+    "name": "isFullscreen",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Controlled full-screen state. Pair with `onIsFullscreenChange`."
+  },
+  {
+    "name": "onIsFullscreenChange",
+    "type": "(isFullscreen: boolean) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the full-screen state is toggled."
+  },
+  {
+    "name": "showColumnFilters",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`; omit for uncontrolled (seed with `defaultShowColumnFilters`)."
+  },
+  {
+    "name": "onShowColumnFiltersChange",
+    "type": "(showColumnFilters: boolean) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the filter row is shown or hidden."
+  },
+  {
+    "name": "globalFilterMode",
+    "type": "GlobalFilterMode",
+    "required": false,
+    "default": null,
+    "description": "Controlled global search mode. Pair with `onGlobalFilterModeChange`; omit for uncontrolled (seed with `defaultGlobalFilterMode`)."
+  },
+  {
+    "name": "onGlobalFilterModeChange",
+    "type": "(mode: GlobalFilterMode) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the global search mode changes."
+  },
+  {
     "name": "enableColumnOrdering",
     "type": "boolean",
     "required": false,
@@ -319,6 +375,13 @@ export const useDataTableOptions: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "positionPagination",
+    "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
+    "required": false,
+    "default": "\"bottom\"",
+    "description": "Where the pagination controls render. Default \"bottom\". \"none\" keeps pagination active but hides the controls."
+  },
+  {
     "name": "enableTopToolbar",
     "type": "boolean",
     "required": false,
@@ -331,6 +394,27 @@ export const useDataTableOptions: ApiMember[] = [
     "required": false,
     "default": "true",
     "description": ""
+  },
+  {
+    "name": "enableDensityToggle",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Show the density toggle in the toolbar. Default true."
+  },
+  {
+    "name": "enableFullscreenToggle",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Show the full-screen toggle in the toolbar. Default true."
+  },
+  {
+    "name": "enableToolbarInternalActions",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control."
   },
   {
     "name": "enableKeyboardNavigation",
@@ -351,7 +435,35 @@ export const useDataTableOptions: ApiMember[] = [
     "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
     "required": false,
     "default": null,
-    "description": ""
+    "description": "Custom content rendered in the top toolbar's left region (next to the title), e.g. bulk-action buttons."
+  },
+  {
+    "name": "renderTopToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the entire top toolbar with custom content."
+  },
+  {
+    "name": "renderBottomToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the entire bottom toolbar (pagination region) with custom content."
+  },
+  {
+    "name": "renderToolbarInternalActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the top toolbar's internal icon-action cluster with custom content."
+  },
+  {
+    "name": "renderBottomToolbarCustomActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Custom content rendered in the bottom toolbar's left region (next to pagination), e.g. summary text or actions."
   },
   {
     "name": "renderEmpty",
@@ -683,7 +795,7 @@ export const tableInstance: ApiMember[] = [
   },
   {
     "name": "renderDetailPanel",
-    "type": "(props: { row: Row<TData>; table: DataTableInstance<TData> }) => React.ReactNode",
+    "type": "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     "required": false,
     "default": null,
     "description": ""
@@ -892,6 +1004,13 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "positionPagination",
+    "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
     "name": "enableRowSelection",
     "type": "boolean",
     "required": true,
@@ -907,6 +1026,27 @@ export const tableInstance: ApiMember[] = [
   },
   {
     "name": "enableBottomToolbar",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "enableDensityToggle",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "enableFullscreenToggle",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "enableToolbarInternalActions",
     "type": "boolean",
     "required": true,
     "default": null,
@@ -929,6 +1069,34 @@ export const tableInstance: ApiMember[] = [
   {
     "name": "renderToolbarActions",
     "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderTopToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderBottomToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderToolbarInternalActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderBottomToolbarCustomActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     "required": false,
     "default": null,
     "description": ""

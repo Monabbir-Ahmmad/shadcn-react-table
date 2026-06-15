@@ -93,7 +93,7 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
             // dnd-kit injects an aria-describedby id that can differ between the
             // server and client render; suppress that benign attribute mismatch.
             suppressHydrationWarning
-            className="-ml-1 flex cursor-grab items-center text-muted-foreground opacity-0 transition-opacity outline-none group-hover/th:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
+            className="-ml-1 flex cursor-grab items-center text-muted-foreground opacity-70 transition-opacity outline-none group-hover/th:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >

@@ -27,9 +27,14 @@ export function DataTableToolbar<TData extends RowData>({
   const {
     title,
     renderToolbarActions,
+    renderToolbarInternalActions,
+    enableToolbarInternalActions,
+    enableGlobalFilter,
     enableColumnFilters,
     enableColumnActions,
     enableExport,
+    enableDensityToggle,
+    enableFullscreenToggle,
     exportFileName,
   } = table.cnTable
 
@@ -38,7 +43,10 @@ export function DataTableToolbar<TData extends RowData>({
     .some((column) => column.getCanFilter())
 
   return (
-    <div className="flex items-start justify-between gap-3 py-1">
+    <div
+      data-slot="data-table-toolbar"
+      className="flex items-start justify-between gap-3 py-1"
+    >
       <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
         {title != null && (
           <div className="text-sm font-semibold tracking-wide">{title}</div>
@@ -46,18 +54,31 @@ export function DataTableToolbar<TData extends RowData>({
         {renderToolbarActions?.({ table })}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1.5">
-        <DataTableGlobalFilter table={table} />
-        {enableColumnFilters && anyFilterable && (
-          <DataTableFilterToggle table={table} />
-        )}
-        {enableColumnActions && <DataTableViewOptions table={table} />}
-        {enableExport && (
-          <DataTableExportMenu table={table} fileName={exportFileName} />
-        )}
-        <DataTableDensityToggle table={table} />
-        <DataTableFullscreenToggle table={table} />
-      </div>
+      {enableToolbarInternalActions && (
+        <div
+          data-slot="data-table-toolbar-actions"
+          className="flex shrink-0 items-center gap-1.5"
+        >
+          {renderToolbarInternalActions ? (
+            renderToolbarInternalActions({ table })
+          ) : (
+            <>
+              {enableGlobalFilter && <DataTableGlobalFilter table={table} />}
+              {enableColumnFilters && anyFilterable && (
+                <DataTableFilterToggle table={table} />
+              )}
+              {enableColumnActions && <DataTableViewOptions table={table} />}
+              {enableExport && (
+                <DataTableExportMenu table={table} fileName={exportFileName} />
+              )}
+              {enableDensityToggle && <DataTableDensityToggle table={table} />}
+              {enableFullscreenToggle && (
+                <DataTableFullscreenToggle table={table} />
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -81,6 +102,7 @@ export function DataTableAlertBanner<TData extends RowData>({
 
   return (
     <div
+      data-slot="data-table-alert-banner"
       className={cn(
         "flex items-center justify-between gap-3 rounded-md border bg-muted px-3 py-2 text-xs font-medium text-muted-foreground"
       )}
