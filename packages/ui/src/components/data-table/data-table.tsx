@@ -70,8 +70,9 @@ import { SELECTION_COLUMN_ID } from "./selection-column"
 import { DENSITY_CELL_PADDING, type DataTableInstance } from "./types"
 import { useGridNavigation } from "./use-grid-navigation"
 
-interface DataTableProps<TData extends RowData>
-  extends React.ComponentProps<"div"> {
+interface DataTableProps<
+  TData extends RowData,
+> extends React.ComponentProps<"div"> {
   table: DataTableInstance<TData>
   /** Page-size options for the bottom pagination control. */
   pageSizeOptions?: number[]
@@ -286,7 +287,7 @@ export function DataTable<TData extends RowData>({
           ALIGN_CELL[align],
           getColumnPinningClass(cell.column),
           enableKeyboardNavigation &&
-            "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none focus-visible:-outline-offset-2"
+            "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:-outline-offset-2 focus-visible:outline-none"
         )}
       >
         {treeIndent > 0 ? (
@@ -383,8 +384,7 @@ export function DataTable<TData extends RowData>({
   const renderRow = (row: Row<TData>) => {
     const rowIndex = runningRowIndex++
     const isGrouped = row.getIsGrouped()
-    const showDetail =
-      !!renderDetailPanel && row.getIsExpanded() && !isGrouped
+    const showDetail = !!renderDetailPanel && row.getIsExpanded() && !isGrouped
 
     return (
       <React.Fragment key={row.id}>
@@ -397,7 +397,9 @@ export function DataTable<TData extends RowData>({
             !isGrouped
           }
           onClick={
-            onRowClick ? (event) => onRowClick({ row, table, event }) : undefined
+            onRowClick
+              ? (event) => onRowClick({ row, table, event })
+              : undefined
           }
           onDoubleClick={
             onRowDoubleClick
@@ -485,6 +487,7 @@ export function DataTable<TData extends RowData>({
   return (
     <TooltipProvider delayDuration={300}>
       <div
+        data-slot="data-table"
         className={cn(
           "flex w-full flex-col gap-2",
           isFullscreen &&
@@ -507,6 +510,7 @@ export function DataTable<TData extends RowData>({
           <div
             ref={gridRef}
             onKeyDown={onKeyDown}
+            data-slot="data-table-surface"
             className={cn(
               // This surface is the single scroll container for both axes, so
               // the sticky header/footer engage and the horizontal scrollbar
@@ -520,6 +524,7 @@ export function DataTable<TData extends RowData>({
           >
             {isLoading && (
               <div
+                data-slot="data-table-progress"
                 className="absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden bg-primary/20"
                 role="presentation"
               >
@@ -613,7 +618,11 @@ export function DataTable<TData extends RowData>({
                             <tr aria-hidden>
                               <td
                                 colSpan={visibleColumnCount}
-                                style={{ height: padTop, padding: 0, border: 0 }}
+                                style={{
+                                  height: padTop,
+                                  padding: 0,
+                                  border: 0,
+                                }}
                               />
                             </tr>
                           )}
@@ -655,7 +664,11 @@ export function DataTable<TData extends RowData>({
                                 onClick={
                                   onRowClick
                                     ? (event) =>
-                                        onRowClick({ row: item.row, table, event })
+                                        onRowClick({
+                                          row: item.row,
+                                          table,
+                                          event,
+                                        })
                                     : undefined
                                 }
                                 onDoubleClick={
@@ -712,7 +725,8 @@ export function DataTable<TData extends RowData>({
                       colSpan={visibleColumnCount}
                       className="h-32 text-center text-sm text-muted-foreground"
                     >
-                      {renderEmpty?.({ table }) ?? localization.noRecordsToDisplay}
+                      {renderEmpty?.({ table }) ??
+                        localization.noRecordsToDisplay}
                     </TableCell>
                   </TableRow>
                 )}
@@ -720,9 +734,7 @@ export function DataTable<TData extends RowData>({
 
               {showFooter && (
                 <TableFooter
-                  className={cn(
-                    enableStickyFooter && "sticky bottom-0 z-20"
-                  )}
+                  className={cn(enableStickyFooter && "sticky bottom-0 z-20")}
                 >
                   {table.getFooterGroups().map((footerGroup) => {
                     const headers = enableColumnVirtualization
@@ -765,13 +777,19 @@ export function DataTable<TData extends RowData>({
             </Table>
 
             {isLoading && hasRows && (
-              <div className="absolute inset-0 z-10 bg-background/40" aria-hidden />
+              <div
+                className="absolute inset-0 z-10 bg-background/40"
+                aria-hidden
+              />
             )}
           </div>
         </DndContext>
 
         {enableBottomToolbar && enablePagination && (
-          <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} />
+          <DataTablePagination
+            table={table}
+            pageSizeOptions={pageSizeOptions}
+          />
         )}
 
         <DataTableEditModal table={table} />

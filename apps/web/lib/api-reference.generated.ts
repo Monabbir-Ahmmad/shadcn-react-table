@@ -88,6 +88,62 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Initial global search mode. Default \"fuzzy\"."
   },
   {
+    "name": "density",
+    "type": "Density",
+    "required": false,
+    "default": null,
+    "description": "Controlled density. Pair with `onDensityChange`; omit for uncontrolled (seed the initial value with `defaultDensity`)."
+  },
+  {
+    "name": "onDensityChange",
+    "type": "(density: Density) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the density changes (toolbar toggle or programmatic)."
+  },
+  {
+    "name": "isFullscreen",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Controlled full-screen state. Pair with `onIsFullscreenChange`."
+  },
+  {
+    "name": "onIsFullscreenChange",
+    "type": "(isFullscreen: boolean) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the full-screen state is toggled."
+  },
+  {
+    "name": "showColumnFilters",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`; omit for uncontrolled (seed with `defaultShowColumnFilters`)."
+  },
+  {
+    "name": "onShowColumnFiltersChange",
+    "type": "(showColumnFilters: boolean) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the filter row is shown or hidden."
+  },
+  {
+    "name": "globalFilterMode",
+    "type": "GlobalFilterMode",
+    "required": false,
+    "default": null,
+    "description": "Controlled global search mode. Pair with `onGlobalFilterModeChange`; omit for uncontrolled (seed with `defaultGlobalFilterMode`)."
+  },
+  {
+    "name": "onGlobalFilterModeChange",
+    "type": "(mode: GlobalFilterMode) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the global search mode changes."
+  },
+  {
     "name": "enableColumnOrdering",
     "type": "boolean",
     "required": false,

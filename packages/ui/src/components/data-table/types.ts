@@ -138,7 +138,10 @@ export interface DataTableConfig<TData extends RowData> {
   enableGrouping: boolean
   enableExpanding: boolean
   enableStickyFooter: boolean
-  renderDetailPanel?: (props: { row: Row<TData>; table: DataTableInstance<TData> }) => React.ReactNode
+  renderDetailPanel?: (props: {
+    row: Row<TData>
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
 
   // Editing / actions
   enableEditing: boolean
@@ -221,8 +224,10 @@ export type DataTableInstance<TData extends RowData = unknown> =
  * and adds our presentation/feature options. `getCoreRowModel` and the other
  * row models are supplied with sensible defaults but can be overridden.
  */
-export interface UseDataTableOptions<TData extends RowData>
-  extends Omit<TableOptions<TData>, "getCoreRowModel"> {
+export interface UseDataTableOptions<TData extends RowData> extends Omit<
+  TableOptions<TData>,
+  "getCoreRowModel"
+> {
   getCoreRowModel?: TableOptions<TData>["getCoreRowModel"]
   localization?: Partial<DataTableLocalization>
   /** Override any subset of the table's icons. */
@@ -243,6 +248,25 @@ export interface UseDataTableOptions<TData extends RowData>
   enableGlobalFilterModes?: boolean
   /** Initial global search mode. Default "fuzzy". */
   defaultGlobalFilterMode?: GlobalFilterMode
+  /** Controlled density. Pair with `onDensityChange`; omit for uncontrolled
+   *  (seed the initial value with `defaultDensity`). */
+  density?: Density
+  /** Called whenever the density changes (toolbar toggle or programmatic). */
+  onDensityChange?: (density: Density) => void
+  /** Controlled full-screen state. Pair with `onIsFullscreenChange`. */
+  isFullscreen?: boolean
+  /** Called whenever the full-screen state is toggled. */
+  onIsFullscreenChange?: (isFullscreen: boolean) => void
+  /** Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`;
+   *  omit for uncontrolled (seed with `defaultShowColumnFilters`). */
+  showColumnFilters?: boolean
+  /** Called whenever the filter row is shown or hidden. */
+  onShowColumnFiltersChange?: (showColumnFilters: boolean) => void
+  /** Controlled global search mode. Pair with `onGlobalFilterModeChange`;
+   *  omit for uncontrolled (seed with `defaultGlobalFilterMode`). */
+  globalFilterMode?: GlobalFilterMode
+  /** Called whenever the global search mode changes. */
+  onGlobalFilterModeChange?: (mode: GlobalFilterMode) => void
   /** Drag-and-drop column reordering (adds a grip to each header). */
   enableColumnOrdering?: boolean
   /** Column pinning (left/right) via the column-actions menu + sticky columns. */
