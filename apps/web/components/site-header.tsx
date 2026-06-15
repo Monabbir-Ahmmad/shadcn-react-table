@@ -13,22 +13,19 @@ import { ThemeCustomizer } from "@/components/theme-customizer"
 const GITHUB_URL = "https://github.com/Monabbir-Ahmmad/tablecn"
 
 /**
- * The shared top bar for both the examples browser and the docs site: brand,
- * primary nav (with active state), and the theme customizer.
- *
- * The examples page owns the icon-library state (it feeds a
- * DataTableConfigProvider), so it passes `iconLibrary` / `onIconLibraryChange`
- * in. Elsewhere the header manages its own local state.
+ * The shared top bar for the docs site: brand, primary nav (with active
+ * state), and the theme customizer.
  */
 export function SiteHeader() {
   const pathname = usePathname()
   const { iconLibrary, setIconLibrary } = useIconLibrary()
 
-  const isExamples = pathname?.startsWith("/examples") ?? false
-
   const links = [
-    { href: "/docs", label: "Docs", active: !isExamples },
-    { href: "/examples", label: "Examples", active: isExamples },
+    {
+      href: "/docs",
+      label: "Docs",
+      active: pathname?.startsWith("/docs") ?? true,
+    },
   ]
 
   return (

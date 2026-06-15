@@ -35,9 +35,28 @@ table.cnTable.setDensity("compact")
 
 This is handy when you want to drive density from your own controls instead of the built-in toolbar button.
 
+## Hiding the toolbar button
+
+Each toolbar control can be hidden individually. Pass `enableDensityToggle: false` to drop the density button (for example when you drive density from your own UI), or `enableFullscreenToggle: false` to drop the full-screen button:
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableDensityToggle: false,
+  enableFullscreenToggle: false,
+})
+```
+
+The other toolbar options have their own flags too: `enableGlobalFilter`, `enableColumnFilters`, `enableColumnActions`, and `enableExport`. To remove the entire top toolbar, use `enableTopToolbar: false`.
+
 <Callout variant="tip" title="Persisting density">
-`density` is plain state on the table instance, so you can mirror it into local storage or a query param and restore it via `defaultDensity` on the next load.
+  `density` is plain state on the table instance, so you can mirror it into
+  local storage or a query param and restore it via `defaultDensity` on the next
+  load.
 </Callout>
 
 ## Related
+
 - [Table instance](/docs/api/table-instance)

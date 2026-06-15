@@ -5701,7 +5701,7 @@
       "label": "DataTableAlertBanner()",
       "file_type": "code",
       "source_file": "packages/ui/src/components/data-table/data-table-toolbar.tsx",
-      "source_location": "L69",
+      "source_location": "L72",
       "_origin": "ast",
       "id": "data_table_data_table_toolbar_datatablealertbanner",
       "community": 2,
@@ -6471,7 +6471,7 @@
       "label": "DataTableInstance",
       "file_type": "code",
       "source_file": "packages/ui/src/components/data-table/types.ts",
-      "source_location": "L211",
+      "source_location": "L213",
       "_origin": "ast",
       "id": "data_table_types_datatableinstance",
       "community": 2,
@@ -6481,7 +6481,7 @@
       "label": "UseDataTableOptions",
       "file_type": "code",
       "source_file": "packages/ui/src/components/data-table/types.ts",
-      "source_location": "L222",
+      "source_location": "L224",
       "_origin": "ast",
       "id": "data_table_types_usedatatableoptions",
       "community": 0,
@@ -6491,7 +6491,7 @@
       "label": "DENSITY_ORDER",
       "file_type": "code",
       "source_file": "packages/ui/src/components/data-table/types.ts",
-      "source_location": "L342",
+      "source_location": "L348",
       "_origin": "ast",
       "id": "data_table_types_density_order",
       "community": 0,
@@ -6501,7 +6501,7 @@
       "label": "DENSITY_CELL_PADDING",
       "file_type": "code",
       "source_file": "packages/ui/src/components/data-table/types.ts",
-      "source_location": "L345",
+      "source_location": "L351",
       "_origin": "ast",
       "id": "data_table_types_density_cell_padding",
       "community": 0,
@@ -21657,9 +21657,9 @@
       "source_file": "packages/ui/src/components/data-table/data-table-filter-variants.tsx",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "data_table_data_table_filter_variants",
-      "target": "data_table_data_table_filter_variants_calendar_nav_props",
-      "confidence_score": 1.0
+      "target": "data_table_data_table_filter_variants_calendar_nav_props"
     },
     {
       "relation": "contains",
@@ -30958,5 +30958,5 @@
       "source_file": "apps/web/app/docs/usage/page.mdx"
     }
   ],
-  "built_at_commit": "40013c3058a783761296b7c5cbfbba0a30f81f25"
+  "built_at_commit": "b4945004ea49c6069eb088b9556e8d1bf3502606"
 }

@@ -333,6 +333,20 @@ export const useDataTableOptions: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "enableDensityToggle",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Show the density toggle in the toolbar. Default true."
+  },
+  {
+    "name": "enableFullscreenToggle",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Show the full-screen toggle in the toolbar. Default true."
+  },
+  {
     "name": "enableKeyboardNavigation",
     "type": "boolean",
     "required": false,
@@ -907,6 +921,20 @@ export const tableInstance: ApiMember[] = [
   },
   {
     "name": "enableBottomToolbar",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "enableDensityToggle",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "enableFullscreenToggle",
     "type": "boolean",
     "required": true,
     "default": null,
