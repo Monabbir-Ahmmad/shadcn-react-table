@@ -45,14 +45,7 @@ yarn-error.log*
 next-env.d.ts
 
 # graphify (knowledge graph)
-# Keep the queryable graph + report committed (the graphify workflow in
-# CLAUDE.md expects graphify-out/graph.json to exist); ignore the regenerable
-# cache, generated viz, and local interpreter/state files.
-graphify-out/cache/
-graphify-out/cost.json
-graphify-out/manifest.json
-graphify-out/graph.html
-graphify-out/.graphify_*
+graphify-out/
 
 # Claude Code: share project settings, ignore per-developer local overrides
 .claude/settings.local.json
