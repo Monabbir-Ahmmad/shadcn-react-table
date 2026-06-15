@@ -14,7 +14,7 @@ export const DEFAULT_PREFS: ThemePrefs = {
   accent: "lime",
   base: "neutral",
   font: "raleway",
-  radius: "0.45rem",
+  radius: "0rem",
   icons: "remix",
 }
 

@@ -27,9 +27,12 @@ export function DataTableToolbar<TData extends RowData>({
   const {
     title,
     renderToolbarActions,
+    enableGlobalFilter,
     enableColumnFilters,
     enableColumnActions,
     enableExport,
+    enableDensityToggle,
+    enableFullscreenToggle,
     exportFileName,
   } = table.cnTable
 
@@ -47,7 +50,7 @@ export function DataTableToolbar<TData extends RowData>({
       </div>
 
       <div className="flex shrink-0 items-center gap-1.5">
-        <DataTableGlobalFilter table={table} />
+        {enableGlobalFilter && <DataTableGlobalFilter table={table} />}
         {enableColumnFilters && anyFilterable && (
           <DataTableFilterToggle table={table} />
         )}
@@ -55,8 +58,8 @@ export function DataTableToolbar<TData extends RowData>({
         {enableExport && (
           <DataTableExportMenu table={table} fileName={exportFileName} />
         )}
-        <DataTableDensityToggle table={table} />
-        <DataTableFullscreenToggle table={table} />
+        {enableDensityToggle && <DataTableDensityToggle table={table} />}
+        {enableFullscreenToggle && <DataTableFullscreenToggle table={table} />}
       </div>
     </div>
   )

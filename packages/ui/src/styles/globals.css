@@ -31,7 +31,7 @@
     --chart-3: oklch(0.648 0.2 131.684);
     --chart-4: oklch(0.532 0.157 131.589);
     --chart-5: oklch(0.453 0.124 130.933);
-    --radius: 0.45rem;
+    --radius: 0rem;
     --highlight: oklch(0.905 0.158 96.5);
     --highlight-foreground: oklch(0.35 0.07 72);
     --sidebar: oklch(0.985 0 0);

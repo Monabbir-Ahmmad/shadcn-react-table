@@ -201,6 +201,8 @@ export interface DataTableConfig<TData extends RowData> {
   enableRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
+  enableDensityToggle: boolean
+  enableFullscreenToggle: boolean
   enableKeyboardNavigation: boolean
   title?: React.ReactNode
   renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
@@ -333,6 +335,10 @@ export interface UseDataTableOptions<TData extends RowData>
   enablePagination?: boolean
   enableTopToolbar?: boolean
   enableBottomToolbar?: boolean
+  /** Show the density toggle in the toolbar. Default true. */
+  enableDensityToggle?: boolean
+  /** Show the full-screen toggle in the toolbar. Default true. */
+  enableFullscreenToggle?: boolean
   enableKeyboardNavigation?: boolean
   title?: React.ReactNode
   renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
