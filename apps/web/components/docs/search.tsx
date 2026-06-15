@@ -45,12 +45,19 @@ function loadPagefind(): Promise<Pagefind> {
 }
 
 /**
- * Normalize Pagefind's stored url to an app route. Pagefind stores it relative
- * to the export root (no base path), which is exactly what `router.push` wants —
- * the router prepends the base path itself, so we must NOT add it here.
+ * Normalize Pagefind's stored url to a base-path-relative app route.
+ *
+ * Pagefind derives the url from the built HTML, which embeds the full
+ * base-path-prefixed route (e.g. `/tablecn/docs/guides/toolbar`). `router.push`
+ * prepends the base path itself, so we strip any leading base path here to avoid
+ * doubling it (`/tablecn/tablecn/…`).
  */
 function toHref(url: string): string {
-  return url.replace(/\.html$/, "").replace(/index$/, "")
+  let path = url.replace(/\.html$/, "")
+  if (BASE_PATH && path.startsWith(BASE_PATH)) {
+    path = path.slice(BASE_PATH.length) || "/"
+  }
+  return path
 }
 
 export function DocsSearch() {
