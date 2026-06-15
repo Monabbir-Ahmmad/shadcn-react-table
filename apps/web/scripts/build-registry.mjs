@@ -92,10 +92,12 @@ function read(relPath) {
 // consumer's own shadcn setup (via registryDependencies and the standard
 // `@/lib/utils`), so the table inherits their style and nothing is overwritten.
 //
-// The module is organized into layered subfolders (components/, hooks/, fns/,
-// utils/, locales/), so we walk recursively and preserve each file's subpath in
-// the registry `path`/`target`. The table's internal imports are relative, so
-// the consumer's install must reproduce the same nested layout to resolve them.
+// The module has a small public root (data-table, use-data-table, types,
+// config-context, icons, localization, export-utils + the index barrel) and an
+// internal/ subtree of building blocks, so we walk recursively and preserve
+// each file's subpath in the registry `path`/`target`. The table's internal
+// imports are relative, so the consumer's install must reproduce the same
+// nested layout to resolve them.
 const DT_DIR = join(UI_SRC, "components/data-table")
 function walk(dir) {
   const out = []

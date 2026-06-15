@@ -10,9 +10,13 @@ import type {
 
 import type { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual"
 
-import type { DataTableLocalization } from "./locales/localization"
-import type { FilterMode, GlobalFilterMode } from "./fns/filter-fns"
+import type { DataTableLocalization } from "./localization"
+import type { FilterMode, GlobalFilterMode } from "./internal/fns/filter-fns"
 import type { DataTableIcons } from "./icons"
+
+// Re-exported as part of the public type surface: these describe column-`meta`
+// filter config, while the runtime filter fns stay internal.
+export type { FilterMode, GlobalFilterMode } from "./internal/fns/filter-fns"
 
 export type Density = "compact" | "comfortable" | "spacious"
 
