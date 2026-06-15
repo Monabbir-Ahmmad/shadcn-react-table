@@ -7,7 +7,8 @@
     "dev": "next dev",
     "api:build": "node scripts/build-api-docs.mjs",
     "registry:build": "node scripts/build-registry.mjs",
-    "build": "node scripts/build-api-docs.mjs && node scripts/build-registry.mjs && next build",
+    "search:build": "node scripts/build-search-index.mjs",
+    "build": "node scripts/build-api-docs.mjs && node scripts/build-registry.mjs && next build && node scripts/build-search-index.mjs",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
@@ -38,6 +39,7 @@
     "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9",
+    "pagefind": "^1.5.2",
     "ts-morph": "^28.0.0",
     "typescript": "^5"
   }

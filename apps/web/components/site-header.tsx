@@ -8,6 +8,7 @@ import { Button } from "@monabbir/tablecn/components/button"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
 import { DocsMobileNav } from "@/components/docs/mobile-nav"
+import { DocsSearch } from "@/components/docs/search"
 import { useIconLibrary } from "@/components/icon-library-provider"
 import { ThemeCustomizer } from "@/components/theme-customizer"
 
@@ -55,6 +56,7 @@ export function SiteHeader() {
         </nav>
       </div>
       <div className="flex items-center gap-2">
+        <DocsSearch />
         <Button
           asChild
           variant="outline"

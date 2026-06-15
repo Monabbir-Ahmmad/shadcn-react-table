@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@monabbir/tablecn"],
   // Let `page.mdx` files act as routes alongside ts/tsx.
   pageExtensions: ["ts", "tsx", "mdx"],
+  // Exposed to the client so the docs search can load the Pagefind runtime from
+  // the correct (base-path-prefixed) static URL.
+  env: { NEXT_PUBLIC_BASE_PATH: basePath ?? "" },
   ...(isPages
     ? {
         output: "export",
