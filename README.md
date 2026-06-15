@@ -17,6 +17,8 @@ The table component lives in
 — that README has the complete API and every feature flag. A browsable example
 of every feature is in [`apps/web`](apps/web) (`pnpm dev`).
 
+📖 [View the full documentation](https://monabbir-ahmmad.github.io/tablecn)
+
 ## Installation
 
 tablecn ships as a **shadcn registry**, so in any shadcn/ui project (Tailwind
