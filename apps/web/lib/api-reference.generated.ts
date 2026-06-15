@@ -43,7 +43,42 @@ export const useDataTableOptions: ApiMember[] = [
     "type": "boolean",
     "required": false,
     "default": "false",
-    "description": ""
+    "description": "Show the loading affordances (progress bar; skeletons when empty; a dimming overlay over existing rows). Toggle each independently below."
+  },
+  {
+    "name": "isSaving",
+    "type": "boolean",
+    "required": false,
+    "default": "false",
+    "description": "Show the progress bar for an in-flight save/mutation. Defaults the progress bar on without replacing rows with skeletons."
+  },
+  {
+    "name": "showProgressBars",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Show the top progress bar. Default: `isLoading || isSaving`."
+  },
+  {
+    "name": "showSkeletons",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Replace the body with skeleton rows while empty. Default: `isLoading`."
+  },
+  {
+    "name": "showLoadingOverlay",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Dim existing rows with an overlay while loading. Default: `isLoading`."
+  },
+  {
+    "name": "enableFacetedValues",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Compute faceted unique values / min-max (auto select options + range bounds). Default true; disable to skip the faceted row models."
   },
   {
     "name": "enableColumnActions",
@@ -767,6 +802,41 @@ export const tableInstance: ApiMember[] = [
   },
   {
     "name": "isLoading",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "isSaving",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "showProgressBars",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "showSkeletons",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "showLoadingOverlay",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "enableFacetedValues",
     "type": "boolean",
     "required": true,
     "default": null,

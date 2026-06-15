@@ -43,8 +43,37 @@ if (table.cnTable.isLoading) {
 ```
 
 <Callout variant="tip" title="Pairs well with server-side data">
-Set `isLoading` to `true` before a request and back to `false` when it resolves so users always see the skeletons while new pages or filtered results load.
+  Set `isLoading` to `true` before a request and back to `false` when it
+  resolves so users always see the skeletons while new pages or filtered results
+  load.
 </Callout>
 
+## Saving state
+
+For an in-flight mutation (rather than an initial load), set `isSaving: true`. It shows the progress bar without replacing rows with skeletons, so the current data stays visible while the save runs.
+
+```tsx
+useDataTable({ data, columns, getRowId: (row) => row.id, isSaving })
+```
+
+## Choosing which affordances show
+
+`isLoading` turns on three affordances together; override any of them independently:
+
+- `showProgressBars` — the top progress bar (default `isLoading || isSaving`).
+- `showSkeletons` — skeleton rows while the body is empty (default `isLoading`).
+- `showLoadingOverlay` — a dimming overlay over existing rows (default `isLoading`).
+
+```tsx
+useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  isLoading,
+  showSkeletons: false, // keep rows visible, just dim + show the progress bar
+})
+```
+
 ## Related
+
 - [Server-side data](/docs/guides/server-side)

@@ -96,6 +96,11 @@ export function useDataTable<TData extends RowData>(
     defaultDensity = "comfortable",
     defaultShowColumnFilters = false,
     isLoading = false,
+    isSaving = false,
+    showProgressBars: showProgressBarsProp,
+    showSkeletons: showSkeletonsProp,
+    showLoadingOverlay: showLoadingOverlayProp,
+    enableFacetedValues = true,
     enableColumnActions = true,
     enableStickyHeader = true,
     enablePagination = true,
@@ -192,6 +197,13 @@ export function useDataTable<TData extends RowData>(
   // An expand column is needed for tree sub-rows or detail panels (grouped
   // rows carry their own chevron in the grouping cell).
   const needsExpandColumn = !!renderDetailPanel || !!tableOptions.getSubRows
+
+  // Loading affordances: each can be forced on/off, else derived from the
+  // loading/saving flags (progress bar for either; skeletons + overlay only
+  // for the initial data load).
+  const showProgressBars = showProgressBarsProp ?? (isLoading || isSaving)
+  const showSkeletons = showSkeletonsProp ?? isLoading
+  const showLoadingOverlay = showLoadingOverlayProp ?? isLoading
 
   const [density, setDensity] = useControllableState<Density>(
     densityProp,
@@ -421,16 +433,20 @@ export function useDataTable<TData extends RowData>(
       ? tableOptions.getFilteredRowModel
       : (tableOptions.getFilteredRowModel ?? getFilteredRowModel()),
     // Client-side faceting powers select/multi-select option lists + counts and
-    // range-slider bounds. Unavailable in manual mode (server supplies facets).
-    getFacetedRowModel: isManualFiltering
-      ? tableOptions.getFacetedRowModel
-      : (tableOptions.getFacetedRowModel ?? getFacetedRowModel()),
-    getFacetedUniqueValues: isManualFiltering
-      ? tableOptions.getFacetedUniqueValues
-      : (tableOptions.getFacetedUniqueValues ?? getFacetedUniqueValues()),
-    getFacetedMinMaxValues: isManualFiltering
-      ? tableOptions.getFacetedMinMaxValues
-      : (tableOptions.getFacetedMinMaxValues ?? getFacetedMinMaxValues()),
+    // range-slider bounds. Skipped in manual mode (server supplies facets) or
+    // when `enableFacetedValues` is off.
+    getFacetedRowModel:
+      isManualFiltering || !enableFacetedValues
+        ? tableOptions.getFacetedRowModel
+        : (tableOptions.getFacetedRowModel ?? getFacetedRowModel()),
+    getFacetedUniqueValues:
+      isManualFiltering || !enableFacetedValues
+        ? tableOptions.getFacetedUniqueValues
+        : (tableOptions.getFacetedUniqueValues ?? getFacetedUniqueValues()),
+    getFacetedMinMaxValues:
+      isManualFiltering || !enableFacetedValues
+        ? tableOptions.getFacetedMinMaxValues
+        : (tableOptions.getFacetedMinMaxValues ?? getFacetedMinMaxValues()),
     getPaginationRowModel:
       !enablePagination || tableOptions.manualPagination
         ? tableOptions.getPaginationRowModel
@@ -490,6 +506,11 @@ export function useDataTable<TData extends RowData>(
     enableGlobalFilter,
     enableGlobalFilterModes,
     isLoading,
+    isSaving,
+    showProgressBars,
+    showSkeletons,
+    showLoadingOverlay,
+    enableFacetedValues,
     enableColumnActions,
     enableColumnFilters,
     enableColumnFilterModes,

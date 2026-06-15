@@ -149,6 +149,11 @@ export interface DataTableConfig<TData extends RowData> {
   enableGlobalFilter: boolean
   enableGlobalFilterModes: boolean
   isLoading: boolean
+  isSaving: boolean
+  showProgressBars: boolean
+  showSkeletons: boolean
+  showLoadingOverlay: boolean
+  enableFacetedValues: boolean
   enableColumnActions: boolean
   enableColumnFilters: boolean
   enableColumnFilterModes: boolean
@@ -285,7 +290,21 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   defaultDensity?: Density
   /** Initially show the filter row. Uncontrolled. */
   defaultShowColumnFilters?: boolean
+  /** Show the loading affordances (progress bar; skeletons when empty; a dimming
+   *  overlay over existing rows). Toggle each independently below. */
   isLoading?: boolean
+  /** Show the progress bar for an in-flight save/mutation. Defaults the progress
+   *  bar on without replacing rows with skeletons. */
+  isSaving?: boolean
+  /** Show the top progress bar. Default: `isLoading || isSaving`. */
+  showProgressBars?: boolean
+  /** Replace the body with skeleton rows while empty. Default: `isLoading`. */
+  showSkeletons?: boolean
+  /** Dim existing rows with an overlay while loading. Default: `isLoading`. */
+  showLoadingOverlay?: boolean
+  /** Compute faceted unique values / min-max (auto select options + range
+   *  bounds). Default true; disable to skip the faceted row models. */
+  enableFacetedValues?: boolean
   enableColumnActions?: boolean
   /** Show the filter-mode menu adornment on filter fields. Default true. */
   enableColumnFilterModes?: boolean

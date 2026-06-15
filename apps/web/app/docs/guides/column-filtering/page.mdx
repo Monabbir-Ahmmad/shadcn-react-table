@@ -58,6 +58,11 @@ Matched substrings in cells are highlighted by default. Disable it for the whole
 
 Set `enableColumnFilter: false` on a column to remove its filter control entirely.
 
+## Faceted values
+
+Select / multi-select filters auto-derive their options, and range filters their min/max bounds, from the data's faceted values. This is on by default; set `enableFacetedValues: false` to skip computing the faceted row models (e.g. for very large client-side datasets) — then provide `meta.options` explicitly for select-style filters.
+
 ## Related
+
 - [Filter modes](/docs/guides/filter-modes)
 - [Column options](/docs/api/column-options)

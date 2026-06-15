@@ -121,7 +121,9 @@ export function DataTable<TData extends RowData>({
   const {
     density,
     isFullscreen,
-    isLoading,
+    showProgressBars,
+    showSkeletons,
+    showLoadingOverlay,
     showColumnFilters,
     enableColumnFilters,
     enableFilterMatchHighlighting,
@@ -538,7 +540,7 @@ export function DataTable<TData extends RowData>({
               surfaceClassName
             )}
           >
-            {isLoading && (
+            {showProgressBars && (
               <div
                 data-slot="data-table-progress"
                 className="absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden bg-primary/20"
@@ -611,7 +613,7 @@ export function DataTable<TData extends RowData>({
               </TableHeader>
 
               <TableBody>
-                {isLoading && !hasRows ? (
+                {showSkeletons && !hasRows ? (
                   <SkeletonRows
                     rowCount={
                       enablePagination
@@ -795,7 +797,7 @@ export function DataTable<TData extends RowData>({
               )}
             </Table>
 
-            {isLoading && hasRows && (
+            {showLoadingOverlay && hasRows && (
               <div
                 className="absolute inset-0 z-10 bg-background/40"
                 aria-hidden
