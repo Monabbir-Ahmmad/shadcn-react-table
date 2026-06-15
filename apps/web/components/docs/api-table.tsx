@@ -39,6 +39,12 @@ export function ApiTable({
     return only.map((name) => byName.get(name)).filter(Boolean) as ApiMember[]
   }, [all, only])
 
+  // Drop columns that carry no data for this section (e.g. slots have no
+  // Type/Default; refs have no Default).
+  const showType = rows.some((r) => r.type)
+  const showDefault = rows.some((r) => r.default != null)
+  const colCount = 2 + (showType ? 1 : 0) + (showDefault ? 1 : 0)
+
   const showSearch = search ?? !only
   const [query, setQuery] = React.useState("")
   const q = query.trim().toLowerCase()
@@ -75,8 +81,10 @@ export function ApiTable({
           <thead>
             <tr className="border-b bg-muted/50 text-left">
               <th className="px-3 py-2 font-medium">{propLabel}</th>
-              <th className="px-3 py-2 font-medium">Type</th>
-              <th className="px-3 py-2 font-medium">Default</th>
+              {showType && <th className="px-3 py-2 font-medium">Type</th>}
+              {showDefault && (
+                <th className="px-3 py-2 font-medium">Default</th>
+              )}
               <th className="px-3 py-2 font-medium">Description</th>
             </tr>
           </thead>
@@ -84,7 +92,7 @@ export function ApiTable({
             {filtered.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={colCount}
                   className="px-3 py-6 text-center text-muted-foreground"
                 >
                   No matches.
@@ -104,18 +112,22 @@ export function ApiTable({
                       )}
                     </code>
                   </td>
-                  <td className="px-3 py-2">
-                    <code className="font-mono text-xs text-muted-foreground">
-                      {row.type}
-                    </code>
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap">
-                    {row.default != null ? (
-                      <code className="font-mono text-xs">{row.default}</code>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </td>
+                  {showType && (
+                    <td className="px-3 py-2">
+                      <code className="font-mono text-xs text-muted-foreground">
+                        {row.type}
+                      </code>
+                    </td>
+                  )}
+                  {showDefault && (
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {row.default != null ? (
+                        <code className="font-mono text-xs">{row.default}</code>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-3 py-2 text-muted-foreground">
                     {row.description || "—"}
                   </td>

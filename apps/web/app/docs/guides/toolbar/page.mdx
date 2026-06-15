@@ -101,13 +101,7 @@ useDataTable({
 
 Every toolbar slot exposes a `data-slot` attribute, so you can target it with a Tailwind selector instead of a styling prop — no per-slot props needed:
 
-| Slot                                 | `data-slot`                  |
-| ------------------------------------ | ---------------------------- |
-| Top toolbar                          | `data-table-toolbar`         |
-| Internal actions cluster             | `data-table-toolbar-actions` |
-| Selection alert banner               | `data-table-alert-banner`    |
-| Bottom toolbar (with custom actions) | `data-table-bottom-toolbar`  |
-| Pagination                           | `data-table-pagination`      |
+<ApiTable of="slots" propLabel="Slot" only={["data-table-toolbar", "data-table-toolbar-actions", "data-table-alert-banner", "data-table-bottom-toolbar", "data-table-pagination"]} />
 
 ```tsx
 <DataTable table={table} className="[&_[data-slot=data-table-toolbar]]:px-2" />

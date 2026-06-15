@@ -2266,3 +2266,121 @@ export const iconSlots: ApiMember[] = [
     "description": ""
   }
 ]
+
+export const tableRefs: ApiMember[] = [
+  {
+    "name": "tablePaperRef",
+    "type": "React.RefObject<HTMLDivElement | null>",
+    "required": true,
+    "default": null,
+    "description": "The outermost `data-slot=\"data-table\"` wrapper. Always present."
+  },
+  {
+    "name": "tableContainerRef",
+    "type": "React.RefObject<HTMLDivElement | null>",
+    "required": true,
+    "default": null,
+    "description": "The scroll container (`data-slot=\"data-table-surface\"`) — the single scroll container for both axes. Always present."
+  },
+  {
+    "name": "topToolbarRef",
+    "type": "React.RefObject<HTMLDivElement | null>",
+    "required": true,
+    "default": null,
+    "description": "The top toolbar root (`data-slot=\"data-table-toolbar\"`). `null` when the top toolbar is disabled or replaced via `renderTopToolbar`."
+  },
+  {
+    "name": "bottomToolbarRef",
+    "type": "React.RefObject<HTMLDivElement | null>",
+    "required": true,
+    "default": null,
+    "description": "The bottom toolbar root (`data-slot=\"data-table-bottom-toolbar\"`). `null` when there is no bottom toolbar, or it is replaced via `renderBottomToolbar`."
+  },
+  {
+    "name": "tableHeadRef",
+    "type": "React.RefObject<HTMLTableSectionElement | null>",
+    "required": true,
+    "default": null,
+    "description": "The `<thead>` element. Always present."
+  },
+  {
+    "name": "tableFooterRef",
+    "type": "React.RefObject<HTMLTableSectionElement | null>",
+    "required": true,
+    "default": null,
+    "description": "The `<tfoot>` element. `null` unless a column defines a `footer`."
+  },
+  {
+    "name": "searchInputRef",
+    "type": "React.RefObject<HTMLInputElement | null>",
+    "required": true,
+    "default": null,
+    "description": "The global-search `<input>`. `null` until the search box is expanded."
+  }
+]
+
+export const slots: ApiMember[] = [
+  {
+    "name": "data-table",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Outermost wrapper element."
+  },
+  {
+    "name": "data-table-alert-banner",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Selection alert banner."
+  },
+  {
+    "name": "data-table-bottom-toolbar",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Bottom toolbar (custom actions and/or pagination)."
+  },
+  {
+    "name": "data-table-create-row",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Inline create row (createDisplayMode: \"row\")."
+  },
+  {
+    "name": "data-table-pagination",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Pagination controls."
+  },
+  {
+    "name": "data-table-progress",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Indeterminate progress bar shown while loading or saving."
+  },
+  {
+    "name": "data-table-surface",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "The scroll container for the table (both axes)."
+  },
+  {
+    "name": "data-table-toolbar",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Top toolbar root."
+  },
+  {
+    "name": "data-table-toolbar-actions",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": "Internal actions cluster (search, filters, density, full screen, …)."
+  }
+]

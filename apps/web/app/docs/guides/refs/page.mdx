@@ -20,15 +20,7 @@ return <DataTable table={table} />
 
 ## Available refs
 
-| Ref | Element | Notes |
-| --- | --- | --- |
-| `tablePaperRef` | outer `div` (`data-slot="data-table"`) | Always present. |
-| `tableContainerRef` | scroll surface (`data-slot="data-table-surface"`) | The single scroll container for both axes. |
-| `topToolbarRef` | top toolbar `div` | `null` when the top toolbar is disabled or fully replaced via `renderTopToolbar`. |
-| `bottomToolbarRef` | bottom toolbar `div` | `null` when there is no bottom toolbar (no pagination and no custom actions), or when replaced via `renderBottomToolbar`. |
-| `tableHeadRef` | `thead` | Always present. |
-| `tableFooterRef` | `tfoot` | `null` unless a column defines a `footer`. |
-| `searchInputRef` | global-search `input` | `null` until the search box is expanded. |
+<ApiTable of="tableRefs" propLabel="Ref" />
 
 <Callout variant="warning" title="Populated after mount">
   Refs are `null` during the first render and on the server. Read them inside an

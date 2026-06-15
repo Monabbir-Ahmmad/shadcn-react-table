@@ -51,19 +51,23 @@ export type ColumnVirtualizerOptions<TData extends RowData> = ValueOrFunc<
  * footer, `searchInputRef` before the search box is expanded).
  */
 export interface DataTableRefs {
-  /** The outermost `data-slot="data-table"` wrapper. */
+  /** The outermost `data-slot="data-table"` wrapper. Always present. */
   tablePaperRef: React.RefObject<HTMLDivElement | null>
-  /** The scroll container (`data-slot="data-table-surface"`). */
+  /** The scroll container (`data-slot="data-table-surface"`) — the single
+   *  scroll container for both axes. Always present. */
   tableContainerRef: React.RefObject<HTMLDivElement | null>
-  /** The top toolbar root (`data-slot="data-table-toolbar"`). */
+  /** The top toolbar root (`data-slot="data-table-toolbar"`). `null` when the
+   *  top toolbar is disabled or replaced via `renderTopToolbar`. */
   topToolbarRef: React.RefObject<HTMLDivElement | null>
-  /** The bottom toolbar root (`data-slot="data-table-bottom-toolbar"`). */
+  /** The bottom toolbar root (`data-slot="data-table-bottom-toolbar"`). `null`
+   *  when there is no bottom toolbar, or it is replaced via
+   *  `renderBottomToolbar`. */
   bottomToolbarRef: React.RefObject<HTMLDivElement | null>
-  /** The `<thead>` element. */
+  /** The `<thead>` element. Always present. */
   tableHeadRef: React.RefObject<HTMLTableSectionElement | null>
-  /** The `<tfoot>` element. */
+  /** The `<tfoot>` element. `null` unless a column defines a `footer`. */
   tableFooterRef: React.RefObject<HTMLTableSectionElement | null>
-  /** The global-search `<input>`. */
+  /** The global-search `<input>`. `null` until the search box is expanded. */
   searchInputRef: React.RefObject<HTMLInputElement | null>
 }
 
