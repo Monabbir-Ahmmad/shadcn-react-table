@@ -135,6 +135,6 @@ function SortIndicator({
   if (sorted === "asc") return <icons.sortAscending className="size-3.5" />
   if (sorted === "desc") return <icons.sortDescending className="size-3.5" />
   return (
-    <icons.sortUnsorted className="size-3.5 opacity-0 transition-opacity group-hover/th:opacity-50" />
+    <icons.sortUnsorted className="size-3.5 opacity-50 transition-opacity group-hover/th:opacity-70" />
   )
 }
