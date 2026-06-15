@@ -5,7 +5,7 @@ import type { RowData } from "@tanstack/react-table"
 
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import { DataTableExportMenu } from "./data-table-export-menu"
+import { DataTableExportMenu } from "../menus/data-table-export-menu"
 import { DataTableGlobalFilter } from "./data-table-global-filter"
 import {
   DataTableDensityToggle,
@@ -13,7 +13,7 @@ import {
   DataTableFullscreenToggle,
 } from "./data-table-toolbar-controls"
 import { DataTableViewOptions } from "./data-table-view-options"
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 /**
  * Top toolbar. Left region: title slot + consumer toolbar actions. Right

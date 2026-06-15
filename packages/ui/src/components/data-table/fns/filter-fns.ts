@@ -2,7 +2,7 @@ import type { FilterFn, RowData } from "@tanstack/react-table"
 import { rankItem } from "@tanstack/match-sorter-utils"
 import { isAfter, isBefore, startOfDay } from "date-fns"
 
-import type { FilterVariant } from "./types"
+import type { FilterVariant } from "../types"
 
 /** Global-search modes offered in the global filter-mode menu. */
 export type GlobalFilterMode =

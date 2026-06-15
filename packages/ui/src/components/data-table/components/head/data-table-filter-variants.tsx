@@ -32,11 +32,11 @@ import {
 import { Slider } from "@monabbir/tablecn/components/slider"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import { getColumnLabel } from "./data-table-column-actions"
-import { getEffectiveMode } from "./data-table-filter-mode-menu"
-import { VALUELESS_MODES } from "./filter-fns"
-import type { IconComponent } from "./icons"
-import type { DataTableFilterOption, DataTableInstance } from "./types"
+import { getColumnLabel } from "../menus/data-table-column-actions"
+import { getEffectiveMode } from "../menus/data-table-filter-mode-menu"
+import { VALUELESS_MODES } from "../../fns/filter-fns"
+import type { IconComponent } from "../../icons"
+import type { DataTableFilterOption, DataTableInstance } from "../../types"
 
 export interface FilterFieldProps<TData extends RowData, TValue> {
   column: Column<TData, TValue>

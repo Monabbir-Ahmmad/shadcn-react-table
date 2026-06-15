@@ -5,7 +5,7 @@
 // and writes the registry-item JSON. Run from the repo root:
 //   node apps/web/scripts/build-registry.mjs
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs"
-import { join, dirname } from "node:path"
+import { join, dirname, relative } from "node:path"
 import { fileURLToPath } from "node:url"
 
 // Anchor to the repo root from this file (apps/web/scripts/), so the script
@@ -91,15 +91,32 @@ function read(relPath) {
 // Ship only the data-table module. Primitives + lib/utils come from the
 // consumer's own shadcn setup (via registryDependencies and the standard
 // `@/lib/utils`), so the table inherits their style and nothing is overwritten.
+//
+// The module is organized into layered subfolders (components/, hooks/, fns/,
+// utils/, locales/), so we walk recursively and preserve each file's subpath in
+// the registry `path`/`target`. The table's internal imports are relative, so
+// the consumer's install must reproduce the same nested layout to resolve them.
+const DT_DIR = join(UI_SRC, "components/data-table")
+function walk(dir) {
+  const out = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const abs = join(dir, entry.name)
+    if (entry.isDirectory()) out.push(...walk(abs))
+    else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx"))
+      out.push(abs)
+  }
+  return out
+}
+
 const files = []
-for (const f of readdirSync(join(UI_SRC, "components/data-table")).filter(
-  (f) => f.endsWith(".ts") || f.endsWith(".tsx")
-)) {
+for (const abs of walk(DT_DIR).sort()) {
+  // Forward-slash subpath (e.g. "filtering/filter-fns.ts") for portability.
+  const sub = relative(DT_DIR, abs).split("\\").join("/")
   files.push({
-    path: `ui/data-table/${f}`,
+    path: `ui/data-table/${sub}`,
     type: "registry:ui",
-    target: `components/ui/data-table/${f}`,
-    content: read(`components/data-table/${f}`),
+    target: `components/ui/data-table/${sub}`,
+    content: read(`components/data-table/${sub}`),
   })
 }
 

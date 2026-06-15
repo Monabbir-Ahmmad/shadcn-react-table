@@ -2,11 +2,11 @@ import type { Column, Row, RowData } from "@tanstack/react-table"
 import Papa from "papaparse"
 import * as XLSX from "xlsx"
 
-import { getColumnLabel } from "./data-table-column-actions"
-import { EXPAND_COLUMN_ID, ROW_DRAG_COLUMN_ID, ROW_NUMBER_COLUMN_ID } from "./display-columns"
-import { ROW_ACTIONS_COLUMN_ID } from "./data-table-row-actions"
-import { SELECTION_COLUMN_ID } from "./selection-column"
-import type { DataTableInstance } from "./types"
+import { getColumnLabel } from "../components/menus/data-table-column-actions"
+import { EXPAND_COLUMN_ID, ROW_DRAG_COLUMN_ID, ROW_NUMBER_COLUMN_ID } from "../hooks/display-columns/display-columns"
+import { ROW_ACTIONS_COLUMN_ID } from "../hooks/display-columns/data-table-row-actions"
+import { SELECTION_COLUMN_ID } from "../hooks/display-columns/selection-column"
+import type { DataTableInstance } from "../types"
 
 const NON_DATA_COLUMNS = new Set([
   SELECTION_COLUMN_ID,

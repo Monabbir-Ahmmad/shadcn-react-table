@@ -8,9 +8,9 @@ import { CSS } from "@dnd-kit/utilities"
 import { TableHead, TableRow } from "@monabbir/tablecn/components/table"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import { getColumnPinningClass, getColumnPinningStyle } from "./column-styles"
-import { RowDragContext } from "./display-columns"
-import type { DataTableInstance } from "./types"
+import { getColumnPinningClass, getColumnPinningStyle } from "../../utils/column-styles"
+import { RowDragContext } from "../../hooks/display-columns/display-columns"
+import type { DataTableInstance } from "../../types"
 
 /** Drag handle to grab the resize edge of a column header. */
 export function ColumnResizeHandle<TData extends RowData, TValue>({

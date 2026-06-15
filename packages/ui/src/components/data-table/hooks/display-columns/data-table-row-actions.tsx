@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@monabbir/tablecn/components/dropdown-menu"
 
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
 

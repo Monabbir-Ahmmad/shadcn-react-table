@@ -9,10 +9,10 @@ import {
   ContextMenuTrigger,
 } from "@monabbir/tablecn/components/context-menu"
 
-import { ClickToCopy } from "./click-to-copy"
-import { getColumnLabel } from "./data-table-column-actions"
+import { ClickToCopy } from "../body/click-to-copy"
+import { getColumnLabel } from "../menus/data-table-column-actions"
 import { DataTableEditField } from "./data-table-edit-field"
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 /** A column is editable when it has an accessor and isn't opted out via meta. */
 export function isColumnEditable<TData extends RowData, TValue>(

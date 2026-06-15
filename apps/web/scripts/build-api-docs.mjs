@@ -18,10 +18,10 @@ const project = new Project({
 })
 
 const typesSf = project.addSourceFileAtPath(join(DT, "types.ts"))
-const localeSf = project.addSourceFileAtPath(join(DT, "localization.ts"))
+const localeSf = project.addSourceFileAtPath(join(DT, "locales/localization.ts"))
 const iconsSf = project.addSourceFileAtPath(join(DT, "icons.tsx"))
-const hookSf = project.addSourceFileAtPath(join(DT, "use-data-table.ts"))
-const tableSf = project.addSourceFileAtPath(join(DT, "data-table.tsx"))
+const hookSf = project.addSourceFileAtPath(join(DT, "hooks/use-data-table.ts"))
+const tableSf = project.addSourceFileAtPath(join(DT, "components/data-table.tsx"))
 
 const oneLine = (s) => (s ?? "").replace(/\s+/g, " ").trim()
 
@@ -162,9 +162,19 @@ const SLOT_DESCRIPTIONS = {
   "data-table-create-row": 'Inline create row (createDisplayMode: "row").',
 }
 const slotValues = new Set()
-for (const file of readdirSync(DT)) {
-  if (!file.endsWith(".tsx")) continue
-  const text = readFileSync(join(DT, file), "utf8")
+// data-slot markers live in .tsx files spread across the feature subfolders, so
+// walk the tree rather than just the top level.
+function walkTsx(dir) {
+  const out = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const abs = join(dir, entry.name)
+    if (entry.isDirectory()) out.push(...walkTsx(abs))
+    else if (entry.name.endsWith(".tsx")) out.push(abs)
+  }
+  return out
+}
+for (const file of walkTsx(DT)) {
+  const text = readFileSync(file, "utf8")
   for (const m of text.matchAll(/data-slot="(data-table[^"]*)"/g)) {
     slotValues.add(m[1])
   }

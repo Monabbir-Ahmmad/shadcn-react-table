@@ -15,8 +15,8 @@ import {
   TooltipTrigger,
 } from "@monabbir/tablecn/components/tooltip"
 
-import { exportToCsv, exportToExcel } from "./export-utils"
-import type { DataTableInstance } from "./types"
+import { exportToCsv, exportToExcel } from "../../utils/export-utils"
+import type { DataTableInstance } from "../../types"
 
 /**
  * Toolbar export menu (CSV / Excel). Exports the selected rows when any are

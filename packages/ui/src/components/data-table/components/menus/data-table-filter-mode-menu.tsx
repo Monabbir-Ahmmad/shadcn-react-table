@@ -22,8 +22,8 @@ import {
   defaultModeForVariant,
   modeOptionsForVariant,
   type FilterMode,
-} from "./filter-fns"
-import type { DataTableInstance } from "./types"
+} from "../../fns/filter-fns"
+import type { DataTableInstance } from "../../types"
 
 /** Effective filter mode for a column: explicit selection → meta → variant default. */
 export function getEffectiveMode<TData extends RowData, TValue>(

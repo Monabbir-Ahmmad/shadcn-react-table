@@ -5,10 +5,10 @@ import type { Column, RowData } from "@tanstack/react-table"
 import { Button } from "@monabbir/tablecn/components/button"
 import { TableCell, TableRow } from "@monabbir/tablecn/components/table"
 
-import { getColumnLabel } from "./data-table-column-actions"
+import { getColumnLabel } from "../menus/data-table-column-actions"
 import { isColumnEditable } from "./data-table-edit-cell"
 import { DataTableEditField } from "./data-table-edit-field"
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 /**
  * Inline create row for `createDisplayMode: "row"`. Renders an editor per

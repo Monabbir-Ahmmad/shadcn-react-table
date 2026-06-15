@@ -10,8 +10,8 @@ import type {
 
 import type { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual"
 
-import type { DataTableLocalization } from "./localization"
-import type { FilterMode, GlobalFilterMode } from "./filter-fns"
+import type { DataTableLocalization } from "./locales/localization"
+import type { FilterMode, GlobalFilterMode } from "./fns/filter-fns"
 import type { DataTableIcons } from "./icons"
 
 export type Density = "compact" | "comfortable" | "spacious"

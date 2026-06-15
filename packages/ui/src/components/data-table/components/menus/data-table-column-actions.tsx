@@ -17,7 +17,7 @@ import {
 } from "@monabbir/tablecn/components/tooltip"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 interface DataTableColumnActionsProps<TData extends RowData, TValue> {
   column: Column<TData, TValue>

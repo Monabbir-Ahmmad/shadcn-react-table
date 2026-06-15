@@ -21,8 +21,8 @@ import {
 } from "@monabbir/tablecn/components/tooltip"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import type { GlobalFilterMode } from "./filter-fns"
-import type { DataTableInstance } from "./types"
+import type { GlobalFilterMode } from "../../fns/filter-fns"
+import type { DataTableInstance } from "../../types"
 
 const GLOBAL_MODES: GlobalFilterMode[] = [
   "fuzzy",

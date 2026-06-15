@@ -5,8 +5,8 @@ import type { ColumnDef, RowData } from "@tanstack/react-table"
 
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import type { DataTableIcons, IconComponent } from "./icons"
-import type { DataTableLocalization } from "./localization"
+import type { DataTableIcons, IconComponent } from "../../icons"
+import type { DataTableLocalization } from "../../locales/localization"
 
 export const ROW_NUMBER_COLUMN_ID = "cn-row-number"
 export const ROW_DRAG_COLUMN_ID = "cn-row-drag"

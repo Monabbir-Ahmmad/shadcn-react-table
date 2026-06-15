@@ -6,8 +6,8 @@ import { useDroppable } from "@dnd-kit/core"
 import { Badge } from "@monabbir/tablecn/components/badge"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import { getColumnLabel } from "./data-table-column-actions"
-import type { DataTableInstance } from "./types"
+import { getColumnLabel } from "../menus/data-table-column-actions"
+import type { DataTableInstance } from "../../types"
 
 export const GROUP_DROPZONE_ID = "cn-group-dropzone"
 

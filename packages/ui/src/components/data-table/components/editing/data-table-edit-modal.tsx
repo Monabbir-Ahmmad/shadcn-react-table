@@ -12,10 +12,10 @@ import {
 } from "@monabbir/tablecn/components/dialog"
 import { Label } from "@monabbir/tablecn/components/label"
 
-import { getColumnLabel } from "./data-table-column-actions"
+import { getColumnLabel } from "../menus/data-table-column-actions"
 import { DataTableEditField } from "./data-table-edit-field"
 import { isColumnEditable } from "./data-table-edit-cell"
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any

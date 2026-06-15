@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@monabbir/tablecn/components/tooltip"
 
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: DataTableInstance<TData>

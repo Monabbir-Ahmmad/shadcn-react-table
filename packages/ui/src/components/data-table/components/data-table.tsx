@@ -46,31 +46,31 @@ import {
   getColumnPinningStyle,
   getColumnSizeVars,
   getColumnWidthStyle,
-} from "./column-styles"
-import { DataTableColumnFilter } from "./data-table-column-filter"
-import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableCreateRow } from "./data-table-create-row"
-import { DataTableBodyRow, DataTableHeadCell } from "./data-table-dnd"
-import { DataTableBodyCellContent } from "./data-table-edit-cell"
-import { DataTableEditModal } from "./data-table-edit-modal"
-import { getEffectiveMode } from "./data-table-filter-mode-menu"
+} from "../utils/column-styles"
+import { DataTableColumnFilter } from "./head/data-table-column-filter"
+import { DataTableColumnHeader } from "./head/data-table-column-header"
+import { DataTableCreateRow } from "./editing/data-table-create-row"
+import { DataTableBodyRow, DataTableHeadCell } from "./body/data-table-dnd"
+import { DataTableBodyCellContent } from "./editing/data-table-edit-cell"
+import { DataTableEditModal } from "./editing/data-table-edit-modal"
+import { getEffectiveMode } from "./menus/data-table-filter-mode-menu"
 import {
   DataTableDropToGroupZone,
   GROUP_DROPZONE_ID,
-} from "./data-table-grouping"
-import { DataTablePagination } from "./data-table-pagination"
-import { DataTableAlertBanner, DataTableToolbar } from "./data-table-toolbar"
+} from "./toolbar/data-table-grouping"
+import { DataTablePagination } from "./toolbar/data-table-pagination"
+import { DataTableAlertBanner, DataTableToolbar } from "./toolbar/data-table-toolbar"
 import {
   EXPAND_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
-} from "./display-columns"
-import { ROW_ACTIONS_COLUMN_ID } from "./data-table-row-actions"
-import { SUBSTRING_MODES } from "./filter-fns"
-import { Highlight } from "./highlight"
-import { SELECTION_COLUMN_ID } from "./selection-column"
-import { DENSITY_CELL_PADDING, type DataTableInstance } from "./types"
-import { useGridNavigation } from "./use-grid-navigation"
+} from "../hooks/display-columns/display-columns"
+import { ROW_ACTIONS_COLUMN_ID } from "../hooks/display-columns/data-table-row-actions"
+import { SUBSTRING_MODES } from "../fns/filter-fns"
+import { Highlight } from "./body/highlight"
+import { SELECTION_COLUMN_ID } from "../hooks/display-columns/selection-column"
+import { DENSITY_CELL_PADDING, type DataTableInstance } from "../types"
+import { useGridNavigation } from "../hooks/use-grid-navigation"
 
 interface DataTableProps<
   TData extends RowData,

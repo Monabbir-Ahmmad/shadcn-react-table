@@ -17,8 +17,8 @@ import {
   TooltipTrigger,
 } from "@monabbir/tablecn/components/tooltip"
 
-import { getColumnLabel } from "./data-table-column-actions"
-import type { DataTableInstance } from "./types"
+import { getColumnLabel } from "../menus/data-table-column-actions"
+import type { DataTableInstance } from "../../types"
 
 /**
  * Column visibility menu (toolbar icon cluster). Lists every hideable column

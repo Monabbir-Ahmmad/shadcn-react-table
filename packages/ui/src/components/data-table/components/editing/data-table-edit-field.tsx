@@ -12,7 +12,7 @@ import {
 } from "@monabbir/tablecn/components/select"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import type { DataTableFilterOption, EditVariant } from "./types"
+import type { DataTableFilterOption, EditVariant } from "../../types"
 
 const FIELD_CLASS =
   "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"

@@ -2,7 +2,7 @@
 
 import type { Header, RowData } from "@tanstack/react-table"
 
-import { DataTableFilterModeMenu } from "./data-table-filter-mode-menu"
+import { DataTableFilterModeMenu } from "../menus/data-table-filter-mode-menu"
 import {
   CheckboxFilterField,
   DateFilterField,
@@ -14,7 +14,7 @@ import {
   TextFilterField,
   type FilterFieldProps,
 } from "./data-table-filter-variants"
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 interface DataTableColumnFilterProps<TData extends RowData, TValue> {
   header: Header<TData, TValue>

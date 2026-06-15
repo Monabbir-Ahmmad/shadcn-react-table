@@ -10,8 +10,8 @@ import {
 } from "@monabbir/tablecn/components/tooltip"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import { DENSITY_ORDER } from "./types"
-import type { DataTableInstance } from "./types"
+import { DENSITY_ORDER } from "../../types"
+import type { DataTableInstance } from "../../types"
 
 /** Funnel toggle that shows/hides the filter row. */
 export function DataTableFilterToggle<TData extends RowData>({

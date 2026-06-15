@@ -20,9 +20,9 @@ import {
 } from "@monabbir/tablecn/components/tooltip"
 import { cn } from "@monabbir/tablecn/lib/utils"
 
-import { DataTableColumnActions, getColumnLabel } from "./data-table-column-actions"
+import { DataTableColumnActions, getColumnLabel } from "../menus/data-table-column-actions"
 import { DataTableColumnFilter } from "./data-table-column-filter"
-import type { DataTableInstance } from "./types"
+import type { DataTableInstance } from "../../types"
 
 interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
   header: Header<TData, TValue>

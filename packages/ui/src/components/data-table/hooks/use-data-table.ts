@@ -23,24 +23,24 @@ import {
   VALUELESS_MODES,
   type FilterMode,
   type GlobalFilterMode,
-} from "./filter-fns"
+} from "../fns/filter-fns"
 import {
   createExpandColumn,
   createRowDragHandleColumn,
   createRowNumberColumn,
-} from "./display-columns"
-import { createRowActionsColumn } from "./data-table-row-actions"
-import { useDataTableConfigContext } from "./config-context"
-import { defaultIcons } from "./icons"
-import { defaultLocalization } from "./localization"
-import { createSelectionColumn } from "./selection-column"
+} from "./display-columns/display-columns"
+import { createRowActionsColumn } from "./display-columns/data-table-row-actions"
+import { useDataTableConfigContext } from "../config-context"
+import { defaultIcons } from "../icons"
+import { defaultLocalization } from "../locales/localization"
+import { createSelectionColumn } from "./display-columns/selection-column"
 import type {
   DataTableConfig,
   DataTableInstance,
   Density,
   EditingCell,
   UseDataTableOptions,
-} from "./types"
+} from "../types"
 
 /** Best-effort column id used to key per-column filter modes. */
 function columnKey(def: { id?: string; accessorKey?: unknown }): string | null {
