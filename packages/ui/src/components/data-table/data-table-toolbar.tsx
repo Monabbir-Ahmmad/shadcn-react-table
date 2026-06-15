@@ -27,6 +27,8 @@ export function DataTableToolbar<TData extends RowData>({
   const {
     title,
     renderToolbarActions,
+    renderToolbarInternalActions,
+    enableToolbarInternalActions,
     enableGlobalFilter,
     enableColumnFilters,
     enableColumnActions,
@@ -52,21 +54,31 @@ export function DataTableToolbar<TData extends RowData>({
         {renderToolbarActions?.({ table })}
       </div>
 
-      <div
-        data-slot="data-table-toolbar-actions"
-        className="flex shrink-0 items-center gap-1.5"
-      >
-        {enableGlobalFilter && <DataTableGlobalFilter table={table} />}
-        {enableColumnFilters && anyFilterable && (
-          <DataTableFilterToggle table={table} />
-        )}
-        {enableColumnActions && <DataTableViewOptions table={table} />}
-        {enableExport && (
-          <DataTableExportMenu table={table} fileName={exportFileName} />
-        )}
-        {enableDensityToggle && <DataTableDensityToggle table={table} />}
-        {enableFullscreenToggle && <DataTableFullscreenToggle table={table} />}
-      </div>
+      {enableToolbarInternalActions && (
+        <div
+          data-slot="data-table-toolbar-actions"
+          className="flex shrink-0 items-center gap-1.5"
+        >
+          {renderToolbarInternalActions ? (
+            renderToolbarInternalActions({ table })
+          ) : (
+            <>
+              {enableGlobalFilter && <DataTableGlobalFilter table={table} />}
+              {enableColumnFilters && anyFilterable && (
+                <DataTableFilterToggle table={table} />
+              )}
+              {enableColumnActions && <DataTableViewOptions table={table} />}
+              {enableExport && (
+                <DataTableExportMenu table={table} fileName={exportFileName} />
+              )}
+              {enableDensityToggle && <DataTableDensityToggle table={table} />}
+              {enableFullscreenToggle && (
+                <DataTableFullscreenToggle table={table} />
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }

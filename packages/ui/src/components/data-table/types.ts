@@ -201,14 +201,24 @@ export interface DataTableConfig<TData extends RowData> {
   exportFileName?: string
   enableStickyHeader: boolean
   enablePagination: boolean
+  positionPagination: "top" | "bottom" | "both" | "none"
   enableRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
   enableDensityToggle: boolean
   enableFullscreenToggle: boolean
+  enableToolbarInternalActions: boolean
   enableKeyboardNavigation: boolean
   title?: React.ReactNode
   renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderBottomToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderToolbarInternalActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
+  renderBottomToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 
@@ -357,15 +367,37 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   exportFileName?: string
   enableStickyHeader?: boolean
   enablePagination?: boolean
+  /** Where the pagination controls render. Default "bottom". "none" keeps
+   *  pagination active but hides the controls. */
+  positionPagination?: "top" | "bottom" | "both" | "none"
   enableTopToolbar?: boolean
   enableBottomToolbar?: boolean
   /** Show the density toggle in the toolbar. Default true. */
   enableDensityToggle?: boolean
   /** Show the full-screen toggle in the toolbar. Default true. */
   enableFullscreenToggle?: boolean
+  /** Show the toolbar's internal icon-action cluster (search, filters, column
+   *  visibility, export, density, full screen). Default true. Hides the whole
+   *  cluster at once; use the per-item flags for finer control. */
+  enableToolbarInternalActions?: boolean
   enableKeyboardNavigation?: boolean
   title?: React.ReactNode
+  /** Custom content rendered in the top toolbar's left region (next to the
+   *  title), e.g. bulk-action buttons. */
   renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Replace the entire top toolbar with custom content. */
+  renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Replace the entire bottom toolbar (pagination region) with custom content. */
+  renderBottomToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Replace the top toolbar's internal icon-action cluster with custom content. */
+  renderToolbarInternalActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
+  /** Custom content rendered in the bottom toolbar's left region (next to
+   *  pagination), e.g. summary text or actions. */
+  renderBottomToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 

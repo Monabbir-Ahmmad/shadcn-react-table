@@ -34,6 +34,8 @@ export const docsNav: DocsNavGroup[] = [
       { title: "Column resizing", href: "/docs/guides/column-resizing" },
       { title: "Column visibility", href: "/docs/guides/column-visibility" },
       { title: "Density", href: "/docs/guides/density" },
+      { title: "Toolbar customization", href: "/docs/guides/toolbar" },
+      { title: "State management", href: "/docs/guides/state" },
       { title: "Sticky header & footer", href: "/docs/guides/sticky" },
       { title: "Loading state", href: "/docs/guides/loading" },
       { title: "Row selection", href: "/docs/guides/row-selection" },

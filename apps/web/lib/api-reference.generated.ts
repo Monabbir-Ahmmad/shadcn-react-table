@@ -375,6 +375,13 @@ export const useDataTableOptions: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "positionPagination",
+    "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
+    "required": false,
+    "default": "\"bottom\"",
+    "description": "Where the pagination controls render. Default \"bottom\". \"none\" keeps pagination active but hides the controls."
+  },
+  {
     "name": "enableTopToolbar",
     "type": "boolean",
     "required": false,
@@ -403,6 +410,13 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Show the full-screen toggle in the toolbar. Default true."
   },
   {
+    "name": "enableToolbarInternalActions",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control."
+  },
+  {
     "name": "enableKeyboardNavigation",
     "type": "boolean",
     "required": false,
@@ -421,7 +435,35 @@ export const useDataTableOptions: ApiMember[] = [
     "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
     "required": false,
     "default": null,
-    "description": ""
+    "description": "Custom content rendered in the top toolbar's left region (next to the title), e.g. bulk-action buttons."
+  },
+  {
+    "name": "renderTopToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the entire top toolbar with custom content."
+  },
+  {
+    "name": "renderBottomToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the entire bottom toolbar (pagination region) with custom content."
+  },
+  {
+    "name": "renderToolbarInternalActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the top toolbar's internal icon-action cluster with custom content."
+  },
+  {
+    "name": "renderBottomToolbarCustomActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Custom content rendered in the bottom toolbar's left region (next to pagination), e.g. summary text or actions."
   },
   {
     "name": "renderEmpty",
@@ -753,7 +795,7 @@ export const tableInstance: ApiMember[] = [
   },
   {
     "name": "renderDetailPanel",
-    "type": "(props: { row: Row<TData>; table: DataTableInstance<TData> }) => React.ReactNode",
+    "type": "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     "required": false,
     "default": null,
     "description": ""
@@ -962,6 +1004,13 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "positionPagination",
+    "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
     "name": "enableRowSelection",
     "type": "boolean",
     "required": true,
@@ -997,6 +1046,13 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "enableToolbarInternalActions",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
     "name": "enableKeyboardNavigation",
     "type": "boolean",
     "required": true,
@@ -1013,6 +1069,34 @@ export const tableInstance: ApiMember[] = [
   {
     "name": "renderToolbarActions",
     "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderTopToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderBottomToolbar",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderToolbarInternalActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderBottomToolbarCustomActions",
+    "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     "required": false,
     "default": null,
     "description": ""

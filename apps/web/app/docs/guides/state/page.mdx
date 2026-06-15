@@ -1,0 +1,82 @@
+export const metadata = { title: "State management" }
+
+# State management
+
+tablecn has two layers of state, and both can be left uncontrolled, observed, or fully controlled.
+
+## TanStack table state
+
+All the standard table state — sorting, column filters, global filter, pagination, row selection, column visibility, ordering, pinning, sizing, expansion, grouping — is plain TanStack Table state. `useDataTable` spreads its options straight into `useReactTable`, so you control it exactly as you would in TanStack: pass `state` + the matching `onXChange` setter (and optionally `initialState` for uncontrolled seeds).
+
+```tsx
+const [sorting, setSorting] = React.useState<SortingState>([])
+const [rowSelection, setRowSelection] = React.useState({})
+
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  state: { sorting, rowSelection },
+  onSortingChange: setSorting,
+  onRowSelectionChange: setRowSelection,
+})
+```
+
+For server-side data, combine this with the `manual*` flags — see [Server-side data](/docs/guides/server-side).
+
+## tablecn UI state
+
+The presentation state that tablecn adds on top of TanStack lives on `table.cnTable`: **density**, **full screen**, **filter-row visibility**, and the **global search mode**. Each is uncontrolled by default but accepts a controlled value and/or an `onChange` callback — so you can observe a change without taking ownership, or take full control.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+
+  // Uncontrolled with a seed:
+  defaultDensity: "compact",
+  defaultShowColumnFilters: true,
+  defaultGlobalFilterMode: "fuzzy",
+
+  // Observe changes (still uncontrolled):
+  onDensityChange: (d) => saveToLocalStorage("density", d),
+
+  // Or take control:
+  isFullscreen,
+  onIsFullscreenChange: setIsFullscreen,
+})
+```
+
+| Uncontrolled seed          | Controlled value    | Change callback             |
+| -------------------------- | ------------------- | --------------------------- |
+| `defaultDensity`           | `density`           | `onDensityChange`           |
+| —                          | `isFullscreen`      | `onIsFullscreenChange`      |
+| `defaultShowColumnFilters` | `showColumnFilters` | `onShowColumnFiltersChange` |
+| `defaultGlobalFilterMode`  | `globalFilterMode`  | `onGlobalFilterModeChange`  |
+
+## Reading and setting from the instance
+
+Whether controlled or not, the current values and setters are always available on `table.cnTable`:
+
+```tsx
+table.cnTable.density // "comfortable" | "compact" | "spacious"
+table.cnTable.setDensity("compact")
+table.cnTable.setIsFullscreen(true)
+table.cnTable.setShowColumnFilters((prev) => !prev)
+```
+
+<Callout variant="tip" title="Persisting state">
+  Mirror any of these into local storage or a query param, then restore via the
+  matching `default*` (uncontrolled) or controlled value on the next load.
+</Callout>
+
+## Styling without props
+
+tablecn is styled with Tailwind, not per-component style props. Structural slots emit a `data-slot` attribute you can target with a selector — see the table in [Toolbar customization](/docs/guides/toolbar#styling).
+
+## Related
+
+- [Toolbar customization](/docs/guides/toolbar)
+- [Server-side data](/docs/guides/server-side)
+- [Table instance](/docs/api/table-instance)

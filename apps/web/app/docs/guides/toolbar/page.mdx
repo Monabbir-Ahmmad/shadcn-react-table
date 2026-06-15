@@ -1,0 +1,100 @@
+export const metadata = { title: "Toolbar customization" }
+
+# Toolbar customization
+
+The table renders a **top toolbar** (title slot + your actions on the left, an icon-action cluster on the right) and a **bottom toolbar** (pagination). Every part can be hidden, replaced, or extended.
+
+## Showing / hiding the toolbars
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableTopToolbar: false, // remove the entire top toolbar
+  enableBottomToolbar: false, // remove the entire bottom toolbar
+})
+```
+
+## Internal actions (the icon cluster)
+
+The right-hand cluster holds global search, the filter toggle, column visibility, export, the density toggle, and the full-screen toggle. Hide individual items, or the whole cluster:
+
+```tsx
+useDataTable({
+  // per-item
+  enableGlobalFilter: false,
+  enableColumnFilters: false,
+  enableColumnActions: false, // column visibility menu
+  enableExport: false,
+  enableDensityToggle: false,
+  enableFullscreenToggle: false,
+  // …or hide all of them at once
+  enableToolbarInternalActions: false,
+})
+```
+
+## Custom actions
+
+Add your own buttons without replacing anything. `renderToolbarActions` fills the top toolbar's left region (next to the title); `renderBottomToolbarCustomActions` fills the bottom toolbar's left region (next to pagination):
+
+```tsx
+useDataTable({
+  renderToolbarActions: ({ table }) => (
+    <Button size="sm" onClick={() => table.cnTable.beginCreate()}>
+      Add row
+    </Button>
+  ),
+  renderBottomToolbarCustomActions: ({ table }) => (
+    <span className="text-xs text-muted-foreground">
+      {table.getSelectedRowModel().rows.length} selected
+    </span>
+  ),
+})
+```
+
+## Replacing a whole toolbar
+
+For full control, replace the built-in toolbar entirely. The render slot receives the table instance:
+
+```tsx
+useDataTable({
+  renderTopToolbar: ({ table }) => <MyToolbar table={table} />,
+  renderBottomToolbar: ({ table }) => <MyFooter table={table} />,
+  // or replace just the icon cluster, keeping the title/actions layout:
+  renderToolbarInternalActions: ({ table }) => <MyIconButtons table={table} />,
+})
+```
+
+## Pagination placement
+
+`positionPagination` controls where the pagination controls render. `"none"` keeps pagination active (the data is still paged) but hides the controls.
+
+```tsx
+useDataTable({
+  positionPagination: "both", // "top" | "bottom" | "both" | "none"
+})
+```
+
+## Styling
+
+Every toolbar slot exposes a `data-slot` attribute, so you can target it with a Tailwind selector instead of a styling prop — no per-slot props needed:
+
+| Slot                                 | `data-slot`                  |
+| ------------------------------------ | ---------------------------- |
+| Top toolbar                          | `data-table-toolbar`         |
+| Internal actions cluster             | `data-table-toolbar-actions` |
+| Selection alert banner               | `data-table-alert-banner`    |
+| Bottom toolbar (with custom actions) | `data-table-bottom-toolbar`  |
+| Pagination                           | `data-table-pagination`      |
+
+```tsx
+<DataTable table={table} className="[&_[data-slot=data-table-toolbar]]:px-2" />
+```
+
+## Related
+
+- [State management](/docs/guides/state)
+- [Density](/docs/guides/density)
+- [Global search](/docs/guides/global-search)
+- [Export](/docs/guides/export)

@@ -135,6 +135,7 @@ export function DataTable<TData extends RowData>({
     enableColumnVirtualization,
     enableStickyHeader,
     enablePagination,
+    positionPagination,
     enableTopToolbar,
     enableBottomToolbar,
     enableKeyboardNavigation,
@@ -144,6 +145,9 @@ export function DataTable<TData extends RowData>({
     onCellClick,
     onCellDoubleClick,
     renderEmpty,
+    renderTopToolbar,
+    renderBottomToolbar,
+    renderBottomToolbarCustomActions,
     localization,
   } = table.cnTable
 
@@ -497,8 +501,18 @@ export function DataTable<TData extends RowData>({
         data-density={density}
         {...props}
       >
-        {enableTopToolbar && <DataTableToolbar table={table} />}
+        {renderTopToolbar
+          ? renderTopToolbar({ table })
+          : enableTopToolbar && <DataTableToolbar table={table} />}
         <DataTableAlertBanner table={table} />
+
+        {enablePagination &&
+          (positionPagination === "top" || positionPagination === "both") && (
+            <DataTablePagination
+              table={table}
+              pageSizeOptions={pageSizeOptions}
+            />
+          )}
 
         <DndContext
           sensors={sensors}
@@ -785,12 +799,34 @@ export function DataTable<TData extends RowData>({
           </div>
         </DndContext>
 
-        {enableBottomToolbar && enablePagination && (
-          <DataTablePagination
-            table={table}
-            pageSizeOptions={pageSizeOptions}
-          />
-        )}
+        {renderBottomToolbar
+          ? renderBottomToolbar({ table })
+          : enableBottomToolbar &&
+            (() => {
+              const customActions = renderBottomToolbarCustomActions?.({
+                table,
+              })
+              const showBottomPagination =
+                enablePagination &&
+                (positionPagination === "bottom" ||
+                  positionPagination === "both")
+              const pagination = showBottomPagination ? (
+                <DataTablePagination
+                  table={table}
+                  pageSizeOptions={pageSizeOptions}
+                />
+              ) : null
+              if (customActions == null) return pagination
+              return (
+                <div
+                  data-slot="data-table-bottom-toolbar"
+                  className="flex flex-wrap items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-2">{customActions}</div>
+                  {pagination && <div className="flex-1">{pagination}</div>}
+                </div>
+              )
+            })()}
 
         <DataTableEditModal table={table} />
       </div>
