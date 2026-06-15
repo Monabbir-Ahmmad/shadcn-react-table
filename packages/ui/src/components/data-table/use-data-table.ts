@@ -498,9 +498,28 @@ export function useDataTable<TData extends RowData>(
     [table]
   )
 
+  // Structural DOM refs, exposed on `table.cnTable.refs` and attached to the
+  // corresponding elements in DataTable / toolbar / global-filter.
+  const tablePaperRef = React.useRef<HTMLDivElement>(null)
+  const tableContainerRef = React.useRef<HTMLDivElement>(null)
+  const topToolbarRef = React.useRef<HTMLDivElement>(null)
+  const bottomToolbarRef = React.useRef<HTMLDivElement>(null)
+  const tableHeadRef = React.useRef<HTMLTableSectionElement>(null)
+  const tableFooterRef = React.useRef<HTMLTableSectionElement>(null)
+  const searchInputRef = React.useRef<HTMLInputElement>(null)
+
   const config: DataTableConfig<TData> = {
     localization,
     icons,
+    refs: {
+      tablePaperRef,
+      tableContainerRef,
+      topToolbarRef,
+      bottomToolbarRef,
+      tableHeadRef,
+      tableFooterRef,
+      searchInputRef,
+    },
     density,
     setDensity,
     isFullscreen,

@@ -40,8 +40,12 @@ const GLOBAL_MODES: GlobalFilterMode[] = [
  */
 export function DataTableGlobalFilter<TData extends RowData>({
   table,
+  searchInputRef,
 }: {
   table: DataTableInstance<TData>
+  /** Optional ref forwarded to the search input. Defaults to the instance's
+   *  `searchInputRef` when rendered by `DataTable`. */
+  searchInputRef?: React.RefObject<HTMLInputElement | null>
 }) {
   const {
     localization,
@@ -56,7 +60,11 @@ export function DataTableGlobalFilter<TData extends RowData>({
   const external = (table.getState().globalFilter ?? "") as string
   const [expanded, setExpanded] = React.useState(external.length > 0)
   const [value, setValue] = React.useState(external)
-  const inputRef = React.useRef<HTMLInputElement>(null)
+  // Drive focus-on-expand and let consumers focus the box. Use the forwarded
+  // ref when provided (so `DataTable` shares its `searchInputRef`), else a
+  // local one. React assigns it directly — no manual `.current` mutation.
+  const localRef = React.useRef<HTMLInputElement>(null)
+  const inputRef = searchInputRef ?? localRef
 
   const debounceMs = table.options.manualFiltering ? 300 : 0
 

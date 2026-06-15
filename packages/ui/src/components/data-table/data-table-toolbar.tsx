@@ -1,5 +1,6 @@
 "use client"
 
+import type * as React from "react"
 import type { RowData } from "@tanstack/react-table"
 
 import { cn } from "@monabbir/tablecn/lib/utils"
@@ -21,8 +22,16 @@ import type { DataTableInstance } from "./types"
  */
 export function DataTableToolbar<TData extends RowData>({
   table,
+  toolbarRef,
+  searchInputRef,
 }: {
   table: DataTableInstance<TData>
+  /** Optional ref forwarded to the toolbar root. Defaults to the instance's
+   *  `topToolbarRef` when rendered by `DataTable`. */
+  toolbarRef?: React.Ref<HTMLDivElement>
+  /** Optional ref forwarded to the global-search input. Defaults to the
+   *  instance's `searchInputRef` when rendered by `DataTable`. */
+  searchInputRef?: React.RefObject<HTMLInputElement | null>
 }) {
   const {
     title,
@@ -47,12 +56,13 @@ export function DataTableToolbar<TData extends RowData>({
 
   return (
     <div
+      ref={toolbarRef}
       data-slot="data-table-toolbar"
       className="flex items-start justify-between gap-3 py-1"
     >
       <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
         {showGlobalFilter && positionGlobalFilter === "left" && (
-          <DataTableGlobalFilter table={table} />
+          <DataTableGlobalFilter table={table} searchInputRef={searchInputRef} />
         )}
         {title != null && (
           <div className="text-sm font-semibold tracking-wide">{title}</div>
@@ -70,7 +80,10 @@ export function DataTableToolbar<TData extends RowData>({
           ) : (
             <>
               {showGlobalFilter && positionGlobalFilter === "right" && (
-                <DataTableGlobalFilter table={table} />
+                <DataTableGlobalFilter
+                  table={table}
+                  searchInputRef={searchInputRef}
+                />
               )}
               {enableColumnFilters && anyFilterable && (
                 <DataTableFilterToggle table={table} />

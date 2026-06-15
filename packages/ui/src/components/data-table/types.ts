@@ -43,6 +43,30 @@ export type ColumnVirtualizerOptions<TData extends RowData> = ValueOrFunc<
   Partial<VirtualizerOptions<HTMLDivElement, HTMLTableCellElement>>
 >
 
+/**
+ * DOM refs to the table's structural elements, exposed on
+ * `table.cnTable.refs` for imperative access (focus, measure, scroll). Each is
+ * populated after mount and may be `null` when its element isn't rendered
+ * (e.g. `bottomToolbarRef` with no bottom toolbar, `tableFooterRef` with no
+ * footer, `searchInputRef` before the search box is expanded).
+ */
+export interface DataTableRefs {
+  /** The outermost `data-slot="data-table"` wrapper. */
+  tablePaperRef: React.RefObject<HTMLDivElement | null>
+  /** The scroll container (`data-slot="data-table-surface"`). */
+  tableContainerRef: React.RefObject<HTMLDivElement | null>
+  /** The top toolbar root (`data-slot="data-table-toolbar"`). */
+  topToolbarRef: React.RefObject<HTMLDivElement | null>
+  /** The bottom toolbar root (`data-slot="data-table-bottom-toolbar"`). */
+  bottomToolbarRef: React.RefObject<HTMLDivElement | null>
+  /** The `<thead>` element. */
+  tableHeadRef: React.RefObject<HTMLTableSectionElement | null>
+  /** The `<tfoot>` element. */
+  tableFooterRef: React.RefObject<HTMLTableSectionElement | null>
+  /** The global-search `<input>`. */
+  searchInputRef: React.RefObject<HTMLInputElement | null>
+}
+
 /** Filter UI variants (full set wired in Phase 2; Phase 1 ships "text"). */
 export type FilterVariant =
   | "text"
@@ -277,6 +301,8 @@ export interface DataTableConfig<TData extends RowData> {
   onCellClick?: (props: CellEvent<TData>) => void
   onCellDoubleClick?: (props: CellEvent<TData>) => void
 
+  /** DOM refs to the table's structural elements (populated after mount). */
+  refs: DataTableRefs
   enableRowVirtualization: boolean
   enableColumnVirtualization: boolean
   estimateRowHeight: number

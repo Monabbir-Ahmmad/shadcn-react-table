@@ -123,6 +123,7 @@ export type {
   EditingCell,
   RowEvent,
   CellEvent,
+  DataTableRefs,
   DataTableRowVirtualizer,
   DataTableColumnVirtualizer,
   RowVirtualizerOptions,

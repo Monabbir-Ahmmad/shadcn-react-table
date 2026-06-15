@@ -140,6 +140,7 @@ export function DataTable<TData extends RowData>({
     columnVirtualizerOptions,
     rowVirtualizerInstanceRef,
     columnVirtualizerInstanceRef,
+    refs,
     enableStickyHeader,
     enablePagination,
     positionPagination,
@@ -522,6 +523,7 @@ export function DataTable<TData extends RowData>({
   return (
     <TooltipProvider delayDuration={300}>
       <div
+        ref={refs.tablePaperRef}
         data-slot="data-table"
         className={cn(
           "flex w-full flex-col gap-2",
@@ -534,7 +536,13 @@ export function DataTable<TData extends RowData>({
       >
         {renderTopToolbar
           ? renderTopToolbar({ table })
-          : enableTopToolbar && <DataTableToolbar table={table} />}
+          : enableTopToolbar && (
+              <DataTableToolbar
+                table={table}
+                toolbarRef={refs.topToolbarRef}
+                searchInputRef={refs.searchInputRef}
+              />
+            )}
         {positionToolbarAlertBanner === "top" && (
           <DataTableAlertBanner table={table} />
         )}
@@ -559,7 +567,10 @@ export function DataTable<TData extends RowData>({
             )}
 
           <div
-            ref={gridRef}
+            ref={(node) => {
+              gridRef.current = node
+              refs.tableContainerRef.current = node
+            }}
             onKeyDown={onKeyDown}
             data-slot="data-table-surface"
             className={cn(
@@ -594,6 +605,7 @@ export function DataTable<TData extends RowData>({
                 <TableCaption>{renderCaption({ table })}</TableCaption>
               )}
               <TableHeader
+                ref={refs.tableHeadRef}
                 className={cn(
                   enableStickyHeader && "sticky top-0 z-20 bg-background"
                 )}
@@ -788,6 +800,7 @@ export function DataTable<TData extends RowData>({
 
               {showFooter && (
                 <TableFooter
+                  ref={refs.tableFooterRef}
                   className={cn(enableStickyFooter && "sticky bottom-0 z-20")}
                 >
                   {table.getFooterGroups().map((footerGroup) => {
@@ -866,14 +879,26 @@ export function DataTable<TData extends RowData>({
                   pageSizeOptions={pageSizeOptions}
                 />
               ) : null
-              if (customActions == null) return pagination
+              if (customActions == null && pagination == null) return null
               return (
                 <div
+                  ref={refs.bottomToolbarRef}
                   data-slot="data-table-bottom-toolbar"
-                  className="flex flex-wrap items-center justify-between gap-4"
+                  className={cn(
+                    customActions != null &&
+                      "flex flex-wrap items-center justify-between gap-4"
+                  )}
                 >
-                  <div className="flex items-center gap-2">{customActions}</div>
-                  {pagination && <div className="flex-1">{pagination}</div>}
+                  {customActions != null ? (
+                    <>
+                      <div className="flex items-center gap-2">
+                        {customActions}
+                      </div>
+                      {pagination && <div className="flex-1">{pagination}</div>}
+                    </>
+                  ) : (
+                    pagination
+                  )}
                 </div>
               )
             })()}

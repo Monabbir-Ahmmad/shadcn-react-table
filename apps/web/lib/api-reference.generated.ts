@@ -1193,6 +1193,13 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "refs",
+    "type": "DataTableRefs",
+    "required": true,
+    "default": null,
+    "description": "DOM refs to the table's structural elements (populated after mount)."
+  },
+  {
     "name": "enableRowVirtualization",
     "type": "boolean",
     "required": true,
