@@ -68,6 +68,32 @@ const columns = [
 ]
 ```
 
+## Custom mode menu
+
+Replace the built-in radio items with your own using `renderColumnFilterModeMenuItems`. You get the allowed `modes`, the `currentMode`, and an `onSelect(mode)` to switch.
+
+```tsx
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  renderColumnFilterModeMenuItems: ({ modes, currentMode, onSelect }) =>
+    modes.map((mode) => (
+      <DropdownMenuItem
+        key={mode}
+        disabled={mode === currentMode}
+        onClick={() => onSelect(mode)}
+      >
+        {mode}
+      </DropdownMenuItem>
+    )),
+})
+```
+
+The global-search mode menu has the same hook: `renderGlobalFilterModeMenuItems` — see [Global search](/docs/guides/global-search).
+
 ## Localizing mode labels
 
 Mode menu labels are localizable via `localization.filterModes`.

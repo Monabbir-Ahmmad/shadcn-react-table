@@ -37,5 +37,32 @@ const table = useDataTable({
 })
 ```
 
+## Custom mode menu
+
+Replace the built-in mode radio items with `renderGlobalFilterModeMenuItems`. It receives the allowed `modes`, the `currentMode`, and an `onSelect(mode)` to switch.
+
+```tsx
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+
+useDataTable({
+  renderGlobalFilterModeMenuItems: ({ modes, currentMode, onSelect }) =>
+    modes.map((mode) => (
+      <DropdownMenuItem
+        key={mode}
+        disabled={mode === currentMode}
+        onClick={() => onSelect(mode)}
+      >
+        {mode}
+      </DropdownMenuItem>
+    )),
+})
+```
+
+## Placement
+
+Move the search to the left toolbar region with `positionGlobalFilter: "left"` — see [Toolbar customization](/docs/guides/toolbar#search-placement).
+
 ## Related
+
 - [Column filtering](/docs/guides/column-filtering)
+- [Filter modes](/docs/guides/filter-modes)

@@ -50,6 +50,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
     enableGlobalFilterModes,
     globalFilterMode,
     setGlobalFilterMode,
+    renderGlobalFilterModeMenuItems,
   } = table.cnTable
 
   const external = (table.getState().globalFilter ?? "") as string
@@ -148,18 +149,27 @@ export function DataTableGlobalFilter<TData extends RowData>({
               {localization.globalFilterMode}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup
-              value={globalFilterMode}
-              onValueChange={(mode) =>
-                setGlobalFilterMode(mode as GlobalFilterMode)
-              }
-            >
-              {GLOBAL_MODES.map((mode) => (
-                <DropdownMenuRadioItem key={mode} value={mode}>
-                  {localization.filterModes[mode] ?? mode}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
+            {renderGlobalFilterModeMenuItems ? (
+              renderGlobalFilterModeMenuItems({
+                modes: GLOBAL_MODES,
+                currentMode: globalFilterMode,
+                onSelect: setGlobalFilterMode,
+                table,
+              })
+            ) : (
+              <DropdownMenuRadioGroup
+                value={globalFilterMode}
+                onValueChange={(mode) =>
+                  setGlobalFilterMode(mode as GlobalFilterMode)
+                }
+              >
+                {GLOBAL_MODES.map((mode) => (
+                  <DropdownMenuRadioItem key={mode} value={mode}>
+                    {localization.filterModes[mode] ?? mode}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

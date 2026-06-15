@@ -8,7 +8,7 @@ Effort key: **S** small · **M** medium · **L** large · **XL** very large.
 
 ---
 
-## Completed (Phases 1–9)
+## Completed (Phases 1–11)
 
 | Phase | Area | Key additions |
 | --- | --- | --- |
@@ -21,26 +21,18 @@ Effort key: **S** small · **M** medium · **L** large · **XL** very large.
 | 7 | Positioning & select-all | `positionGlobalFilter`, `positionActionsColumn`, `positionExpandColumn`, `selectAllMode`, `enableSelectAll` |
 | 8 | Menu render slots & caption | `renderRowActionMenuItems`, `renderColumnActionsMenuItems`, `renderCaption` |
 | 9 | Loading & faceting | `isSaving`, `showProgressBars`, `showSkeletons`, `showLoadingOverlay`, `enableFacetedValues` |
+| 10 | Filter-mode menu slots | `renderColumnFilterModeMenuItems`, `renderGlobalFilterModeMenuItems` |
+| 11 | Alert-banner & drop-zone position | `positionToolbarAlertBanner`, `positionToolbarDropZone` |
 
-API reference as of Phase 9: **79 options · 85 instance fields**.
+API reference as of Phase 11: **83 options · 89 instance fields**.
 
 TanStack-native state (sorting, filters, pagination, selection, visibility, ordering, pinning, sizing, expansion, grouping) and their `onXChange`/`initialState`/`state` pass straight through `useReactTable`, so they were never part of this effort.
 
 ---
 
-## Planned (Phases 10–17)
+## Planned (Phases 12–17)
 
-Recommended sequence: **10 → 11 → 12 → 13 → 14**, then optionally 15–16; **skip 17 by default**.
-
-### Phase 10 — Filter-mode menu render slots `[S]`
-`renderColumnFilterModeMenuItems` / `renderGlobalFilterModeMenuItems`. Adapt rather than copy MRT: the slot **replaces** the radio group, receiving `{ modes, currentMode, onSelect, column?, table }` and calling the provided `onSelect`.
-- Touch: `data-table-filter-mode-menu.tsx`, `data-table-global-filter.tsx`, `types.ts`, `use-data-table.ts`.
-- Value: medium-low · Risk: low. *(Deferred in Phase 8 — radio-group menus make a literal "render items" API awkward.)*
-
-### Phase 11 — Alert-banner & drop-zone position `[S]`
-`positionToolbarAlertBanner` (`top`/`bottom`/`none`, default `top`); `positionToolbarDropZone` (`top`/`bottom`/`both`/`none`, default `top`; grouping only).
-- Touch: `data-table.tsx` (render placement of `DataTableAlertBanner` / `DataTableDropToGroupZone`), `types.ts`, `use-data-table.ts`, toolbar guide.
-- Value: low-medium · Risk: low. *Completes the `position*` family.*
+Recommended sequence: **12 → 13 → 14**, then optionally 15–16; **skip 17 by default**.
 
 ### Phase 12 — Virtualizer options & instance refs `[M]`
 `rowVirtualizerOptions` / `columnVirtualizerOptions` (partial passthrough merged into `useVirtualizer`); `rowVirtualizerInstanceRef` / `columnVirtualizerInstanceRef`.

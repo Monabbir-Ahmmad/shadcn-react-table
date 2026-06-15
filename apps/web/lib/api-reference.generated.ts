@@ -340,6 +340,20 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Append custom items to the bottom of every column-actions menu. Returns the items (e.g. `<DropdownMenuItem>`); a separator is added before them."
   },
   {
+    "name": "renderColumnFilterModeMenuItems",
+    "type": "(props: { column: Column<TData, unknown> modes: FilterMode[] currentMode: FilterMode onSelect: (mode: FilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the radio items in a column's filter-mode menu. Render your own items and call `onSelect(mode)` to switch; `modes` is the allowed set."
+  },
+  {
+    "name": "renderGlobalFilterModeMenuItems",
+    "type": "(props: { modes: GlobalFilterMode[] currentMode: GlobalFilterMode onSelect: (mode: GlobalFilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Replace the radio items in the global-search mode menu. Render your own items and call `onSelect(mode)` to switch; `modes` is the allowed set."
+  },
+  {
     "name": "onRowClick",
     "type": "(props: RowEvent<TData>) => void",
     "required": false,
@@ -436,6 +450,20 @@ export const useDataTableOptions: ApiMember[] = [
     "required": false,
     "default": "\"right\"",
     "description": "Which toolbar region the global search renders in. Default \"right\" (the internal-actions cluster). \"left\" places it next to the title/actions; \"none\" hides it (same as `enableGlobalFilter: false`)."
+  },
+  {
+    "name": "positionToolbarAlertBanner",
+    "type": "\"top\" | \"bottom\" | \"none\"",
+    "required": false,
+    "default": "\"top\"",
+    "description": "Where the row-selection alert banner renders. Default \"top\"."
+  },
+  {
+    "name": "positionToolbarDropZone",
+    "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
+    "required": false,
+    "default": "\"top\"",
+    "description": "Where the group-by drop zone renders (grouping only). Default \"top\"."
   },
   {
     "name": "positionActionsColumn",
@@ -1095,6 +1123,20 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "renderColumnFilterModeMenuItems",
+    "type": "(props: { column: Column<TData, unknown> modes: FilterMode[] currentMode: FilterMode onSelect: (mode: FilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderGlobalFilterModeMenuItems",
+    "type": "(props: { modes: GlobalFilterMode[] currentMode: GlobalFilterMode onSelect: (mode: GlobalFilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
     "name": "onRowClick",
     "type": "(props: RowEvent<TData>) => void",
     "required": false,
@@ -1188,6 +1230,20 @@ export const tableInstance: ApiMember[] = [
   {
     "name": "positionGlobalFilter",
     "type": "\"left\" | \"right\" | \"none\"",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "positionToolbarAlertBanner",
+    "type": "\"top\" | \"bottom\" | \"none\"",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "positionToolbarDropZone",
+    "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
     "required": true,
     "default": null,
     "description": ""

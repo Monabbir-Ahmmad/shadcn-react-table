@@ -228,6 +228,19 @@ export interface DataTableConfig<TData extends RowData> {
     column: Column<TData, unknown>
     table: DataTableInstance<TData>
   }) => React.ReactNode
+  renderColumnFilterModeMenuItems?: (props: {
+    column: Column<TData, unknown>
+    modes: FilterMode[]
+    currentMode: FilterMode
+    onSelect: (mode: FilterMode) => void
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
+  renderGlobalFilterModeMenuItems?: (props: {
+    modes: GlobalFilterMode[]
+    currentMode: GlobalFilterMode
+    onSelect: (mode: GlobalFilterMode) => void
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
 
   // Event listeners
   onRowClick?: (props: RowEvent<TData>) => void
@@ -245,6 +258,8 @@ export interface DataTableConfig<TData extends RowData> {
   enablePagination: boolean
   positionPagination: "top" | "bottom" | "both" | "none"
   positionGlobalFilter: "left" | "right" | "none"
+  positionToolbarAlertBanner: "top" | "bottom" | "none"
+  positionToolbarDropZone: "top" | "bottom" | "both" | "none"
   enableRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
@@ -412,6 +427,23 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
     column: Column<TData, unknown>
     table: DataTableInstance<TData>
   }) => React.ReactNode
+  /** Replace the radio items in a column's filter-mode menu. Render your own
+   *  items and call `onSelect(mode)` to switch; `modes` is the allowed set. */
+  renderColumnFilterModeMenuItems?: (props: {
+    column: Column<TData, unknown>
+    modes: FilterMode[]
+    currentMode: FilterMode
+    onSelect: (mode: FilterMode) => void
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
+  /** Replace the radio items in the global-search mode menu. Render your own
+   *  items and call `onSelect(mode)` to switch; `modes` is the allowed set. */
+  renderGlobalFilterModeMenuItems?: (props: {
+    modes: GlobalFilterMode[]
+    currentMode: GlobalFilterMode
+    onSelect: (mode: GlobalFilterMode) => void
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
 
   /** Fired when a body row is clicked / double-clicked. */
   onRowClick?: (props: RowEvent<TData>) => void
@@ -444,6 +476,10 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  internal-actions cluster). "left" places it next to the title/actions;
    *  "none" hides it (same as `enableGlobalFilter: false`). */
   positionGlobalFilter?: "left" | "right" | "none"
+  /** Where the row-selection alert banner renders. Default "top". */
+  positionToolbarAlertBanner?: "top" | "bottom" | "none"
+  /** Where the group-by drop zone renders (grouping only). Default "top". */
+  positionToolbarDropZone?: "top" | "bottom" | "both" | "none"
   /** Position of the auto-injected row-actions column. Default "last". */
   positionActionsColumn?: "first" | "last"
   /** Position of the auto-injected expand column (tree / detail panel).

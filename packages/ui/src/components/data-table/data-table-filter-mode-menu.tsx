@@ -51,8 +51,13 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
   column: Column<TData, TValue>
   table: DataTableInstance<TData>
 }) {
-  const { localization, icons, setColumnFilterMode, enableColumnFilterModes } =
-    table.cnTable
+  const {
+    localization,
+    icons,
+    setColumnFilterMode,
+    enableColumnFilterModes,
+    renderColumnFilterModeMenuItems,
+  } = table.cnTable
   const variant = column.columnDef.meta?.variant ?? "text"
   const perColumn = column.columnDef.meta?.enableColumnFilterModes
   const enabled = perColumn ?? enableColumnFilterModes
@@ -88,18 +93,28 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
       <DropdownMenuContent align="start" className="w-52">
         <DropdownMenuLabel>{localization.filterMode}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup
-          value={current}
-          onValueChange={(value) =>
-            setColumnFilterMode(column.id, value as FilterMode)
-          }
-        >
-          {modes.map((mode) => (
-            <DropdownMenuRadioItem key={mode} value={mode}>
-              {localization.filterModes[mode] ?? mode}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
+        {renderColumnFilterModeMenuItems ? (
+          renderColumnFilterModeMenuItems({
+            column: column as Column<TData, unknown>,
+            modes,
+            currentMode: current,
+            onSelect: (mode) => setColumnFilterMode(column.id, mode),
+            table,
+          })
+        ) : (
+          <DropdownMenuRadioGroup
+            value={current}
+            onValueChange={(value) =>
+              setColumnFilterMode(column.id, value as FilterMode)
+            }
+          >
+            {modes.map((mode) => (
+              <DropdownMenuRadioItem key={mode} value={mode}>
+                {localization.filterModes[mode] ?? mode}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

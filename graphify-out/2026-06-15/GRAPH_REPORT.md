@@ -1,16 +1,16 @@
 # Graph Report - tablecn  (2026-06-15)
 
 ## Corpus Check
-- 154 files · ~64,155 words
+- 155 files · ~66,858 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1121 nodes · 1921 edges · 75 communities (63 shown, 12 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 22 edges (avg confidence: 0.8)
+- 1142 nodes · 1947 edges · 80 communities (67 shown, 13 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5e2b280c`
+- Built from commit: `fc34caa5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -46,8 +46,9 @@
 - [[_COMMUNITY_Docs Layout & Navigation|Docs Layout & Navigation]]
 - [[_COMMUNITY_Editing & Loading Docs|Editing & Loading Docs]]
 - [[_COMMUNITY_UI Dev Dependencies|UI Dev Dependencies]]
-- [[_COMMUNITY_Examples Browser & Header|Examples Browser & Header]]
+- [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Next.js TypeScript Config|Next.js TypeScript Config]]
+- [[_COMMUNITY_Community 33|Community 33]]
 - [[_COMMUNITY_TS Config Package Manifest|TS Config Package Manifest]]
 - [[_COMMUNITY_UI Package tsconfig|UI Package tsconfig]]
 - [[_COMMUNITY_Web App tsconfig|Web App tsconfig]]
@@ -84,6 +85,10 @@
 - [[_COMMUNITY_Community 71|Community 71]]
 - [[_COMMUNITY_Community 72|Community 72]]
 - [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 81|Community 81]]
 - [[_COMMUNITY_Community 83|Community 83]]
 
@@ -94,9 +99,9 @@
 4. `DataTableInstance` - 27 edges
 5. `Button()` - 21 edges
 6. `getColumnLabel()` - 21 edges
-7. `compilerOptions` - 15 edges
-8. `Column filtering` - 15 edges
-9. `Editing` - 15 edges
+7. `Column filtering` - 16 edges
+8. `Editing` - 16 edges
+9. `compilerOptions` - 15 edges
 10. `Usage` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -125,27 +130,27 @@
 - **Row-number column shared by numbers and pinning** — row_numbers_page_enable_row_numbers, row_numbers_page_row_number_mode, row_pinning_page_enable_row_pinning [EXTRACTED 0.85]
 - **Options-in / instance-out core flow** — quick_start_page_use_data_table, quick_start_page_data_table_component, docs_page_cn_table [EXTRACTED 0.85]
 
-## Communities (75 total, 12 thin omitted)
+## Communities (80 total, 13 thin omitted)
 
 ### Community 0 - "Display Columns, Row Actions & Export"
-Cohesion: 0.05
-Nodes (73): DataTableConfigContext, DataTableConfigContextValue, useDataTableConfigContext(), DataTableColumnActions(), getColumnLabel(), DataTableColumnFilter(), DataTableColumnFilterProps, DataTableColumnHeader() (+65 more)
+Cohesion: 0.06
+Nodes (71): DataTableConfigContext, DataTableConfigContextValue, DataTableConfigProvider(), useDataTableConfigContext(), getColumnLabel(), DataTableColumnFilter(), DataTableColumnFilterProps, DataTableColumnHeader() (+63 more)
 
 ### Community 1 - "Demo Examples & Column Defs"
 Cohesion: 0.08
-Nodes (55): useDataTable(), currency, dateFmt, DEPARTMENT_OPTIONS, ROLE_OPTIONS, STATUS_OPTIONS, STATUS_VARIANT, userColumns() (+47 more)
+Nodes (56): useControllableState(), useDataTable(), currency, dateFmt, DEPARTMENT_OPTIONS, ROLE_OPTIONS, STATUS_OPTIONS, STATUS_VARIANT (+48 more)
 
 ### Community 2 - "Button/Dropdown/Tooltip UI"
-Cohesion: 0.20
-Nodes (17): DropdownMenu(), DropdownMenuCheckboxItem(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuLabel(), DropdownMenuRadioGroup(), DropdownMenuRadioItem(), DropdownMenuSeparator() (+9 more)
+Cohesion: 0.11
+Nodes (34): Badge(), badgeVariants, Button(), buttonVariants, Calendar(), CalendarDayButton(), DropdownMenu(), DropdownMenuCheckboxItem() (+26 more)
 
 ### Community 3 - "Web App Dependencies"
 Cohesion: 0.05
-Nodes (41): dependencies, cmdk, date-fns, lucide-react, @mdx-js/loader, @mdx-js/react, @monabbir/tablecn, next (+33 more)
+Nodes (43): dependencies, cmdk, date-fns, lucide-react, @mdx-js/loader, @mdx-js/react, @monabbir/tablecn, next (+35 more)
 
 ### Community 4 - "Core Table Rendering & Pinning"
-Cohesion: 0.08
-Nodes (32): Skeleton(), Table(), TableBody(), TableCaption(), TableCell(), TableFooter(), TableHead(), TableHeader() (+24 more)
+Cohesion: 0.09
+Nodes (31): Skeleton(), Table(), TableBody(), TableCaption(), TableCell(), TableFooter(), TableHead(), TableHeader() (+23 more)
 
 ### Community 5 - "Monorepo Build Config (Turbo)"
 Cohesion: 0.05
@@ -153,11 +158,11 @@ Nodes (36): devDependencies, prettier, prettier-plugin-tailwindcss, turbo, types
 
 ### Community 6 - "Architecture & API Concepts"
 Cohesion: 0.06
-Nodes (39): Next.js 16 Agent Rules, Column options, DataTable Props, surfaceClassName (bounded scroll surface), table.cnTable Instance Extension, DataTable Component, Feature flags (all opt-in unless noted), Notes (+31 more)
+Nodes (40): Next.js 16 Agent Rules, Column options, DataTable Props, surfaceClassName (bounded scroll surface), table.cnTable Instance Extension, DataTable Component, Feature flags (all opt-in unless noted), Notes (+32 more)
 
 ### Community 7 - "Command & Dialog UI"
-Cohesion: 0.11
-Nodes (20): Command(), CommandDialog(), CommandEmpty(), CommandGroup(), CommandInput(), CommandItem(), CommandList(), CommandSeparator() (+12 more)
+Cohesion: 0.19
+Nodes (11): Command(), CommandDialog(), CommandEmpty(), CommandInput(), CommandItem(), CommandList(), CommandSeparator(), CommandShortcut() (+3 more)
 
 ### Community 8 - "Getting Started & Server-side Docs"
 Cohesion: 0.18
@@ -176,12 +181,12 @@ Cohesion: 0.09
 Nodes (23): dependencies, class-variance-authority, clsx, cmdk, date-fns, @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities (+15 more)
 
 ### Community 12 - "Filter Fields & Variants"
-Cohesion: 0.24
-Nodes (9): DataTableExportMenu(), DataTableGlobalFilter(), DataTableDensityToggle(), DataTableFilterToggle(), DataTableFullscreenToggle(), DENSITY_LABEL_KEYS, DataTableAlertBanner(), DataTableToolbar() (+1 more)
+Cohesion: 0.19
+Nodes (12): Select(), SelectContent(), SelectGroup(), SelectItem(), SelectLabel(), SelectScrollDownButton(), SelectScrollUpButton(), SelectSeparator() (+4 more)
 
 ### Community 13 - "Context Menu & Cell Editing"
-Cohesion: 0.12
-Nodes (14): ContextMenu(), ContextMenuCheckboxItem(), ContextMenuContent(), ContextMenuItem(), ContextMenuLabel(), ContextMenuRadioItem(), ContextMenuSeparator(), ContextMenuShortcut() (+6 more)
+Cohesion: 0.13
+Nodes (19): ContextMenu(), ContextMenuCheckboxItem(), ContextMenuContent(), ContextMenuItem(), ContextMenuLabel(), ContextMenuRadioItem(), ContextMenuSeparator(), ContextMenuShortcut() (+11 more)
 
 ### Community 14 - "Docs MDX Components"
 Cohesion: 0.11
@@ -189,11 +194,11 @@ Nodes (16): ApiTable(), SectionKey, SECTIONS, Callout(), LABELS, STYLES, Variant
 
 ### Community 15 - "Column Management Docs"
 Cohesion: 0.05
-Nodes (37): Column ordering, enableColumnOrdering, Initial order, initialState.columnOrder, Related, Column pinning, enableColumnPinning, Initial pins (+29 more)
+Nodes (38): Column ordering, enableColumnOrdering, Initial order, initialState.columnOrder, Related, Column pinning, enableColumnPinning, Initial pins (+30 more)
 
 ### Community 16 - "Popover & Theme Customizer"
-Cohesion: 0.06
-Nodes (34): geist, geistMono, notoSerif, raleway, RootLayout(), IconLibraryContext, IconLibraryContextValue, IconLibraryProvider() (+26 more)
+Cohesion: 0.13
+Nodes (12): useIconLibrary(), SiteHeader(), Accent, ACCENTS, BASE_COLORS, ColorPreset, FONTS, ICON_LIBS (+4 more)
 
 ### Community 17 - "Data-table Registry Tokens"
 Cohesion: 0.10
@@ -208,8 +213,8 @@ Cohesion: 0.10
 Nodes (19): aliases, components, hooks, lib, ui, utils, iconLibrary, menuAccent (+11 more)
 
 ### Community 20 - "Filtering & Search Docs"
-Cohesion: 0.06
-Nodes (35): Cell actions, Click to copy, ContextMenuItem, enableClickToCopy, Related, renderCellActionMenuItems, Usage, Choosing a filter control (+27 more)
+Cohesion: 0.05
+Nodes (38): Cell actions, Click to copy, Column actions menu, ContextMenuItem, enableClickToCopy, Related, renderCellActionMenuItems, Usage (+30 more)
 
 ### Community 21 - "Base TypeScript Config"
 Cohesion: 0.11
@@ -220,40 +225,44 @@ Cohesion: 0.16
 Nodes (12): Add the component, Installation, Next, Prerequisites, shadcn CLI add command, shadcn registry distribution, Verify, Density and dark mode (+4 more)
 
 ### Community 23 - "Input & Toggle UI"
-Cohesion: 0.18
-Nodes (13): Button(), buttonVariants, Calendar(), CalendarDayButton(), InputGroup(), InputGroupAddon(), inputGroupAddonVariants, InputGroupButton() (+5 more)
+Cohesion: 0.14
+Nodes (12): Checkbox(), CommandGroup(), Popover(), PopoverContent(), PopoverDescription(), PopoverHeader(), PopoverTitle(), PopoverTrigger() (+4 more)
 
 ### Community 24 - "Select & Pagination UI"
-Cohesion: 0.13
-Nodes (21): Checkbox(), DropdownMenuShortcut(), DropdownMenuSubContent(), DropdownMenuSubTrigger(), Input(), Select(), SelectContent(), SelectGroup() (+13 more)
+Cohesion: 0.19
+Nodes (9): Dialog(), DialogContent(), DialogDescription(), DialogFooter(), DialogHeader(), DialogOverlay(), DialogTitle(), Label() (+1 more)
 
 ### Community 25 - "Row & Virtualization Docs"
 Cohesion: 0.07
-Nodes (23): enableRowOrdering option, onRowOrderChange callback, Related, Row ordering, enableMultiRowSelection option, enableRowSelection option, getRowId option, Related (+15 more)
+Nodes (24): enableRowOrdering option, onRowOrderChange callback, Related, Row ordering, enableMultiRowSelection option, enableRowSelection option, getRowId option, Related (+16 more)
 
 ### Community 26 - "Registry Build Script"
 Cohesion: 0.17
 Nodes (12): cssVars, DEV_DEPENDENCIES, files, item, NPM_DEPENDENCIES, OUT, read(), registry (+4 more)
 
 ### Community 27 - "Icon Library & Theme Store"
-Cohesion: 0.33
-Nodes (5): Badge(), badgeVariants, Toggle(), toggleVariants, DataTableDropToGroupZone()
+Cohesion: 0.22
+Nodes (8): metadata, DocsMobileNav(), DocsPrevNext(), DocsSidebar(), docsFlatNav, docsNav, DocsNavGroup, DocsNavItem
 
 ### Community 29 - "Editing & Loading Docs"
-Cohesion: 0.09
-Nodes (21): table.cnTable.beginCreate, Cell editing, editDisplayMode, meta.editVariant, Editing, enableEditing, Modal editing & creating, onCreateRow (+13 more)
+Cohesion: 0.08
+Nodes (24): table.cnTable.beginCreate, Cell editing, Custom editor, editDisplayMode, meta.editVariant, Editing, enableEditing, Modal editing & creating (+16 more)
 
 ### Community 30 - "UI Dev Dependencies"
 Cohesion: 0.17
 Nodes (12): devDependencies, eslint, tailwindcss, @tailwindcss/postcss, @turbo/gen, @types/node, @types/papaparse, @types/react (+4 more)
 
-### Community 31 - "Examples Browser & Header"
-Cohesion: 0.12
-Nodes (16): Sheet(), SheetContent(), SheetDescription(), SheetFooter(), SheetHeader(), SheetOverlay(), SheetTitle(), SheetTrigger() (+8 more)
+### Community 31 - "Community 31"
+Cohesion: 0.21
+Nodes (10): InputGroup(), InputGroupAddon(), inputGroupAddonVariants, InputGroupButton(), inputGroupButtonVariants, InputGroupInput(), InputGroupText(), InputGroupTextarea() (+2 more)
 
 ### Community 32 - "Next.js TypeScript Config"
 Cohesion: 0.18
 Nodes (10): compilerOptions, allowJs, jsx, module, moduleResolution, noEmit, plugins, display (+2 more)
+
+### Community 33 - "Community 33"
+Cohesion: 0.24
+Nodes (8): Sheet(), SheetContent(), SheetDescription(), SheetFooter(), SheetHeader(), SheetOverlay(), SheetTitle(), SheetTrigger()
 
 ### Community 34 - "TS Config Package Manifest"
 Cohesion: 0.22
@@ -312,12 +321,12 @@ Cohesion: 0.33
 Nodes (5): enableExport, Export, exportFileName, Related, What gets exported
 
 ### Community 50 - "Detail Panel Docs"
-Cohesion: 0.40
-Nodes (4): Detail panel, Related, renderDetailPanel, Usage
+Cohesion: 0.33
+Nodes (5): Detail panel, Positioning the expander, Related, renderDetailPanel, Usage
 
 ### Community 51 - "Row Actions Docs"
-Cohesion: 0.40
-Nodes (4): Related, renderRowActions option, Row actions, Usage
+Cohesion: 0.29
+Nodes (6): As a menu, Positioning the column, Related, renderRowActions option, Row actions, Usage
 
 ### Community 52 - "Tree Data Docs"
 Cohesion: 0.40
@@ -355,33 +364,45 @@ Nodes (4): How it works, Next steps, tablecn, Why tablecn
 Cohesion: 0.50
 Nodes (3): Checklist, Related issues, Summary
 
+### Community 74 - "Community 74"
+Cohesion: 0.20
+Nodes (7): geist, geistMono, notoSerif, raleway, RootLayout(), IconLibraryProvider(), ThemeProvider()
+
+### Community 75 - "Community 75"
+Cohesion: 0.33
+Nodes (5): normalize(), MIME, OUT, resolveFile(), server
+
+### Community 76 - "Community 76"
+Cohesion: 0.31
+Nodes (8): IconLibraryContext, IconLibraryContextValue, IconLibrary, lucideIcons, DEFAULT_PREFS, readPrefs(), ThemePrefs, writePrefs()
+
 ### Community 81 - "Community 81"
-Cohesion: 0.22
-Nodes (8): Custom actions, Internal actions (the icon cluster), Pagination placement, Related, Replacing a whole toolbar, Showing / hiding the toolbars, Styling, Toolbar customization
+Cohesion: 0.20
+Nodes (9): Custom actions, Internal actions (the icon cluster), Pagination placement, Related, Replacing a whole toolbar, Search placement, Showing / hiding the toolbars, Styling (+1 more)
 
 ### Community 83 - "Community 83"
 Cohesion: 0.29
 Nodes (6): Reading and setting from the instance, Related, State management, Styling without props, tablecn UI state, TanStack table state
 
 ## Knowledge Gaps
-- **511 isolated node(s):** `metadata`, `geist`, `raleway`, `notoSerif`, `geistMono` (+506 more)
+- **530 isolated node(s):** `metadata`, `geist`, `raleway`, `notoSerif`, `geistMono` (+525 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `Select & Pagination UI` to `Display Columns, Row Actions & Export`, `Button/Dropdown/Tooltip UI`, `Core Table Rendering & Pinning`, `Command & Dialog UI`, `Filter Fields & Variants`, `Context Menu & Cell Editing`, `Docs MDX Components`, `Popover & Theme Customizer`, `Input & Toggle UI`, `Icon Library & Theme Store`, `Examples Browser & Header`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
-- **Why does `Button()` connect `Input & Toggle UI` to `Display Columns, Row Actions & Export`, `Demo Examples & Column Defs`, `Button/Dropdown/Tooltip UI`, `Command & Dialog UI`, `Filter Fields & Variants`, `Popover & Theme Customizer`, `Select & Pagination UI`, `Examples Browser & Header`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Context Menu & Cell Editing` to `Display Columns, Row Actions & Export`, `Community 33`, `Button/Dropdown/Tooltip UI`, `Core Table Rendering & Pinning`, `Command & Dialog UI`, `Community 74`, `Filter Fields & Variants`, `Community 78`, `Docs MDX Components`, `Popover & Theme Customizer`, `Input & Toggle UI`, `Select & Pagination UI`, `Icon Library & Theme Store`, `Community 31`?**
+  _High betweenness centrality (0.058) - this node is a cross-community bridge._
+- **Why does `Button()` connect `Button/Dropdown/Tooltip UI` to `Community 33`, `Demo Examples & Column Defs`, `Command & Dialog UI`, `Filter Fields & Variants`, `Context Menu & Cell Editing`, `Popover & Theme Customizer`, `Input & Toggle UI`, `Select & Pagination UI`, `Community 31`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Why does `useDataTable()` connect `Demo Examples & Column Defs` to `Display Columns, Row Actions & Export`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **What connects `metadata`, `geist`, `raleway` to the rest of the system?**
-  _518 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _537 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Display Columns, Row Actions & Export` be split into smaller, more focused modules?**
-  _Cohesion score 0.053860719545550176 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05518925518925519 - nodes in this community are weakly interconnected._
 - **Should `Demo Examples & Column Defs` be split into smaller, more focused modules?**
-  _Cohesion score 0.0771478667445938 - nodes in this community are weakly interconnected._
-- **Should `Web App Dependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07514124293785311 - nodes in this community are weakly interconnected._
+- **Should `Button/Dropdown/Tooltip UI` be split into smaller, more focused modules?**
+  _Cohesion score 0.10651629072681704 - nodes in this community are weakly interconnected._

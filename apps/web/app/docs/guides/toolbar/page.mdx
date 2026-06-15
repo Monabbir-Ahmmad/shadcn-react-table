@@ -86,6 +86,17 @@ useDataTable({
 })
 ```
 
+## Alert banner & drop zone
+
+The row-selection alert banner and the group-by drop zone default to the top. Reposition or hide them independently:
+
+```tsx
+useDataTable({
+  positionToolbarAlertBanner: "bottom", // "top" | "bottom" | "none"
+  positionToolbarDropZone: "both", // "top" | "bottom" | "both" | "none"
+})
+```
+
 ## Styling
 
 Every toolbar slot exposes a `data-slot` attribute, so you can target it with a Tailwind selector instead of a styling prop — no per-slot props needed:

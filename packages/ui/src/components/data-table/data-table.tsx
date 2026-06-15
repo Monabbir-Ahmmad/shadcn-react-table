@@ -139,6 +139,8 @@ export function DataTable<TData extends RowData>({
     enableStickyHeader,
     enablePagination,
     positionPagination,
+    positionToolbarAlertBanner,
+    positionToolbarDropZone,
     enableTopToolbar,
     enableBottomToolbar,
     enableKeyboardNavigation,
@@ -508,7 +510,9 @@ export function DataTable<TData extends RowData>({
         {renderTopToolbar
           ? renderTopToolbar({ table })
           : enableTopToolbar && <DataTableToolbar table={table} />}
-        <DataTableAlertBanner table={table} />
+        {positionToolbarAlertBanner === "top" && (
+          <DataTableAlertBanner table={table} />
+        )}
 
         {enablePagination &&
           (positionPagination === "top" || positionPagination === "both") && (
@@ -523,7 +527,11 @@ export function DataTable<TData extends RowData>({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          {enableGrouping && <DataTableDropToGroupZone table={table} />}
+          {enableGrouping &&
+            (positionToolbarDropZone === "top" ||
+              positionToolbarDropZone === "both") && (
+              <DataTableDropToGroupZone table={table} />
+            )}
 
           <div
             ref={gridRef}
@@ -804,7 +812,17 @@ export function DataTable<TData extends RowData>({
               />
             )}
           </div>
+
+          {enableGrouping &&
+            (positionToolbarDropZone === "bottom" ||
+              positionToolbarDropZone === "both") && (
+              <DataTableDropToGroupZone table={table} />
+            )}
         </DndContext>
+
+        {positionToolbarAlertBanner === "bottom" && (
+          <DataTableAlertBanner table={table} />
+        )}
 
         {renderBottomToolbar
           ? renderBottomToolbar({ table })
