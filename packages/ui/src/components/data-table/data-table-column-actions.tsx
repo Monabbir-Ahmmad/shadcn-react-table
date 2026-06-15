@@ -40,6 +40,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
     localization,
     icons,
     setShowColumnFilters,
+    columnFilterDisplayMode,
     enableColumnPinning,
     enableGrouping,
     renderColumnActionsMenuItems,
@@ -104,10 +105,12 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
         {canFilter && (
           <>
             {canSort && <DropdownMenuSeparator />}
-            <DropdownMenuItem onClick={() => setShowColumnFilters(true)}>
-              <icons.filter />
-              {localization.filterByColumn(getColumnLabel(column))}
-            </DropdownMenuItem>
+            {columnFilterDisplayMode === "subheader" && (
+              <DropdownMenuItem onClick={() => setShowColumnFilters(true)}>
+                <icons.filter />
+                {localization.filterByColumn(getColumnLabel(column))}
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onClick={() => column.setFilterValue(undefined)}
               disabled={!hasFilter}

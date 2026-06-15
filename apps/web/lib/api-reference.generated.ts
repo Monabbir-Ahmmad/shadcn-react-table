@@ -277,6 +277,13 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "How edits are surfaced. Default \"cell\"."
   },
   {
+    "name": "createDisplayMode",
+    "type": "CreateDisplayMode",
+    "required": false,
+    "default": "\"modal\"",
+    "description": "How the create form is surfaced, independent of `editDisplayMode`: `\"modal\"` (dialog, default), `\"row\"` (an inline editable row at the top of the table), or `\"custom\"` (you render it from `isCreating` + `rowDraft`)."
+  },
+  {
     "name": "createRowDefaults",
     "type": "Record<string, unknown>",
     "required": false,
@@ -471,6 +478,20 @@ export const useDataTableOptions: ApiMember[] = [
     "required": false,
     "default": "\"bottom\"",
     "description": "Where the pagination controls render. Default \"bottom\". \"none\" keeps pagination active but hides the controls."
+  },
+  {
+    "name": "paginationDisplayMode",
+    "type": "PaginationDisplayMode",
+    "required": false,
+    "default": "\"default\"",
+    "description": "Pagination control style: `\"default\"` (range label + first/prev/next/last buttons), `\"pages\"` (numbered page buttons), or `\"custom\"` (render your own via `renderBottomToolbarCustomActions`). Default \"default\"."
+  },
+  {
+    "name": "columnFilterDisplayMode",
+    "type": "ColumnFilterDisplayMode",
+    "required": false,
+    "default": "\"subheader\"",
+    "description": "Where column filter inputs live: `\"subheader\"` (a filter row under the header, default), `\"popover\"` (per-column popovers opened from the column header), or `\"custom\"` (you render them)."
   },
   {
     "name": "positionGlobalFilter",
@@ -1032,6 +1053,13 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "createDisplayMode",
+    "type": "CreateDisplayMode",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
     "name": "editingCell",
     "type": "EditingCell | null",
     "required": true,
@@ -1286,6 +1314,20 @@ export const tableInstance: ApiMember[] = [
   {
     "name": "positionPagination",
     "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "paginationDisplayMode",
+    "type": "PaginationDisplayMode",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "columnFilterDisplayMode",
+    "type": "ColumnFilterDisplayMode",
     "required": true,
     "default": null,
     "description": ""
@@ -1868,6 +1910,13 @@ export const localizationKeys: ApiMember[] = [
     "type": "string",
     "required": true,
     "default": "Go to last page",
+    "description": ""
+  },
+  {
+    "name": "goToPage",
+    "type": "(page: number) => string",
+    "required": true,
+    "default": "(page) => `Go to page ${page}`",
     "description": ""
   },
   {

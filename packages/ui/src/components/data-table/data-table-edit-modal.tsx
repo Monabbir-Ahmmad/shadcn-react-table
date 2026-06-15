@@ -30,6 +30,7 @@ export function DataTableEditModal<TData extends RowData>({
   const {
     localization,
     editDisplayMode,
+    createDisplayMode,
     editingRowId,
     isCreating,
     rowDraft,
@@ -42,7 +43,8 @@ export function DataTableEditModal<TData extends RowData>({
   const editingRow =
     editingRowId != null ? table.getRow(editingRowId) : undefined
   const open =
-    isCreating || (editDisplayMode === "modal" && editingRowId != null)
+    (isCreating && createDisplayMode === "modal") ||
+    (editDisplayMode === "modal" && editingRowId != null)
   if (!open) return null
 
   const editableColumns = table

@@ -87,6 +87,7 @@ export interface DataTableLocalization {
   goToPreviousPage: string
   goToNextPage: string
   goToLastPage: string
+  goToPage: (page: number) => string
 
   // Editing / actions
   rowActions: string
@@ -205,6 +206,7 @@ export const defaultLocalization: DataTableLocalization = {
   goToPreviousPage: "Go to previous page",
   goToNextPage: "Go to next page",
   goToLastPage: "Go to last page",
+  goToPage: (page) => `Go to page ${page}`,
 
   rowActions: "Row actions",
   edit: "Edit",

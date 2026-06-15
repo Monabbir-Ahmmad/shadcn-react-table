@@ -72,6 +72,7 @@ export const docsNav: DocsNavGroup[] = [
       { title: "Density", href: "/docs/guides/density" },
       { title: "Sticky header & footer", href: "/docs/guides/sticky" },
       { title: "Toolbar customization", href: "/docs/guides/toolbar" },
+      { title: "Display modes", href: "/docs/guides/display-modes" },
       { title: "Table refs", href: "/docs/guides/refs" },
       { title: "Theming", href: "/docs/guides/theming" },
       { title: "Custom icons", href: "/docs/guides/custom-icons" },

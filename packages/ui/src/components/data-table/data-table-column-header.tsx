@@ -7,6 +7,12 @@ import {
 } from "@tanstack/react-table"
 
 import { Badge } from "@monabbir/tablecn/components/badge"
+import { Button } from "@monabbir/tablecn/components/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@monabbir/tablecn/components/popover"
 import {
   Tooltip,
   TooltipContent,
@@ -15,6 +21,7 @@ import {
 import { cn } from "@monabbir/tablecn/lib/utils"
 
 import { DataTableColumnActions, getColumnLabel } from "./data-table-column-actions"
+import { DataTableColumnFilter } from "./data-table-column-filter"
 import type { DataTableInstance } from "./types"
 
 interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
@@ -39,8 +46,43 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   table,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   const { column } = header
-  const { localization, icons, enableColumnActions } = table.cnTable
+  const { localization, icons, enableColumnActions, columnFilterDisplayMode } =
+    table.cnTable
   const align = column.columnDef.meta?.align ?? "left"
+
+  const showFilterPopover =
+    columnFilterDisplayMode === "popover" && column.getCanFilter()
+  const hasFilter = column.getFilterValue() != null
+  const filterPopover = showFilterPopover ? (
+    <Popover>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={localization.filterByColumn(getColumnLabel(column))}
+              className={cn(
+                "size-7 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                hasFilter && "text-primary opacity-100"
+              )}
+            >
+              {hasFilter ? <icons.filter /> : <icons.filterOff />}
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          {localization.filterByColumn(getColumnLabel(column))}
+        </TooltipContent>
+      </Tooltip>
+      <PopoverContent align="start" className="w-64 gap-2">
+        <span className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">
+          {localization.filterByColumn(getColumnLabel(column))}
+        </span>
+        <DataTableColumnFilter header={header} table={table} />
+      </PopoverContent>
+    </Popover>
+  ) : null
 
   const labelNode = header.isPlaceholder
     ? null
@@ -66,6 +108,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
     return (
       <div className={cn("flex items-center gap-1", ALIGN_CLASS[align])}>
         {labelNode}
+        {filterPopover}
       </div>
     )
   }
@@ -121,6 +164,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
           className="-my-1"
         />
       )}
+      {filterPopover}
     </div>
   )
 }

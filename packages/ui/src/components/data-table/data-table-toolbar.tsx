@@ -41,6 +41,7 @@ export function DataTableToolbar<TData extends RowData>({
     enableGlobalFilter,
     positionGlobalFilter,
     enableColumnFilters,
+    columnFilterDisplayMode,
     enableColumnActions,
     enableExport,
     enableDensityToggle,
@@ -85,9 +86,11 @@ export function DataTableToolbar<TData extends RowData>({
                   searchInputRef={searchInputRef}
                 />
               )}
-              {enableColumnFilters && anyFilterable && (
-                <DataTableFilterToggle table={table} />
-              )}
+              {enableColumnFilters &&
+                anyFilterable &&
+                columnFilterDisplayMode === "subheader" && (
+                  <DataTableFilterToggle table={table} />
+                )}
               {enableColumnActions && <DataTableViewOptions table={table} />}
               {enableExport && (
                 <DataTableExportMenu table={table} fileName={exportFileName} />

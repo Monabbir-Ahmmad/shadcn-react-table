@@ -85,6 +85,16 @@ export interface DataTableFilterOption {
 
 export type EditDisplayMode = "cell" | "row" | "table" | "modal" | "custom"
 
+/** How the create form is surfaced (decoupled from {@link EditDisplayMode}). */
+export type CreateDisplayMode = "modal" | "row" | "custom"
+
+/** How the pagination controls render. `"pages"` = numbered page buttons. */
+export type PaginationDisplayMode = "default" | "pages" | "custom"
+
+/** Where column filter inputs live: the filter subheader row or per-column
+ *  popovers opened from the column header. */
+export type ColumnFilterDisplayMode = "subheader" | "popover" | "custom"
+
 /** Which cell is being edited (cell mode). */
 export interface EditingCell {
   rowId: string
@@ -233,6 +243,7 @@ export interface DataTableConfig<TData extends RowData> {
   // Editing / actions
   enableEditing: boolean
   editDisplayMode: EditDisplayMode
+  createDisplayMode: CreateDisplayMode
   editingCell: EditingCell | null
   setEditingCell: React.Dispatch<React.SetStateAction<EditingCell | null>>
   editingRowId: string | null
@@ -316,6 +327,8 @@ export interface DataTableConfig<TData extends RowData> {
   enableStickyHeader: boolean
   enablePagination: boolean
   positionPagination: "top" | "bottom" | "both" | "none"
+  paginationDisplayMode: PaginationDisplayMode
+  columnFilterDisplayMode: ColumnFilterDisplayMode
   positionGlobalFilter: "left" | "right" | "none"
   positionToolbarAlertBanner: "top" | "bottom" | "none"
   positionToolbarDropZone: "top" | "bottom" | "both" | "none"
@@ -444,6 +457,10 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableEditing?: boolean
   /** How edits are surfaced. Default "cell". */
   editDisplayMode?: EditDisplayMode
+  /** How the create form is surfaced, independent of `editDisplayMode`:
+   *  `"modal"` (dialog, default), `"row"` (an inline editable row at the top of
+   *  the table), or `"custom"` (you render it from `isCreating` + `rowDraft`). */
+  createDisplayMode?: CreateDisplayMode
   /** Default values for the create form, keyed by column id. */
   createRowDefaults?: Record<string, unknown>
   /** Show a click-to-copy affordance on all cells (per-column override via meta). */
@@ -544,6 +561,14 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Where the pagination controls render. Default "bottom". "none" keeps
    *  pagination active but hides the controls. */
   positionPagination?: "top" | "bottom" | "both" | "none"
+  /** Pagination control style: `"default"` (range label + first/prev/next/last
+   *  buttons), `"pages"` (numbered page buttons), or `"custom"` (render your own
+   *  via `renderBottomToolbarCustomActions`). Default "default". */
+  paginationDisplayMode?: PaginationDisplayMode
+  /** Where column filter inputs live: `"subheader"` (a filter row under the
+   *  header, default), `"popover"` (per-column popovers opened from the column
+   *  header), or `"custom"` (you render them). */
+  columnFilterDisplayMode?: ColumnFilterDisplayMode
   /** Which toolbar region the global search renders in. Default "right" (the
    *  internal-actions cluster). "left" places it next to the title/actions;
    *  "none" hides it (same as `enableGlobalFilter: false`). */

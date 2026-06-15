@@ -73,6 +73,7 @@ export {
   isColumnEditable,
 } from "./data-table-edit-cell"
 export { DataTableEditModal } from "./data-table-edit-modal"
+export { DataTableCreateRow } from "./data-table-create-row"
 export { ClickToCopy } from "./click-to-copy"
 export { DataTableExportMenu } from "./data-table-export-menu"
 export {
