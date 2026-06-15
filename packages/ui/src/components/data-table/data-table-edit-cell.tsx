@@ -19,8 +19,7 @@ export function isColumnEditable<TData extends RowData, TValue>(
   column: Column<TData, TValue>
 ): boolean {
   return (
-    column.accessorFn != null &&
-    column.columnDef.meta?.enableEditing !== false
+    column.accessorFn != null && column.columnDef.meta?.enableEditing !== false
   )
 }
 
@@ -52,10 +51,18 @@ export function DataTableBodyCellContent<TData extends RowData>({
   const isTableEditing = mode === "table"
 
   if (editable && (isCellEditing || isRowEditing || isTableEditing)) {
+    const renderEditCell = column.columnDef.meta?.renderEditCell
+    if (renderEditCell) {
+      return renderEditCell({ cell, row, column, table })
+    }
     return mode === "row" ? (
       <RowDraftEditor cell={cell} table={table} />
     ) : (
-      <LocalDraftEditor cell={cell} table={table} exitOnCommit={mode === "cell"} />
+      <LocalDraftEditor
+        cell={cell}
+        table={table}
+        exitOnCommit={mode === "cell"}
+      />
     )
   }
 

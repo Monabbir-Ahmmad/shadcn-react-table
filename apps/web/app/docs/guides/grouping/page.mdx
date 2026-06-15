@@ -49,8 +49,27 @@ const columns = [
 ```
 
 <Callout variant="tip" title="Keep totals in view">
-Grouping pairs well with a pinned footer. Add `enableStickyFooter: true` so the grand total stays visible while scrolling long groups.
+  Grouping pairs well with a pinned footer. Add `enableStickyFooter: true` so
+  the grand total stays visible while scrolling long groups.
 </Callout>
+
+## Custom group cells
+
+For finer control over how grouped rows render, the column `meta` exposes render hooks that receive the full table instance: `renderGroupedCell` (the group-header cell), `renderAggregatedCell` (overrides `aggregatedCell`), and `renderPlaceholderCell` (cells with no value because another column owns the group; empty by default).
+
+```tsx
+{
+  accessorKey: "department",
+  header: "Department",
+  meta: {
+    renderGroupedCell: ({ row }) => (
+      <span className="font-medium">
+        {row.getValue("department")} · {row.subRows.length}
+      </span>
+    ),
+  },
+}
+```
 
 ## Related
 

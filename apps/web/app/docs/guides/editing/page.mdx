@@ -19,9 +19,7 @@ const table = useDataTable({
   editDisplayMode: "cell",
   onEditCellSave: ({ row, column, value }) => {
     setData((prev) =>
-      prev.map((r) =>
-        r.id === row.id ? { ...r, [column.id]: value } : r
-      )
+      prev.map((r) => (r.id === row.id ? { ...r, [column.id]: value } : r))
     )
   },
 })
@@ -68,9 +66,7 @@ const table = useDataTable({
   editDisplayMode: "table",
   onEditCellSave: ({ row, column, value }) => {
     setData((prev) =>
-      prev.map((r) =>
-        r.id === row.id ? { ...r, [column.id]: value } : r
-      )
+      prev.map((r) => (r.id === row.id ? { ...r, [column.id]: value } : r))
     )
   },
 })
@@ -142,6 +138,27 @@ const columns = [
     meta: { enableEditing: false },
   },
 ]
+```
+
+## Custom editor
+
+When `editVariant` isn't enough, supply your own editor with `meta.renderEditCell`. It replaces the built-in field while the cell/row is editing; drive the value through the table instance (`setRowDraftValue` for row/modal editing, or `onEditCellSave` for cell editing):
+
+```tsx
+{
+  accessorKey: "status",
+  header: "Status",
+  meta: {
+    renderEditCell: ({ cell, table }) => (
+      <MyStatusPicker
+        value={cell.getValue() as string}
+        onChange={(value) =>
+          table.cnTable.setRowDraftValue(cell.column.id, value)
+        }
+      />
+    ),
+  },
+}
 ```
 
 ## Related

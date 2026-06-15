@@ -511,6 +511,13 @@ export const columnOptions: ApiMember[] = [
     "description": "Custom filter UI for this column (escape hatch). Replaces the variant."
   },
   {
+    "name": "columnFilterModeOptions",
+    "type": "FilterMode[]",
+    "required": false,
+    "default": null,
+    "description": "Restrict (and order) the filter-mode menu for this column to this subset of modes. Include the column's default mode."
+  },
+  {
     "name": "enableEditing",
     "type": "boolean",
     "required": false,
@@ -530,6 +537,34 @@ export const columnOptions: ApiMember[] = [
     "required": false,
     "default": null,
     "description": "Options for the \"select\" edit variant."
+  },
+  {
+    "name": "renderEditCell",
+    "type": "(props: CellRenderProps<TData, TValue>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; drive the value via `table.cnTable` (`rowDraft`/`setRowDraftValue` or `onEditCellSave`)."
+  },
+  {
+    "name": "renderGroupedCell",
+    "type": "(props: CellRenderProps<TData, TValue>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Custom render for this column's group header cell (when grouped)."
+  },
+  {
+    "name": "renderAggregatedCell",
+    "type": "( props: CellRenderProps<TData, TValue> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Custom render for this column's aggregated cell (when grouped). Overrides the TanStack `columnDef.aggregatedCell`."
+  },
+  {
+    "name": "renderPlaceholderCell",
+    "type": "( props: CellRenderProps<TData, TValue> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Custom render for this column's placeholder cells in grouped rows (cells with no value because another column owns the group). Default: empty."
   },
   {
     "name": "validate",

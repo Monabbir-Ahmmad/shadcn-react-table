@@ -59,12 +59,33 @@ declare module "@tanstack/react-table" {
       column: Column<TData, TValue>
       table: DataTableInstance<TData>
     }) => React.ReactNode
+    /** Restrict (and order) the filter-mode menu for this column to this subset
+     *  of modes. Include the column's default mode. */
+    columnFilterModeOptions?: FilterMode[]
     /** Allow editing this column (defaults to true when table editing is on). */
     enableEditing?: boolean
     /** Inline editor variant. Defaults to "text". */
     editVariant?: EditVariant
     /** Options for the "select" edit variant. */
     editSelectOptions?: DataTableFilterOption[]
+    /** Custom inline editor for this column (escape hatch). Replaces the built-in
+     *  editor while the cell/row is editing; drive the value via `table.cnTable`
+     *  (`rowDraft`/`setRowDraftValue` or `onEditCellSave`). */
+    renderEditCell?: (props: CellRenderProps<TData, TValue>) => React.ReactNode
+    /** Custom render for this column's group header cell (when grouped). */
+    renderGroupedCell?: (
+      props: CellRenderProps<TData, TValue>
+    ) => React.ReactNode
+    /** Custom render for this column's aggregated cell (when grouped). Overrides
+     *  the TanStack `columnDef.aggregatedCell`. */
+    renderAggregatedCell?: (
+      props: CellRenderProps<TData, TValue>
+    ) => React.ReactNode
+    /** Custom render for this column's placeholder cells in grouped rows (cells
+     *  with no value because another column owns the group). Default: empty. */
+    renderPlaceholderCell?: (
+      props: CellRenderProps<TData, TValue>
+    ) => React.ReactNode
     /** Validate an edited value; return an error message or undefined if valid. */
     validate?: (value: unknown) => string | undefined
     /** Show a click-to-copy affordance on this column's cells. */
@@ -95,6 +116,14 @@ export interface CellEvent<TData extends RowData> {
   row: Row<TData>
   table: DataTableInstance<TData>
   event: React.MouseEvent<HTMLTableCellElement>
+}
+
+/** Props passed to per-column cell render hooks on `columnDef.meta`. */
+export interface CellRenderProps<TData extends RowData, TValue = unknown> {
+  cell: Cell<TData, TValue>
+  row: Row<TData>
+  column: Column<TData, TValue>
+  table: DataTableInstance<TData>
 }
 
 /**

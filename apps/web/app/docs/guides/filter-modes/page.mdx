@@ -50,10 +50,29 @@ const columns = [
 ]
 ```
 
+## Restricting the available modes
+
+Limit a column's mode menu to a specific subset (and order) with `meta.columnFilterModeOptions`. Only modes valid for the column's variant are kept; include the column's default mode.
+
+```tsx
+const columns = [
+  {
+    accessorKey: "title",
+    header: "Title",
+    meta: {
+      variant: "text",
+      filterMode: "contains",
+      columnFilterModeOptions: ["contains", "startsWith", "equals"],
+    },
+  },
+]
+```
+
 ## Localizing mode labels
 
 Mode menu labels are localizable via `localization.filterModes`.
 
 ## Related
+
 - [Column filtering](/docs/guides/column-filtering)
 - [Localization](/docs/api/localization)

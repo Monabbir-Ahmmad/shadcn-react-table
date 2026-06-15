@@ -873,6 +873,7 @@ function renderBodyCell<TData extends RowData>(
 ): React.ReactNode {
   const { row, column } = cell
   const icons = table.cnTable.icons
+  const meta = column.columnDef.meta
 
   // Grouped/aggregated/placeholder cells are a grouping concept. Tree data
   // (getSubRows) also marks parent rows' cells as "aggregated", which would
@@ -896,7 +897,9 @@ function renderBodyCell<TData extends RowData>(
           <icons.collapsed className="size-4 shrink-0 text-muted-foreground" />
         )}
         <span className="font-medium">
-          {flexRender(column.columnDef.cell, cell.getContext())}
+          {meta?.renderGroupedCell
+            ? meta.renderGroupedCell({ cell, row, column, table })
+            : flexRender(column.columnDef.cell, cell.getContext())}
         </span>
         <span className="text-xs text-muted-foreground">
           ({row.subRows.length})
@@ -906,13 +909,20 @@ function renderBodyCell<TData extends RowData>(
   }
 
   if (isGrouping && cell.getIsAggregated()) {
+    if (meta?.renderAggregatedCell) {
+      return meta.renderAggregatedCell({ cell, row, column, table })
+    }
     return flexRender(
       column.columnDef.aggregatedCell ?? column.columnDef.cell,
       cell.getContext()
     )
   }
 
-  if (isGrouping && cell.getIsPlaceholder()) return null
+  if (isGrouping && cell.getIsPlaceholder()) {
+    return meta?.renderPlaceholderCell
+      ? meta.renderPlaceholderCell({ cell, row, column, table })
+      : null
+  }
 
   return (
     <DataTableBodyCellContent
