@@ -76,6 +76,16 @@ useDataTable({
 })
 ```
 
+## Search placement
+
+`positionGlobalFilter` moves the global search to the left region (next to the title/actions) or keeps it in the right-hand icon cluster. `"none"` hides it (same as `enableGlobalFilter: false`).
+
+```tsx
+useDataTable({
+  positionGlobalFilter: "left", // "left" | "right" | "none"
+})
+```
+
 ## Styling
 
 Every toolbar slot exposes a `data-slot` attribute, so you can target it with a Tailwind selector instead of a styling prop — no per-slot props needed:

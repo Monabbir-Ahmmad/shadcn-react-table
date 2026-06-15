@@ -100,6 +100,11 @@ export function useDataTable<TData extends RowData>(
     enableStickyHeader = true,
     enablePagination = true,
     positionPagination = "bottom",
+    positionGlobalFilter = "right",
+    positionActionsColumn = "last",
+    positionExpandColumn = "first",
+    selectAllMode = "page",
+    enableSelectAll = true,
     enableTopToolbar = true,
     enableBottomToolbar = true,
     enableDensityToggle = true,
@@ -305,19 +310,30 @@ export function useDataTable<TData extends RowData>(
     return set
   }, [columns])
 
-  // Prepend display columns once, memoized so we don't hand TanStack a new
+  // Inject display columns once, memoized so we don't hand TanStack a new
   // `columns` identity every render (a classic infinite-loop / lost-state trap).
-  // Order: drag handle → selection → row number → user columns.
+  // Leading order: drag handle → selection → expand → row number → user columns.
+  // The expand and row-actions columns can be moved to the trailing/leading edge
+  // via `positionExpandColumn` / `positionActionsColumn`.
   const resolvedColumns = React.useMemo(() => {
     const leading = []
+    const trailing = []
     if (enableRowOrdering) {
       leading.push(createRowDragHandleColumn<TData>(localization, icons))
     }
     if (enableRowSelection) {
-      leading.push(createSelectionColumn<TData>(localization))
+      leading.push(
+        createSelectionColumn<TData>(
+          localization,
+          selectAllMode,
+          enableSelectAll
+        )
+      )
     }
     if (needsExpandColumn) {
-      leading.push(createExpandColumn<TData>(localization, icons))
+      const expand = createExpandColumn<TData>(localization, icons)
+      if (positionExpandColumn === "last") trailing.push(expand)
+      else leading.push(expand)
     }
     if (enableRowNumbers) {
       leading.push(
@@ -333,7 +349,11 @@ export function useDataTable<TData extends RowData>(
       !!renderRowActions ||
       (enableEditing &&
         (editDisplayMode === "row" || editDisplayMode === "modal"))
-    const trailing = showRowActions ? [createRowActionsColumn<TData>()] : []
+    if (showRowActions) {
+      const actions = createRowActionsColumn<TData>()
+      if (positionActionsColumn === "first") leading.unshift(actions)
+      else trailing.push(actions)
+    }
     return leading.length > 0 || trailing.length > 0
       ? [...leading, ...columns, ...trailing]
       : columns
@@ -341,11 +361,15 @@ export function useDataTable<TData extends RowData>(
     columns,
     enableRowOrdering,
     enableRowSelection,
+    selectAllMode,
+    enableSelectAll,
     needsExpandColumn,
+    positionExpandColumn,
     enableRowNumbers,
     rowNumberMode,
     enableRowPinning,
     renderRowActions,
+    positionActionsColumn,
     enableEditing,
     editDisplayMode,
     localization,
@@ -508,6 +532,7 @@ export function useDataTable<TData extends RowData>(
     enableStickyHeader,
     enablePagination,
     positionPagination,
+    positionGlobalFilter,
     enableRowSelection,
     enableTopToolbar,
     enableBottomToolbar,

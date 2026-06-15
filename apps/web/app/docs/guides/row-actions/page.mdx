@@ -31,8 +31,20 @@ return <DataTable table={table} />
 ```
 
 <Callout variant="tip" title="Combine with editing">
-Row actions sit alongside editing controls — wire up an edit button here to start row editing programmatically.
+  Row actions sit alongside editing controls — wire up an edit button here to
+  start row editing programmatically.
 </Callout>
+
+## Positioning the column
+
+The actions column trails the data columns by default. Set `positionActionsColumn: "first"` to move it to the leading edge.
+
+```tsx
+useDataTable({
+  renderRowActions: ({ row }) => <RowMenu row={row} />,
+  positionActionsColumn: "first", // "first" | "last"
+})
+```
 
 ## Related
 

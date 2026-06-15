@@ -30,6 +30,7 @@ export function DataTableToolbar<TData extends RowData>({
     renderToolbarInternalActions,
     enableToolbarInternalActions,
     enableGlobalFilter,
+    positionGlobalFilter,
     enableColumnFilters,
     enableColumnActions,
     enableExport,
@@ -42,12 +43,17 @@ export function DataTableToolbar<TData extends RowData>({
     .getAllColumns()
     .some((column) => column.getCanFilter())
 
+  const showGlobalFilter = enableGlobalFilter && positionGlobalFilter !== "none"
+
   return (
     <div
       data-slot="data-table-toolbar"
       className="flex items-start justify-between gap-3 py-1"
     >
       <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
+        {showGlobalFilter && positionGlobalFilter === "left" && (
+          <DataTableGlobalFilter table={table} />
+        )}
         {title != null && (
           <div className="text-sm font-semibold tracking-wide">{title}</div>
         )}
@@ -63,7 +69,9 @@ export function DataTableToolbar<TData extends RowData>({
             renderToolbarInternalActions({ table })
           ) : (
             <>
-              {enableGlobalFilter && <DataTableGlobalFilter table={table} />}
+              {showGlobalFilter && positionGlobalFilter === "right" && (
+                <DataTableGlobalFilter table={table} />
+              )}
               {enableColumnFilters && anyFilterable && (
                 <DataTableFilterToggle table={table} />
               )}

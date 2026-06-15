@@ -7,7 +7,9 @@ Set `enableRowSelection: true` to add a leading checkbox column. When rows are s
 `enableRowSelection` accepts a boolean or a `(row) => boolean` predicate (standard TanStack), so you can allow selecting only certain rows.
 
 <Callout variant="tip" title="Stable selection keys">
-Always provide `getRowId` so selection keys stay stable across re-renders, sorting, and pagination. Without it, selection is keyed by row index and can drift.
+  Always provide `getRowId` so selection keys stay stable across re-renders,
+  sorting, and pagination. Without it, selection is keyed by row index and can
+  drift.
 </Callout>
 
 ## row-selection
@@ -68,6 +70,21 @@ const table = useDataTable({
 })
 
 return <DataTable table={table} />
+```
+
+## Select-all behavior
+
+The selection column header carries a select-all checkbox. `selectAllMode` controls its scope — `"page"` (default) toggles the current page, `"all"` toggles every row across pages. Set `enableSelectAll: false` to hide the header checkbox entirely.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowSelection: true,
+  selectAllMode: "all", // "page" | "all"
+  enableSelectAll: true,
+})
 ```
 
 ## Related

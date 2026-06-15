@@ -231,6 +231,7 @@ export interface DataTableConfig<TData extends RowData> {
   enableStickyHeader: boolean
   enablePagination: boolean
   positionPagination: "top" | "bottom" | "both" | "none"
+  positionGlobalFilter: "left" | "right" | "none"
   enableRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
@@ -399,6 +400,20 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Where the pagination controls render. Default "bottom". "none" keeps
    *  pagination active but hides the controls. */
   positionPagination?: "top" | "bottom" | "both" | "none"
+  /** Which toolbar region the global search renders in. Default "right" (the
+   *  internal-actions cluster). "left" places it next to the title/actions;
+   *  "none" hides it (same as `enableGlobalFilter: false`). */
+  positionGlobalFilter?: "left" | "right" | "none"
+  /** Position of the auto-injected row-actions column. Default "last". */
+  positionActionsColumn?: "first" | "last"
+  /** Position of the auto-injected expand column (tree / detail panel).
+   *  Default "first". */
+  positionExpandColumn?: "first" | "last"
+  /** Select-all scope for the header checkbox: the current page ("page",
+   *  default) or every row ("all"). */
+  selectAllMode?: "page" | "all"
+  /** Show the select-all checkbox in the selection column header. Default true. */
+  enableSelectAll?: boolean
   enableTopToolbar?: boolean
   enableBottomToolbar?: boolean
   /** Show the density toggle in the toolbar. Default true. */

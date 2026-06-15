@@ -382,6 +382,41 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Where the pagination controls render. Default \"bottom\". \"none\" keeps pagination active but hides the controls."
   },
   {
+    "name": "positionGlobalFilter",
+    "type": "\"left\" | \"right\" | \"none\"",
+    "required": false,
+    "default": "\"right\"",
+    "description": "Which toolbar region the global search renders in. Default \"right\" (the internal-actions cluster). \"left\" places it next to the title/actions; \"none\" hides it (same as `enableGlobalFilter: false`)."
+  },
+  {
+    "name": "positionActionsColumn",
+    "type": "\"first\" | \"last\"",
+    "required": false,
+    "default": "\"last\"",
+    "description": "Position of the auto-injected row-actions column. Default \"last\"."
+  },
+  {
+    "name": "positionExpandColumn",
+    "type": "\"first\" | \"last\"",
+    "required": false,
+    "default": "\"first\"",
+    "description": "Position of the auto-injected expand column (tree / detail panel). Default \"first\"."
+  },
+  {
+    "name": "selectAllMode",
+    "type": "\"page\" | \"all\"",
+    "required": false,
+    "default": "\"page\"",
+    "description": "Select-all scope for the header checkbox: the current page (\"page\", default) or every row (\"all\")."
+  },
+  {
+    "name": "enableSelectAll",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "Show the select-all checkbox in the selection column header. Default true."
+  },
+  {
     "name": "enableTopToolbar",
     "type": "boolean",
     "required": false,
@@ -547,7 +582,7 @@ export const columnOptions: ApiMember[] = [
   },
   {
     "name": "renderGroupedCell",
-    "type": "(props: CellRenderProps<TData, TValue>) => React.ReactNode",
+    "type": "( props: CellRenderProps<TData, TValue> ) => React.ReactNode",
     "required": false,
     "default": null,
     "description": "Custom render for this column's group header cell (when grouped)."
@@ -1041,6 +1076,13 @@ export const tableInstance: ApiMember[] = [
   {
     "name": "positionPagination",
     "type": "\"top\" | \"bottom\" | \"both\" | \"none\"",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "positionGlobalFilter",
+    "type": "\"left\" | \"right\" | \"none\"",
     "required": true,
     "default": null,
     "description": ""

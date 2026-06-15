@@ -31,8 +31,21 @@ return <DataTable table={table} />
 ```
 
 <Callout variant="note" title="Expansion is automatic">
-You don't need to configure `getExpandedRowModel` or add a chevron column yourself — defining `renderDetailPanel` turns on row expansion and inserts the expander column.
+  You don't need to configure `getExpandedRowModel` or add a chevron column
+  yourself — defining `renderDetailPanel` turns on row expansion and inserts the
+  expander column.
 </Callout>
+
+## Positioning the expander
+
+The expander column leads the data columns by default. Set `positionExpandColumn: "last"` to move it to the trailing edge.
+
+```tsx
+useDataTable({
+  renderDetailPanel: ({ row }) => <Detail row={row} />,
+  positionExpandColumn: "last", // "first" | "last"
+})
+```
 
 ## Related
 
