@@ -1,5 +1,5 @@
-import type { NextConfig } from "next"
 import createMDX from "@next/mdx"
+import type { NextConfig } from "next"
 
 // Static export for GitHub Pages is opt-in via GITHUB_PAGES=true (set by the
 // deploy workflow), so local `next dev` / `next build` stay unaffected and serve
@@ -26,6 +26,6 @@ const nextConfig: NextConfig = {
     : {}),
 }
 
-const withMDX = createMDX({})
+const withMDX = createMDX({ options: { remarkPlugins: ["remark-gfm"] } })
 
 export default withMDX(nextConfig)
