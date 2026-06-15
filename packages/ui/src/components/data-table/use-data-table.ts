@@ -144,6 +144,9 @@ export function useDataTable<TData extends RowData>(
     onCreateRow,
     renderRowActions,
     renderCellActionMenuItems,
+    renderRowActionMenuItems,
+    renderColumnActionsMenuItems,
+    renderCaption,
     onRowClick,
     onRowDoubleClick,
     onCellClick,
@@ -347,6 +350,7 @@ export function useDataTable<TData extends RowData>(
     }
     const showRowActions =
       !!renderRowActions ||
+      !!renderRowActionMenuItems ||
       (enableEditing &&
         (editDisplayMode === "row" || editDisplayMode === "modal"))
     if (showRowActions) {
@@ -369,6 +373,7 @@ export function useDataTable<TData extends RowData>(
     rowNumberMode,
     enableRowPinning,
     renderRowActions,
+    renderRowActionMenuItems,
     positionActionsColumn,
     enableEditing,
     editDisplayMode,
@@ -546,6 +551,9 @@ export function useDataTable<TData extends RowData>(
     renderBottomToolbar,
     renderToolbarInternalActions,
     renderBottomToolbarCustomActions,
+    renderRowActionMenuItems,
+    renderColumnActionsMenuItems,
+    renderCaption,
     renderEmpty,
   }
 

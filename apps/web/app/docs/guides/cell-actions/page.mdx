@@ -15,9 +15,7 @@ const table = useDataTable({
   getRowId: (row) => row.id,
   renderCellActionMenuItems: ({ cell }) => (
     <ContextMenuItem
-      onSelect={() =>
-        navigator.clipboard.writeText(String(cell.getValue()))
-      }
+      onSelect={() => navigator.clipboard.writeText(String(cell.getValue()))}
     >
       Copy value
     </ContextMenuItem>
@@ -39,6 +37,25 @@ const columns = [
     meta: { enableClickToCopy: true },
   },
 ]
+```
+
+## Column actions menu
+
+Append custom items to the bottom of every column header's actions menu with `renderColumnActionsMenuItems`. Return `DropdownMenuItem`s; they receive `{ column, table }`, and a separator is added before them.
+
+```tsx
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  renderColumnActionsMenuItems: ({ column }) => (
+    <DropdownMenuItem onClick={() => exportColumn(column.id)}>
+      Export column
+    </DropdownMenuItem>
+  ),
+})
 ```
 
 ## Related

@@ -42,6 +42,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
     setShowColumnFilters,
     enableColumnPinning,
     enableGrouping,
+    renderColumnActionsMenuItems,
   } = table.cnTable
   const canSort = column.getCanSort()
   const canHide = column.getCanHide()
@@ -103,9 +104,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
         {canFilter && (
           <>
             {canSort && <DropdownMenuSeparator />}
-            <DropdownMenuItem
-              onClick={() => setShowColumnFilters(true)}
-            >
+            <DropdownMenuItem onClick={() => setShowColumnFilters(true)}>
               <icons.filter />
               {localization.filterByColumn(getColumnLabel(column))}
             </DropdownMenuItem>
@@ -173,6 +172,18 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
               <icons.unpin />
               {localization.unpin}
             </DropdownMenuItem>
+          </>
+        )}
+
+        {renderColumnActionsMenuItems && (
+          <>
+            {(canSort || canFilter || canHide || canGroup || canPin) && (
+              <DropdownMenuSeparator />
+            )}
+            {renderColumnActionsMenuItems({
+              column: column as Column<TData, unknown>,
+              table,
+            })}
           </>
         )}
       </DropdownMenuContent>

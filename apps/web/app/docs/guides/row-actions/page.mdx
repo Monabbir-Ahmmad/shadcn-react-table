@@ -35,6 +35,30 @@ return <DataTable table={table} />
   start row editing programmatically.
 </Callout>
 
+## As a menu
+
+For a compact kebab menu instead of inline buttons, use `renderRowActionMenuItems`. It returns the menu items (e.g. `DropdownMenuItem`s) rendered inside an auto-injected dropdown in the actions column. Both slots can be combined — inline controls plus a menu.
+
+```tsx
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  renderRowActionMenuItems: ({ row, table }) => (
+    <>
+      <DropdownMenuItem onClick={() => table.cnTable.beginRowEdit(row)}>
+        Edit
+      </DropdownMenuItem>
+      <DropdownMenuItem variant="destructive" onClick={() => remove(row.id)}>
+        Delete
+      </DropdownMenuItem>
+    </>
+  ),
+})
+```
+
 ## Positioning the column
 
 The actions column trails the data columns by default. Set `positionActionsColumn: "first"` to move it to the leading edge.

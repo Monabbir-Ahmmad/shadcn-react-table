@@ -3,6 +3,11 @@
 import type { ColumnDef, Row, RowData } from "@tanstack/react-table"
 
 import { Button } from "@monabbir/tablecn/components/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@monabbir/tablecn/components/dropdown-menu"
 
 import type { DataTableInstance } from "./types"
 
@@ -10,7 +15,9 @@ export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
 
 /** Trailing actions column: edit/save/cancel controls + the consumer's
  *  `renderRowActions` slot. */
-export function createRowActionsColumn<TData extends RowData>(): ColumnDef<TData> {
+export function createRowActionsColumn<
+  TData extends RowData,
+>(): ColumnDef<TData> {
   return {
     id: ROW_ACTIONS_COLUMN_ID,
     enableSorting: false,
@@ -46,10 +53,10 @@ function RowActionsCell<TData extends RowData>({
     beginRowEdit,
     cancelEdit,
     renderRowActions,
+    renderRowActionMenuItems,
   } = table.cnTable
 
-  const isEditingThisRow =
-    editDisplayMode === "row" && editingRowId === row.id
+  const isEditingThisRow = editDisplayMode === "row" && editingRowId === row.id
 
   if (isEditingThisRow) {
     return (
@@ -79,8 +86,7 @@ function RowActionsCell<TData extends RowData>({
   }
 
   const canInlineEdit =
-    enableEditing &&
-    (editDisplayMode === "row" || editDisplayMode === "modal")
+    enableEditing && (editDisplayMode === "row" || editDisplayMode === "modal")
 
   return (
     <div className="flex items-center justify-end gap-1">
@@ -96,6 +102,23 @@ function RowActionsCell<TData extends RowData>({
         </Button>
       )}
       {renderRowActions?.({ row, table })}
+      {renderRowActionMenuItems && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={localization.rowActions}
+              className="size-7"
+            >
+              <icons.columnActions />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {renderRowActionMenuItems({ row, table })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   )
 }

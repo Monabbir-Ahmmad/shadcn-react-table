@@ -291,6 +291,20 @@ export const useDataTableOptions: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "renderRowActionMenuItems",
+    "type": "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically."
+  },
+  {
+    "name": "renderColumnActionsMenuItems",
+    "type": "(props: { column: Column<TData, unknown> table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Append custom items to the bottom of every column-actions menu. Returns the items (e.g. `<DropdownMenuItem>`); a separator is added before them."
+  },
+  {
     "name": "onRowClick",
     "type": "(props: RowEvent<TData>) => void",
     "required": false,
@@ -499,6 +513,13 @@ export const useDataTableOptions: ApiMember[] = [
     "required": false,
     "default": null,
     "description": "Custom content rendered in the bottom toolbar's left region (next to pagination), e.g. summary text or actions."
+  },
+  {
+    "name": "renderCaption",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": "Render a `<caption>` for the table (e.g. an accessible summary)."
   },
   {
     "name": "renderEmpty",
@@ -990,6 +1011,20 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
+    "name": "renderRowActionMenuItems",
+    "type": "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderColumnActionsMenuItems",
+    "type": "(props: { column: Column<TData, unknown> table: DataTableInstance<TData> }) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
     "name": "onRowClick",
     "type": "(props: RowEvent<TData>) => void",
     "required": false,
@@ -1174,6 +1209,13 @@ export const tableInstance: ApiMember[] = [
   {
     "name": "renderBottomToolbarCustomActions",
     "type": "( props: DataTableSlotProps<TData> ) => React.ReactNode",
+    "required": false,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "renderCaption",
+    "type": "(props: DataTableSlotProps<TData>) => React.ReactNode",
     "required": false,
     "default": null,
     "description": ""

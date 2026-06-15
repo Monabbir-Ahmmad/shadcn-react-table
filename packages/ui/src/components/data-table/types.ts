@@ -215,6 +215,14 @@ export interface DataTableConfig<TData extends RowData> {
     row: Row<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
+  renderRowActionMenuItems?: (props: {
+    row: Row<TData>
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
+  renderColumnActionsMenuItems?: (props: {
+    column: Column<TData, unknown>
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
 
   // Event listeners
   onRowClick?: (props: RowEvent<TData>) => void
@@ -249,6 +257,7 @@ export interface DataTableConfig<TData extends RowData> {
   renderBottomToolbarCustomActions?: (
     props: DataTableSlotProps<TData>
   ) => React.ReactNode
+  renderCaption?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 
@@ -372,6 +381,18 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
     row: Row<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
+  /** Render a kebab menu in the row-actions column. Returns the menu items
+   *  (e.g. `<DropdownMenuItem>`); injects the actions column automatically. */
+  renderRowActionMenuItems?: (props: {
+    row: Row<TData>
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
+  /** Append custom items to the bottom of every column-actions menu. Returns the
+   *  items (e.g. `<DropdownMenuItem>`); a separator is added before them. */
+  renderColumnActionsMenuItems?: (props: {
+    column: Column<TData, unknown>
+    table: DataTableInstance<TData>
+  }) => React.ReactNode
 
   /** Fired when a body row is clicked / double-clicked. */
   onRowClick?: (props: RowEvent<TData>) => void
@@ -442,6 +463,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   renderBottomToolbarCustomActions?: (
     props: DataTableSlotProps<TData>
   ) => React.ReactNode
+  /** Render a `<caption>` for the table (e.g. an accessible summary). */
+  renderCaption?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 

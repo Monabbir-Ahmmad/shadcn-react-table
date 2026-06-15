@@ -30,6 +30,7 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
@@ -145,6 +146,7 @@ export function DataTable<TData extends RowData>({
     onCellClick,
     onCellDoubleClick,
     renderEmpty,
+    renderCaption,
     renderTopToolbar,
     renderBottomToolbar,
     renderBottomToolbarCustomActions,
@@ -553,6 +555,9 @@ export function DataTable<TData extends RowData>({
               // scroll when their combined width exceeds it.
               className={cn(enableColumnResizing && "w-auto min-w-full")}
             >
+              {renderCaption && (
+                <TableCaption>{renderCaption({ table })}</TableCaption>
+              )}
               <TableHeader
                 className={cn(
                   enableStickyHeader && "sticky top-0 z-20 bg-background"
