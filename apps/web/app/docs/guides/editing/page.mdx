@@ -161,8 +161,19 @@ When `editVariant` isn't enough, supply your own editor with `meta.renderEditCel
 }
 ```
 
+## Relevant options
+
+`useDataTable` options that drive editing and creating:
+
+<ApiTable of="useDataTableOptions" only={["enableEditing", "editDisplayMode", "createDisplayMode", "createRowDefaults", "onEditCellSave", "onSaveRow", "onCreateRow"]} />
+
+Per-column, via `columnDef.meta`:
+
+<ApiTable of="columnOptions" propLabel="meta key" only={["enableEditing", "editVariant", "editSelectOptions", "renderEditCell", "validate"]} />
+
 ## Related
 
+- [Display modes](/docs/guides/display-modes)
 - [Column options](/docs/api/column-options)
 - [Table instance](/docs/api/table-instance)
 - [Row actions](/docs/guides/row-actions)

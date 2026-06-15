@@ -62,7 +62,18 @@ Set `enableColumnFilter: false` on a column to remove its filter control entirel
 
 Select / multi-select filters auto-derive their options, and range filters their min/max bounds, from the data's faceted values. This is on by default; set `enableFacetedValues: false` to skip computing the faceted row models (e.g. for very large client-side datasets) — then provide `meta.options` explicitly for select-style filters.
 
+## Relevant options
+
+`useDataTable` options that affect column filtering:
+
+<ApiTable of="useDataTableOptions" only={["defaultShowColumnFilters", "showColumnFilters", "onShowColumnFiltersChange", "enableColumnFilterModes", "enableFilterMatchHighlighting", "enableFacetedValues", "columnFilterDisplayMode"]} />
+
+Per-column, via `columnDef.meta`:
+
+<ApiTable of="columnOptions" propLabel="meta key" only={["variant", "options", "filterMode", "enableColumnFilterModes", "renderColumnFilter", "columnFilterModeOptions", "disableHighlight"]} />
+
 ## Related
 
 - [Filter modes](/docs/guides/filter-modes)
+- [Display modes](/docs/guides/display-modes)
 - [Column options](/docs/api/column-options)
