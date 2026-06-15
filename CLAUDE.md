@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## What this repo is
+
+**tablecn** (`@monabbir/tablecn`) is a shadcn/ui data table with **Material React Table (MRT V3) parity**, built on TanStack Table v8 and distributed as a **shadcn registry block** (consumers run `npx shadcn add` and the source is copied into their project). Two workspaces:
+
+- **`packages/ui`** (`@monabbir/tablecn`) — the product: the data-table module plus the shadcn primitives it depends on.
+- **`apps/web`** — the docs site, live examples, and the registry host that serves `/r/data-table.json`.
+
+The data table is the product; everything in `apps/web` exists to document and ship it.
+
 ## Critical: Next.js version
 
 This repo uses **Next.js 16.2.6** (with React 19.2.4). Per `AGENTS.md`, this version has breaking changes vs. older Next.js — APIs, conventions, and file structure may differ from training data. Before writing any Next.js code, read the relevant guide in `node_modules/next/dist/docs/` and heed deprecation notices.
@@ -20,6 +29,18 @@ From repo root:
 Per-package: same scripts exist inside `apps/web/package.json` and `packages/ui/package.json` and can be run directly with `pnpm --filter web <script>` or `pnpm --filter @monabbir/tablecn <script>`.
 
 There is no test runner configured in this repo.
+
+## Plans, reviews, and commits
+
+- **Plans** live in `.ai/plans/<plan-name>-<date>.md` (repo root).
+- **Code reviews** live in `.ai/reviews/<review-name>-<date>.md` (repo root).
+- **Commits:**
+  - Never commit unless explicitly asked.
+  - Commits are authored as the repo user — never add a `Co-Authored-By` trailer.
+  - Subject line only — no commit body/description.
+  - Message format: `<prefix>: <msg>` (e.g. `feat: add column pinning`, `fix: debounce filter input`).
+
+> Plans are stored under `.ai/plans/` and code reviews under `.ai/reviews/`.
 
 ## Adding shadcn/ui components
 
@@ -43,6 +64,29 @@ Turborepo + pnpm workspaces. Workspaces are `apps/*` and `packages/*`.
 - Edits in `packages/ui/src/` are picked up immediately by `next dev` — no rebuild needed.
 - The package cannot be consumed outside a bundler that transpiles it (intentional — it's a private internal package).
 - `apps/web/tsconfig.json` maps `@monabbir/tablecn/*` → `../../packages/ui/src/*` so TS resolves the same source paths as runtime.
+
+### The data-table module
+
+The product lives at `packages/ui/src/components/data-table/`, organized MRT-style by **layer**:
+
+- `index.ts` — the public API barrel; the single entry consumers import (`@monabbir/tablecn/components/data-table`). Treat it as the API surface — keep it curated.
+- `components/` — UI grouped by region (`head/ body/ toolbar/ editing/ menus/`).
+- `hooks/` — `use-data-table` + `use-grid-navigation`; `hooks/display-columns/` holds the column-def factories.
+- `fns/` — pluggable filter functions · `utils/` — style/export helpers · `locales/` — default localization.
+- Root also holds `types.ts`, `icons.tsx`, `config-context.tsx`.
+
+The other files in `packages/ui/src/components/` (button, dialog, table, …) are the **shadcn primitives** the table depends on — not part of the data-table module.
+
+### Registry & generated artifacts
+
+`apps/web` ships the table as a registry block and generates **committed** artifacts from the package source. Never hand-edit these — change the source and regenerate:
+
+- `build-registry.mjs` → `apps/web/public/r/{data-table,registry}.json` — recursively walks the module, rewrites package imports to portable `@/` aliases, and preserves the folder structure consumers receive.
+- `build-api-docs.mjs` → `apps/web/lib/api-reference.generated.ts` — API tables derived from `types.ts` / `use-data-table.ts` / `icons.tsx` / `localization.ts` (paths are hardcoded in the script; update them if those files move).
+- `build-example-source.mjs` → `apps/web/lib/example-source.generated.ts`.
+- `build-search-index.mjs` → docs search index.
+
+Run individually via `pnpm --filter tablecn-web {registry,api,examples,search}:build`, or all of them plus `next build` via `pnpm --filter tablecn-web build`. Preview the production static export with `pnpm --filter tablecn-web preview` (serves `apps/web/out` at `http://localhost:3000`).
 
 ### Path aliases (apps/web)
 - `@/*` → app-local files (`apps/web/*`) — used for app-only components/hooks/lib
