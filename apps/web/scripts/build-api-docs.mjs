@@ -18,10 +18,10 @@ const project = new Project({
 })
 
 const typesSf = project.addSourceFileAtPath(join(DT, "types.ts"))
-const localeSf = project.addSourceFileAtPath(join(DT, "locales/localization.ts"))
+const localeSf = project.addSourceFileAtPath(join(DT, "localization.ts"))
 const iconsSf = project.addSourceFileAtPath(join(DT, "icons.tsx"))
-const hookSf = project.addSourceFileAtPath(join(DT, "hooks/use-data-table.ts"))
-const tableSf = project.addSourceFileAtPath(join(DT, "components/data-table.tsx"))
+const hookSf = project.addSourceFileAtPath(join(DT, "use-data-table.ts"))
+const tableSf = project.addSourceFileAtPath(join(DT, "data-table.tsx"))
 
 const oneLine = (s) => (s ?? "").replace(/\s+/g, " ").trim()
 

@@ -26,7 +26,7 @@ const table = useDataTable({
 
 - `"subheader"` — a filter row beneath the header (toggled by the toolbar funnel button).
 - `"popover"` — a filter button on each filterable column header that opens the filter in a popover. The toolbar funnel and the "filter by" menu item are hidden in this mode.
-- `"custom"` — neither is rendered; place filter fields yourself with `DataTableColumnFilter` or `meta.renderColumnFilter`.
+- `"custom"` — neither is rendered; supply your own filter UI per column via `meta.renderColumnFilter`.
 
 ```tsx
 const table = useDataTable({

@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import type { DataTableIcons } from "./icons"
-import type { DataTableLocalization } from "./locales/localization"
+import type { DataTableLocalization } from "./localization"
 
 /**
  * App-wide defaults for every table below it. `useDataTable` merges these
