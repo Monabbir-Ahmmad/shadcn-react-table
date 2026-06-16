@@ -3,14 +3,14 @@
 import { RiMenuLine } from "@remixicon/react"
 import * as React from "react"
 
-import { Button } from "@monabbir/tablecn/components/button"
+import { Button } from "@workspace/ui/components/button"
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@monabbir/tablecn/components/sheet"
+} from "@workspace/ui/components/sheet"
 
 import { DocsSidebar } from "@/components/docs/sidebar"
 

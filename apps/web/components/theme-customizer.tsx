@@ -9,14 +9,14 @@ import {
   RiSunLine,
 } from "@remixicon/react"
 
-import { Button } from "@monabbir/tablecn/components/button"
-import { Label } from "@monabbir/tablecn/components/label"
+import { Button } from "@workspace/ui/components/button"
+import { Label } from "@workspace/ui/components/label"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@monabbir/tablecn/components/popover"
-import { cn } from "@monabbir/tablecn/lib/utils"
+} from "@workspace/ui/components/popover"
+import { cn } from "@workspace/ui/lib/utils"
 
 import type { IconLibrary } from "@/components/examples/icon-sets"
 import { readPrefs, writePrefs } from "@/lib/theme-store"

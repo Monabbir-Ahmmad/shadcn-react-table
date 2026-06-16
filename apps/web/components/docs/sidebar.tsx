@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { docsNav } from "@/lib/docs-nav"
 
 export function DocsSidebar() {

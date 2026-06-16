@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table"
 
-import { Badge } from "@monabbir/tablecn/components/badge"
+import { Badge } from "@workspace/ui/components/badge"
 
 import type { User } from "@/lib/example-data"
 

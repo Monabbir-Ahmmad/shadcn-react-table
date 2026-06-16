@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ContextMenu as ContextMenuPrimitive } from "radix-ui"
 
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { RiArrowRightSLine, RiCheckLine } from "@remixicon/react"
 
 function ContextMenu({

@@ -3,18 +3,18 @@
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@monabbir/tablecn/components/dialog"
+} from "@workspace/ui/components/dialog"
 import {
   InputGroup,
   InputGroupAddon,
-} from "@monabbir/tablecn/components/input-group"
+} from "@workspace/ui/components/input-group"
 import { RiSearchLine, RiCheckLine } from "@remixicon/react"
 
 function Command({

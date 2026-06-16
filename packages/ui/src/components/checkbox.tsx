@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Checkbox as CheckboxPrimitive } from "radix-ui"
 
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { RiCheckLine } from "@remixicon/react"
 
 function Checkbox({

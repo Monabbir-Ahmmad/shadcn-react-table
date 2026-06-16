@@ -4,8 +4,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { RiGithubFill } from "@remixicon/react"
 
-import { Button } from "@monabbir/tablecn/components/button"
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { Button } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
 
 import { DocsMobileNav } from "@/components/docs/mobile-nav"
 import { DocsSearch } from "@/components/docs/search"

@@ -3,8 +3,8 @@
 import { Dialog as SheetPrimitive } from "radix-ui"
 import * as React from "react"
 
-import { Button } from "@monabbir/tablecn/components/button"
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { Button } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
 import { RiCloseLine } from "@remixicon/react"
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {

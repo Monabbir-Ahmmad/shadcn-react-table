@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
-      "@monabbir/tablecn/*": ["../../packages/ui/src/*"]
+      "@monabbir/tablecn/*": ["../../packages/tablecn/src/*"],
+      "@workspace/ui/*": ["../../packages/ui/src/*"]
     },
     "plugins": [
       {

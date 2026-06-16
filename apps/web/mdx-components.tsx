@@ -1,7 +1,7 @@
 import type { MDXComponents } from "mdx/types"
 import Link from "next/link"
 
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { ApiTable } from "@/components/docs/api-table"
 import { Callout } from "@/components/docs/callout"
 import { Example } from "@/components/docs/example"

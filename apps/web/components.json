@@ -14,8 +14,8 @@
     "components": "@/components",
     "hooks": "@/hooks",
     "lib": "@/lib",
-    "utils": "@monabbir/tablecn/lib/utils",
-    "ui": "@monabbir/tablecn/components"
+    "utils": "@workspace/ui/lib/utils",
+    "ui": "@workspace/ui/components"
   },
   "rtl": false,
   "menuColor": "inverted-translucent",

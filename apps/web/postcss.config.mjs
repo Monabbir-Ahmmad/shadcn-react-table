@@ -1,1 +1,1 @@
-export { default } from "@monabbir/tablecn/postcss.config";
+export { default } from "@workspace/ui/postcss.config";

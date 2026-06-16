@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url"
 import { Project, SyntaxKind } from "ts-morph"
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
-const DT = join(REPO, "packages/ui/src/components/data-table")
+const DT = join(REPO, "packages/tablecn/src/components/data-table")
 const OUT = join(REPO, "apps/web/lib/api-reference.generated.ts")
 
 const project = new Project({
@@ -17,11 +17,11 @@ const project = new Project({
   compilerOptions: { allowJs: false, jsx: 4 },
 })
 
-const typesSf = project.addSourceFileAtPath(join(DT, "types.ts"))
-const localeSf = project.addSourceFileAtPath(join(DT, "localization.ts"))
-const iconsSf = project.addSourceFileAtPath(join(DT, "icons.tsx"))
-const hookSf = project.addSourceFileAtPath(join(DT, "use-data-table.ts"))
-const tableSf = project.addSourceFileAtPath(join(DT, "data-table.tsx"))
+const typesSf = project.addSourceFileAtPath(join(DT, "core/types.ts"))
+const localeSf = project.addSourceFileAtPath(join(DT, "core/localization.ts"))
+const iconsSf = project.addSourceFileAtPath(join(DT, "core/icons.tsx"))
+const hookSf = project.addSourceFileAtPath(join(DT, "core/use-data-table.ts"))
+const tableSf = project.addSourceFileAtPath(join(DT, "core/data-table.tsx"))
 
 const oneLine = (s) => (s ?? "").replace(/\s+/g, " ").trim()
 

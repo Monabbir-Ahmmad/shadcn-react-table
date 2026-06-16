@@ -1,10 +1,10 @@
 import type { CSSProperties } from "react"
 import { Geist, Geist_Mono, Raleway, Noto_Serif } from "next/font/google"
 
-import "@monabbir/tablecn/globals.css"
+import "@workspace/ui/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { IconLibraryProvider } from "@/components/icon-library-provider"
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 // Each font gets its own CSS variable so the theme customizer can switch
 // --font-sans / --font-heading between them at runtime.

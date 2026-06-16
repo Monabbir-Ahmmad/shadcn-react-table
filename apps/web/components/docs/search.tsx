@@ -4,7 +4,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { RiSearchLine } from "@remixicon/react"
 
-import { Button } from "@monabbir/tablecn/components/button"
+import { Button } from "@workspace/ui/components/button"
 import {
   Command,
   CommandDialog,
@@ -12,7 +12,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@monabbir/tablecn/components/command"
+} from "@workspace/ui/components/command"
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
 

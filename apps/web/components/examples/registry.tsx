@@ -11,8 +11,8 @@ import {
   RiSortDesc,
 } from "@remixicon/react"
 
-import { Button } from "@monabbir/tablecn/components/button"
-import { ContextMenuItem } from "@monabbir/tablecn/components/context-menu"
+import { Button } from "@workspace/ui/components/button"
+import { ContextMenuItem } from "@workspace/ui/components/context-menu"
 import {
   DataTable,
   useDataTable,

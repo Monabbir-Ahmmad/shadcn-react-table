@@ -4,12 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-**tablecn** (`@monabbir/tablecn`) is a shadcn/ui data table with **Material React Table (MRT V3) parity**, built on TanStack Table v8 and distributed as a **shadcn registry block** (consumers run `npx shadcn add` and the source is copied into their project). Two workspaces:
+**tablecn** (`@monabbir/tablecn`) is a shadcn/ui data table with **Material React Table (MRT V3) parity**, built on TanStack Table v8 and distributed as a **shadcn registry block** (consumers run `npx shadcn add` and the source is copied into their project). Workspaces:
 
-- **`packages/ui`** (`@monabbir/tablecn`) — the product: the data-table module plus the shadcn primitives it depends on.
+- **`packages/tablecn`** (`@monabbir/tablecn`) — the product: the data-table module only. Depends on `@workspace/ui` for the shadcn primitives it renders.
+- **`packages/ui`** (`@workspace/ui`) — the shared shadcn primitives (button, dialog, table, …), `lib/utils` (`cn`), and the single `globals.css`. This is the shadcn target — `pnpm dlx shadcn add` writes here. Consumed by both `@monabbir/tablecn` and `apps/web`.
+- **`packages/eslint-config`**, **`packages/typescript-config`** — shared config presets.
 - **`apps/web`** — the docs site, live examples, and the registry host that serves `/r/data-table.json`.
 
-The data table is the product; everything in `apps/web` exists to document and ship it.
+The data table is the product; everything in `apps/web` exists to document and ship it. The primitives in `@workspace/ui` are in-repo dependencies — they are *not* shipped to consumers (the registry declares them as `registryDependencies` so consumers get them from upstream shadcn in their own style).
 
 ## Critical: Next.js version
 
@@ -26,7 +28,7 @@ From repo root:
 - `pnpm typecheck` — `tsc --noEmit` across workspaces
 - `pnpm format` — Prettier `--write` across workspaces
 
-Per-package: same scripts exist inside `apps/web/package.json` and `packages/ui/package.json` and can be run directly with `pnpm --filter web <script>` or `pnpm --filter @monabbir/tablecn <script>`.
+Per-package: the same scripts exist in each workspace's `package.json` and can be run directly, e.g. `pnpm --filter tablecn-web <script>`, `pnpm --filter @monabbir/tablecn <script>`, or `pnpm --filter @workspace/ui <script>`.
 
 There is no test runner configured in this repo.
 
@@ -50,7 +52,7 @@ Run from the **repo root** (not inside `apps/web`):
 pnpm dlx shadcn@latest add <component> -c apps/web
 ```
 
-Components land in `packages/ui/src/components/` (not in `apps/web`). The `apps/web/components.json` `ui` alias is wired to `@monabbir/tablecn/components`, so the shadcn CLI writes there even when targeting the web app. Import with `import { Foo } from "@monabbir/tablecn/components/foo"`.
+Components land in `packages/ui/src/components/` (the `@workspace/ui` package, not `apps/web`). The `apps/web/components.json` `ui` alias is wired to `@workspace/ui/components`, so the shadcn CLI writes there even when targeting the web app. Import with `import { Foo } from "@workspace/ui/components/foo"`.
 
 shadcn config (both `components.json` files agree): `style: radix-sera`, `baseColor: neutral`, `iconLibrary: remixicon`, RSC + TSX enabled, CSS variables on. The single source-of-truth stylesheet is `packages/ui/src/styles/globals.css`.
 
@@ -60,29 +62,29 @@ Turborepo + pnpm workspaces. Workspaces are `apps/*` and `packages/*`.
 
 ### Consumption model: source, not built artifacts
 
-`@monabbir/tablecn` has **no build step**. Its `exports` field points directly at `./src/*` (`.ts`/`.tsx`), and `apps/web/next.config.ts` declares `transpilePackages: ["@monabbir/tablecn"]` so Next compiles the package's source in-tree. Consequences:
-- Edits in `packages/ui/src/` are picked up immediately by `next dev` — no rebuild needed.
-- The package cannot be consumed outside a bundler that transpiles it (intentional — it's a private internal package).
-- `apps/web/tsconfig.json` maps `@monabbir/tablecn/*` → `../../packages/ui/src/*` so TS resolves the same source paths as runtime.
+Neither `@monabbir/tablecn` nor `@workspace/ui` has a **build step**. Their `exports` fields point directly at `./src/*` (`.ts`/`.tsx`), and `apps/web/next.config.ts` declares `transpilePackages: ["@monabbir/tablecn", "@workspace/ui"]` so Next compiles both packages' source in-tree. Consequences:
+- Edits in `packages/tablecn/src/` and `packages/ui/src/` are picked up immediately by `next dev` — no rebuild needed.
+- The packages cannot be consumed outside a bundler that transpiles them (intentional — they're private internal packages).
+- `apps/web/tsconfig.json` maps `@monabbir/tablecn/*` → `../../packages/tablecn/src/*` and `@workspace/ui/*` → `../../packages/ui/src/*` so TS resolves the same source paths as runtime.
 
 ### The data-table module
 
-The product lives at `packages/ui/src/components/data-table/`, organized MRT-style by **layer**:
+The product lives at `packages/tablecn/src/components/data-table/`, organized by **layer**:
 
 - `index.ts` — the public API barrel; the single entry consumers import (`@monabbir/tablecn/components/data-table`). Treat it as the API surface — keep it curated.
-- `components/` — UI grouped by region (`head/ body/ toolbar/ editing/ menus/`).
-- `hooks/` — `use-data-table` + `use-grid-navigation`; `hooks/display-columns/` holds the column-def factories.
-- `fns/` — pluggable filter functions · `utils/` — style/export helpers · `locales/` — default localization.
-- Root also holds `types.ts`, `icons.tsx`, `config-context.tsx`.
+- `core/` — the engine and shared definitions: `data-table.tsx`, `use-data-table.ts`, `types.ts`, `config-context.tsx`, `icons.tsx`, `localization.ts`.
+- `components/` — the supporting UI grouped by region (`head/ body/ toolbar/ editing/ menus/`).
+- `hooks/` — auxiliary hooks: `use-grid-navigation.ts` and `display-columns/` (column-def factories).
+- `fns/` — pluggable filter functions · `utils/` — style + export helpers (`column-styles.ts`, `export-utils.ts`).
 
-The other files in `packages/ui/src/components/` (button, dialog, table, …) are the **shadcn primitives** the table depends on — not part of the data-table module.
+The data-table imports the **shadcn primitives** it renders (button, dialog, table, …) from `@workspace/ui/components/*` and `cn` from `@workspace/ui/lib/utils` — those primitives live in `packages/ui/src/components/` and are a separate package.
 
 ### Registry & generated artifacts
 
 `apps/web` ships the table as a registry block and generates **committed** artifacts from the package source. Never hand-edit these — change the source and regenerate:
 
 - `build-registry.mjs` → `apps/web/public/r/{data-table,registry}.json` — recursively walks the module, rewrites package imports to portable `@/` aliases, and preserves the folder structure consumers receive.
-- `build-api-docs.mjs` → `apps/web/lib/api-reference.generated.ts` — API tables derived from `types.ts` / `use-data-table.ts` / `icons.tsx` / `localization.ts` (paths are hardcoded in the script; update them if those files move).
+- `build-api-docs.mjs` → `apps/web/lib/api-reference.generated.ts` — API tables derived from `types.ts` / `use-data-table.ts` / `icons.tsx` / `localization.ts` under `packages/tablecn/src/components/data-table` (paths are hardcoded in the script; update them if those files move).
 - `build-example-source.mjs` → `apps/web/lib/example-source.generated.ts`.
 - `build-search-index.mjs` → docs search index.
 
@@ -90,12 +92,13 @@ Run individually via `pnpm --filter tablecn-web {registry,api,examples,search}:b
 
 ### Path aliases (apps/web)
 - `@/*` → app-local files (`apps/web/*`) — used for app-only components/hooks/lib
-- `@monabbir/tablecn/components/*`, `@monabbir/tablecn/hooks/*`, `@monabbir/tablecn/lib/*` → shared package
-- `@monabbir/tablecn/globals.css` — the shared stylesheet, imported once in `apps/web/app/layout.tsx`
-- `cn` helper lives at `@monabbir/tablecn/lib/utils` (clsx + tailwind-merge)
+- `@monabbir/tablecn/components/data-table` → the product (`packages/tablecn/src/...`)
+- `@workspace/ui/components/*`, `@workspace/ui/hooks/*`, `@workspace/ui/lib/*` → shared primitives package (`packages/ui/src/...`)
+- `@workspace/ui/globals.css` — the shared stylesheet, imported once in `apps/web/app/layout.tsx`
+- `cn` helper lives at `@workspace/ui/lib/utils` (clsx + tailwind-merge)
 
 ### Shared config packages
-- `@workspace/eslint-config` exports `./base`, `./next-js`, `./react-internal`. `apps/web` uses `next-js`; `packages/ui` uses `react-internal`. Root `.eslintrc.js` only sets ignore patterns.
+- `@workspace/eslint-config` exports `./base`, `./next-js`, `./react-internal`. `apps/web` uses `next-js`; `packages/ui` and `packages/tablecn` use `react-internal`. Root `.eslintrc.js` only sets ignore patterns.
 - `@workspace/typescript-config` exports `base.json`, `nextjs.json`, `react-library.json`. Each workspace's `tsconfig.json` extends the right one.
 
 ### Styling

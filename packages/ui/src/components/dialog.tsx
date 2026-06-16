@@ -3,8 +3,8 @@
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
-import { cn } from "@monabbir/tablecn/lib/utils"
-import { Button } from "@monabbir/tablecn/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
 import { RiCloseLine } from "@remixicon/react"
 
 function Dialog({

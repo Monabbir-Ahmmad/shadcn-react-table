@@ -11,7 +11,11 @@ import { fileURLToPath } from "node:url"
 // Anchor to the repo root from this file (apps/web/scripts/), so the script
 // works regardless of the cwd `pnpm --filter` runs it in.
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
-const UI_SRC = join(REPO, "packages/ui/src")
+// The data-table module lives in the @monabbir/tablecn package; the shadcn
+// primitives it imports live in @workspace/ui. Only the data-table source is
+// shipped (primitives come from the consumer's own shadcn setup), so we read
+// from packages/tablecn/src.
+const UI_SRC = join(REPO, "packages/tablecn/src")
 const OUT = join(REPO, "apps/web/public/r")
 
 // npm packages the data-table source imports directly. The shadcn primitives
@@ -80,8 +84,8 @@ const cssVars = {
 /** Rewrite internal package imports to the portable shadcn `@/` aliases. */
 function rewrite(content) {
   return content
-    .replaceAll("@monabbir/tablecn/components/", "@/components/ui/")
-    .replaceAll("@monabbir/tablecn/lib/", "@/lib/")
+    .replaceAll("@workspace/ui/components/", "@/components/ui/")
+    .replaceAll("@workspace/ui/lib/", "@/lib/")
 }
 
 function read(relPath) {

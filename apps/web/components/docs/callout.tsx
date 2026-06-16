@@ -1,4 +1,4 @@
-import { cn } from "@monabbir/tablecn/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 type Variant = "note" | "tip" | "warning"
 

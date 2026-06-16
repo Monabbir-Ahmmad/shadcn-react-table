@@ -13,7 +13,7 @@ modal) + create, row/cell actions, click-to-copy, CSV/Excel export,
 localization, custom icons, and server-side/manual mode.
 
 The table component lives in
-[`packages/ui/src/components/data-table/`](packages/ui/src/components/data-table/README.md)
+[`packages/tablecn/src/components/data-table/`](packages/tablecn/src/components/data-table/README.md)
 — that README has the complete API and every feature flag. A browsable example
 of every feature is in [`apps/web`](apps/web) (`pnpm dev`).
 
@@ -60,7 +60,7 @@ also pulls their own deps like `react-day-picker`, `cmdk`, `radix-ui`):
 npx shadcn@latest add badge button calendar checkbox command context-menu dialog dropdown-menu input label popover select skeleton slider table tooltip
 ```
 
-Copy `packages/ui/src/components/data-table/` into your `@/components/ui/data-table/`,
+Copy `packages/tablecn/src/components/data-table/` into your `@/components/ui/data-table/`,
 then add the table's own npm deps:
 
 ```bash
@@ -190,7 +190,7 @@ Pass these to `useDataTable`:
 | Custom icons / i18n | `icons`, `localization` |
 | Server-side data | `manualPagination` / `manualSorting` / `manualFiltering` + `rowCount` + controlled `state` |
 
-The component-level [data-table README](packages/ui/src/components/data-table/README.md)
+The component-level [data-table README](packages/tablecn/src/components/data-table/README.md)
 documents the full option set, `columnDef.meta` fields, server-side mode, and
 stability requirements.
 
@@ -199,8 +199,10 @@ stability requirements.
 Turborepo + pnpm workspaces (`apps/*`, `packages/*`):
 
 - `apps/web` — Next.js 16 demo / examples browser
-- `packages/ui` — the `@monabbir/tablecn` component library (consumed as source via
-  `transpilePackages`; no build step)
+- `packages/tablecn` — the `@monabbir/tablecn` data-table (the product; consumed as
+  source via `transpilePackages`, no build step)
+- `packages/ui` — `@workspace/ui`, the shared shadcn primitives + `lib/utils` +
+  `globals.css` the data-table depends on (also consumed as source)
 - `packages/eslint-config`, `packages/typescript-config` — shared config
 
 ## Commands
@@ -215,10 +217,11 @@ pnpm format      # prettier --write
 
 ## Adding shadcn/ui primitives
 
-Run from the repo root (components land in `packages/ui/src/components`):
+Run from the repo root (components land in `packages/ui/src/components`, the
+`@workspace/ui` package):
 
 ```bash
 pnpm dlx shadcn@latest add <component> -c apps/web
 ```
 
-Import shared components with `import { Foo } from "@monabbir/tablecn/components/foo"`.
+Import shared primitives with `import { Foo } from "@workspace/ui/components/foo"`.

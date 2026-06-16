@@ -24,8 +24,9 @@ pnpm install
    ```bash
    git switch -c my-feature
    ```
-2. Make your change. Edits in `packages/ui/src/` are picked up immediately by
-   `pnpm dev` (no rebuild needed — the package is consumed as source).
+2. Make your change. Edits in `packages/tablecn/src/` (the data-table) and
+   `packages/ui/src/` (shadcn primitives) are picked up immediately by
+   `pnpm dev` (no rebuild needed — the packages are consumed as source).
 3. Before opening a PR, make sure these all pass locally:
    ```bash
    pnpm lint

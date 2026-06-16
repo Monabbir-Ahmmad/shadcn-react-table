@@ -8,8 +8,8 @@ import {
   type Locale,
 } from "react-day-picker"
 
-import { cn } from "@monabbir/tablecn/lib/utils"
-import { Button, buttonVariants } from "@monabbir/tablecn/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { RiArrowLeftSLine, RiArrowRightSLine, RiArrowDownSLine } from "@remixicon/react"
 
 function Calendar({

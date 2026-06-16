@@ -9,7 +9,7 @@ const isPages = process.env.GITHUB_PAGES === "true"
 const basePath = isPages ? "/tablecn" : undefined
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@monabbir/tablecn"],
+  transpilePackages: ["@monabbir/tablecn", "@workspace/ui"],
   // Let `page.mdx` files act as routes alongside ts/tsx.
   pageExtensions: ["ts", "tsx", "mdx"],
   // Exposed to the client so the docs search can load the Pagefind runtime from
