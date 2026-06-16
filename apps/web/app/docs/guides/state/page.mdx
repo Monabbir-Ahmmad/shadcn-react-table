@@ -48,12 +48,22 @@ const table = useDataTable({
 })
 ```
 
-| Uncontrolled seed          | Controlled value    | Change callback             |
-| -------------------------- | ------------------- | --------------------------- |
-| `defaultDensity`           | `density`           | `onDensityChange`           |
-| —                          | `isFullscreen`      | `onIsFullscreenChange`      |
-| `defaultShowColumnFilters` | `showColumnFilters` | `onShowColumnFiltersChange` |
-| `defaultGlobalFilterMode`  | `globalFilterMode`  | `onGlobalFilterModeChange`  |
+<ApiTable
+  of="useDataTableOptions"
+  only={[
+    "defaultDensity",
+    "density",
+    "onDensityChange",
+    "isFullscreen",
+    "onIsFullscreenChange",
+    "defaultShowColumnFilters",
+    "showColumnFilters",
+    "onShowColumnFiltersChange",
+    "defaultGlobalFilterMode",
+    "globalFilterMode",
+    "onGlobalFilterModeChange",
+  ]}
+/>
 
 ## Reading and setting from the instance
 
