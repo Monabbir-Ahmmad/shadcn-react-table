@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "api:build": "node scripts/build-api-docs.mjs",
