@@ -58,13 +58,35 @@ useDataTable({
 })
 ```
 
+## Ranked results
+
+In fuzzy mode, each match carries a relevance score. Set `enableGlobalFilterRankedResults` to order rows by that score — best matches first — for as long as a search is active.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  defaultGlobalFilterMode: "fuzzy",
+  enableGlobalFilterRankedResults: true,
+})
+```
+
+The ranking yields to the user: the moment they click a column to sort, their sort takes over, and clearing the search restores the original order. It applies only in `"fuzzy"` mode and is skipped while grouping or row expansion is active, or under `manualSorting` / `manualFiltering` (the server owns ordering there).
+
+<Callout variant="note" title="Off by default">
+  Material React Table enables this by default; tablecn keeps it off so adding a
+  search box never silently reorders your rows. Opt in when relevance ordering
+  is what you want.
+</Callout>
+
 ## Placement
 
 Move the search to the left toolbar region with `positionGlobalFilter: "left"` — see [Toolbar customization](/docs/guides/toolbar#search-placement).
 
 ## Relevant options
 
-<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "defaultGlobalFilterMode", "globalFilterMode", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
+<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "defaultGlobalFilterMode", "enableGlobalFilterRankedResults", "globalFilterMode", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
 
 ## Related
 

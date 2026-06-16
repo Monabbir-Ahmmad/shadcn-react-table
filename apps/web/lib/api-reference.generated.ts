@@ -116,6 +116,13 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Show the global search mode menu (fuzzy/contains/…). Default true."
   },
   {
+    "name": "enableGlobalFilterRankedResults",
+    "type": "boolean",
+    "required": false,
+    "default": "false",
+    "description": "While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but tablecn keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering."
+  },
+  {
     "name": "defaultGlobalFilterMode",
     "type": "GlobalFilterMode",
     "required": false,

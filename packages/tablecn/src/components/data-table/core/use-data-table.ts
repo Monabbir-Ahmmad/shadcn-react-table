@@ -10,7 +10,6 @@ import {
   getFilteredRowModel,
   getGroupedRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
   type Row,
   type RowData,
@@ -19,6 +18,7 @@ import {
 import {
   createDynamicFilterFn,
   createGlobalFilterFn,
+  createRankedSortedRowModel,
   defaultModeForVariant,
   VALUELESS_MODES,
   type FilterMode,
@@ -123,6 +123,7 @@ export function useDataTable<TData extends RowData>(
     enableFilterMatchHighlighting = true,
     enableGlobalFilter = true,
     enableGlobalFilterModes = true,
+    enableGlobalFilterRankedResults = false,
     defaultGlobalFilterMode = "fuzzy",
     density: densityProp,
     onDensityChange,
@@ -406,6 +407,41 @@ export function useDataTable<TData extends RowData>(
 
   const isManualFiltering = !!tableOptions.manualFiltering
 
+  // Fuzzy-rank ordering: while a fuzzy global search is active and the user
+  // hasn't sorted, order rows by best match. The current config is read through
+  // a ref so the row-model factory keeps a stable identity — recreating it each
+  // render would defeat TanStack's sorted-model memoization.
+  const rankingRef = React.useRef<{
+    enabled: boolean
+    mode: GlobalFilterMode
+    manualSorting: boolean
+    manualFiltering: boolean
+    grouping: boolean
+  }>(null!)
+  rankingRef.current = {
+    enabled: enableGlobalFilterRankedResults,
+    mode: globalFilterMode,
+    manualSorting: !!tableOptions.manualSorting,
+    manualFiltering: isManualFiltering,
+    grouping: enableGrouping,
+  }
+  const rankedSortedRowModel = React.useMemo(
+    () =>
+      createRankedSortedRowModel<TData>((t) => {
+        const c = rankingRef.current
+        if (!c.enabled || c.mode !== "fuzzy") return false
+        if (c.manualSorting || c.manualFiltering) return false
+        const s = t.getState()
+        if (!s.globalFilter) return false
+        if (s.sorting.some(Boolean)) return false
+        if (c.grouping && s.grouping.length > 0) return false
+        if (s.expanded === true || Object.values(s.expanded).some(Boolean))
+          return false
+        return true
+      }),
+    []
+  )
+
   const table = useReactTable<TData>({
     ...tableOptions,
     columns: resolvedColumns,
@@ -439,7 +475,7 @@ export function useDataTable<TData extends RowData>(
     getCoreRowModel: tableOptions.getCoreRowModel ?? getCoreRowModel(),
     getSortedRowModel: tableOptions.manualSorting
       ? tableOptions.getSortedRowModel
-      : (tableOptions.getSortedRowModel ?? getSortedRowModel()),
+      : (tableOptions.getSortedRowModel ?? rankedSortedRowModel),
     getFilteredRowModel: isManualFiltering
       ? tableOptions.getFilteredRowModel
       : (tableOptions.getFilteredRowModel ?? getFilteredRowModel()),
