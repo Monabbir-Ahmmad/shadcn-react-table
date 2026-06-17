@@ -65,6 +65,7 @@ export function DataTableBody<TData extends RowData>({
     enableKeyboardNavigation,
     enableFilterMatchHighlighting,
     columnsWithCustomCell,
+    enableColumnResizing,
     enableColumnVirtualization,
     enableRowVirtualization,
     enableRowOrdering,
@@ -139,6 +140,9 @@ export function DataTableBody<TData extends RowData>({
           "relative bg-background",
           padding,
           ALIGN_CELL[align],
+          // Fixed layout (resizing on) clips overflowing content with an
+          // ellipsis instead of letting it bleed into the next column.
+          enableColumnResizing && "overflow-hidden text-ellipsis",
           getColumnPinningClass(cell.column),
           enableKeyboardNavigation &&
             "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:-outline-offset-2 focus-visible:outline-none"

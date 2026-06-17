@@ -45,7 +45,9 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
     ...widthStyle,
     ...getColumnPinningStyle(column),
     transform: CSS.Translate.toString(transform),
-    transition: "width 0.15s ease",
+    // Animate width for programmatic changes (autosize, pinning) but not during
+    // an active drag, where the easing makes the header lag behind the cursor.
+    transition: column.getIsResizing() ? undefined : "width 0.15s ease",
     opacity: isDragging ? 0.7 : undefined,
     zIndex: isDragging ? 30 : undefined,
   }
@@ -60,6 +62,9 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
       className={cn(
         "relative bg-background",
         padding,
+        // Match the body: under fixed layout, keep long header labels from
+        // bleeding past the (resizable) column edge.
+        resizable && "overflow-hidden",
         getColumnPinningClass(column)
       )}
     >

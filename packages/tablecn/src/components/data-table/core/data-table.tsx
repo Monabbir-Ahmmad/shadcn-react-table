@@ -1,30 +1,43 @@
 "use client"
 
-import * as React from "react"
-import { type RowData } from "@tanstack/react-table"
 import { DndContext, closestCenter } from "@dnd-kit/core"
+import { type RowData } from "@tanstack/react-table"
+import * as React from "react"
 
 import { Table, TableCaption } from "@workspace/ui/components/table"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { getColumnSizeVars } from "../utils/column-styles"
 import { DataTableBody } from "../components/body/data-table-body"
 import {
   DataTableFooter,
   hasFooter,
 } from "../components/body/data-table-footer"
-import { DataTableHeader } from "../components/head/data-table-header"
 import { DataTableEditModal } from "../components/editing/data-table-edit-modal"
+import { DataTableHeader } from "../components/head/data-table-header"
+import { DataTableAlertBanner } from "../components/toolbar/data-table-alert-banner"
+import { DataTableBottomToolbar } from "../components/toolbar/data-table-bottom-toolbar"
 import { DataTableDropToGroupZone } from "../components/toolbar/data-table-grouping"
 import { DataTablePagination } from "../components/toolbar/data-table-pagination"
-import { DataTableBottomToolbar } from "../components/toolbar/data-table-bottom-toolbar"
-import { DataTableAlertBanner } from "../components/toolbar/data-table-alert-banner"
 import { DataTableToolbar } from "../components/toolbar/data-table-toolbar"
 import { useGridNavigation } from "../hooks/use-grid-navigation"
 import { useTableDnd } from "../hooks/use-table-dnd"
 import { useTableVirtualizers } from "../hooks/use-table-virtualizers"
+import { getColumnSizeVars } from "../utils/column-styles"
 import { type DataTableInstance } from "./types"
+
+/**
+ * Body wrapper that freezes during an active column resize. With
+ * `columnResizeMode: "onChange"` the table re-renders on every mousemove;
+ * skipping the body's re-render keeps drags smooth, since column widths come
+ * from the CSS size vars on `<table>` and update without React. Outside of a
+ * resize the comparator returns false, so normal re-rendering is unchanged.
+ */
+const MemoizedDataTableBody = React.memo(
+  DataTableBody,
+  (_prev, next) =>
+    next.table.getState().columnSizingInfo.isResizingColumn !== false
+) as typeof DataTableBody
 
 interface DataTableProps<
   TData extends RowData,
@@ -168,11 +181,17 @@ export function DataTable<TData extends RowData>({
             )}
 
             <Table
-              style={columnSizeVars}
-              // When resizing, size to content but never below the container,
-              // so columns fill the width (incl. full-screen) yet can grow to
-              // scroll when their combined width exceeds it.
-              className={cn(enableColumnResizing && "w-auto min-w-full")}
+              style={{
+                ...columnSizeVars,
+                // Fixed layout makes per-column widths authoritative (auto
+                // layout would stretch/redistribute them and ignore a resize).
+                // The explicit total width lets the surface scroll horizontally
+                // once the columns outgrow it.
+                ...(enableColumnResizing
+                  ? { width: table.getTotalSize() }
+                  : null),
+              }}
+              className={cn(enableColumnResizing && "table-fixed")}
             >
               {renderCaption && (
                 <TableCaption>{renderCaption({ table })}</TableCaption>
@@ -182,7 +201,7 @@ export function DataTable<TData extends RowData>({
                 virtualColumns={virtualColumns}
                 withColumnSpacers={withColumnSpacers}
               />
-              <DataTableBody
+              <MemoizedDataTableBody
                 table={table}
                 rowVirtualizer={rowVirtualizer}
                 virtualItems={virtualItems}
@@ -217,7 +236,10 @@ export function DataTable<TData extends RowData>({
           <DataTableAlertBanner table={table} />
         )}
 
-        <DataTableBottomToolbar table={table} pageSizeOptions={pageSizeOptions} />
+        <DataTableBottomToolbar
+          table={table}
+          pageSizeOptions={pageSizeOptions}
+        />
 
         <DataTableEditModal table={table} />
       </div>
