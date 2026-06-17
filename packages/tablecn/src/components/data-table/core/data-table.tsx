@@ -1,6 +1,6 @@
 "use client"
 
-import { DndContext, closestCenter } from "@dnd-kit/core"
+import { DndContext } from "@dnd-kit/core"
 import { type RowData } from "@tanstack/react-table"
 import * as React from "react"
 
@@ -86,7 +86,7 @@ export function DataTable<TData extends RowData>({
   const { ref: gridRef, onKeyDown } = useGridNavigation<HTMLDivElement>(
     enableKeyboardNavigation
   )
-  const { sensors, handleDragEnd } = useTableDnd(table)
+  const { sensors, collisionDetection, handleDragEnd } = useTableDnd(table)
   const { rowVirtualizer, virtualItems, virtualColumns, withColumnSpacers } =
     useTableVirtualizers(table, gridRef)
 
@@ -143,7 +143,7 @@ export function DataTable<TData extends RowData>({
 
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={collisionDetection}
           onDragEnd={handleDragEnd}
         >
           {enableGrouping &&

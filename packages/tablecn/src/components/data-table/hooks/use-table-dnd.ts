@@ -3,8 +3,11 @@
 import {
   KeyboardSensor,
   PointerSensor,
+  closestCenter,
+  pointerWithin,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
 } from "@dnd-kit/core"
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
@@ -28,6 +31,17 @@ export function useTableDnd<TData extends RowData>(
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
+  // The group drop zone should accept a drop anywhere inside its bounds, not
+  // only near its center. Prefer a pointer-within hit on the zone; otherwise
+  // fall back to closestCenter for column/row reordering (and keyboard dnd,
+  // where pointerWithin yields nothing).
+  const collisionDetection: CollisionDetection = (args) => {
+    const groupHit = pointerWithin(args).find(
+      (c) => c.id === GROUP_DROPZONE_ID
+    )
+    return groupHit ? [groupHit] : closestCenter(args)
+  }
+
   const onRowOrderChange = table.cnTable.onRowOrderChange
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -42,12 +56,15 @@ export function useTableDnd<TData extends RowData>(
       return
     }
 
-    // column drag
+    // column drag → drop on the group zone groups by that column
     if (over.id === GROUP_DROPZONE_ID) {
       const column = table.getColumn(active.id as string)
       if (column && !column.getIsGrouped()) column.toggleGrouping()
       return
     }
+    // Otherwise it's a reorder, which only applies when ordering is enabled
+    // (a column may be draggable solely to support drag-to-group).
+    if (!table.cnTable.enableColumnOrdering) return
     if (active.id === over.id) return
     const base =
       table.getState().columnOrder.length > 0
@@ -59,5 +76,5 @@ export function useTableDnd<TData extends RowData>(
     table.setColumnOrder(arrayMove(base, oldIndex, newIndex))
   }
 
-  return { sensors, handleDragEnd }
+  return { sensors, collisionDetection, handleDragEnd }
 }

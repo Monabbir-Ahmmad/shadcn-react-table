@@ -46,6 +46,7 @@ export function DataTableHeader<TData extends RowData>({
   const {
     density,
     enableColumnOrdering,
+    enableGrouping,
     enableColumnResizing,
     enableColumnVirtualization,
     enableColumnFilters,
@@ -73,7 +74,10 @@ export function DataTableHeader<TData extends RowData>({
       header={header}
       table={table}
       draggable={
-        enableColumnOrdering &&
+        // Draggable for reordering (column ordering) or to drag onto the group
+        // zone (grouping) — the drag-end handler routes by the drop target.
+        (enableColumnOrdering ||
+          (enableGrouping && header.column.getCanGroup())) &&
         !enableColumnVirtualization &&
         !DISPLAY_COLUMN_IDS.has(header.column.id) &&
         !header.column.getIsPinned()
