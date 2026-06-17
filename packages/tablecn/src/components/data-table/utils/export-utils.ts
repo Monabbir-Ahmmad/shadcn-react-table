@@ -3,9 +3,9 @@ import Papa from "papaparse"
 import * as XLSX from "xlsx"
 
 import { getColumnLabel } from "../helpers/column-label"
-import { EXPAND_COLUMN_ID, ROW_DRAG_COLUMN_ID, ROW_NUMBER_COLUMN_ID } from "../display-columns/display-columns"
-import { ROW_ACTIONS_COLUMN_ID } from "../display-columns/data-table-row-actions"
-import { SELECTION_COLUMN_ID } from "../display-columns/selection-column"
+import { EXPAND_COLUMN_ID, ROW_DRAG_COLUMN_ID, ROW_NUMBER_COLUMN_ID } from "../injected-columns/injected-columns"
+import { ROW_ACTIONS_COLUMN_ID } from "../injected-columns/data-table-row-actions"
+import { SELECTION_COLUMN_ID } from "../injected-columns/selection-column"
 import type { DataTableInstance } from "../core/types"
 
 const NON_DATA_COLUMNS = new Set([

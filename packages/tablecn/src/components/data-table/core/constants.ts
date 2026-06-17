@@ -2,9 +2,9 @@ import {
   EXPAND_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
-} from "../display-columns/display-columns"
-import { ROW_ACTIONS_COLUMN_ID } from "../display-columns/data-table-row-actions"
-import { SELECTION_COLUMN_ID } from "../display-columns/selection-column"
+} from "../injected-columns/injected-columns"
+import { ROW_ACTIONS_COLUMN_ID } from "../injected-columns/data-table-row-actions"
+import { SELECTION_COLUMN_ID } from "../injected-columns/selection-column"
 import type { Density } from "./types"
 
 export const DENSITY_ORDER: Density[] = ["comfortable", "compact", "spacious"]

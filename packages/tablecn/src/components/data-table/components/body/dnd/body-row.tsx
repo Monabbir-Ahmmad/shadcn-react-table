@@ -8,7 +8,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { TableRow } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { RowDragContext } from "../../../display-columns/display-columns"
+import { RowDragContext } from "../../../injected-columns/injected-columns"
 
 /**
  * Body row. `useSortable` is always called (disabled when row ordering is off).

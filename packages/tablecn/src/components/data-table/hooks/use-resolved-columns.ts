@@ -7,9 +7,9 @@ import {
   createExpandColumn,
   createRowDragHandleColumn,
   createRowNumberColumn,
-} from "../display-columns/display-columns"
-import { createRowActionsColumn } from "../display-columns/data-table-row-actions"
-import { createSelectionColumn } from "../display-columns/selection-column"
+} from "../injected-columns/injected-columns"
+import { createRowActionsColumn } from "../injected-columns/data-table-row-actions"
+import { createSelectionColumn } from "../injected-columns/selection-column"
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { EditDisplayMode, UseDataTableOptions } from "../core/types"

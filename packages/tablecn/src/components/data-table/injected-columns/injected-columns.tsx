@@ -1,8 +1,9 @@
 "use client"
 
-// Barrel for the injected leading/trailing display-column factories. Each lives
-// in its own file; selection and row-actions columns are siblings in this
-// folder. Many modules import the column-id constants from here.
+// Barrel for the injected leading/trailing column factories (TanStack "display"
+// columns — no data accessor). Each lives in its own file; selection and
+// row-actions columns are siblings in this folder. Many modules import the
+// column-id constants from here.
 
 export { EXPAND_COLUMN_ID, createExpandColumn } from "./expand-column"
 export {

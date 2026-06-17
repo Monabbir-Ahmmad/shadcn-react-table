@@ -75,7 +75,7 @@ The product lives at `packages/tablecn/src/components/data-table/`, organized by
 - `core/` — the engine and shared definitions: `data-table.tsx`, `use-data-table.ts`, `types.ts`, `constants.ts`, `config-context.tsx`, `icons.tsx`, `localization.ts`.
 - `components/` — the supporting UI grouped by region (`head/ body/ toolbar/ editing/ menus/`); regions nest their own subfolders (`head/filter-variants/`, `body/dnd/`, `toolbar/controls/`).
 - `hooks/` — auxiliary hooks: `use-grid-navigation.ts`, the state-slice hooks composed by `use-data-table` (`use-controllable-state`, `use-editing-state`, `use-column-filter-modes`, `use-global-filter-mode`, `use-resolved-columns`, `use-page-reset-on-filter-change`), and the render hooks (`use-table-dnd`, `use-table-virtualizers`).
-- `display-columns/` — column-def factories for the injected columns (`selection`, `expand`, `row-drag`, `row-number`, `row-actions`) + `RowDragContext`.
+- `injected-columns/` — column-def factories for the injected columns (`selection`, `expand`, `row-drag`, `row-number`, `row-actions`) + `RowDragContext`.
 - `helpers/` — pure, framework-light helpers (`column-key`, `column-label`, `effective-filter-mode`, `is-column-editable`).
 - `fns/` — the filter engine (`filter-modes`, `filter-factories`, `ranked-row-model`, `variant-modes`) behind the `filter-fns` barrel · `utils/` — style + export helpers (`column-styles.ts`, `export-utils.ts`).
 
