@@ -234,6 +234,11 @@ export interface DataTableConfig<TData extends RowData> {
   enableColumnOrdering: boolean
   enableColumnPinning: boolean
   enableColumnResizing: boolean
+  enableColumnAutosize: boolean
+  /** Resize a single column to fit its widest visible value (header + data). */
+  autoSizeColumn: (columnId: string) => void
+  /** Auto-size every resizable visible column. */
+  autoSizeAllColumns: () => void
   enableRowOrdering: boolean
   enableRowPinning: boolean
   enableRowNumbers: boolean
@@ -442,6 +447,12 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableColumnPinning?: boolean
   /** Column resizing via an edge drag handle. */
   enableColumnResizing?: boolean
+  /**
+   * Double-clicking a column's resize handle auto-sizes it to fit its widest
+   * value. Defaults to `enableColumnResizing`. When off, double-click resets
+   * the column to its default size instead.
+   */
+  enableColumnAutosize?: boolean
   /** Drag-and-drop row reordering (adds a drag-handle column). */
   enableRowOrdering?: boolean
   /** Row pinning (top) via a pin toggle in the row-number column. */

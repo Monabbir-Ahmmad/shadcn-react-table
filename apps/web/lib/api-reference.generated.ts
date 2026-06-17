@@ -207,6 +207,13 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Column resizing via an edge drag handle."
   },
   {
+    "name": "enableColumnAutosize",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead."
+  },
+  {
     "name": "enableRowOrdering",
     "type": "boolean",
     "required": false,
@@ -981,6 +988,27 @@ export const tableInstance: ApiMember[] = [
     "required": true,
     "default": null,
     "description": ""
+  },
+  {
+    "name": "enableColumnAutosize",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "autoSizeColumn",
+    "type": "(columnId: string) => void",
+    "required": true,
+    "default": null,
+    "description": "Resize a single column to fit its widest visible value (header + data)."
+  },
+  {
+    "name": "autoSizeAllColumns",
+    "type": "() => void",
+    "required": true,
+    "default": null,
+    "description": "Auto-size every resizable visible column."
   },
   {
     "name": "enableRowOrdering",
@@ -1804,7 +1832,7 @@ export const localizationKeys: ApiMember[] = [
     "name": "filterModes",
     "type": "Record<string, string>",
     "required": true,
-    "default": "{\n    fuzzy: \"Fuzzy\",\n    contains: \"Contains\",\n    startsWith: \"Starts with\",\n    endsWith: \"Ends with\",\n    equals: \"Equals\",\n    notEquals: \"Not equals\",\n    empty: \"Empty\",\n    notEmpty: \"Not empty\",\n    between: \"Between (exclusive)\",\n    betweenInclusive: \"Between (inclusive)\",\n    greaterThan: \"Greater than\",\n    greaterThanOrEqualTo: \"Greater than or equal to\",\n    lessThan: \"Less than\",\n    lessThanOrEqualTo: \"Less than or equal to\",\n    before: \"Before\",\n    after: \"After\",\n    betweenDates: \"Between\",\n    equalsString: \"Equals\",\n    arrIncludesSome: \"Includes\",\n    equalsBool: \"Equals\",\n  }",
+    "default": "{\r\n    fuzzy: \"Fuzzy\",\r\n    contains: \"Contains\",\r\n    startsWith: \"Starts with\",\r\n    endsWith: \"Ends with\",\r\n    equals: \"Equals\",\r\n    notEquals: \"Not equals\",\r\n    empty: \"Empty\",\r\n    notEmpty: \"Not empty\",\r\n    between: \"Between (exclusive)\",\r\n    betweenInclusive: \"Between (inclusive)\",\r\n    greaterThan: \"Greater than\",\r\n    greaterThanOrEqualTo: \"Greater than or equal to\",\r\n    lessThan: \"Less than\",\r\n    lessThanOrEqualTo: \"Less than or equal to\",\r\n    before: \"Before\",\r\n    after: \"After\",\r\n    betweenDates: \"Between\",\r\n    equalsString: \"Equals\",\r\n    arrIncludesSome: \"Includes\",\r\n    equalsBool: \"Equals\",\r\n  }",
     "description": "Labels for each filter mode, keyed by the `FilterMode` string."
   },
   {

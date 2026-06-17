@@ -21,7 +21,11 @@ export function ColumnResizeHandle<TData extends RowData, TValue>({
       aria-label={table.cnTable.localization.resizeColumn}
       onMouseDown={header.getResizeHandler()}
       onTouchStart={header.getResizeHandler()}
-      onDoubleClick={() => header.column.resetSize()}
+      onDoubleClick={() =>
+        table.cnTable.enableColumnAutosize
+          ? table.cnTable.autoSizeColumn(header.column.id)
+          : header.column.resetSize()
+      }
       className={cn(
         "absolute top-0 right-0 z-10 h-full w-1 cursor-col-resize touch-none select-none bg-transparent transition-colors hover:bg-border",
         header.column.getIsResizing() && "bg-primary"

@@ -42,6 +42,27 @@ const columns = [
 Define `minSize` and `maxSize` so users cannot collapse or stretch a column past a usable width.
 </Callout>
 
+## Auto-sizing
+Double-click a column's resize handle to size it to fit its widest value — header and data, across the full dataset (not just the rows currently on screen). This is on by default whenever `enableColumnResizing` is set, and respects each column's `minSize`/`maxSize` bounds.
+
+Set `enableColumnAutosize: false` to turn it off; double-clicking the handle then resets the column to its default size instead.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  enableColumnResizing: true,
+  enableColumnAutosize: true, // default: matches enableColumnResizing
+})
+```
+
+You can also trigger it imperatively from the table instance:
+
+```tsx
+table.cnTable.autoSizeColumn("firstName")
+table.cnTable.autoSizeAllColumns()
+```
+
 ## Related
 - [Column options](/docs/api/column-options)
 - [useDataTable options](/docs/api/use-data-table)

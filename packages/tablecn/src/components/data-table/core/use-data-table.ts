@@ -16,6 +16,8 @@ import {
 
 import { VALUELESS_MODES, type FilterMode } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
+import { getColumnLabel } from "../helpers/column-label"
+import { measureColumnWidth } from "../helpers/measure-column-width"
 import { useControllableState } from "../hooks/use-controllable-state"
 import { useEditingState } from "../hooks/use-editing-state"
 import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
@@ -94,6 +96,7 @@ export function useDataTable<TData extends RowData>(
     enableColumnOrdering = false,
     enableColumnPinning = false,
     enableColumnResizing = false,
+    enableColumnAutosize: enableColumnAutosizeProp,
     enableRowOrdering = false,
     enableRowPinning = false,
     enableRowNumbers = false,
@@ -349,6 +352,62 @@ export function useDataTable<TData extends RowData>(
   const tableFooterRef = React.useRef<HTMLTableSectionElement>(null)
   const searchInputRef = React.useRef<HTMLInputElement>(null)
 
+  // Double-clicking a resize handle (or calling this imperatively) fits a column
+  // to its widest value. Defaults on when resizing is enabled.
+  const enableColumnAutosize = enableColumnAutosizeProp ?? enableColumnResizing
+
+  const autoSizeColumn = React.useCallback(
+    (columnId: string) => {
+      const column = table.getColumn(columnId)
+      if (!column || !column.getCanResize()) return
+
+      // Font + horizontal padding come from a real rendered cell so measurement
+      // matches the actual type scale and density; fall back to sane defaults.
+      const containerEl = tableContainerRef.current
+      const sampleCell =
+        containerEl?.querySelector<HTMLElement>("tbody td") ??
+        containerEl?.querySelector<HTMLElement>("thead th") ??
+        null
+      let font = "14px sans-serif"
+      let padding = 24
+      if (sampleCell) {
+        const cs = getComputedStyle(sampleCell)
+        if (cs.font) font = cs.font
+        padding = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)
+      }
+
+      // Measure the full dataset (not just virtualized-visible rows) from raw
+      // values. Headers render uppercase, so match that for measurement.
+      const values = table.getRowModel().rows.map((row) => {
+        const value = row.getValue(columnId)
+        return value == null ? "" : String(value)
+      })
+      const headerText = getColumnLabel(column).toUpperCase()
+
+      const width = measureColumnWidth(values, headerText, {
+        font,
+        padding,
+        // Header room for the sort indicator + column-actions trigger.
+        extraWidth: 48,
+      })
+
+      // Respect any per-column size bounds from the column def.
+      const { minSize, maxSize } = column.columnDef
+      let clamped = width
+      if (typeof minSize === "number") clamped = Math.max(clamped, minSize)
+      if (typeof maxSize === "number") clamped = Math.min(clamped, maxSize)
+
+      table.setColumnSizing((prev) => ({ ...prev, [columnId]: clamped }))
+    },
+    [table]
+  )
+
+  const autoSizeAllColumns = React.useCallback(() => {
+    for (const column of table.getVisibleLeafColumns()) {
+      if (column.getCanResize()) autoSizeColumn(column.id)
+    }
+  }, [table, autoSizeColumn])
+
   const config: DataTableConfig<TData> = {
     localization,
     icons,
@@ -387,6 +446,9 @@ export function useDataTable<TData extends RowData>(
     enableColumnOrdering,
     enableColumnPinning,
     enableColumnResizing,
+    enableColumnAutosize,
+    autoSizeColumn,
+    autoSizeAllColumns,
     enableRowOrdering,
     enableRowPinning,
     enableRowNumbers,
