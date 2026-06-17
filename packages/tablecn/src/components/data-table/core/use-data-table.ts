@@ -22,6 +22,7 @@ import { useControllableState } from "../hooks/use-controllable-state"
 import { useEditingState } from "../hooks/use-editing-state"
 import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
 import { useGlobalFilterMode } from "../hooks/use-global-filter-mode"
+import { useAdvancedFilter } from "../hooks/use-advanced-filter"
 import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { usePageResetOnFilterChange } from "../hooks/use-page-reset-on-filter-change"
 import { useDataTableConfigContext } from "./config-context"
@@ -91,6 +92,10 @@ export function useDataTable<TData extends RowData>(
     onIsFullscreenChange,
     showColumnFilters: showColumnFiltersProp,
     onShowColumnFiltersChange,
+    enableAdvancedFilter = false,
+    advancedFilter: advancedFilterProp,
+    defaultAdvancedFilter,
+    onAdvancedFilterChange,
     globalFilterMode: globalFilterModeProp,
     onGlobalFilterModeChange,
     enableColumnOrdering = false,
@@ -226,6 +231,19 @@ export function useDataTable<TData extends RowData>(
     enableGrouping,
   })
 
+  const {
+    advancedFilter,
+    setAdvancedFilter,
+    showAdvancedFilterPanel,
+    setShowAdvancedFilterPanel,
+    advancedFilteredRowModel,
+  } = useAdvancedFilter<TData>({
+    enableAdvancedFilter,
+    advancedFilter: advancedFilterProp,
+    defaultAdvancedFilter,
+    onAdvancedFilterChange,
+  })
+
   const enableRowSelection =
     tableOptions.enableRowSelection != null
       ? !!tableOptions.enableRowSelection
@@ -298,7 +316,10 @@ export function useDataTable<TData extends RowData>(
       : (tableOptions.getSortedRowModel ?? rankedSortedRowModel),
     getFilteredRowModel: isManualFiltering
       ? tableOptions.getFilteredRowModel
-      : (tableOptions.getFilteredRowModel ?? getFilteredRowModel()),
+      : (tableOptions.getFilteredRowModel ??
+        (enableAdvancedFilter
+          ? advancedFilteredRowModel
+          : getFilteredRowModel())),
     // Client-side faceting powers select/multi-select option lists + counts and
     // range-slider bounds. Skipped in manual mode (server supplies facets) or
     // when `enableFacetedValues` is off.
@@ -327,6 +348,28 @@ export function useDataTable<TData extends RowData>(
     manualPagination: tableOptions.manualPagination,
     autoResetPageIndex: tableOptions.autoResetPageIndex,
   })
+
+  // Advanced filter edits can shrink the result set; jump back to the first
+  // page so the user isn't stranded on an out-of-range page (mirrors the
+  // column-filter reset above).
+  const advancedFilterResetRef = React.useRef(advancedFilter)
+  React.useEffect(() => {
+    if (advancedFilterResetRef.current === advancedFilter) return
+    advancedFilterResetRef.current = advancedFilter
+    if (
+      enableAdvancedFilter &&
+      enablePagination &&
+      !tableOptions.manualPagination
+    ) {
+      table.setPageIndex(0)
+    }
+  }, [
+    advancedFilter,
+    enableAdvancedFilter,
+    enablePagination,
+    tableOptions.manualPagination,
+    table,
+  ])
 
   // Switching a column's mode resets its value so a stale value (e.g. a
   // numeric range left over from "between") can't break the new mode. Valueless
@@ -432,6 +475,11 @@ export function useDataTable<TData extends RowData>(
     setGlobalFilterMode,
     enableGlobalFilter,
     enableGlobalFilterModes,
+    enableAdvancedFilter,
+    advancedFilter,
+    setAdvancedFilter,
+    showAdvancedFilterPanel,
+    setShowAdvancedFilterPanel,
     isLoading,
     isSaving,
     showProgressBars,

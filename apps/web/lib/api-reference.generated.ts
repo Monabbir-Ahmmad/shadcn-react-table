@@ -172,6 +172,34 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Called whenever the filter row is shown or hidden."
   },
   {
+    "name": "enableAdvancedFilter",
+    "type": "boolean",
+    "required": false,
+    "default": "false",
+    "description": "Enable the advanced filter panel: compound rules joined by AND/OR, applied on top of the per-column filters. A toolbar button opens the panel and shows the active-rule count. Default false."
+  },
+  {
+    "name": "advancedFilter",
+    "type": "AdvancedFilterGroup",
+    "required": false,
+    "default": null,
+    "description": "Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for uncontrolled (seed with `defaultAdvancedFilter`)."
+  },
+  {
+    "name": "defaultAdvancedFilter",
+    "type": "AdvancedFilterGroup",
+    "required": false,
+    "default": null,
+    "description": "Initial advanced filter for uncontrolled usage."
+  },
+  {
+    "name": "onAdvancedFilterChange",
+    "type": "(filter: AdvancedFilterGroup) => void",
+    "required": false,
+    "default": null,
+    "description": "Called whenever the advanced filter changes."
+  },
+  {
     "name": "globalFilterMode",
     "type": "GlobalFilterMode",
     "required": false,
@@ -887,6 +915,41 @@ export const tableInstance: ApiMember[] = [
   {
     "name": "enableGlobalFilterModes",
     "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "enableAdvancedFilter",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": "Compound AND/OR filter panel (independent of, and additive to, the per-column filters and global search)."
+  },
+  {
+    "name": "advancedFilter",
+    "type": "AdvancedFilterGroup",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "setAdvancedFilter",
+    "type": "React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "showAdvancedFilterPanel",
+    "type": "boolean",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
+    "name": "setShowAdvancedFilterPanel",
+    "type": "React.Dispatch<React.SetStateAction<boolean>>",
     "required": true,
     "default": null,
     "description": ""
@@ -1832,8 +1895,106 @@ export const localizationKeys: ApiMember[] = [
     "name": "filterModes",
     "type": "Record<string, string>",
     "required": true,
-    "default": "{\r\n    fuzzy: \"Fuzzy\",\r\n    contains: \"Contains\",\r\n    startsWith: \"Starts with\",\r\n    endsWith: \"Ends with\",\r\n    equals: \"Equals\",\r\n    notEquals: \"Not equals\",\r\n    empty: \"Empty\",\r\n    notEmpty: \"Not empty\",\r\n    between: \"Between (exclusive)\",\r\n    betweenInclusive: \"Between (inclusive)\",\r\n    greaterThan: \"Greater than\",\r\n    greaterThanOrEqualTo: \"Greater than or equal to\",\r\n    lessThan: \"Less than\",\r\n    lessThanOrEqualTo: \"Less than or equal to\",\r\n    before: \"Before\",\r\n    after: \"After\",\r\n    betweenDates: \"Between\",\r\n    equalsString: \"Equals\",\r\n    arrIncludesSome: \"Includes\",\r\n    equalsBool: \"Equals\",\r\n  }",
+    "default": "{\n    fuzzy: \"Fuzzy\",\n    contains: \"Contains\",\n    startsWith: \"Starts with\",\n    endsWith: \"Ends with\",\n    equals: \"Equals\",\n    notEquals: \"Not equals\",\n    empty: \"Empty\",\n    notEmpty: \"Not empty\",\n    between: \"Between (exclusive)\",\n    betweenInclusive: \"Between (inclusive)\",\n    greaterThan: \"Greater than\",\n    greaterThanOrEqualTo: \"Greater than or equal to\",\n    lessThan: \"Less than\",\n    lessThanOrEqualTo: \"Less than or equal to\",\n    before: \"Before\",\n    after: \"After\",\n    betweenDates: \"Between\",\n    equalsString: \"Equals\",\n    arrIncludesSome: \"Includes\",\n    equalsBool: \"Equals\",\n  }",
     "description": "Labels for each filter mode, keyed by the `FilterMode` string."
+  },
+  {
+    "name": "advancedFilters",
+    "type": "string",
+    "required": true,
+    "default": "Advanced filters",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersMatchLabel",
+    "type": "string",
+    "required": true,
+    "default": "Match",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersMatchAll",
+    "type": "string",
+    "required": true,
+    "default": "All",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersMatchAny",
+    "type": "string",
+    "required": true,
+    "default": "Any",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersOf",
+    "type": "string",
+    "required": true,
+    "default": "of the following rules",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersAddRule",
+    "type": "string",
+    "required": true,
+    "default": "Add filter",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersApply",
+    "type": "string",
+    "required": true,
+    "default": "Apply",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersClearAll",
+    "type": "string",
+    "required": true,
+    "default": "Clear all",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersColumn",
+    "type": "string",
+    "required": true,
+    "default": "Column",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersOperator",
+    "type": "string",
+    "required": true,
+    "default": "Operator",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersValue",
+    "type": "string",
+    "required": true,
+    "default": "Value",
+    "description": ""
+  },
+  {
+    "name": "advancedFiltersEmpty",
+    "type": "string",
+    "required": true,
+    "default": "No filters yet. Add one to get started.",
+    "description": ""
+  },
+  {
+    "name": "removeFilterRule",
+    "type": "string",
+    "required": true,
+    "default": "Remove filter",
+    "description": ""
+  },
+  {
+    "name": "advancedFilterOperators",
+    "type": "Record<string, string>",
+    "required": true,
+    "default": "{\n    contains: \"contains\",\n    notContains: \"does not contain\",\n    startsWith: \"starts with\",\n    endsWith: \"ends with\",\n    equals: \"equals\",\n    notEquals: \"does not equal\",\n    isEmpty: \"is empty\",\n    isNotEmpty: \"is not empty\",\n    greaterThan: \"greater than\",\n    greaterThanOrEqual: \"greater than or equal\",\n    lessThan: \"less than\",\n    lessThanOrEqual: \"less than or equal\",\n    between: \"is between\",\n  }",
+    "description": "Operator labels, keyed by `AdvancedFilterOperator`."
   },
   {
     "name": "search",
@@ -2117,6 +2278,13 @@ export const iconSlots: ApiMember[] = [
     "required": true,
     "default": "RiFilterOffLine",
     "description": ""
+  },
+  {
+    "name": "advancedFilter",
+    "type": "IconComponent",
+    "required": true,
+    "default": "RiFilter3Line",
+    "description": "Advanced filter panel toggle."
   },
   {
     "name": "clearAll",

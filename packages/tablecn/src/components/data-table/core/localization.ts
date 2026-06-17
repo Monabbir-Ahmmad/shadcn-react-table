@@ -64,6 +64,23 @@ export interface DataTableLocalization {
   /** Labels for each filter mode, keyed by the `FilterMode` string. */
   filterModes: Record<string, string>
 
+  // Advanced filter panel
+  advancedFilters: string
+  advancedFiltersMatchLabel: string
+  advancedFiltersMatchAll: string
+  advancedFiltersMatchAny: string
+  advancedFiltersOf: string
+  advancedFiltersAddRule: string
+  advancedFiltersApply: string
+  advancedFiltersClearAll: string
+  advancedFiltersColumn: string
+  advancedFiltersOperator: string
+  advancedFiltersValue: string
+  advancedFiltersEmpty: string
+  removeFilterRule: string
+  /** Operator labels, keyed by `AdvancedFilterOperator`. */
+  advancedFilterOperators: Record<string, string>
+
   // Global search
   search: string
   searchPlaceholder: string
@@ -185,6 +202,35 @@ export const defaultLocalization: DataTableLocalization = {
     equalsString: "Equals",
     arrIncludesSome: "Includes",
     equalsBool: "Equals",
+  },
+
+  advancedFilters: "Advanced filters",
+  advancedFiltersMatchLabel: "Match",
+  advancedFiltersMatchAll: "All",
+  advancedFiltersMatchAny: "Any",
+  advancedFiltersOf: "of the following rules",
+  advancedFiltersAddRule: "Add filter",
+  advancedFiltersApply: "Apply",
+  advancedFiltersClearAll: "Clear all",
+  advancedFiltersColumn: "Column",
+  advancedFiltersOperator: "Operator",
+  advancedFiltersValue: "Value",
+  advancedFiltersEmpty: "No filters yet. Add one to get started.",
+  removeFilterRule: "Remove filter",
+  advancedFilterOperators: {
+    contains: "contains",
+    notContains: "does not contain",
+    startsWith: "starts with",
+    endsWith: "ends with",
+    equals: "equals",
+    notEquals: "does not equal",
+    isEmpty: "is empty",
+    isNotEmpty: "is not empty",
+    greaterThan: "greater than",
+    greaterThanOrEqual: "greater than or equal",
+    lessThan: "less than",
+    lessThanOrEqual: "less than or equal",
+    between: "is between",
   },
 
   search: "Search",

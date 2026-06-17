@@ -4,8 +4,10 @@ import type * as React from "react"
 import type { RowData } from "@tanstack/react-table"
 
 import { DataTableExportMenu } from "../menus/data-table-export-menu"
+import { DataTableFilterPanel } from "../menus/data-table-filter-panel"
 import { DataTableGlobalFilter } from "./data-table-global-filter"
 import {
+  DataTableAdvancedFilterToggle,
   DataTableDensityToggle,
   DataTableFilterToggle,
   DataTableFullscreenToggle,
@@ -40,6 +42,7 @@ export function DataTableToolbar<TData extends RowData>({
     positionGlobalFilter,
     enableColumnFilters,
     columnFilterDisplayMode,
+    enableAdvancedFilter,
     enableColumnActions,
     enableExport,
     enableDensityToggle,
@@ -54,53 +57,67 @@ export function DataTableToolbar<TData extends RowData>({
   const showGlobalFilter = enableGlobalFilter && positionGlobalFilter !== "none"
 
   return (
-    <div
-      ref={toolbarRef}
-      data-slot="data-table-toolbar"
-      className="flex items-start justify-between gap-3 py-1"
-    >
-      <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
-        {showGlobalFilter && positionGlobalFilter === "left" && (
-          <DataTableGlobalFilter table={table} searchInputRef={searchInputRef} />
-        )}
-        {title != null && (
-          <div className="text-sm font-semibold tracking-wide">{title}</div>
-        )}
-        {renderToolbarActions?.({ table })}
-      </div>
-
-      {enableToolbarInternalActions && (
-        <div
-          data-slot="data-table-toolbar-actions"
-          className="flex shrink-0 items-center gap-1.5"
-        >
-          {renderToolbarInternalActions ? (
-            renderToolbarInternalActions({ table })
-          ) : (
-            <>
-              {showGlobalFilter && positionGlobalFilter === "right" && (
-                <DataTableGlobalFilter
-                  table={table}
-                  searchInputRef={searchInputRef}
-                />
-              )}
-              {enableColumnFilters &&
-                anyFilterable &&
-                columnFilterDisplayMode === "subheader" && (
-                  <DataTableFilterToggle table={table} />
-                )}
-              {enableColumnActions && <DataTableViewOptions table={table} />}
-              {enableExport && (
-                <DataTableExportMenu table={table} fileName={exportFileName} />
-              )}
-              {enableDensityToggle && <DataTableDensityToggle table={table} />}
-              {enableFullscreenToggle && (
-                <DataTableFullscreenToggle table={table} />
-              )}
-            </>
+    <>
+      <div
+        ref={toolbarRef}
+        data-slot="data-table-toolbar"
+        className="flex items-start justify-between gap-3 py-1"
+      >
+        <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
+          {showGlobalFilter && positionGlobalFilter === "left" && (
+            <DataTableGlobalFilter
+              table={table}
+              searchInputRef={searchInputRef}
+            />
           )}
+          {title != null && (
+            <div className="text-sm font-semibold tracking-wide">{title}</div>
+          )}
+          {renderToolbarActions?.({ table })}
         </div>
-      )}
-    </div>
+
+        {enableToolbarInternalActions && (
+          <div
+            data-slot="data-table-toolbar-actions"
+            className="flex shrink-0 items-center gap-1.5"
+          >
+            {renderToolbarInternalActions ? (
+              renderToolbarInternalActions({ table })
+            ) : (
+              <>
+                {showGlobalFilter && positionGlobalFilter === "right" && (
+                  <DataTableGlobalFilter
+                    table={table}
+                    searchInputRef={searchInputRef}
+                  />
+                )}
+                {enableColumnFilters &&
+                  anyFilterable &&
+                  columnFilterDisplayMode === "subheader" && (
+                    <DataTableFilterToggle table={table} />
+                  )}
+                {enableAdvancedFilter && (
+                  <DataTableAdvancedFilterToggle table={table} />
+                )}
+                {enableColumnActions && <DataTableViewOptions table={table} />}
+                {enableExport && (
+                  <DataTableExportMenu
+                    table={table}
+                    fileName={exportFileName}
+                  />
+                )}
+                {enableDensityToggle && (
+                  <DataTableDensityToggle table={table} />
+                )}
+                {enableFullscreenToggle && (
+                  <DataTableFullscreenToggle table={table} />
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+      {enableAdvancedFilter && <DataTableFilterPanel table={table} />}
+    </>
   )
 }

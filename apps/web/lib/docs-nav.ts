@@ -28,6 +28,7 @@ export const docsNav: DocsNavGroup[] = [
       { title: "Column filtering", href: "/docs/guides/column-filtering" },
       { title: "Filter modes", href: "/docs/guides/filter-modes" },
       { title: "Global search", href: "/docs/guides/global-search" },
+      { title: "Advanced filter", href: "/docs/guides/advanced-filter" },
     ],
   },
   {

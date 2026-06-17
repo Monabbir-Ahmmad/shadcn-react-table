@@ -15,6 +15,7 @@ import {
   RiEyeOffLine,
   RiFileExcel2Line,
   RiFileTextLine,
+  RiFilter3Line,
   RiFilterLine,
   RiFilterOffLine,
   RiFullscreenExitLine,
@@ -47,6 +48,8 @@ export interface DataTableIcons {
   columnActions: IconComponent
   filter: IconComponent
   filterOff: IconComponent
+  /** Advanced filter panel toggle. */
+  advancedFilter: IconComponent
   /** Clear-sort / show-all reset action. */
   clearAll: IconComponent
   hide: IconComponent
@@ -83,6 +86,7 @@ export const defaultIcons: DataTableIcons = {
   columnActions: RiMore2Line,
   filter: RiFilterLine,
   filterOff: RiFilterOffLine,
+  advancedFilter: RiFilter3Line,
   clearAll: RiListCheck,
   hide: RiEyeOffLine,
   pin: RiPushpinLine,

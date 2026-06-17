@@ -12,10 +12,10 @@ import {
 } from "@workspace/ui/components/dialog"
 import { Label } from "@workspace/ui/components/label"
 
-import { getColumnLabel } from "../../helpers/column-label"
-import { DataTableEditField } from "./data-table-edit-field"
-import { isColumnEditable } from "../../helpers/is-column-editable"
 import type { DataTableInstance } from "../../core/types"
+import { getColumnLabel } from "../../helpers/column-label"
+import { isColumnEditable } from "../../helpers/is-column-editable"
+import { DataTableEditField } from "./data-table-edit-field"
 
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any
@@ -64,13 +64,18 @@ export function DataTableEditModal<TData extends RowData>({
     if (isCreating) {
       onCreateRow?.({ values: rowDraft, table, exit: cancelEdit })
     } else if (editingRow) {
-      onSaveRow?.({ row: editingRow, values: rowDraft, table, exit: cancelEdit })
+      onSaveRow?.({
+        row: editingRow,
+        values: rowDraft,
+        table,
+        exit: cancelEdit,
+      })
     }
   }
 
   return (
     <Dialog open onOpenChange={(next) => !next && cancelEdit()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {isCreating ? localization.createNewRow : localization.editRow}

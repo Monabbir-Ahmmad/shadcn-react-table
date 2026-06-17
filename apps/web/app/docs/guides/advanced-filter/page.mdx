@@ -1,0 +1,63 @@
+export const metadata = { title: "Advanced filter" }
+
+# Advanced filter
+
+Set `enableAdvancedFilter: true` to add a toolbar button that opens a dialog where users build compound filter rules — multiple conditions joined by **All** (AND) or **Any** (OR) logic. The button badges the number of active rules.
+
+<Example slug="advanced-filter" />
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableAdvancedFilter: true,
+})
+
+return <DataTable table={table} />
+```
+
+## How it works
+
+Each rule is a `{ columnId, operator, value }`. The available operators adapt to the column's `meta.variant`:
+
+| Variant                   | Operators                                                                                      |
+| ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `text` (default)          | contains, does not contain, starts with, ends with, equals, not equals, is empty, is not empty |
+| `select` / `multi-select` | equals, not equals, is empty, is not empty                                                     |
+| `range` / `range-slider`  | equals, not equals, `>`, `≥`, `<`, `≤`, between, is empty, is not empty                                |
+| `date` / `date-range`     | equals, not equals, `>`, `<`, between, is empty, is not empty                                      |
+| `checkbox`                | equals                                                                                         |
+
+Build your rules in the dialog, then click **Apply** to filter the table. Closing or cancelling the dialog discards unapplied edits.
+
+<Callout variant="note" title="Additive to column filters">
+  The advanced filter is independent of the per-column filter row and global
+  search: a row must pass <em>all</em> active filter systems to be shown. Clear
+  the panel's rules (or use "Clear all") to remove just the advanced filters.
+</Callout>
+
+## Controlled usage
+
+Drive the filter from your own state with `advancedFilter` + `onAdvancedFilterChange` (or seed an uncontrolled table with `defaultAdvancedFilter`).
+
+```tsx
+const [filter, setFilter] = React.useState<AdvancedFilterGroup>({
+  logic: "and",
+  rules: [],
+})
+
+const table = useDataTable({
+  data,
+  columns,
+  enableAdvancedFilter: true,
+  advancedFilter: filter,
+  onAdvancedFilterChange: setFilter,
+})
+```
+
+## Related
+
+- [Column filtering](/docs/guides/column-filtering)
+- [Filter modes](/docs/guides/filter-modes)
+- [useDataTable options](/docs/api/use-data-table)

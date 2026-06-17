@@ -91,6 +91,41 @@ export interface DataTableFilterOption {
   value: string
 }
 
+/** Operators for the advanced filter panel's compound rules. Availability per
+ *  column is gated by its `meta.variant` (see `getOperatorsForVariant`). */
+export type AdvancedFilterOperator =
+  | "isEmpty"
+  | "isNotEmpty"
+  | "equals"
+  | "notEquals"
+  | "contains"
+  | "notContains"
+  | "startsWith"
+  | "endsWith"
+  | "greaterThan"
+  | "greaterThanOrEqual"
+  | "lessThan"
+  | "lessThanOrEqual"
+  | "between"
+
+/** A single advanced-filter condition: column + operator + value(s). */
+export interface AdvancedFilterRule {
+  /** Stable key for React + edits. */
+  id: string
+  columnId: string
+  operator: AdvancedFilterOperator
+  /** Comparison value (string / number / Date / undefined). */
+  value: unknown
+  /** Upper bound, only used by the `between` operator. */
+  value2?: unknown
+}
+
+/** The full advanced filter: a flat list of rules joined by one logic mode. */
+export interface AdvancedFilterGroup {
+  logic: "and" | "or"
+  rules: AdvancedFilterRule[]
+}
+
 export type EditDisplayMode = "cell" | "row" | "table" | "modal" | "custom"
 
 /** How the create form is surfaced (decoupled from {@link EditDisplayMode}). */
@@ -219,6 +254,13 @@ export interface DataTableConfig<TData extends RowData> {
   setGlobalFilterMode: (mode: GlobalFilterMode) => void
   enableGlobalFilter: boolean
   enableGlobalFilterModes: boolean
+  /** Compound AND/OR filter panel (independent of, and additive to, the
+   *  per-column filters and global search). */
+  enableAdvancedFilter: boolean
+  advancedFilter: AdvancedFilterGroup
+  setAdvancedFilter: React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>
+  showAdvancedFilterPanel: boolean
+  setShowAdvancedFilterPanel: React.Dispatch<React.SetStateAction<boolean>>
   isLoading: boolean
   isSaving: boolean
   showProgressBars: boolean
@@ -436,6 +478,17 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   showColumnFilters?: boolean
   /** Called whenever the filter row is shown or hidden. */
   onShowColumnFiltersChange?: (showColumnFilters: boolean) => void
+  /** Enable the advanced filter panel: compound rules joined by AND/OR, applied
+   *  on top of the per-column filters. A toolbar button opens the panel and
+   *  shows the active-rule count. Default false. */
+  enableAdvancedFilter?: boolean
+  /** Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for
+   *  uncontrolled (seed with `defaultAdvancedFilter`). */
+  advancedFilter?: AdvancedFilterGroup
+  /** Initial advanced filter for uncontrolled usage. */
+  defaultAdvancedFilter?: AdvancedFilterGroup
+  /** Called whenever the advanced filter changes. */
+  onAdvancedFilterChange?: (filter: AdvancedFilterGroup) => void
   /** Controlled global search mode. Pair with `onGlobalFilterModeChange`;
    *  omit for uncontrolled (seed with `defaultGlobalFilterMode`). */
   globalFilterMode?: GlobalFilterMode
@@ -644,4 +697,3 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   renderCaption?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
-

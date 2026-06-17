@@ -57,7 +57,10 @@ function SortingExample() {
     getRowId: (row) => row.id,
     enableMultiSort: true,
     initialState: {
-      sorting: [{ id: "department", desc: false }, { id: "salary", desc: true }],
+      sorting: [
+        { id: "department", desc: false },
+        { id: "salary", desc: true },
+      ],
       pagination: { pageSize: 10 },
     },
   })
@@ -90,6 +93,19 @@ function FilterModesExample() {
     getRowId: (row) => row.id,
     defaultShowColumnFilters: true,
     enableColumnFilterModes: true,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+
+function AdvancedFilterExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableAdvancedFilter: true,
     initialState: { pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
@@ -211,7 +227,11 @@ function LoadingExample() {
     isLoading,
     initialState: { pagination: { pageSize: 10 } },
     renderToolbarActions: () => (
-      <Button variant="outline" size="sm" onClick={() => setIsLoading((v) => !v)}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setIsLoading((v) => !v)}
+      >
         {isLoading ? "Show data" : "Show loading"}
       </Button>
     ),
@@ -423,7 +443,11 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       exit()
     },
     renderToolbarActions: ({ table }) => (
-      <Button variant="outline" size="sm" onClick={() => table.cnTable.beginCreate()}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => table.cnTable.beginCreate()}
+      >
         <RiAddLine />
         New
       </Button>
@@ -509,16 +533,19 @@ function VirtualizedExample() {
 }
 
 function wideColumns(): ColumnDef<User>[] {
-  const extra = Array.from({ length: 24 }, (_, i): ColumnDef<User> => ({
-    id: `metric${i}`,
-    header: `Metric ${i + 1}`,
-    accessorFn: (row) => (row.age * (i + 3)) % 100,
-    size: 110,
-    meta: { align: "right" },
-    cell: ({ getValue }) => (
-      <span className="tabular-nums">{getValue<number>()}</span>
-    ),
-  }))
+  const extra = Array.from(
+    { length: 24 },
+    (_, i): ColumnDef<User> => ({
+      id: `metric${i}`,
+      header: `Metric ${i + 1}`,
+      accessorFn: (row) => (row.age * (i + 3)) % 100,
+      size: 110,
+      meta: { align: "right" },
+      cell: ({ getValue }) => (
+        <span className="tabular-nums">{getValue<number>()}</span>
+      ),
+    })
+  )
   return [...userColumns(), ...extra]
 }
 
@@ -728,38 +755,252 @@ export interface ExampleDef {
 }
 
 export const EXAMPLES: ExampleDef[] = [
-  { slug: "basic", title: "Basic", description: "Sorting + client pagination — the default feature set.", category: "Basics", Component: BasicExample },
-  { slug: "sorting", title: "Sorting", description: "Multi-column sorting (shift-click) with an order badge.", category: "Basics", Component: SortingExample },
-  { slug: "column-filters", title: "Column filters", description: "Per-column filter row with text, select, multi-select, range, and date variants.", category: "Filtering", Component: ColumnFiltersExample },
-  { slug: "filter-modes", title: "Filter modes", description: "Switch a column's match mode (contains, starts with, between, …).", category: "Filtering", Component: FilterModesExample },
-  { slug: "global-search", title: "Global search", description: "Expandable fuzzy search across all columns, with mode menu.", category: "Filtering", Component: GlobalSearchExample },
-  { slug: "column-ordering", title: "Column ordering", description: "Drag column headers to reorder.", category: "Columns", Component: ColumnOrderingExample },
-  { slug: "column-pinning", title: "Column pinning", description: "Pin columns left/right; they stay sticky while scrolling.", category: "Columns", Component: ColumnPinningExample },
-  { slug: "column-resizing", title: "Column resizing", description: "Drag the header edge to resize a column.", category: "Columns", Component: ColumnResizingExample },
-  { slug: "column-visibility", title: "Column visibility", description: "Toggle columns from the toolbar or the column-actions menu.", category: "Columns", Component: ColumnVisibilityExample },
-  { slug: "density", title: "Density", description: "Cycle comfortable → compact → spacious.", category: "Display", Component: DensityExample },
-  { slug: "sticky", title: "Sticky header & footer", description: "Header and aggregation footer stay visible while scrolling.", category: "Display", Component: StickyExample },
-  { slug: "loading", title: "Loading state", description: "Skeleton rows + progress bar; toggle to compare.", category: "Display", Component: LoadingExample },
-  { slug: "row-selection", title: "Row selection", description: "Multi-row selection with an alert banner.", category: "Selection & rows", Component: RowSelectionExample },
-  { slug: "single-selection", title: "Single selection", description: "Single-row selection (no select-all).", category: "Selection & rows", Component: SingleSelectionExample },
-  { slug: "row-numbers", title: "Row numbers", description: "A leading row-number column.", category: "Selection & rows", Component: RowNumbersExample },
-  { slug: "row-pinning", title: "Row pinning", description: "Pin rows to the top via the row-number column.", category: "Selection & rows", Component: RowPinningExample },
-  { slug: "row-ordering", title: "Row ordering", description: "Drag rows to reorder (controlled data).", category: "Selection & rows", Component: RowOrderingExample },
-  { slug: "grouping", title: "Grouping & aggregation", description: "Group by a column; aggregate with a sticky footer total.", category: "Grouping & trees", Component: GroupingExample },
-  { slug: "detail-panel", title: "Detail panel", description: "Expand a row to reveal a custom detail panel.", category: "Grouping & trees", Component: DetailPanelExample },
-  { slug: "tree", title: "Tree (sub-rows)", description: "Expandable hierarchical data via getSubRows.", category: "Grouping & trees", Component: TreeExample },
-  { slug: "editing-cell", title: "Editing — cell", description: "Click a cell to edit it inline.", category: "Editing", Component: () => <EditingExample mode="cell" /> },
-  { slug: "editing-row", title: "Editing — row", description: "Edit a whole row inline with save/cancel.", category: "Editing", Component: () => <EditingExample mode="row" /> },
-  { slug: "editing-table", title: "Editing — table", description: "Every editable cell is always editable.", category: "Editing", Component: () => <EditingExample mode="table" /> },
-  { slug: "editing-modal", title: "Editing — modal", description: "Edit or create a row in a dialog.", category: "Editing", Component: () => <EditingExample mode="modal" /> },
-  { slug: "row-actions", title: "Row actions", description: "A trailing actions column (e.g. delete).", category: "Actions", Component: RowActionsExample },
-  { slug: "cell-actions", title: "Cell actions & copy", description: "Right-click a cell for actions; click-to-copy enabled.", category: "Actions", Component: CellActionsExample },
-  { slug: "virtualized", title: "Virtualized (1,000 rows)", description: "Row virtualization for large datasets.", category: "Data", Component: VirtualizedExample },
-  { slug: "column-virtualization", title: "Column virtualization", description: "Horizontal virtualization for very wide tables (34 columns × 300 rows).", category: "Data", Component: ColumnVirtualizationExample },
-  { slug: "event-listeners", title: "Event listeners", description: "onRowClick / onCellClick (and double-click) handlers.", category: "Data", Component: EventListenersExample },
-  { slug: "custom-icons", title: "Custom icons", description: "Override any of the table's icons via the icons prop.", category: "Data", Component: CustomIconsExample },
-  { slug: "export", title: "Export", description: "Export selected or filtered rows to CSV / Excel.", category: "Data", Component: ExportExample },
-  { slug: "localization", title: "Localization", description: "Override the string table (Spanish).", category: "Data", Component: LocalizationExample },
-  { slug: "server-side", title: "Server-side (manual)", description: "Manual pagination against a simulated server.", category: "Data", Component: ServerSideExample },
-  { slug: "advanced", title: "Advanced (kitchen sink)", description: "Most features enabled at once.", category: "Data", Component: AdvancedExample },
+  {
+    slug: "basic",
+    title: "Basic",
+    description: "Sorting + client pagination — the default feature set.",
+    category: "Basics",
+    Component: BasicExample,
+  },
+  {
+    slug: "sorting",
+    title: "Sorting",
+    description: "Multi-column sorting (shift-click) with an order badge.",
+    category: "Basics",
+    Component: SortingExample,
+  },
+  {
+    slug: "column-filters",
+    title: "Column filters",
+    description:
+      "Per-column filter row with text, select, multi-select, range, and date variants.",
+    category: "Filtering",
+    Component: ColumnFiltersExample,
+  },
+  {
+    slug: "filter-modes",
+    title: "Filter modes",
+    description:
+      "Switch a column's match mode (contains, starts with, between, …).",
+    category: "Filtering",
+    Component: FilterModesExample,
+  },
+  {
+    slug: "global-search",
+    title: "Global search",
+    description: "Expandable fuzzy search across all columns, with mode menu.",
+    category: "Filtering",
+    Component: GlobalSearchExample,
+  },
+  {
+    slug: "advanced-filter",
+    title: "Advanced filter",
+    description: "Build compound AND/OR filter rules in a dialog.",
+    category: "Filtering",
+    Component: AdvancedFilterExample,
+  },
+  {
+    slug: "column-ordering",
+    title: "Column ordering",
+    description: "Drag column headers to reorder.",
+    category: "Columns",
+    Component: ColumnOrderingExample,
+  },
+  {
+    slug: "column-pinning",
+    title: "Column pinning",
+    description: "Pin columns left/right; they stay sticky while scrolling.",
+    category: "Columns",
+    Component: ColumnPinningExample,
+  },
+  {
+    slug: "column-resizing",
+    title: "Column resizing",
+    description: "Drag the header edge to resize a column.",
+    category: "Columns",
+    Component: ColumnResizingExample,
+  },
+  {
+    slug: "column-visibility",
+    title: "Column visibility",
+    description: "Toggle columns from the toolbar or the column-actions menu.",
+    category: "Columns",
+    Component: ColumnVisibilityExample,
+  },
+  {
+    slug: "density",
+    title: "Density",
+    description: "Cycle comfortable → compact → spacious.",
+    category: "Display",
+    Component: DensityExample,
+  },
+  {
+    slug: "sticky",
+    title: "Sticky header & footer",
+    description: "Header and aggregation footer stay visible while scrolling.",
+    category: "Display",
+    Component: StickyExample,
+  },
+  {
+    slug: "loading",
+    title: "Loading state",
+    description: "Skeleton rows + progress bar; toggle to compare.",
+    category: "Display",
+    Component: LoadingExample,
+  },
+  {
+    slug: "row-selection",
+    title: "Row selection",
+    description: "Multi-row selection with an alert banner.",
+    category: "Selection & rows",
+    Component: RowSelectionExample,
+  },
+  {
+    slug: "single-selection",
+    title: "Single selection",
+    description: "Single-row selection (no select-all).",
+    category: "Selection & rows",
+    Component: SingleSelectionExample,
+  },
+  {
+    slug: "row-numbers",
+    title: "Row numbers",
+    description: "A leading row-number column.",
+    category: "Selection & rows",
+    Component: RowNumbersExample,
+  },
+  {
+    slug: "row-pinning",
+    title: "Row pinning",
+    description: "Pin rows to the top via the row-number column.",
+    category: "Selection & rows",
+    Component: RowPinningExample,
+  },
+  {
+    slug: "row-ordering",
+    title: "Row ordering",
+    description: "Drag rows to reorder (controlled data).",
+    category: "Selection & rows",
+    Component: RowOrderingExample,
+  },
+  {
+    slug: "grouping",
+    title: "Grouping & aggregation",
+    description: "Group by a column; aggregate with a sticky footer total.",
+    category: "Grouping & trees",
+    Component: GroupingExample,
+  },
+  {
+    slug: "detail-panel",
+    title: "Detail panel",
+    description: "Expand a row to reveal a custom detail panel.",
+    category: "Grouping & trees",
+    Component: DetailPanelExample,
+  },
+  {
+    slug: "tree",
+    title: "Tree (sub-rows)",
+    description: "Expandable hierarchical data via getSubRows.",
+    category: "Grouping & trees",
+    Component: TreeExample,
+  },
+  {
+    slug: "editing-cell",
+    title: "Editing — cell",
+    description: "Click a cell to edit it inline.",
+    category: "Editing",
+    Component: () => <EditingExample mode="cell" />,
+  },
+  {
+    slug: "editing-row",
+    title: "Editing — row",
+    description: "Edit a whole row inline with save/cancel.",
+    category: "Editing",
+    Component: () => <EditingExample mode="row" />,
+  },
+  {
+    slug: "editing-table",
+    title: "Editing — table",
+    description: "Every editable cell is always editable.",
+    category: "Editing",
+    Component: () => <EditingExample mode="table" />,
+  },
+  {
+    slug: "editing-modal",
+    title: "Editing — modal",
+    description: "Edit or create a row in a dialog.",
+    category: "Editing",
+    Component: () => <EditingExample mode="modal" />,
+  },
+  {
+    slug: "row-actions",
+    title: "Row actions",
+    description: "A trailing actions column (e.g. delete).",
+    category: "Actions",
+    Component: RowActionsExample,
+  },
+  {
+    slug: "cell-actions",
+    title: "Cell actions & copy",
+    description: "Right-click a cell for actions; click-to-copy enabled.",
+    category: "Actions",
+    Component: CellActionsExample,
+  },
+  {
+    slug: "virtualized",
+    title: "Virtualized (1,000 rows)",
+    description: "Row virtualization for large datasets.",
+    category: "Data",
+    Component: VirtualizedExample,
+  },
+  {
+    slug: "column-virtualization",
+    title: "Column virtualization",
+    description:
+      "Horizontal virtualization for very wide tables (34 columns × 300 rows).",
+    category: "Data",
+    Component: ColumnVirtualizationExample,
+  },
+  {
+    slug: "event-listeners",
+    title: "Event listeners",
+    description: "onRowClick / onCellClick (and double-click) handlers.",
+    category: "Data",
+    Component: EventListenersExample,
+  },
+  {
+    slug: "custom-icons",
+    title: "Custom icons",
+    description: "Override any of the table's icons via the icons prop.",
+    category: "Data",
+    Component: CustomIconsExample,
+  },
+  {
+    slug: "export",
+    title: "Export",
+    description: "Export selected or filtered rows to CSV / Excel.",
+    category: "Data",
+    Component: ExportExample,
+  },
+  {
+    slug: "localization",
+    title: "Localization",
+    description: "Override the string table (Spanish).",
+    category: "Data",
+    Component: LocalizationExample,
+  },
+  {
+    slug: "server-side",
+    title: "Server-side (manual)",
+    description: "Manual pagination against a simulated server.",
+    category: "Data",
+    Component: ServerSideExample,
+  },
+  {
+    slug: "advanced",
+    title: "Advanced (kitchen sink)",
+    description: "Most features enabled at once.",
+    category: "Data",
+    Component: AdvancedExample,
+  },
 ]
