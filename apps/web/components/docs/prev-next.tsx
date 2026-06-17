@@ -3,12 +3,14 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { docsFlatNav } from "@/lib/docs-nav"
+import { docsFlatNav, normalizeDocsPath } from "@/lib/docs-nav"
 
 /** Previous / next page links derived from the flattened nav order. */
 export function DocsPrevNext() {
-  const pathname = usePathname()
-  const index = docsFlatNav.findIndex((i) => i.href === pathname)
+  const pathname = normalizeDocsPath(usePathname())
+  const index = docsFlatNav.findIndex(
+    (i) => normalizeDocsPath(i.href) === pathname
+  )
   if (index === -1) return null
 
   const prev = index > 0 ? docsFlatNav[index - 1] : null

@@ -4,10 +4,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { cn } from "@workspace/ui/lib/utils"
-import { docsNav } from "@/lib/docs-nav"
+import { docsNav, normalizeDocsPath } from "@/lib/docs-nav"
 
 export function DocsSidebar() {
-  const pathname = usePathname()
+  const pathname = normalizeDocsPath(usePathname())
 
   return (
     <nav className="flex flex-col gap-6">
@@ -17,7 +17,7 @@ export function DocsSidebar() {
             {group.title}
           </div>
           {group.items.map((item) => {
-            const active = pathname === item.href
+            const active = pathname === normalizeDocsPath(item.href)
             return (
               <Link
                 key={item.href}

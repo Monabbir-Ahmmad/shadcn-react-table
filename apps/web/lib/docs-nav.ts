@@ -104,3 +104,12 @@ export const docsNav: DocsNavGroup[] = [
 
 /** Flattened, in-order list for prev/next navigation. */
 export const docsFlatNav: DocsNavItem[] = docsNav.flatMap((g) => g.items)
+
+/**
+ * Strip a trailing slash so route matching works both in dev and under the
+ * GitHub Pages export (`trailingSlash: true`), where `usePathname()` returns
+ * e.g. `/docs/guides/column-resizing/` but nav hrefs have no trailing slash.
+ */
+export function normalizeDocsPath(path: string): string {
+  return path.replace(/\/+$/, "") || "/"
+}
