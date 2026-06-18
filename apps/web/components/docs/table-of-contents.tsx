@@ -36,7 +36,13 @@ function useTableOfContents(): { items: TocItem[]; activeId: string | null } {
       }
     }
     setItems(built)
-    setActiveId(built[0]?.id ?? null)
+
+    const hash = window.location.hash.slice(1)
+    setActiveId(hash || built[0]?.id || null)
+
+    const onHashChange = () =>
+      setActiveId(window.location.hash.slice(1) || null)
+    window.addEventListener("hashchange", onHashChange)
 
     if (headings.length > 0) {
       const observer = new IntersectionObserver(
@@ -49,12 +55,17 @@ function useTableOfContents(): { items: TocItem[]; activeId: string | null } {
             setActiveId((first.target as HTMLElement).id)
           }
         },
-        { rootMargin: "-10% 0% -80% 0%", threshold: 0 }
+        { rootMargin: "-57px 0% -85% 0%", threshold: 0 }
       )
 
       headings.forEach((h) => observer.observe(h))
-      return () => observer.disconnect()
+      return () => {
+        observer.disconnect()
+        window.removeEventListener("hashchange", onHashChange)
+      }
     }
+
+    return () => window.removeEventListener("hashchange", onHashChange)
   }, [pathname])
 
   return { items, activeId }
