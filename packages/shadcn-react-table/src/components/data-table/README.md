@@ -1,4 +1,4 @@
-# data-table
+# Shadcn React Table
 
 A shadcn/ui data table with Material React Table (MRT V3) parity, built on
 TanStack Table v8. Import from `@monabbir/shadcn-react-table/components/data-table`.
@@ -14,26 +14,26 @@ through. Our presentation/feature options and UI state live on `table.cnTable`.
 
 ## Feature flags (all opt-in unless noted)
 
-| Area | Options |
-| --- | --- |
-| Sorting | TanStack defaults; `enableMultiSort`, `sortDescFirst` per column |
-| Selection | `enableRowSelection`, `enableMultiRowSelection` (auto select column + alert banner) |
-| Density / fullscreen | on by default |
+| Area                   | Options                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Sorting                | TanStack defaults; `enableMultiSort`, `sortDescFirst` per column                                                                |
+| Selection              | `enableRowSelection`, `enableMultiRowSelection` (auto select column + alert banner)                                             |
+| Density / fullscreen   | on by default                                                                                                                   |
 | Sticky header / footer | on by default (`enableStickyHeader` / `enableStickyFooter`); engages when the surface scrolls (give it a `max-h` or virtualize) |
-| Column filters | `meta.variant`, `meta.filterMode`, `enableColumnFilterModes`, `enableFilterMatchHighlighting` |
-| Global search | `enableGlobalFilter` (fuzzy via match-sorter), `enableGlobalFilterModes` |
-| Column mgmt | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing` |
-| Row mgmt | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers` |
-| Grouping | `enableGrouping` (drop-zone + menu + aggregation rows) |
-| Expansion | `renderDetailPanel`, `getSubRows` (tree); `enableExpanding` auto-derives |
-| Footer row | per-column `footer` (rendered whenever defined; sticky by default) |
-| Editing | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditCellSave`/`onSaveRow`/`onCreateRow` |
-| Actions / copy | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy` |
-| Virtualization | `enableRowVirtualization` and `enableColumnVirtualization` (give the surface a bounded height) |
-| Export | `enableExport` (CSV/Excel) or call `exportToCsv` / `exportToExcel` |
-| Event listeners | `onRowClick` / `onRowDoubleClick` / `onCellClick` / `onCellDoubleClick` |
-| Custom icons | `icons` (override any subset; see `DataTableIcons`) |
-| Column widths | `columnDef.size` is honored even without resizing |
+| Column filters         | `meta.variant`, `meta.filterMode`, `enableColumnFilterModes`, `enableFilterMatchHighlighting`                                   |
+| Global search          | `enableGlobalFilter` (fuzzy via match-sorter), `enableGlobalFilterModes`                                                        |
+| Column mgmt            | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing`                                                           |
+| Row mgmt               | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers`                                                |
+| Grouping               | `enableGrouping` (drop-zone + menu + aggregation rows)                                                                          |
+| Expansion              | `renderDetailPanel`, `getSubRows` (tree); `enableExpanding` auto-derives                                                        |
+| Footer row             | per-column `footer` (rendered whenever defined; sticky by default)                                                              |
+| Editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditCellSave`/`onSaveRow`/`onCreateRow`                   |
+| Actions / copy         | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy`                                                            |
+| Virtualization         | `enableRowVirtualization` and `enableColumnVirtualization` (give the surface a bounded height)                                  |
+| Export                 | `enableExport` (CSV/Excel) or call `exportToCsv` / `exportToExcel`                                                              |
+| Event listeners        | `onRowClick` / `onRowDoubleClick` / `onCellClick` / `onCellDoubleClick`                                                         |
+| Custom icons           | `icons` (override any subset; see `DataTableIcons`)                                                                             |
+| Column widths          | `columnDef.size` is honored even without resizing                                                                               |
 
 ## Server-side / manual mode
 

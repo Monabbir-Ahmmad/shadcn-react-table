@@ -1,6 +1,6 @@
 export const metadata = { title: "Introduction" }
 
-# data-table
+# Shadcn React Table
 
 A **shadcn/ui data table** with [Material React Table](https://www.material-react-table.com/) (MRT V3) feature parity, built on [TanStack Table v8](https://tanstack.com/table/v8). It ships as a shadcn **registry** component — you install the source into your own project with the shadcn CLI, so it inherits your style, base color, and theme tokens and you own every line.
 
@@ -12,7 +12,7 @@ MRT is the most complete React table, but it's tied to Material UI. This table b
 
 - **One hook, one component.** `useDataTable(options)` returns an enriched TanStack instance; `<DataTable table={table} />` renders it. Everything is driven by options.
 - **Feature-complete.** Sorting, per-column filtering with mode menus, fuzzy global search, column ordering / pinning / resizing / visibility, density, sticky header & footer, row selection, row numbers, row pinning, drag-to-reorder rows, grouping with aggregation, detail panels, tree data, inline editing (cell / row / table / modal), row & cell actions, click-to-copy, row & column virtualization, CSV / Excel export, full localization, and swappable icons.
-- **Style-agnostic.** It only uses standard shadcn primitive APIs (`button`, `table`, `popover`, `command`, …), declared as registry dependencies. `shadcn add` installs them in *your* configured style, so the table adopts your look with nothing to override.
+- **Style-agnostic.** It only uses standard shadcn primitive APIs (`button`, `table`, `popover`, `command`, …), declared as registry dependencies. `shadcn add` installs them in _your_ configured style, so the table adopts your look with nothing to override.
 - **You own the source.** No opaque dependency — the component lands in your repo under `components/ui/data-table/` and is yours to extend.
 
 ## How it works

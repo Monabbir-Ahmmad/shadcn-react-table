@@ -1,8 +1,8 @@
 "use client"
 
+import { RiGithubFill } from "@remixicon/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { RiGithubFill } from "@remixicon/react"
 
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -37,7 +37,7 @@ export function SiteHeader() {
           <DocsMobileNav />
         </div>
         <Link href="/docs" className="text-base font-semibold tracking-tight">
-          data-table
+          Shadcn React Table
         </Link>
         <nav className="hidden items-center gap-4 text-sm md:flex">
           {links.map((link) => (
