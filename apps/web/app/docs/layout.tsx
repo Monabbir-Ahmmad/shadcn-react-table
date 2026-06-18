@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import { DocsPrevNext } from "@/components/docs/prev-next"
 import { DocsSidebar } from "@/components/docs/sidebar"
+import { DocsTableOfContents } from "@/components/docs/table-of-contents"
 import { SiteHeader } from "@/components/site-header"
 
 export const metadata: Metadata = {
@@ -25,11 +26,15 @@ export default function DocsLayout({
         </aside>
 
         <main className="min-w-0 flex-1 px-4 py-6 md:px-10 md:py-8 lg:px-16">
-          <article className="mx-auto max-w-5xl">
+          <article className="mx-auto max-w-5xl" data-docs-article>
             {children}
             <DocsPrevNext />
           </article>
         </main>
+
+        <aside className="hidden xl:sticky xl:top-[57px] xl:block xl:h-[calc(100svh-57px)] xl:w-56 xl:shrink-0 xl:overflow-y-auto xl:border-s xl:px-4 xl:py-6">
+          <DocsTableOfContents />
+        </aside>
       </div>
     </div>
   )
