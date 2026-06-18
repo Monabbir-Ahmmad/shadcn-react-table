@@ -5,9 +5,9 @@ import { DocsSidebar } from "@/components/docs/sidebar"
 import { SiteHeader } from "@/components/site-header"
 
 export const metadata: Metadata = {
-  title: { default: "Docs", template: "%s — tablecn" },
+  title: { default: "Docs", template: "%s — data-table" },
   description:
-    "Documentation for tablecn, a shadcn/ui data table with Material React Table parity.",
+    "Documentation for the data table, a shadcn/ui data table with Material React Table parity.",
 }
 
 export default function DocsLayout({

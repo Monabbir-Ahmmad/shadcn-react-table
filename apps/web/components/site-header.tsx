@@ -1,8 +1,8 @@
 "use client"
 
+import { RiGithubFill } from "@remixicon/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { RiGithubFill } from "@remixicon/react"
 
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
@@ -12,7 +12,7 @@ import { DocsSearch } from "@/components/docs/search"
 import { useIconLibrary } from "@/components/icon-library-provider"
 import { ThemeCustomizer } from "@/components/theme-customizer"
 
-const GITHUB_URL = "https://github.com/Monabbir-Ahmmad/tablecn"
+const GITHUB_URL = "https://github.com/Monabbir-Ahmmad/shadcn-react-table"
 
 /**
  * The shared top bar for the docs site: brand, primary nav (with active
@@ -37,7 +37,7 @@ export function SiteHeader() {
           <DocsMobileNav />
         </div>
         <Link href="/docs" className="text-base font-semibold tracking-tight">
-          tablecn
+          Shadcn React Table
         </Link>
         <nav className="hidden items-center gap-4 text-sm md:flex">
           {links.map((link) => (

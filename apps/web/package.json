@@ -1,5 +1,5 @@
 {
-  "name": "tablecn-web",
+  "name": "shadcn-react-table-web",
   "version": "0.0.1",
   "type": "module",
   "private": true,
@@ -20,7 +20,7 @@
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
-    "@monabbir/tablecn": "workspace:*",
+    "@monabbir/shadcn-react-table": "workspace:*",
     "@next/mdx": "^16.2.9",
     "@remixicon/react": "^4.9.0",
     "@tanstack/react-table": "^8.21.3",

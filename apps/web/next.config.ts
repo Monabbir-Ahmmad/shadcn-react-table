@@ -3,13 +3,13 @@ import type { NextConfig } from "next"
 
 // Static export for GitHub Pages is opt-in via GITHUB_PAGES=true (set by the
 // deploy workflow), so local `next dev` / `next build` stay unaffected and serve
-// from the root. The project page lives under /tablecn, so base/asset paths are
-// prefixed in that mode only.
+// from the root. The project page lives under /shadcn-react-table, so base/asset
+// paths are prefixed in that mode only.
 const isPages = process.env.GITHUB_PAGES === "true"
-const basePath = isPages ? "/tablecn" : undefined
+const basePath = isPages ? "/shadcn-react-table" : undefined
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@monabbir/tablecn", "@workspace/ui"],
+  transpilePackages: ["@monabbir/shadcn-react-table", "@workspace/ui"],
   // Let `page.mdx` files act as routes alongside ts/tsx.
   pageExtensions: ["ts", "tsx", "mdx"],
   // Exposed to the client so the docs search can load the Pagefind runtime from

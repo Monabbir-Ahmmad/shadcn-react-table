@@ -2,7 +2,7 @@ export const metadata = { title: "Table instance" }
 
 # Table instance (`table.cnTable`)
 
-`useDataTable` returns the standard TanStack table instance with one addition: a **`cnTable`** object holding tablecn's resolved configuration and UI state. Components read from it instead of prop drilling; you can read and call into it too.
+`useDataTable` returns the standard TanStack table instance with one addition: a **`cnTable`** object holding the table's resolved configuration and UI state. Components read from it instead of prop drilling; you can read and call into it too.
 
 ```tsx
 table.cnTable.beginCreate()       // open the create-row form

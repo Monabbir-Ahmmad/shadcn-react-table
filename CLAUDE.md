@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-**tablecn** (`@monabbir/tablecn`) is a shadcn/ui data table with **Material React Table (MRT V3) parity**, built on TanStack Table v8 and distributed as a **shadcn registry block** (consumers run `npx shadcn add` and the source is copied into their project). Workspaces:
+**shadcn-react-table** (`@monabbir/shadcn-react-table`) is a shadcn/ui data table with **Material React Table (MRT V3) parity**, built on TanStack Table v8 and distributed as a **shadcn registry block** (consumers run `npx shadcn add` and the source is copied into their project). Workspaces:
 
-- **`packages/tablecn`** (`@monabbir/tablecn`) — the product: the data-table module only. Depends on `@workspace/ui` for the shadcn primitives it renders.
-- **`packages/ui`** (`@workspace/ui`) — the shared shadcn primitives (button, dialog, table, …), `lib/utils` (`cn`), and the single `globals.css`. This is the shadcn target — `pnpm dlx shadcn add` writes here. Consumed by both `@monabbir/tablecn` and `apps/web`.
+- **`packages/shadcn-react-table`** (`@monabbir/shadcn-react-table`) — the product: the data-table module only. Depends on `@workspace/ui` for the shadcn primitives it renders.
+- **`packages/ui`** (`@workspace/ui`) — the shared shadcn primitives (button, dialog, table, …), `lib/utils` (`cn`), and the single `globals.css`. This is the shadcn target — `pnpm dlx shadcn add` writes here. Consumed by both `@monabbir/shadcn-react-table` and `apps/web`.
 - **`packages/eslint-config`**, **`packages/typescript-config`** — shared config presets.
 - **`apps/web`** — the docs site, live examples, and the registry host that serves `/r/data-table.json`.
 
@@ -28,7 +28,7 @@ From repo root:
 - `pnpm typecheck` — `tsc --noEmit` across workspaces
 - `pnpm format` — Prettier `--write` across workspaces
 
-Per-package: the same scripts exist in each workspace's `package.json` and can be run directly, e.g. `pnpm --filter tablecn-web <script>`, `pnpm --filter @monabbir/tablecn <script>`, or `pnpm --filter @workspace/ui <script>`.
+Per-package: the same scripts exist in each workspace's `package.json` and can be run directly, e.g. `pnpm --filter shadcn-react-table-web <script>`, `pnpm --filter @monabbir/shadcn-react-table <script>`, or `pnpm --filter @workspace/ui <script>`.
 
 There is no test runner configured in this repo.
 
@@ -62,16 +62,16 @@ Turborepo + pnpm workspaces. Workspaces are `apps/*` and `packages/*`.
 
 ### Consumption model: source, not built artifacts
 
-Neither `@monabbir/tablecn` nor `@workspace/ui` has a **build step**. Their `exports` fields point directly at `./src/*` (`.ts`/`.tsx`), and `apps/web/next.config.ts` declares `transpilePackages: ["@monabbir/tablecn", "@workspace/ui"]` so Next compiles both packages' source in-tree. Consequences:
-- Edits in `packages/tablecn/src/` and `packages/ui/src/` are picked up immediately by `next dev` — no rebuild needed.
+Neither `@monabbir/shadcn-react-table` nor `@workspace/ui` has a **build step**. Their `exports` fields point directly at `./src/*` (`.ts`/`.tsx`), and `apps/web/next.config.ts` declares `transpilePackages: ["@monabbir/shadcn-react-table", "@workspace/ui"]` so Next compiles both packages' source in-tree. Consequences:
+- Edits in `packages/shadcn-react-table/src/` and `packages/ui/src/` are picked up immediately by `next dev` — no rebuild needed.
 - The packages cannot be consumed outside a bundler that transpiles them (intentional — they're private internal packages).
-- `apps/web/tsconfig.json` maps `@monabbir/tablecn/*` → `../../packages/tablecn/src/*` and `@workspace/ui/*` → `../../packages/ui/src/*` so TS resolves the same source paths as runtime.
+- `apps/web/tsconfig.json` maps `@monabbir/shadcn-react-table/*` → `../../packages/shadcn-react-table/src/*` and `@workspace/ui/*` → `../../packages/ui/src/*` so TS resolves the same source paths as runtime.
 
 ### The data-table module
 
-The product lives at `packages/tablecn/src/components/data-table/`, organized by **layer**:
+The product lives at `packages/shadcn-react-table/src/components/data-table/`, organized by **layer**:
 
-- `index.ts` — the public API barrel; the single entry consumers import (`@monabbir/tablecn/components/data-table`). Treat it as the API surface — keep it curated.
+- `index.ts` — the public API barrel; the single entry consumers import (`@monabbir/shadcn-react-table/components/data-table`). Treat it as the API surface — keep it curated.
 - `core/` — the engine and shared definitions: `data-table.tsx`, `use-data-table.ts`, `types.ts`, `constants.ts`, `config-context.tsx`, `icons.tsx`, `localization.ts`.
 - `components/` — the supporting UI grouped by region (`head/ body/ toolbar/ editing/ menus/`); regions nest their own subfolders (`head/filter-variants/`, `body/dnd/`, `toolbar/controls/`).
 - `hooks/` — auxiliary hooks: `use-grid-navigation.ts`, the state-slice hooks composed by `use-data-table` (`use-controllable-state`, `use-editing-state`, `use-column-filter-modes`, `use-global-filter-mode`, `use-resolved-columns`, `use-page-reset-on-filter-change`), and the render hooks (`use-table-dnd`, `use-table-virtualizers`).
@@ -86,21 +86,21 @@ The data-table imports the **shadcn primitives** it renders (button, dialog, tab
 `apps/web` ships the table as a registry block and generates **committed** artifacts from the package source. Never hand-edit these — change the source and regenerate:
 
 - `build-registry.mjs` → `apps/web/public/r/{data-table,registry}.json` — recursively walks the module, rewrites package imports to portable `@/` aliases, and preserves the folder structure consumers receive.
-- `build-api-docs.mjs` → `apps/web/lib/api-reference.generated.ts` — API tables derived from `types.ts` / `use-data-table.ts` / `icons.tsx` / `localization.ts` under `packages/tablecn/src/components/data-table` (paths are hardcoded in the script; update them if those files move).
+- `build-api-docs.mjs` → `apps/web/lib/api-reference.generated.ts` — API tables derived from `types.ts` / `use-data-table.ts` / `icons.tsx` / `localization.ts` under `packages/shadcn-react-table/src/components/data-table` (paths are hardcoded in the script; update them if those files move).
 - `build-example-source.mjs` → `apps/web/lib/example-source.generated.ts`.
 - `build-search-index.mjs` → docs search index.
 
-Run individually via `pnpm --filter tablecn-web {registry,api,examples,search}:build`, or all of them plus `next build` via `pnpm --filter tablecn-web build`. Preview the production static export with `pnpm --filter tablecn-web preview` (serves `apps/web/out` at `http://localhost:3000`).
+Run individually via `pnpm --filter shadcn-react-table-web {registry,api,examples,search}:build`, or all of them plus `next build` via `pnpm --filter shadcn-react-table-web build`. Preview the production static export with `pnpm --filter shadcn-react-table-web preview` (serves `apps/web/out` at `http://localhost:3000`).
 
 ### Path aliases (apps/web)
 - `@/*` → app-local files (`apps/web/*`) — used for app-only components/hooks/lib
-- `@monabbir/tablecn/components/data-table` → the product (`packages/tablecn/src/...`)
+- `@monabbir/shadcn-react-table/components/data-table` → the product (`packages/shadcn-react-table/src/...`)
 - `@workspace/ui/components/*`, `@workspace/ui/hooks/*`, `@workspace/ui/lib/*` → shared primitives package (`packages/ui/src/...`)
 - `@workspace/ui/globals.css` — the shared stylesheet, imported once in `apps/web/app/layout.tsx`
 - `cn` helper lives at `@workspace/ui/lib/utils` (clsx + tailwind-merge)
 
 ### Shared config packages
-- `@workspace/eslint-config` exports `./base`, `./next-js`, `./react-internal`. `apps/web` uses `next-js`; `packages/ui` and `packages/tablecn` use `react-internal`. Root `.eslintrc.js` only sets ignore patterns.
+- `@workspace/eslint-config` exports `./base`, `./next-js`, `./react-internal`. `apps/web` uses `next-js`; `packages/ui` and `packages/shadcn-react-table` use `react-internal`. Root `.eslintrc.js` only sets ignore patterns.
 - `@workspace/typescript-config` exports `base.json`, `nextjs.json`, `react-library.json`. Each workspace's `tsconfig.json` extends the right one.
 
 ### Styling

@@ -2,15 +2,15 @@ export const metadata = { title: "Theming" }
 
 # Theming
 
-tablecn is **style-agnostic**. It is built entirely on standard shadcn/ui primitive APIs, and those primitives are declared as registry dependencies. When you run `shadcn add`, the CLI installs those primitives in *your* configured style (Sera, Vega, Nova, Luma, …) and base color — so the table simply inherits your existing look with nothing to override.
+The data table is **style-agnostic**. It is built entirely on standard shadcn/ui primitive APIs, and those primitives are declared as registry dependencies. When you run `shadcn add`, the CLI installs those primitives in *your* configured style (Sera, Vega, Nova, Luma, …) and base color — so the table simply inherits your existing look with nothing to override.
 
 <Callout variant="tip" title="No table-specific theme">
-There is no separate "tablecn theme." Whatever your shadcn style and base color are, the table already matches them.
+There is no separate table-specific theme. Whatever your shadcn style and base color are, the table already matches them.
 </Callout>
 
 ## Design tokens
 
-The only styling tablecn introduces is two design tokens, injected into your `globals.css` via the registry's `cssVars`:
+The only styling the table introduces is two design tokens, injected into your `globals.css` via the registry's `cssVars`:
 
 - `--highlight`
 - `--highlight-foreground`
@@ -33,11 +33,11 @@ See [Column filtering](/docs/guides/column-filtering) for where highlighting app
 
 ## Density and dark mode
 
-Density vertical padding is controlled by the component itself, not by a CSS variable. Dark mode is whatever your app's theme provider sets — for example `next-themes` toggling the `.dark` class. tablecn reads the same tokens in either mode.
+Density vertical padding is controlled by the component itself, not by a CSS variable. Dark mode is whatever your app's theme provider sets — for example `next-themes` toggling the `.dark` class. The table reads the same tokens in either mode.
 
 ## Retheming
 
-To retheme, change your shadcn base color or CSS variables. Because the table consumes your primitives and tokens directly, it follows along — there are no tablecn-specific changes to make.
+To retheme, change your shadcn base color or CSS variables. Because the table consumes your primitives and tokens directly, it follows along — there are no table-specific changes to make.
 
 ## Related
 - [Installation](/docs/installation)

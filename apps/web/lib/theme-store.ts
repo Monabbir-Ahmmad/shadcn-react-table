@@ -8,7 +8,7 @@ export interface ThemePrefs {
   icons: IconLibrary
 }
 
-const KEY = "tablecn-theme"
+const KEY = "shadcn-react-table-theme"
 
 export const DEFAULT_PREFS: ThemePrefs = {
   accent: "lime",

@@ -1,4 +1,4 @@
-# Contributing to tablecn
+# Contributing to shadcn-react-table
 
 Thanks for your interest in contributing! Direct pushes to `main` are disabled —
 all changes land through pull requests. The flow below works for both maintainers
@@ -13,8 +13,8 @@ and outside contributors.
 
 ```bash
 # Outside contributors: fork the repo first, then clone your fork.
-git clone https://github.com/<you>/tablecn.git
-cd tablecn
+git clone https://github.com/<you>/shadcn-react-table.git
+cd shadcn-react-table
 pnpm install
 ```
 
@@ -24,7 +24,7 @@ pnpm install
    ```bash
    git switch -c my-feature
    ```
-2. Make your change. Edits in `packages/tablecn/src/` (the data-table) and
+2. Make your change. Edits in `packages/shadcn-react-table/src/` (the data-table) and
    `packages/ui/src/` (shadcn primitives) are picked up immediately by
    `pnpm dev` (no rebuild needed — the packages are consumed as source).
 3. Before opening a PR, make sure these all pass locally:

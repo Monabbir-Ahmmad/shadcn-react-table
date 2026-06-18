@@ -2,7 +2,7 @@ export const metadata = { title: "State management" }
 
 # State management
 
-tablecn has two layers of state, and both can be left uncontrolled, observed, or fully controlled.
+The data table has two layers of state, and both can be left uncontrolled, observed, or fully controlled.
 
 ## TanStack table state
 
@@ -24,9 +24,9 @@ const table = useDataTable({
 
 For server-side data, combine this with the `manual*` flags — see [Server-side data](/docs/guides/server-side).
 
-## tablecn UI state
+## Data table UI state
 
-The presentation state that tablecn adds on top of TanStack lives on `table.cnTable`: **density**, **full screen**, **filter-row visibility**, and the **global search mode**. Each is uncontrolled by default but accepts a controlled value and/or an `onChange` callback — so you can observe a change without taking ownership, or take full control.
+The presentation state the table adds on top of TanStack lives on `table.cnTable`: **density**, **full screen**, **filter-row visibility**, and the **global search mode**. Each is uncontrolled by default but accepts a controlled value and/or an `onChange` callback — so you can observe a change without taking ownership, or take full control.
 
 ```tsx
 const table = useDataTable({
@@ -83,7 +83,7 @@ table.cnTable.setShowColumnFilters((prev) => !prev)
 
 ## Styling without props
 
-tablecn is styled with Tailwind, not per-component style props. Structural slots emit a `data-slot` attribute you can target with a selector — see the table in [Toolbar customization](/docs/guides/toolbar#styling).
+The table is styled with Tailwind, not per-component style props. Structural slots emit a `data-slot` attribute you can target with a selector — see the table in [Toolbar customization](/docs/guides/toolbar#styling).
 
 ## Related
 

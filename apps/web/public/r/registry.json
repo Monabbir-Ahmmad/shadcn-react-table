@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "tablecn",
-  "homepage": "https://github.com/Monabbir-Ahmmad/tablecn",
+  "name": "shadcn-react-table",
+  "homepage": "https://github.com/Monabbir-Ahmmad/shadcn-react-table",
   "items": [
     {
       "name": "data-table",
       "type": "registry:block",
-      "title": "tablecn Data Table",
+      "title": "Data Table",
       "description": "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more."
     }
   ]

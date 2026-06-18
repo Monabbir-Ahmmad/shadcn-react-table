@@ -7,7 +7,7 @@ import { EXAMPLES } from "@/components/examples/registry"
 import { EXAMPLE_SOURCE } from "@/lib/example-source.generated"
 
 const GITHUB_SRC =
-  "https://github.com/Monabbir-Ahmmad/tablecn/blob/main/apps/web/components/examples/registry.tsx"
+  "https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/apps/web/components/examples/registry.tsx"
 
 /**
  * Embeds a live example from the shared registry by slug, with a Live/Code

@@ -35,9 +35,9 @@ importers:
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.2.15)(react@19.2.4)
-      '@monabbir/tablecn':
+      '@monabbir/shadcn-react-table':
         specifier: workspace:*
-        version: link:../../packages/tablecn
+        version: link:../../packages/shadcn-react-table
       '@next/mdx':
         specifier: ^16.2.9
         version: 16.2.9(@mdx-js/loader@3.1.1)(@mdx-js/react@3.1.1(@types/react@19.2.15)(react@19.2.4))
@@ -154,7 +154,7 @@ importers:
         specifier: ^8.60.0
         version: 8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
 
-  packages/tablecn:
+  packages/shadcn-react-table:
     dependencies:
       '@dnd-kit/core':
         specifier: ^6.3.1
