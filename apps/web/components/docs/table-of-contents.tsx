@@ -45,8 +45,17 @@ function useTableOfContents(): { items: TocItem[]; activeId: string | null } {
     window.addEventListener("hashchange", onHashChange)
 
     if (headings.length > 0) {
+      // URL hash has priority on initial load — suppress the observer until
+      // the user scrolls so its first sweep doesn't overwrite the hash.
+      let hashPriority = !!window.location.hash.slice(1)
+      const clearHashPriority = () => {
+        hashPriority = false
+      }
+      window.addEventListener("scroll", clearHashPriority, { once: true })
+
       const observer = new IntersectionObserver(
         (entries) => {
+          if (hashPriority) return
           const visible = entries
             .filter((e) => e.isIntersecting)
             .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
@@ -62,6 +71,7 @@ function useTableOfContents(): { items: TocItem[]; activeId: string | null } {
       return () => {
         observer.disconnect()
         window.removeEventListener("hashchange", onHashChange)
+        window.removeEventListener("scroll", clearHashPriority)
       }
     }
 
