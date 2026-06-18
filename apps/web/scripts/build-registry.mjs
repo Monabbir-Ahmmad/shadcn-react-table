@@ -1,6 +1,7 @@
-// Builds the shadcn registry item(s) for tablecn, served at /r/*.json so users
-// can run `npx shadcn@latest add <url>`. Reads the @monabbir/tablecn source,
-// rewrites its package imports to the shadcn-standard `@/components/ui/*` and
+// Builds the shadcn registry item(s) for shadcn-react-table, served at /r/*.json
+// so users can run `npx shadcn@latest add <url>`. Reads the
+// @monabbir/shadcn-react-table source, rewrites its package imports to the
+// shadcn-standard `@/components/ui/*` and
 // `@/lib/*` aliases (the CLI then maps `@/` to the consumer's own aliases),
 // and writes the registry-item JSON. Run from the repo root:
 //   node apps/web/scripts/build-registry.mjs
@@ -11,11 +12,11 @@ import { fileURLToPath } from "node:url"
 // Anchor to the repo root from this file (apps/web/scripts/), so the script
 // works regardless of the cwd `pnpm --filter` runs it in.
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
-// The data-table module lives in the @monabbir/tablecn package; the shadcn
-// primitives it imports live in @workspace/ui. Only the data-table source is
-// shipped (primitives come from the consumer's own shadcn setup), so we read
-// from packages/tablecn/src.
-const UI_SRC = join(REPO, "packages/tablecn/src")
+// The data-table module lives in the @monabbir/shadcn-react-table package; the
+// shadcn primitives it imports live in @workspace/ui. Only the data-table source
+// is shipped (primitives come from the consumer's own shadcn setup), so we read
+// from packages/shadcn-react-table/src.
+const UI_SRC = join(REPO, "packages/shadcn-react-table/src")
 const OUT = join(REPO, "apps/web/public/r")
 
 // npm packages the data-table source imports directly. The shadcn primitives
@@ -130,7 +131,7 @@ const item = {
   $schema: "https://ui.shadcn.com/schema/registry-item.json",
   name: "data-table",
   type: "registry:block",
-  title: "tablecn Data Table",
+  title: "Data Table",
   description:
     "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
   dependencies: NPM_DEPENDENCIES,
@@ -142,8 +143,8 @@ const item = {
 
 const registry = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
-  name: "tablecn",
-  homepage: "https://github.com/Monabbir-Ahmmad/tablecn",
+  name: "shadcn-react-table",
+  homepage: "https://github.com/Monabbir-Ahmmad/shadcn-react-table",
   items: [
     {
       name: item.name,

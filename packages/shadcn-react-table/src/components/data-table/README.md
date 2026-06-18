@@ -1,7 +1,7 @@
-# tablecn
+# data-table
 
 A shadcn/ui data table with Material React Table (MRT V3) parity, built on
-TanStack Table v8. Import from `@monabbir/tablecn/components/data-table`.
+TanStack Table v8. Import from `@monabbir/shadcn-react-table/components/data-table`.
 
 ```tsx
 const table = useDataTable({ data, columns /* + feature flags */ })

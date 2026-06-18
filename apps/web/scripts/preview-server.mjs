@@ -1,7 +1,7 @@
 // Serves the static export (apps/web/out) under the GitHub Pages base path so
 // the deployed site — including the Pagefind search index, which only exists
 // after a static export — can be exercised locally exactly as in production.
-// Run via `pnpm --filter tablecn-web preview` (which builds first).
+// Run via `pnpm --filter shadcn-react-table-web preview` (which builds first).
 //   node apps/web/scripts/preview-server.mjs
 import { createReadStream, existsSync, statSync } from "node:fs"
 import { createServer } from "node:http"
@@ -10,14 +10,14 @@ import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "..", "out")
-const BASE = "/tablecn" // matches next.config.ts basePath in GITHUB_PAGES mode
+const BASE = "/shadcn-react-table" // matches next.config.ts basePath in GITHUB_PAGES mode
 const PORT = 3000
 const HOME = `${BASE}/docs/`
 
 if (!existsSync(OUT)) {
   console.error(
     "[preview] No static export found at apps/web/out.\n" +
-      "          Build it first: GITHUB_PAGES=true pnpm --filter tablecn-web build"
+      "          Build it first: GITHUB_PAGES=true pnpm --filter shadcn-react-table-web build"
   )
   process.exit(1)
 }

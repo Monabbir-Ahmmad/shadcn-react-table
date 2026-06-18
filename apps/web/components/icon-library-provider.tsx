@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { DataTableConfigProvider } from "@monabbir/tablecn/components/data-table"
+import { DataTableConfigProvider } from "@monabbir/shadcn-react-table/components/data-table"
 
 import { lucideIcons, type IconLibrary } from "@/components/examples/icon-sets"
 import { readPrefs } from "@/lib/theme-store"

@@ -48,9 +48,9 @@ function loadPagefind(): Promise<Pagefind> {
  * Normalize Pagefind's stored url to a base-path-relative app route.
  *
  * Pagefind derives the url from the built HTML, which embeds the full
- * base-path-prefixed route (e.g. `/tablecn/docs/guides/toolbar`). `router.push`
+ * base-path-prefixed route (e.g. `/shadcn-react-table/docs/guides/toolbar`). `router.push`
  * prepends the base path itself, so we strip any leading base path here to avoid
- * doubling it (`/tablecn/tablecn/…`).
+ * doubling it (`/shadcn-react-table/shadcn-react-table/…`).
  */
 function toHref(url: string): string {
   let path = url.replace(/\.html$/, "")
@@ -131,7 +131,7 @@ export function DocsSearch() {
         open={open}
         onOpenChange={setOpen}
         title="Search documentation"
-        description="Search the tablecn docs"
+        description="Search the docs"
       >
         <Command shouldFilter={false}>
           <CommandInput

@@ -31,7 +31,7 @@ import {
   X,
 } from "lucide-react"
 
-import type { DataTableIcons } from "@monabbir/tablecn/components/data-table"
+import type { DataTableIcons } from "@monabbir/shadcn-react-table/components/data-table"
 
 /**
  * A full Lucide mapping for every `DataTableIcons` slot, so the customizer can

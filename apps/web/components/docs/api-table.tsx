@@ -12,7 +12,7 @@ const SECTIONS = generated as Record<string, ApiMember[]>
 /**
  * Renders an auto-generated API reference table. `of` selects one of the
  * exported arrays in `lib/api-reference.generated.ts` (rebuilt by
- * `pnpm --filter tablecn-web api:build`). `propLabel` sets the first header
+ * `pnpm --filter shadcn-react-table-web api:build`). `propLabel` sets the first header
  * ("Option" / "Prop" / "Key" / "Slot").
  *
  * - `only`: restrict to the named members, in the given order — use this in a

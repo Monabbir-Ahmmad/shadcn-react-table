@@ -458,7 +458,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableGlobalFilterModes?: boolean
   /** While the global search is in fuzzy mode, order rows by best match (most
    *  relevant first) until the user applies their own sort. Default false —
-   *  MRT defaults this on, but tablecn keeps it off so searching never silently
+   *  MRT defaults this on, but the data table keeps it off so searching never silently
    *  reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping
    *  or expanded, or under manual sorting/filtering. */
   enableGlobalFilterRankedResults?: boolean

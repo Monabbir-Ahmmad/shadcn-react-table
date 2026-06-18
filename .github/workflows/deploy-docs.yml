@@ -46,7 +46,7 @@ jobs:
       - name: Build (static export)
         env:
           GITHUB_PAGES: "true"
-        run: pnpm --filter tablecn-web build
+        run: pnpm --filter shadcn-react-table-web build
 
       - name: Disable Jekyll processing
         run: touch apps/web/out/.nojekyll

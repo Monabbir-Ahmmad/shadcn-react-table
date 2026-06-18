@@ -17,7 +17,7 @@ import {
   DataTable,
   useDataTable,
   type EditDisplayMode,
-} from "@monabbir/tablecn/components/data-table"
+} from "@monabbir/shadcn-react-table/components/data-table"
 
 import {
   makeUsers,

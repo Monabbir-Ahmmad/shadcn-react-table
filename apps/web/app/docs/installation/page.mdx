@@ -2,7 +2,7 @@ export const metadata = { title: "Installation" }
 
 # Installation
 
-tablecn is distributed as a **shadcn registry** item. The CLI installs the table source into your project, pulls the shadcn primitives it depends on (in *your* configured style), and installs the npm packages it needs.
+The data table is distributed as a **shadcn registry** item. The CLI installs the table source into your project, pulls the shadcn primitives it depends on (in *your* configured style), and installs the npm packages it needs.
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ tablecn is distributed as a **shadcn registry** item. The CLI installs the table
 - **Tailwind CSS v4** and React 19 / Next.js (or any bundler that compiles your `components/`).
 
 <Callout variant="note" title="Any shadcn style works">
-tablecn only uses standard primitive APIs, so it adapts to any shadcn style (Sera, Vega, Nova, Luma, …) and base color. The primitives it depends on are installed in your style — nothing is overwritten unless you opt in.
+It only uses standard primitive APIs, so it adapts to any shadcn style (Sera, Vega, Nova, Luma, …) and base color. The primitives it depends on are installed in your style — nothing is overwritten unless you opt in.
 </Callout>
 
 ## Add the component
@@ -18,7 +18,7 @@ tablecn only uses standard primitive APIs, so it adapts to any shadcn style (Ser
 Run the shadcn CLI against the registry URL:
 
 ```bash
-pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/tablecn/r/data-table.json
+pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
 ```
 
 This single command:

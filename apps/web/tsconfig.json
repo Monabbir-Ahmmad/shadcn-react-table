@@ -3,7 +3,9 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
-      "@monabbir/tablecn/*": ["../../packages/tablecn/src/*"],
+      "@monabbir/shadcn-react-table/*": [
+        "../../packages/shadcn-react-table/src/*"
+      ],
       "@workspace/ui/*": ["../../packages/ui/src/*"]
     },
     "plugins": [
