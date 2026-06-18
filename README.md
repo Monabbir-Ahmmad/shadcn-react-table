@@ -12,11 +12,6 @@ panels, tree sub-rows, sticky header/footer, inline editing (cell/row/table/
 modal) + create, row/cell actions, click-to-copy, CSV/Excel export,
 localization, custom icons, and server-side/manual mode.
 
-The table component lives in
-[`packages/shadcn-react-table/src/components/data-table/`](packages/shadcn-react-table/src/components/data-table/README.md)
-— that README has the complete API and every feature flag. A browsable example
-of every feature is in [`apps/web`](apps/web) (`pnpm dev`).
-
 ## [View the full documentation](https://monabbir-ahmmad.github.io/shadcn-react-table)
 
 ## Installation
@@ -25,7 +20,7 @@ The data table ships as a **shadcn registry**, so in any shadcn/ui project (Tail
 v4, CSS variables on — the default) you install it with one command:
 
 ```bash
-npx shadcn@latest add https://<your-deployment>/r/data-table.json
+pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
 ```
 
 (Deploy `apps/web` anywhere — e.g. Vercel — and the descriptor is served at
@@ -69,15 +64,15 @@ pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virt
 
 Only `@tanstack/react-table` is strictly required; the rest are per-feature:
 
-| Dependency | Needed for |
-| --- | --- |
-| `@tanstack/match-sorter-utils` | fuzzy global search |
-| `@tanstack/react-virtual` | row / column virtualization |
-| `@dnd-kit/core` `@dnd-kit/sortable` `@dnd-kit/utilities` | column / row drag-and-drop |
-| `date-fns` | date / date-range filters |
-| `papaparse` `xlsx` | CSV / Excel export |
-| `@remixicon/react` | default icons (override via the `icons` prop) |
-| `radix-ui` | the indeterminate select-all checkbox |
+| Dependency                                               | Needed for                                    |
+| -------------------------------------------------------- | --------------------------------------------- |
+| `@tanstack/match-sorter-utils`                           | fuzzy global search                           |
+| `@tanstack/react-virtual`                                | row / column virtualization                   |
+| `@dnd-kit/core` `@dnd-kit/sortable` `@dnd-kit/utilities` | column / row drag-and-drop                    |
+| `date-fns`                                               | date / date-range filters                     |
+| `papaparse` `xlsx`                                       | CSV / Excel export                            |
+| `@remixicon/react`                                       | default icons (override via the `icons` prop) |
+| `radix-ui`                                               | the indeterminate select-all checkbox         |
 
 Tailwind v4 + the shadcn token theme are required. Import the stylesheet **once**
 in your root layout (it ships the `--highlight` token, falling back to
@@ -171,24 +166,24 @@ straight through. Our extras + UI state live on `table.cnTable`.
 
 Pass these to `useDataTable`:
 
-| Want… | Option(s) |
-| --- | --- |
-| Row selection | `enableRowSelection`, `enableMultiRowSelection` |
-| Filter row visible by default | `defaultShowColumnFilters: true` |
-| Per-column filter UI | `columnDef.meta.variant` (`text`/`select`/`multi-select`/`range`/`range-slider`/`date`/`date-range`/`checkbox`) |
-| Global fuzzy search | on by default; `enableGlobalFilter: false` to hide |
-| Column drag / pin / resize | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing` |
-| Row drag / pin / numbers | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers` |
-| Grouping + aggregation | `enableGrouping` + column `footer`/`aggregationFn` |
-| Sticky header / footer | on by default; scrolls within a bounded surface (`max-h`) or virtualized list |
-| Detail panel / tree | `renderDetailPanel` / `getSubRows` |
-| Inline editing | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`) + `onEditCellSave`/`onSaveRow`/`onCreateRow` |
-| Row / cell actions | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy` |
-| Virtualization | `enableRowVirtualization`, `enableColumnVirtualization` (give the surface a bounded height) |
-| Export | `enableExport` |
-| Row/cell clicks | `onRowClick` / `onCellClick` (+ double-click) |
-| Custom icons / i18n | `icons`, `localization` |
-| Server-side data | `manualPagination` / `manualSorting` / `manualFiltering` + `rowCount` + controlled `state` |
+| Want…                         | Option(s)                                                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Row selection                 | `enableRowSelection`, `enableMultiRowSelection`                                                                 |
+| Filter row visible by default | `defaultShowColumnFilters: true`                                                                                |
+| Per-column filter UI          | `columnDef.meta.variant` (`text`/`select`/`multi-select`/`range`/`range-slider`/`date`/`date-range`/`checkbox`) |
+| Global fuzzy search           | on by default; `enableGlobalFilter: false` to hide                                                              |
+| Column drag / pin / resize    | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing`                                           |
+| Row drag / pin / numbers      | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers`                                |
+| Grouping + aggregation        | `enableGrouping` + column `footer`/`aggregationFn`                                                              |
+| Sticky header / footer        | on by default; scrolls within a bounded surface (`max-h`) or virtualized list                                   |
+| Detail panel / tree           | `renderDetailPanel` / `getSubRows`                                                                              |
+| Inline editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`) + `onEditCellSave`/`onSaveRow`/`onCreateRow`  |
+| Row / cell actions            | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy`                                            |
+| Virtualization                | `enableRowVirtualization`, `enableColumnVirtualization` (give the surface a bounded height)                     |
+| Export                        | `enableExport`                                                                                                  |
+| Row/cell clicks               | `onRowClick` / `onCellClick` (+ double-click)                                                                   |
+| Custom icons / i18n           | `icons`, `localization`                                                                                         |
+| Server-side data              | `manualPagination` / `manualSorting` / `manualFiltering` + `rowCount` + controlled `state`                      |
 
 The component-level [data-table README](packages/shadcn-react-table/src/components/data-table/README.md)
 documents the full option set, `columnDef.meta` fields, server-side mode, and
