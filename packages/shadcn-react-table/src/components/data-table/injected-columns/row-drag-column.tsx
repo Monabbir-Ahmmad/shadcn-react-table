@@ -3,6 +3,8 @@
 import * as React from "react"
 import type { ColumnDef, RowData } from "@tanstack/react-table"
 
+import { Button } from "@workspace/ui/components/button"
+
 import type { DataTableIcons, IconComponent } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 
@@ -50,19 +52,21 @@ function RowDragHandle({
 }) {
   const ctx = React.useContext(RowDragContext)
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="icon"
       aria-label={label}
       ref={ctx?.setActivatorNodeRef}
       suppressHydrationWarning
       {...(ctx?.attributes ?? {})}
       {...(ctx?.listeners ?? {})}
-      // touch-none/select-none: let dnd-kit's pointer sensor own the touch
-      // gesture (otherwise the browser scrolls/selects text before a drag can
-      // start on a phone).
-      className="flex cursor-grab touch-none items-center justify-center text-muted-foreground transition-colors outline-none select-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 active:cursor-grabbing"
+      // touch-none: let dnd-kit's pointer sensor own the touch gesture
+      // (otherwise the browser scrolls/selects text before a drag can start on
+      // a phone). size-7 gives a finger-friendly tap target.
+      className="size-7 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
     >
       <Icon className="size-4" />
-    </button>
+    </Button>
   )
 }

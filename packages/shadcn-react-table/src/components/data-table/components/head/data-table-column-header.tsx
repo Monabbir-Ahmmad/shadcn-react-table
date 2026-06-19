@@ -20,6 +20,7 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { ColumnDragHandle } from "../body/dnd"
 import { DataTableColumnActions } from "../menus/data-table-column-actions"
 import { getColumnLabel } from "../../helpers/column-label"
 import { DataTableColumnFilter } from "./data-table-column-filter"
@@ -104,11 +105,21 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
       (table.cnTable.enableColumnPinning && column.getCanPin()) ||
       (table.cnTable.enableGrouping && column.getCanGroup()))
 
+  const dragHandle = (
+    <ColumnDragHandle
+      label={localization.reorderColumn}
+      Icon={icons.dragHandle}
+    />
+  )
+
   // Non-interactive header (e.g. the selection column): render content plainly.
   if (!canSort && !showActions) {
     return (
-      <div className={cn("flex items-center gap-1", ALIGN_CLASS[align])}>
+      <div
+        className={cn("group/th flex items-center gap-1", ALIGN_CLASS[align])}
+      >
         {labelNode}
+        {dragHandle}
         {filterPopover}
       </div>
     )
@@ -158,6 +169,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
         </span>
       )}
 
+      {dragHandle}
       {showActions && (
         <DataTableColumnActions
           column={column}
