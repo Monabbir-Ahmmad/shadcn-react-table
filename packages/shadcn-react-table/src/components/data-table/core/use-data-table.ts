@@ -427,11 +427,40 @@ export function useDataTable<TData extends RowData>(
       })
       const headerText = getColumnLabel(column).toUpperCase()
 
+      // Reserve room beside the label for the header affordances that will
+      // actually render (see DataTableColumnHeader): the sort indicator, the
+      // drag grip, the column-actions trigger, and the popover filter button.
+      // Their presence depends on config + per-column capabilities, so sum only
+      // the ones in play — a fixed estimate clipped the controls once the drag
+      // grip moved into the header.
+      const ICON_BUTTON_WIDTH = 30 // size-7 (28px) icon button + gap-0.5 (2px)
+      const SORT_INDICATOR_WIDTH = 20 // sort glyph + its gap, inside the label
+      const canGroup = column.getCanGroup()
+      const showDragGrip =
+        (enableColumnOrdering || (enableGrouping && canGroup)) &&
+        !enableColumnVirtualization &&
+        !column.getIsPinned()
+      const showActions =
+        enableColumnActions &&
+        !column.columnDef.meta?.disableColumnActions &&
+        (column.getCanSort() ||
+          column.getCanHide() ||
+          column.getCanFilter() ||
+          (enableColumnPinning && column.getCanPin()) ||
+          (enableGrouping && canGroup))
+      const showFilterButton =
+        columnFilterDisplayMode === "popover" && column.getCanFilter()
+
+      const extraWidth =
+        (column.getCanSort() ? SORT_INDICATOR_WIDTH : 0) +
+        (showDragGrip ? ICON_BUTTON_WIDTH : 0) +
+        (showActions ? ICON_BUTTON_WIDTH : 0) +
+        (showFilterButton ? ICON_BUTTON_WIDTH : 0)
+
       const width = measureColumnWidth(values, headerText, {
         font,
         padding,
-        // Header room for the sort indicator + column-actions trigger.
-        extraWidth: 48,
+        extraWidth,
       })
 
       // Respect any per-column size bounds from the column def.
@@ -442,7 +471,15 @@ export function useDataTable<TData extends RowData>(
 
       table.setColumnSizing((prev) => ({ ...prev, [columnId]: clamped }))
     },
-    [table]
+    [
+      table,
+      enableColumnActions,
+      enableColumnOrdering,
+      enableColumnPinning,
+      enableColumnVirtualization,
+      enableGrouping,
+      columnFilterDisplayMode,
+    ]
   )
 
   const autoSizeAllColumns = React.useCallback(() => {
