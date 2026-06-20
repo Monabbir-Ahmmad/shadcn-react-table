@@ -1,42 +1,58 @@
 "use client"
 
-import * as React from "react"
-import { Checkbox as CheckboxPrimitive } from "radix-ui"
 import { RiCheckLine, RiSubtractLine } from "@remixicon/react"
+import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
+
+interface SelectionCheckboxProps extends Omit<
+  React.ComponentProps<"button">,
+  "onChange" | "type" | "role" | "aria-checked"
+> {
+  checked?: boolean
+  indeterminate?: boolean
+  onCheckedChange?: (checked: boolean) => void
+}
 
 /**
  * Selection checkbox that renders a minus glyph for the indeterminate
  * (some-but-not-all) state — the visual MRT uses for partial select-all.
- * Mirrors the shadcn `Checkbox` styling so it blends with the rest of the UI.
+ *
+ * Implemented as a styled `role="checkbox"` button (no headless primitive) so
+ * the data table carries no direct dependency on a specific primitive library
+ * and renders identically whether the consumer's shadcn setup is Radix- or
+ * Base-UI-based. Mirrors the shadcn `Checkbox` styling so it blends in.
  */
 function SelectionCheckbox({
   className,
   indeterminate = false,
-  checked,
+  checked = false,
+  onCheckedChange,
   ...props
-}: Omit<React.ComponentProps<typeof CheckboxPrimitive.Root>, "checked"> & {
-  indeterminate?: boolean
-  checked?: boolean
-}) {
+}: SelectionCheckboxProps) {
+  const active = checked || indeterminate
   return (
-    <CheckboxPrimitive.Root
+    <button
+      type="button"
+      role="checkbox"
       data-slot="checkbox"
-      checked={indeterminate ? "indeterminate" : checked}
+      aria-checked={indeterminate ? "mixed" : checked}
+      onClick={() => onCheckedChange?.(!checked)}
       className={cn(
-        "peer relative flex size-4.5 shrink-0 items-center justify-center rounded-none border border-input bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground data-indeterminate:border-primary data-indeterminate:bg-primary data-indeterminate:text-primary-foreground dark:data-checked:bg-primary",
+        "peer relative flex size-4.5 shrink-0 items-center justify-center rounded-none border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
+        active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-input",
         className
       )}
       {...props}
     >
-      <CheckboxPrimitive.Indicator
-        data-slot="checkbox-indicator"
-        className="grid place-content-center text-current transition-none [&>svg]:size-3.5"
-      >
-        {indeterminate ? <RiSubtractLine /> : <RiCheckLine />}
-      </CheckboxPrimitive.Indicator>
-    </CheckboxPrimitive.Root>
+      {indeterminate ? (
+        <RiSubtractLine className="size-3.5" />
+      ) : checked ? (
+        <RiCheckLine className="size-3.5" />
+      ) : null}
+    </button>
   )
 }
 
