@@ -29,7 +29,7 @@ export function DemoShowcase({ className }: { className?: string }) {
         <div
           role="tablist"
           aria-label="Live table demos"
-          className="flex items-center overflow-x-auto"
+          className="flex items-center overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {DEMO_TABS.map((tab) => {
             const selected = tab.slug === active
