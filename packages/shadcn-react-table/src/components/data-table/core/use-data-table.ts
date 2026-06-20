@@ -17,6 +17,13 @@ import {
 import { VALUELESS_MODES, type FilterMode } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
 import { getColumnLabel } from "../helpers/column-label"
+import {
+  getColumnDefMinWidth,
+  getColumnDefPreferredWidth,
+  getHeaderControlsWidth,
+  isDataColumnDef,
+  type HeaderControlsOptions,
+} from "../helpers/header-controls"
 import { measureColumnWidth } from "../helpers/measure-column-width"
 import { useControllableState } from "../hooks/use-controllable-state"
 import { useEditingState } from "../hooks/use-editing-state"
@@ -280,9 +287,62 @@ export function useDataTable<TData extends RowData>(
     icons,
   })
 
+  // Which header affordances render — shared by the column sizing below, the
+  // autosize measurement, and the header components, so they can't diverge.
+  const headerControlsOptions = React.useMemo<HeaderControlsOptions>(
+    () => ({
+      enableColumnActions,
+      enableColumnOrdering,
+      enableGrouping,
+      enableColumnPinning,
+      enableColumnVirtualization,
+      columnFilterDisplayMode,
+    }),
+    [
+      enableColumnActions,
+      enableColumnOrdering,
+      enableGrouping,
+      enableColumnPinning,
+      enableColumnVirtualization,
+      columnFilterDisplayMode,
+    ]
+  )
+
+  // Size each data column so its header controls are never clipped. Under
+  // `table-layout: fixed` a `<th>` is pinned to `getSize()` and clips overflow,
+  // and CSS `min-width` is ignored — so the drag grip / actions / filter button
+  // (all shrink-0) would be hidden behind a long label or a small size.
+  //  • minSize — a hard floor (controls + a sliver of label) that raises
+  //    `getSize()` and stops the resize drag; the label truncates past it.
+  //  • size — the at-rest default, widened to fit the full header so nothing is
+  //    truncated until the user drags narrower; only when no size was pinned.
+  // Done here as a pure transform (not a post-build mutation) so React Compiler
+  // keeps it and the SSR and client size vars match — a mutation in a memo/effect
+  // is dead-code-eliminated on the client and desyncs hydration.
+  const baseColumnSize = tableOptions.defaultColumn?.size ?? 150
+  const sizedColumns = React.useMemo(
+    () =>
+      resolvedColumns.map((def) => {
+        if (!isDataColumnDef(def)) return def
+        const minSize = Math.max(
+          def.minSize ?? 0,
+          getColumnDefMinWidth(def, headerControlsOptions)
+        )
+        const size =
+          def.size != null
+            ? def.size
+            : Math.max(
+                baseColumnSize,
+                getColumnDefPreferredWidth(def, headerControlsOptions)
+              )
+        return { ...def, minSize, size }
+      }),
+    [resolvedColumns, headerControlsOptions, baseColumnSize]
+  )
+
   const table = useReactTable<TData>({
     ...tableOptions,
-    columns: resolvedColumns,
+    columns: sizedColumns,
     // Default page-reset off: TanStack's auto-reset runs a state update during
     // render (warns in React 19 dev). We reset on filter changes via an effect
     // below instead. Consumers can re-enable by passing the option explicitly.
@@ -427,35 +487,11 @@ export function useDataTable<TData extends RowData>(
       })
       const headerText = getColumnLabel(column).toUpperCase()
 
-      // Reserve room beside the label for the header affordances that will
-      // actually render (see DataTableColumnHeader): the sort indicator, the
-      // drag grip, the column-actions trigger, and the popover filter button.
-      // Their presence depends on config + per-column capabilities, so sum only
-      // the ones in play — a fixed estimate clipped the controls once the drag
-      // grip moved into the header.
-      const ICON_BUTTON_WIDTH = 30 // size-7 (28px) icon button + gap-0.5 (2px)
-      const SORT_INDICATOR_WIDTH = 20 // sort glyph + its gap, inside the label
-      const canGroup = column.getCanGroup()
-      const showDragGrip =
-        (enableColumnOrdering || (enableGrouping && canGroup)) &&
-        !enableColumnVirtualization &&
-        !column.getIsPinned()
-      const showActions =
-        enableColumnActions &&
-        !column.columnDef.meta?.disableColumnActions &&
-        (column.getCanSort() ||
-          column.getCanHide() ||
-          column.getCanFilter() ||
-          (enableColumnPinning && column.getCanPin()) ||
-          (enableGrouping && canGroup))
-      const showFilterButton =
-        columnFilterDisplayMode === "popover" && column.getCanFilter()
-
-      const extraWidth =
-        (column.getCanSort() ? SORT_INDICATOR_WIDTH : 0) +
-        (showDragGrip ? ICON_BUTTON_WIDTH : 0) +
-        (showActions ? ICON_BUTTON_WIDTH : 0) +
-        (showFilterButton ? ICON_BUTTON_WIDTH : 0)
+      // Reserve room beside the label for the header affordances that actually
+      // render (sort indicator, drag grip, column-actions trigger, popover
+      // filter button). Shared with the per-column minSize floor below so
+      // measurement and the floor can never disagree — see helpers/header-controls.
+      const extraWidth = getHeaderControlsWidth(column, headerControlsOptions)
 
       const width = measureColumnWidth(values, headerText, {
         font,
@@ -471,15 +507,7 @@ export function useDataTable<TData extends RowData>(
 
       table.setColumnSizing((prev) => ({ ...prev, [columnId]: clamped }))
     },
-    [
-      table,
-      enableColumnActions,
-      enableColumnOrdering,
-      enableColumnPinning,
-      enableColumnVirtualization,
-      enableGrouping,
-      columnFilterDisplayMode,
-    ]
+    [table, headerControlsOptions]
   )
 
   const autoSizeAllColumns = React.useCallback(() => {

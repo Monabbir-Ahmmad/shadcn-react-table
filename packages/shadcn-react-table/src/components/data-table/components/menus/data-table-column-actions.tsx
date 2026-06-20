@@ -66,7 +66,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
               size="icon"
               aria-label={localization.columnActions}
               className={cn(
-                "size-7 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                "size-7 shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
                 className
               )}
             >

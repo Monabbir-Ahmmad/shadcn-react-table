@@ -20,7 +20,11 @@ import {
   getColumnPinningStyle,
   getWidthStyle,
 } from "../../utils/column-styles"
-import { DENSITY_CELL_PADDING, DISPLAY_COLUMN_IDS } from "../../core/constants"
+import { DENSITY_CELL_PADDING } from "../../core/constants"
+import {
+  headerControlsOptionsFromTable,
+  shouldShowColumnDragGrip,
+} from "../../helpers/header-controls"
 import type { DataTableInstance } from "../../core/types"
 import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
 import { DataTableHeadCell } from "../body/dnd"
@@ -45,8 +49,6 @@ export function DataTableHeader<TData extends RowData>({
 }: DataTableHeaderProps<TData>) {
   const {
     density,
-    enableColumnOrdering,
-    enableGrouping,
     enableColumnResizing,
     enableColumnVirtualization,
     enableColumnFilters,
@@ -56,6 +58,7 @@ export function DataTableHeader<TData extends RowData>({
     refs,
   } = table.cnTable
 
+  const controls = headerControlsOptionsFromTable(table)
   const padding = DENSITY_CELL_PADDING[density]
   const leafColumnIds = table.getVisibleLeafColumns().map((c) => c.id)
 
@@ -73,15 +76,11 @@ export function DataTableHeader<TData extends RowData>({
       key={header.id}
       header={header}
       table={table}
-      draggable={
-        // Draggable for reordering (column ordering) or to drag onto the group
-        // zone (grouping) — the drag-end handler routes by the drop target.
-        (enableColumnOrdering ||
-          (enableGrouping && header.column.getCanGroup())) &&
-        !enableColumnVirtualization &&
-        !DISPLAY_COLUMN_IDS.has(header.column.id) &&
-        !header.column.getIsPinned()
-      }
+      // Draggable for reordering (column ordering) or to drag onto the group
+      // zone (grouping) — the drag-end handler routes by the drop target. The
+      // grip's presence drives the column's reserved width, so both read the
+      // same predicate (see helpers/header-controls).
+      draggable={shouldShowColumnDragGrip(header.column, controls)}
       resizable={enableColumnResizing}
       widthStyle={getWidthStyle(header.column, table)}
       padding={padding}

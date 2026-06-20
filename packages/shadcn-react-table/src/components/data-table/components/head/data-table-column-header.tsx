@@ -23,6 +23,11 @@ import { cn } from "@workspace/ui/lib/utils"
 import { ColumnDragHandle } from "../body/dnd"
 import { DataTableColumnActions } from "../menus/data-table-column-actions"
 import { getColumnLabel } from "../../helpers/column-label"
+import {
+  headerControlsOptionsFromTable,
+  shouldShowColumnActions,
+  shouldShowColumnFilterButton,
+} from "../../helpers/header-controls"
 import { DataTableColumnFilter } from "./data-table-column-filter"
 import type { DataTableInstance } from "../../core/types"
 
@@ -48,12 +53,11 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   table,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   const { column } = header
-  const { localization, icons, enableColumnActions, columnFilterDisplayMode } =
-    table.cnTable
+  const { localization, icons } = table.cnTable
+  const controls = headerControlsOptionsFromTable(table)
   const align = column.columnDef.meta?.align ?? "left"
 
-  const showFilterPopover =
-    columnFilterDisplayMode === "popover" && column.getCanFilter()
+  const showFilterPopover = shouldShowColumnFilterButton(column, controls)
   const hasFilter = column.getFilterValue() != null
   const filterPopover = showFilterPopover ? (
     <Popover>
@@ -65,7 +69,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
               size="icon"
               aria-label={localization.filterByColumn(getColumnLabel(column))}
               className={cn(
-                "size-7 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                "size-7 shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
                 hasFilter && "text-primary opacity-100"
               )}
             >
@@ -96,14 +100,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   const isMultiSort =
     table.getState().sorting.length > 1 && sortIndex >= 0
 
-  const showActions =
-    enableColumnActions &&
-    !column.columnDef.meta?.disableColumnActions &&
-    (canSort ||
-      column.getCanHide() ||
-      column.getCanFilter() ||
-      (table.cnTable.enableColumnPinning && column.getCanPin()) ||
-      (table.cnTable.enableGrouping && column.getCanGroup()))
+  const showActions = shouldShowColumnActions(column, controls)
 
   const dragHandle = (
     <ColumnDragHandle
@@ -146,15 +143,15 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
               type="button"
               onClick={column.getToggleSortingHandler()}
               aria-label={sortTooltip}
-              className="-mx-1.5 flex items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider uppercase whitespace-nowrap text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground"
+              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider uppercase text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground"
               data-sorted={!!sorted}
             >
-              <span>{labelNode}</span>
+              <span className="min-w-0 truncate">{labelNode}</span>
               <SortIndicator sorted={sorted} icons={icons} />
               {isMultiSort && (
                 <Badge
                   variant="secondary"
-                  className="ml-0.5 h-4 min-w-4 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
+                  className="ml-0.5 h-4 min-w-4 shrink-0 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
                 >
                   {sortIndex + 1}
                 </Badge>
@@ -164,7 +161,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
           <TooltipContent>{sortTooltip}</TooltipContent>
         </Tooltip>
       ) : (
-        <span className="px-0 text-xs font-medium tracking-wider uppercase whitespace-nowrap">
+        <span className="min-w-0 truncate px-0 text-xs font-medium tracking-wider uppercase">
           {labelNode}
         </span>
       )}
@@ -189,9 +186,11 @@ function SortIndicator({
   sorted: false | "asc" | "desc"
   icons: DataTableInstance["cnTable"]["icons"]
 }) {
-  if (sorted === "asc") return <icons.sortAscending className="size-3.5" />
-  if (sorted === "desc") return <icons.sortDescending className="size-3.5" />
+  if (sorted === "asc")
+    return <icons.sortAscending className="size-3.5 shrink-0" />
+  if (sorted === "desc")
+    return <icons.sortDescending className="size-3.5 shrink-0" />
   return (
-    <icons.sortUnsorted className="size-3.5 opacity-50 transition-opacity group-hover/th:opacity-70" />
+    <icons.sortUnsorted className="size-3.5 shrink-0 opacity-50 transition-opacity group-hover/th:opacity-70" />
   )
 }
