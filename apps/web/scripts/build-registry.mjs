@@ -33,7 +33,7 @@ const NPM_DEPENDENCIES = [
   "papaparse",
   "xlsx",
   "radix-ui",
-  "@remixicon/react",
+  "lucide-react",
 ]
 
 // Type-only packages for deps that don't ship their own declarations. Without

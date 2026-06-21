@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { DataTableConfigProvider } from "@monabbir/shadcn-react-table/components/data-table"
 
-import { lucideIcons, type IconLibrary } from "@/components/examples/icon-sets"
+import { remixIcons, type IconLibrary } from "@/components/examples/icon-sets"
 import { readPrefs } from "@/lib/theme-store"
 
 interface IconLibraryContextValue {
@@ -25,13 +25,13 @@ export function IconLibraryProvider({
 }: {
   children: React.ReactNode
 }) {
-  // Default to "remix" for SSR + first client render to avoid a hydration
-  // mismatch; sync the saved preference after mount.
-  const [iconLibrary, setIconLibrary] = React.useState<IconLibrary>("remix")
+  // Default to "lucide" (the package default) for SSR + first client render to
+  // avoid a hydration mismatch; sync the saved preference after mount.
+  const [iconLibrary, setIconLibrary] = React.useState<IconLibrary>("lucide")
   React.useEffect(() => {
     const saved = readPrefs().icons
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (saved !== "remix") setIconLibrary(saved)
+    if (saved !== "lucide") setIconLibrary(saved)
   }, [])
 
   const value = React.useMemo(
@@ -42,7 +42,7 @@ export function IconLibraryProvider({
   return (
     <IconLibraryContext.Provider value={value}>
       <DataTableConfigProvider
-        icons={iconLibrary === "lucide" ? lucideIcons : undefined}
+        icons={iconLibrary === "remix" ? remixIcons : undefined}
       >
         {children}
       </DataTableConfigProvider>

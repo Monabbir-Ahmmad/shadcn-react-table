@@ -2241,231 +2241,231 @@ export const iconSlots: ApiMember[] = [
     "name": "sortAscending",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowUpLine",
+    "default": "ArrowUp",
     "description": ""
   },
   {
     "name": "sortDescending",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowDownLine",
+    "default": "ArrowDown",
     "description": ""
   },
   {
     "name": "sortUnsorted",
     "type": "IconComponent",
     "required": true,
-    "default": "RiExpandUpDownLine",
+    "default": "ChevronsUpDown",
     "description": ""
   },
   {
     "name": "columnActions",
     "type": "IconComponent",
     "required": true,
-    "default": "RiMore2Line",
+    "default": "MoreVertical",
     "description": ""
   },
   {
     "name": "filter",
     "type": "IconComponent",
     "required": true,
-    "default": "RiFilterLine",
+    "default": "Filter",
     "description": ""
   },
   {
     "name": "filterOff",
     "type": "IconComponent",
     "required": true,
-    "default": "RiFilterOffLine",
+    "default": "FilterX",
     "description": ""
   },
   {
     "name": "advancedFilter",
     "type": "IconComponent",
     "required": true,
-    "default": "RiFilter3Line",
+    "default": "ListFilter",
     "description": "Advanced filter panel toggle."
   },
   {
     "name": "clearAll",
     "type": "IconComponent",
     "required": true,
-    "default": "RiListCheck",
+    "default": "RotateCcw",
     "description": "Clear-sort / show-all reset action."
   },
   {
     "name": "hide",
     "type": "IconComponent",
     "required": true,
-    "default": "RiEyeOffLine",
+    "default": "EyeOff",
     "description": ""
   },
   {
     "name": "pin",
     "type": "IconComponent",
     "required": true,
-    "default": "RiPushpinLine",
+    "default": "Pin",
     "description": ""
   },
   {
     "name": "pinnedRow",
     "type": "IconComponent",
     "required": true,
-    "default": "RiPushpinFill",
+    "default": "Pin",
     "description": ""
   },
   {
     "name": "unpin",
     "type": "IconComponent",
     "required": true,
-    "default": "RiUnpinLine",
+    "default": "PinOff",
     "description": ""
   },
   {
     "name": "group",
     "type": "IconComponent",
     "required": true,
-    "default": "RiGroup2Line",
+    "default": "Group",
     "description": ""
   },
   {
     "name": "columnVisibility",
     "type": "IconComponent",
     "required": true,
-    "default": "RiLayoutColumnLine",
+    "default": "Columns3",
     "description": ""
   },
   {
     "name": "density",
     "type": "IconComponent",
     "required": true,
-    "default": "RiLineHeight",
+    "default": "Rows3",
     "description": ""
   },
   {
     "name": "fullscreenEnter",
     "type": "IconComponent",
     "required": true,
-    "default": "RiFullscreenLine",
+    "default": "Maximize2",
     "description": ""
   },
   {
     "name": "fullscreenExit",
     "type": "IconComponent",
     "required": true,
-    "default": "RiFullscreenExitLine",
+    "default": "Minimize2",
     "description": ""
   },
   {
     "name": "search",
     "type": "IconComponent",
     "required": true,
-    "default": "RiSearchLine",
+    "default": "Search",
     "description": ""
   },
   {
     "name": "clear",
     "type": "IconComponent",
     "required": true,
-    "default": "RiCloseLine",
+    "default": "X",
     "description": ""
   },
   {
     "name": "pageFirst",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowLeftDoubleLine",
+    "default": "ChevronsLeft",
     "description": ""
   },
   {
     "name": "pagePrev",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowLeftSLine",
+    "default": "ChevronLeft",
     "description": ""
   },
   {
     "name": "pageNext",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowRightSLine",
+    "default": "ChevronRight",
     "description": ""
   },
   {
     "name": "pageLast",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowRightDoubleLine",
+    "default": "ChevronsRight",
     "description": ""
   },
   {
     "name": "expanded",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowDownSLine",
+    "default": "ChevronDown",
     "description": ""
   },
   {
     "name": "collapsed",
     "type": "IconComponent",
     "required": true,
-    "default": "RiArrowRightSLine",
+    "default": "ChevronRight",
     "description": ""
   },
   {
     "name": "dragHandle",
     "type": "IconComponent",
     "required": true,
-    "default": "RiDraggable",
+    "default": "GripVertical",
     "description": ""
   },
   {
     "name": "edit",
     "type": "IconComponent",
     "required": true,
-    "default": "RiPencilLine",
+    "default": "Pencil",
     "description": ""
   },
   {
     "name": "save",
     "type": "IconComponent",
     "required": true,
-    "default": "RiCheckLine",
+    "default": "Check",
     "description": ""
   },
   {
     "name": "cancel",
     "type": "IconComponent",
     "required": true,
-    "default": "RiCloseLine",
+    "default": "X",
     "description": ""
   },
   {
     "name": "export",
     "type": "IconComponent",
     "required": true,
-    "default": "RiDownloadLine",
+    "default": "Download",
     "description": ""
   },
   {
     "name": "fileCsv",
     "type": "IconComponent",
     "required": true,
-    "default": "RiFileTextLine",
+    "default": "FileText",
     "description": ""
   },
   {
     "name": "fileExcel",
     "type": "IconComponent",
     "required": true,
-    "default": "RiFileExcel2Line",
+    "default": "FileSpreadsheet",
     "description": ""
   },
   {
     "name": "calendar",
     "type": "IconComponent",
     "required": true,
-    "default": "RiCalendarLine",
+    "default": "Calendar",
     "description": ""
   }
 ]

@@ -15,7 +15,7 @@ export const DEFAULT_PREFS: ThemePrefs = {
   base: "neutral",
   font: "raleway",
   radius: "0rem",
-  icons: "remix",
+  icons: "lucide",
 }
 
 export function readPrefs(): ThemePrefs {

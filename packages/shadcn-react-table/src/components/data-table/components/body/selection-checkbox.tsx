@@ -1,6 +1,5 @@
 "use client"
 
-import { RiCheckLine, RiSubtractLine } from "@remixicon/react"
 import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
@@ -22,6 +21,11 @@ interface SelectionCheckboxProps extends Omit<
  * the data table carries no direct dependency on a specific primitive library
  * and renders identically whether the consumer's shadcn setup is Radix- or
  * Base-UI-based. Mirrors the shadcn `Checkbox` styling so it blends in.
+ *
+ * The check / indeterminate glyphs are inline SVG (not the swappable `icons`
+ * system, nor an icon-library import) so a selection checkbox never depends on
+ * a particular icon package — it renders the same even if a consumer overrides
+ * every table icon or doesn't install Lucide.
  */
 function SelectionCheckbox({
   className,
@@ -47,11 +51,24 @@ function SelectionCheckbox({
       )}
       {...props}
     >
-      {indeterminate ? (
-        <RiSubtractLine className="size-3.5" />
-      ) : checked ? (
-        <RiCheckLine className="size-3.5" />
-      ) : null}
+      {active && (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-3.5"
+          aria-hidden="true"
+        >
+          {indeterminate ? (
+            <path d="M5 12h14" />
+          ) : (
+            <path d="M20 6 9 17l-5-5" />
+          )}
+        </svg>
+      )}
     </button>
   )
 }
