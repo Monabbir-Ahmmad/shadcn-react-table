@@ -20,7 +20,7 @@ export function SkeletonRows({
           {Array.from({ length: Math.max(1, columnCount) }).map(
             (__, colIndex) => (
               <TableCell key={colIndex} className={padding}>
-                <Skeleton className="h-4 w-full max-w-[12rem]" />
+                <Skeleton className="h-4 w-full max-w-48" />
               </TableCell>
             )
           )}

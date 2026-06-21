@@ -139,18 +139,3 @@
     }
 }
 
-/* data-table: indeterminate loading bar */
-@keyframes cn-table-progress {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(400%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-\[cn-table-progress_1\.1s_ease-in-out_infinite\] {
-    animation: none;
-  }
-}

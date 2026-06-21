@@ -165,8 +165,8 @@ export function DataTable<TData extends RowData>({
               // stays pinned to the visible bottom. Neutralize the shadcn
               // <Table> wrapper's own overflow so it doesn't become a second
               // (unbounded) scroll container that breaks sticky positioning.
-              "relative overflow-auto rounded-md border [&>[data-slot=table-container]]:overflow-visible",
-              enableRowVirtualization && "max-h-[600px]",
+              "relative overflow-auto rounded-md border *:data-[slot=table-container]:overflow-visible",
+              enableRowVirtualization && "max-h-150",
               surfaceClassName
             )}
           >
@@ -176,7 +176,22 @@ export function DataTable<TData extends RowData>({
                 className="absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden bg-primary/20"
                 role="presentation"
               >
-                <div className="h-full w-1/3 animate-[cn-table-progress_1.1s_ease-in-out_infinite] bg-primary" />
+                {/* @keyframes can't go in an inline style attribute, so the rule
+                    lives in this co-located <style> — keeping the table
+                    self-contained (no globals.css / registry CSS needed). The
+                    animation itself is applied inline; reduced motion stops it. */}
+                <style>
+                  {
+                    "@keyframes data-table-progress{from{transform:translateX(-100%)}to{transform:translateX(400%)}}@media (prefers-reduced-motion:reduce){[data-slot=data-table-progress-bar]{animation:none!important}}"
+                  }
+                </style>
+                <div
+                  data-slot="data-table-progress-bar"
+                  className="h-full w-1/3 bg-primary"
+                  style={{
+                    animation: "data-table-progress 1.1s ease-in-out infinite",
+                  }}
+                />
               </div>
             )}
 

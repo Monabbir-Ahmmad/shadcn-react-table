@@ -2566,6 +2566,13 @@ export const slots: ApiMember[] = [
     "description": "Indeterminate progress bar shown while loading or saving."
   },
   {
+    "name": "data-table-progress-bar",
+    "type": "",
+    "required": true,
+    "default": null,
+    "description": ""
+  },
+  {
     "name": "data-table-surface",
     "type": "",
     "required": true,
