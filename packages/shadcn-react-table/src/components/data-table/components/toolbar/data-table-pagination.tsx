@@ -56,7 +56,7 @@ export function DataTablePagination<TData extends RowData>({
         >
           <SelectTrigger
             size="sm"
-            className="h-8 w-[4.5rem]"
+            className="h-8 w-18"
             aria-label={localization.rowsPerPage}
           >
             <SelectValue placeholder={`${pageSize}`} />

@@ -23,11 +23,7 @@ export const Highlight = React.memo(function Highlight({
   className?: string
 }) {
   const trimmed = query?.trim()
-  if (
-    !trimmed ||
-    text.length === 0 ||
-    text.length > MAX_HIGHLIGHT_LENGTH
-  ) {
+  if (!trimmed || text.length === 0 || text.length > MAX_HIGHLIGHT_LENGTH) {
     return <>{text}</>
   }
 
@@ -42,7 +38,7 @@ export const Highlight = React.memo(function Highlight({
           <mark
             key={index}
             className={cn(
-              "rounded-[2px] bg-highlight px-0.5 text-highlight-foreground",
+              "rounded-xs bg-highlight px-0.5 text-highlight-foreground",
               className
             )}
           >

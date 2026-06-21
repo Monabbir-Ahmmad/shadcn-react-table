@@ -94,8 +94,8 @@ const FONTS = [
 const RADII = ["0rem", "0.3rem", "0.45rem", "0.65rem", "1rem"]
 
 const ICON_LIBS: { name: IconLibrary; label: string }[] = [
-  { name: "remix", label: "Remix" },
   { name: "lucide", label: "Lucide" },
+  { name: "remix", label: "Remix" },
 ]
 
 function setVars(vars: Record<string, string>) {
