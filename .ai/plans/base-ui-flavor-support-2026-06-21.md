@@ -1,5 +1,17 @@
 # Base UI Flavor Support Implementation Plan
 
+> **⚠️ SUPERSEDED (2026-07-02).** The Task 1 discovery spike disproved this plan's
+> architecture: the shadcn 4.x CLI transforms `asChild` → `render` at install
+> time and the Base wrappers absorb the `*Positioner` restructure internally, so
+> **no `compat/` layer and no second registry variant were built** (Tasks 2–5
+> obsolete). The delivered work — 3 flavor-neutral source fixes, dropping
+> `radix-ui` from registry deps, and docs — is specified and evidenced in
+> **`.ai/reviews/base-ui-delta-2026-06-21.md`** (the authoritative record).
+> Both flavors are validated: fresh `shadcn add` into `radix-vega` and
+> `base-vega` probe apps each pass `tsc --noEmit` (0 errors) and
+> `next build --webpack` (exit 0) against the same shipped `data-table.json`.
+> Do not execute the tasks below.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let the data table install cleanly into both Radix-flavored and Base-UI-flavored shadcn projects, by isolating every Radix/Base API difference behind a small `compat/` adapter layer and shipping two registry variants generated from one source.
