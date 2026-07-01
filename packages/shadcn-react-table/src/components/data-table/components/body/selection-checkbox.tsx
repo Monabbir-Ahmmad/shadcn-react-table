@@ -62,11 +62,7 @@ function SelectionCheckbox({
           className="size-3.5"
           aria-hidden="true"
         >
-          {indeterminate ? (
-            <path d="M5 12h14" />
-          ) : (
-            <path d="M20 6 9 17l-5-5" />
-          )}
+          {indeterminate ? <path d="M5 12h14" /> : <path d="M20 6 9 17l-5-5" />}
         </svg>
       )}
     </button>

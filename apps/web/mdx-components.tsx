@@ -71,7 +71,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       )
     },
     ul: ({ className, ...props }) => (
-      <ul className={cn("my-5 ml-6 list-disc [&>li]:mt-2", className)} {...props} />
+      <ul
+        className={cn("my-5 ml-6 list-disc [&>li]:mt-2", className)}
+        {...props}
+      />
     ),
     ol: ({ className, ...props }) => (
       <ol
@@ -96,7 +99,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     table: ({ className, ...props }) => (
       <div className="my-6 w-full overflow-x-auto rounded-lg border">
-        <table className={cn("w-full border-collapse text-sm", className)} {...props} />
+        <table
+          className={cn("w-full border-collapse text-sm", className)}
+          {...props}
+        />
       </div>
     ),
     th: ({ className, ...props }) => (
@@ -109,7 +115,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       />
     ),
     td: ({ className, ...props }) => (
-      <td className={cn("border-b px-3 py-2 align-top last:border-0", className)} {...props} />
+      <td
+        className={cn("border-b px-3 py-2 align-top last:border-0", className)}
+        {...props}
+      />
     ),
     code: ({ className, ...props }) => (
       <code

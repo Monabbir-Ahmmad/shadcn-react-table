@@ -1,29 +1,13 @@
 "use client"
 
-import * as React from "react"
-import {
-  type Cell,
-  type Row,
-  type RowData,
-} from "@tanstack/react-table"
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { type Cell, type Row, type RowData } from "@tanstack/react-table"
 import type { Virtualizer } from "@tanstack/react-virtual"
+import * as React from "react"
 
-import {
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@workspace/ui/components/table"
+import { TableBody, TableCell, TableRow } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
-import {
-  getColumnPinningClass,
-  getColumnPinningStyle,
-  getWidthStyle,
-} from "../../utils/column-styles"
 import {
   ALIGN_CELL,
   DENSITY_CELL_PADDING,
@@ -34,8 +18,13 @@ import type {
   VirtualRowItem,
   WithColumnSpacers,
 } from "../../hooks/use-table-virtualizers"
-import { DataTableBodyRow } from "./dnd"
+import {
+  getColumnPinningClass,
+  getColumnPinningStyle,
+  getWidthStyle,
+} from "../../utils/column-styles"
 import { DataTableCreateRow } from "../editing/data-table-create-row"
+import { DataTableBodyRow } from "./dnd"
 import { renderBodyCell } from "./render-body-cell"
 import { SkeletonRows } from "./skeleton-rows"
 
@@ -78,7 +67,7 @@ export function DataTableBody<TData extends RowData>({
     enablePagination,
     showSkeletons,
     localization,
-  } = table.cnTable
+  } = table.tableInstance
 
   const padding = DENSITY_CELL_PADDING[density]
   const visibleColumnCount = table.getVisibleLeafColumns().length
@@ -217,7 +206,9 @@ export function DataTableBody<TData extends RowData>({
             !isGrouped
           }
           onClick={
-            onRowClick ? (event) => onRowClick({ row, table, event }) : undefined
+            onRowClick
+              ? (event) => onRowClick({ row, table, event })
+              : undefined
           }
           onDoubleClick={
             onRowDoubleClick
@@ -234,16 +225,14 @@ export function DataTableBody<TData extends RowData>({
 
   return (
     <TableBody>
-      {table.cnTable.enableEditing &&
-        table.cnTable.isCreating &&
-        table.cnTable.createDisplayMode === "row" && (
+      {table.tableInstance.enableEditing &&
+        table.tableInstance.isCreating &&
+        table.tableInstance.createDisplayMode === "row" && (
           <DataTableCreateRow table={table} />
         )}
       {showSkeletons && !hasRows ? (
         <SkeletonRows
-          rowCount={
-            enablePagination ? table.getState().pagination.pageSize : 8
-          }
+          rowCount={enablePagination ? table.getState().pagination.pageSize : 8}
           columnCount={visibleColumnCount}
           padding={padding}
         />

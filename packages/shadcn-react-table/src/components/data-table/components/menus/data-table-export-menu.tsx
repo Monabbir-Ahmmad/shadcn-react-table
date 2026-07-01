@@ -15,8 +15,8 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
 
-import { exportToCsv, exportToExcel } from "../../utils/export-utils"
 import type { DataTableInstance } from "../../core/types"
+import { exportToCsv, exportToExcel } from "../../utils/export-utils"
 
 /**
  * Toolbar export menu (CSV / Excel). Exports the selected rows when any are
@@ -29,7 +29,7 @@ export function DataTableExportMenu<TData extends RowData>({
   table: DataTableInstance<TData>
   fileName?: string
 }) {
-  const { localization, icons } = table.cnTable
+  const { localization, icons } = table.tableInstance
   return (
     <DropdownMenu>
       <Tooltip>

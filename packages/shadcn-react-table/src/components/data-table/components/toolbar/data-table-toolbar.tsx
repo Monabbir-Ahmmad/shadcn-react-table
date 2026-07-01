@@ -1,19 +1,19 @@
 "use client"
 
-import type * as React from "react"
 import type { RowData } from "@tanstack/react-table"
+import type * as React from "react"
 
+import type { DataTableInstance } from "../../core/types"
 import { DataTableExportMenu } from "../menus/data-table-export-menu"
 import { DataTableFilterPanel } from "../menus/data-table-filter-panel"
-import { DataTableGlobalFilter } from "./data-table-global-filter"
 import {
   DataTableAdvancedFilterToggle,
   DataTableDensityToggle,
   DataTableFilterToggle,
   DataTableFullscreenToggle,
 } from "./controls"
+import { DataTableGlobalFilter } from "./data-table-global-filter"
 import { DataTableViewOptions } from "./data-table-view-options"
-import type { DataTableInstance } from "../../core/types"
 
 /**
  * Top toolbar. Left region: title slot + consumer toolbar actions. Right
@@ -48,7 +48,7 @@ export function DataTableToolbar<TData extends RowData>({
     enableDensityToggle,
     enableFullscreenToggle,
     exportFileName,
-  } = table.cnTable
+  } = table.tableInstance
 
   const anyFilterable = table
     .getAllColumns()

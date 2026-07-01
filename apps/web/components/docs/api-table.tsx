@@ -100,10 +100,7 @@ export function ApiTable({
               </tr>
             ) : (
               filtered.map((row) => (
-                <tr
-                  key={row.name}
-                  className="border-b align-top last:border-0"
-                >
+                <tr key={row.name} className="border-b align-top last:border-0">
                   <td className="px-3 py-2 whitespace-nowrap">
                     <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
                       {row.name}

@@ -41,7 +41,7 @@ Add your own buttons without replacing anything. `renderToolbarActions` fills th
 ```tsx
 useDataTable({
   renderToolbarActions: ({ table }) => (
-    <Button size="sm" onClick={() => table.cnTable.beginCreate()}>
+    <Button size="sm" onClick={() => table.tableInstance.beginCreate()}>
       Add row
     </Button>
   ),
@@ -101,7 +101,17 @@ useDataTable({
 
 Every toolbar slot exposes a `data-slot` attribute, so you can target it with a Tailwind selector instead of a styling prop — no per-slot props needed:
 
-<ApiTable of="slots" propLabel="Slot" only={["data-table-toolbar", "data-table-toolbar-actions", "data-table-alert-banner", "data-table-bottom-toolbar", "data-table-pagination"]} />
+<ApiTable
+  of="slots"
+  propLabel="Slot"
+  only={[
+    "data-table-toolbar",
+    "data-table-toolbar-actions",
+    "data-table-alert-banner",
+    "data-table-bottom-toolbar",
+    "data-table-pagination",
+  ]}
+/>
 
 ```tsx
 <DataTable table={table} className="[&_[data-slot=data-table-toolbar]]:px-2" />

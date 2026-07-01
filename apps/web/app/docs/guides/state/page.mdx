@@ -26,7 +26,7 @@ For server-side data, combine this with the `manual*` flags — see [Server-side
 
 ## Data table UI state
 
-The presentation state the table adds on top of TanStack lives on `table.cnTable`: **density**, **full screen**, **filter-row visibility**, and the **global search mode**. Each is uncontrolled by default but accepts a controlled value and/or an `onChange` callback — so you can observe a change without taking ownership, or take full control.
+The presentation state the table adds on top of TanStack lives on `table.tableInstance`: **density**, **full screen**, **filter-row visibility**, and the **global search mode**. Each is uncontrolled by default but accepts a controlled value and/or an `onChange` callback — so you can observe a change without taking ownership, or take full control.
 
 ```tsx
 const table = useDataTable({
@@ -67,13 +67,13 @@ const table = useDataTable({
 
 ## Reading and setting from the instance
 
-Whether controlled or not, the current values and setters are always available on `table.cnTable`:
+Whether controlled or not, the current values and setters are always available on `table.tableInstance`:
 
 ```tsx
-table.cnTable.density // "comfortable" | "compact" | "spacious"
-table.cnTable.setDensity("compact")
-table.cnTable.setIsFullscreen(true)
-table.cnTable.setShowColumnFilters((prev) => !prev)
+table.tableInstance.density // "comfortable" | "compact" | "spacious"
+table.tableInstance.setDensity("compact")
+table.tableInstance.setIsFullscreen(true)
+table.tableInstance.setShowColumnFilters((prev) => !prev)
 ```
 
 <Callout variant="tip" title="Persisting state">

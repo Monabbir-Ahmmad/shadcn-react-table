@@ -29,8 +29,7 @@ export function DocsMobileNav() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost"
-          size="icon-sm">
+        <Button variant="ghost" size="icon-sm">
           <RiMenuLine className="size-4" />
           <span className="sr-only">Open navigation</span>
         </Button>

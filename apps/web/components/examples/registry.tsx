@@ -1,7 +1,5 @@
 "use client"
 
-import * as React from "react"
-import type { ColumnDef } from "@tanstack/react-table"
 import {
   RiAddLine,
   RiDeleteBinLine,
@@ -10,19 +8,21 @@ import {
   RiSortAsc,
   RiSortDesc,
 } from "@remixicon/react"
+import type { ColumnDef } from "@tanstack/react-table"
+import * as React from "react"
 
-import { Button } from "@workspace/ui/components/button"
-import { ContextMenuItem } from "@workspace/ui/components/context-menu"
 import {
   DataTable,
   useDataTable,
   type EditDisplayMode,
 } from "@monabbir/shadcn-react-table/components/data-table"
+import { Button } from "@workspace/ui/components/button"
+import { ContextMenuItem } from "@workspace/ui/components/context-menu"
 
 import {
+  users as baseUsers,
   makeUsers,
   orgData,
-  users as baseUsers,
   type OrgNode,
   type User,
 } from "@/lib/example-data"
@@ -446,7 +446,7 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => table.cnTable.beginCreate()}
+        onClick={() => table.tableInstance.beginCreate()}
       >
         <RiAddLine />
         New

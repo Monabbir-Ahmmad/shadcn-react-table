@@ -1,7 +1,7 @@
 "use client"
 
-import * as React from "react"
 import type { RowData } from "@tanstack/react-table"
+import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -21,8 +21,8 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { GlobalFilterMode } from "../../fns/filter-fns"
 import type { DataTableInstance } from "../../core/types"
+import type { GlobalFilterMode } from "../../fns/filter-fns"
 
 const GLOBAL_MODES: GlobalFilterMode[] = [
   "fuzzy",
@@ -55,7 +55,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
     globalFilterMode,
     setGlobalFilterMode,
     renderGlobalFilterModeMenuItems,
-  } = table.cnTable
+  } = table.tableInstance
 
   const external = (table.getState().globalFilter ?? "") as string
   const [expanded, setExpanded] = React.useState(external.length > 0)

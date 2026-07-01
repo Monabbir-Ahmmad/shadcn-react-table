@@ -4,9 +4,9 @@ import type { RowData } from "@tanstack/react-table"
 
 import { Input } from "@workspace/ui/components/input"
 
+import { VALUELESS_MODES } from "../../../fns/filter-fns"
 import { getColumnLabel } from "../../../helpers/column-label"
 import { getEffectiveMode } from "../../../helpers/effective-filter-mode"
-import { VALUELESS_MODES } from "../../../fns/filter-fns"
 import {
   BETWEEN_MODES,
   FIELD_CLASS,
@@ -18,7 +18,7 @@ export function NumberFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization } = table.cnTable
+  const { localization } = table.tableInstance
   const mode = getEffectiveMode(column, table)
 
   if (VALUELESS_MODES.has(mode)) {

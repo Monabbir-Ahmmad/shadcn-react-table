@@ -57,11 +57,13 @@ const table = useDataTable({
 ```
 
 <Callout variant="tip" title="Memoize data and columns">
-Pass stable references for `data` and `columns` (e.g. via `React.useMemo` or module scope). Handing TanStack a new `columns` identity every render can reset state.
+  Pass stable references for `data` and `columns` (e.g. via `React.useMemo` or
+  module scope). Handing TanStack a new `columns` identity every render can
+  reset state.
 </Callout>
 
 ## Where to go next
 
-- [Usage](/docs/usage) — the options-in / instance-out model and `table.cnTable`.
+- [Usage](/docs/usage) — the options-in / instance-out model and `table.tableInstance`.
 - [Guides](/docs/guides/sorting) — enable each feature, with live examples.
 - [API reference](/docs/api/use-data-table) — every option and its default.

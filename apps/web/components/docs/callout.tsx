@@ -25,7 +25,12 @@ export function Callout({
   children: React.ReactNode
 }) {
   return (
-    <div className={cn("my-6 rounded-lg border px-4 py-3 text-sm", STYLES[variant])}>
+    <div
+      className={cn(
+        "my-6 rounded-lg border px-4 py-3 text-sm",
+        STYLES[variant]
+      )}
+    >
       <p className="mb-1 font-medium">{title ?? LABELS[variant]}</p>
       <div className="text-muted-foreground [&_a]:underline [&_code]:rounded [&_code]:bg-background/60 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs">
         {children}

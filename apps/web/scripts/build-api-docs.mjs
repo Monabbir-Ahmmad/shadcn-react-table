@@ -3,8 +3,8 @@
 // docs tables never drift from the real API. Emits a typed module the docs
 // pages import. Run from the repo root (anchored via import.meta.url):
 //   node apps/web/scripts/build-api-docs.mjs
-import { writeFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs"
-import { join, dirname } from "node:path"
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { Project, SyntaxKind } from "ts-morph"
 
@@ -94,11 +94,9 @@ const useDataTableOptions = membersOf(
 const colMetaModule = typesSf
   .getModules()
   .find((m) => m.getName().includes("@tanstack/react-table"))
-const columnOptions = membersOf(
-  colMetaModule.getInterfaceOrThrow("ColumnMeta")
-)
+const columnOptions = membersOf(colMetaModule.getInterfaceOrThrow("ColumnMeta"))
 
-// --- Table instance API (table.cnTable = DataTableConfig)
+// --- Table instance API (table.tableInstance = DataTableConfig)
 const tableInstance = membersOf(typesSf.getInterfaceOrThrow("DataTableConfig"))
 
 // --- <DataTable /> component props
@@ -142,7 +140,7 @@ const iconSlots = iconsSf
     description: describe(p),
   }))
 
-// --- Instance refs (table.cnTable.refs = DataTableRefs)
+// --- Instance refs (table.tableInstance.refs = DataTableRefs)
 const tableRefs = membersOf(typesSf.getInterfaceOrThrow("DataTableRefs"))
 
 // --- Structural `data-slot` attributes (scanned from the component source so
@@ -151,7 +149,8 @@ const tableRefs = membersOf(typesSf.getInterfaceOrThrow("DataTableRefs"))
 const SLOT_DESCRIPTIONS = {
   "data-table": "Outermost wrapper element.",
   "data-table-surface": "The scroll container for the table (both axes).",
-  "data-table-progress": "Indeterminate progress bar shown while loading or saving.",
+  "data-table-progress":
+    "Indeterminate progress bar shown while loading or saving.",
   "data-table-toolbar": "Top toolbar root.",
   "data-table-toolbar-actions":
     "Internal actions cluster (search, filters, density, full screen, …).",

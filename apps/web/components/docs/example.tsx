@@ -87,7 +87,9 @@ export function Example({ slug }: { slug: string }) {
         </div>
       ) : (
         <pre className="max-h-[28rem] overflow-auto bg-muted/30 p-4 text-sm">
-          <code className="font-mono text-[13px] leading-relaxed">{source}</code>
+          <code className="font-mono text-[13px] leading-relaxed">
+            {source}
+          </code>
         </pre>
       )}
     </div>

@@ -24,7 +24,7 @@ export function DataTableDensityToggle<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, icons, density, setDensity } = table.cnTable
+  const { localization, icons, density, setDensity } = table.tableInstance
   const currentLabel = localization[DENSITY_LABEL_KEYS[density]]
   const label = `${localization.toggleDensity} (${currentLabel})`
   return (

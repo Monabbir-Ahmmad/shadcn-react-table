@@ -1,5 +1,5 @@
-import type { CSSProperties } from "react"
 import type { Column, RowData, Table } from "@tanstack/react-table"
+import type { CSSProperties } from "react"
 
 import type { DataTableInstance } from "../core/types"
 
@@ -30,10 +30,8 @@ export function getColumnPinningClass<TData extends RowData, TValue>(
 ): string {
   const pinned = column.getIsPinned()
   if (!pinned) return ""
-  const isLastLeft =
-    pinned === "left" && column.getIsLastColumn("left")
-  const isFirstRight =
-    pinned === "right" && column.getIsFirstColumn("right")
+  const isLastLeft = pinned === "left" && column.getIsLastColumn("left")
+  const isFirstRight = pinned === "right" && column.getIsFirstColumn("right")
   if (isLastLeft) {
     return "after:pointer-events-none after:absolute after:inset-y-0 after:-right-px after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/60 after:to-transparent"
   }
@@ -75,7 +73,8 @@ export function getWidthStyle<TData extends RowData>(
   column: Column<TData, unknown>,
   table: DataTableInstance<TData>
 ): CSSProperties {
-  const { enableColumnResizing, enableColumnVirtualization } = table.cnTable
+  const { enableColumnResizing, enableColumnVirtualization } =
+    table.tableInstance
   if (enableColumnResizing) return getColumnWidthStyle(column.id)
   if (enableColumnVirtualization || column.columnDef.size != null) {
     const size = column.getSize()

@@ -17,7 +17,8 @@ export function DataTableFullscreenToggle<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, icons, isFullscreen, setIsFullscreen } = table.cnTable
+  const { localization, icons, isFullscreen, setIsFullscreen } =
+    table.tableInstance
   const label = isFullscreen
     ? localization.exitFullscreen
     : localization.enterFullscreen

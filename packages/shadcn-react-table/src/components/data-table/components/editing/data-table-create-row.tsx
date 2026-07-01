@@ -5,10 +5,10 @@ import type { Column, RowData } from "@tanstack/react-table"
 import { Button } from "@workspace/ui/components/button"
 import { TableCell, TableRow } from "@workspace/ui/components/table"
 
+import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
-import type { DataTableInstance } from "../../core/types"
 
 /**
  * Inline create row for `createDisplayMode: "row"`. Renders an editor per
@@ -20,13 +20,8 @@ export function DataTableCreateRow<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const {
-    enableEditing,
-    rowDraft,
-    onCreateRow,
-    cancelEdit,
-    localization,
-  } = table.cnTable
+  const { enableEditing, rowDraft, onCreateRow, cancelEdit, localization } =
+    table.tableInstance
 
   const leafColumns = table.getVisibleLeafColumns()
   const editableColumns = leafColumns.filter(
@@ -80,7 +75,7 @@ function CreateField<TData extends RowData>({
   column: Column<TData, unknown>
   table: DataTableInstance<TData>
 }) {
-  const cn = table.cnTable
+  const cn = table.tableInstance
   const meta = column.columnDef.meta
   const value = cn.rowDraft[column.id]
   return (

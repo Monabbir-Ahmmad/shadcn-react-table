@@ -10,14 +10,14 @@ import {
 } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { DENSITY_CELL_PADDING } from "../../core/constants"
+import type { DataTableInstance } from "../../core/types"
+import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
 import {
   getColumnPinningClass,
   getColumnPinningStyle,
   getWidthStyle,
 } from "../../utils/column-styles"
-import { DENSITY_CELL_PADDING } from "../../core/constants"
-import type { DataTableInstance } from "../../core/types"
-import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
 
 interface DataTableFooterProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -42,7 +42,7 @@ export function DataTableFooter<TData extends RowData>({
   withColumnSpacers,
 }: DataTableFooterProps<TData>) {
   const { density, enableColumnVirtualization, enableStickyFooter, refs } =
-    table.cnTable
+    table.tableInstance
   const padding = DENSITY_CELL_PADDING[density]
 
   return (

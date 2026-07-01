@@ -2,7 +2,7 @@ export const metadata = { title: "Display modes" }
 
 # Display modes
 
-Several features expose a `*DisplayMode` option that changes *how* the UI is presented without changing the underlying behavior. Each defaults to the current look, so setting them is always opt-in.
+Several features expose a `*DisplayMode` option that changes _how_ the UI is presented without changing the underlying behavior. Each defaults to the current look, so setting them is always opt-in.
 
 ## Pagination display mode
 
@@ -57,7 +57,7 @@ const table = useDataTable({
 })
 
 // trigger the create form from a toolbar action:
-// table.cnTable.beginCreate()
+// table.tableInstance.beginCreate()
 ```
 
 <Callout variant="tip" title="editDisplayMode is independent">
@@ -68,7 +68,14 @@ const table = useDataTable({
 
 ## Relevant options
 
-<ApiTable of="useDataTableOptions" only={["paginationDisplayMode", "columnFilterDisplayMode", "createDisplayMode"]} />
+<ApiTable
+  of="useDataTableOptions"
+  only={[
+    "paginationDisplayMode",
+    "columnFilterDisplayMode",
+    "createDisplayMode",
+  ]}
+/>
 
 ## Related
 
