@@ -107,16 +107,7 @@ export function DataTable<TData extends RowData>({
   )
 
   return (
-    // Radix names the open delay `delayDuration`; Base UI's provider names it
-    // `delay`. Both are context-only components that ignore foreign props, so
-    // passing both (via an assertion, since each flavor types only its own)
-    // keeps this file flavor-neutral for the registry's install-time transform.
-    <TooltipProvider
-      {...({
-        delayDuration: 300,
-        delay: 300,
-      } as Partial<React.ComponentProps<typeof TooltipProvider>>)}
-    >
+    <TooltipProvider delayDuration={300}>
       <div
         ref={refs.tablePaperRef}
         data-slot="data-table"

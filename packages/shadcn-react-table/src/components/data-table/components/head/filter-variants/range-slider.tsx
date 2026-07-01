@@ -25,18 +25,14 @@ export function RangeSliderFilterField<TData extends RowData, TValue>({
         max={max}
         step={1}
         value={current}
-        onValueChange={(next) => {
-          // Radix always emits `number[]`; Base UI emits `number` for a
-          // single-thumb slider. Normalize to a pair so both flavors index
-          // safely.
-          const pair = Array.isArray(next) ? next : [next, next]
+        onValueChange={(next) =>
           column.setFilterValue(
-            pair[0] === min && pair[1] === max ? undefined : pair
+            next[0] === min && next[1] === max ? undefined : next
           )
-        }}
+        }
         aria-label={getColumnLabel(column)}
       />
-      <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums">
+      <div className="flex justify-between text-[10px] tabular-nums text-muted-foreground">
         <span>{current[0]}</span>
         <span>{current[1]}</span>
       </div>

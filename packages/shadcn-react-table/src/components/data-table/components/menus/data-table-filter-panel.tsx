@@ -213,11 +213,7 @@ function FilterPanelContent<TData extends RowData>({
                   <div className="flex items-center gap-2">
                     <Select
                       value={rule.columnId}
-                      // Base UI's Select can emit null (cleared value); Radix
-                      // never does. Guard so both flavors type-check.
-                      onValueChange={(v) => {
-                        if (v != null) changeColumn(rule, v)
-                      }}
+                      onValueChange={(v) => changeColumn(rule, v)}
                     >
                       <SelectTrigger className="h-8 flex-1">
                         <SelectValue
