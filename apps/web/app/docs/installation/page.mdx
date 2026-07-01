@@ -9,8 +9,8 @@ The data table is distributed as a **shadcn registry** item. The CLI installs th
 - A project already set up with **shadcn/ui** (a `components.json` with your style, base color, and `@/components/ui` aliases). If you don't have one, run `pnpm dlx shadcn@latest init` first.
 - **Tailwind CSS v4** and React 19 / Next.js (or any bundler that compiles your `components/`).
 
-<Callout variant="note" title="Any shadcn style works — Radix UI or Base UI">
-It only uses standard primitive APIs, so it adapts to any shadcn style (Sera, Vega, Nova, Luma, …), base color, **and component library flavor**. The same URL works in Radix-flavored and Base-UI-flavored projects: a current shadcn CLI (4.x — the one with `init -b radix|base`) adapts the source to your flavor at install time and pulls the primitives in *your* style. Nothing is overwritten unless you opt in.
+<Callout variant="note" title="Any shadcn style works">
+It only uses standard primitive APIs, so it adapts to any shadcn style (Sera, Vega, Nova, Luma, …) and base color. The primitives it depends on are installed in your style — nothing is overwritten unless you opt in.
 </Callout>
 
 ## Add the component
@@ -23,7 +23,7 @@ pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/
 
 This single command:
 
-1. **Installs npm dependencies** — `@tanstack/react-table`, `@tanstack/react-virtual`, `@tanstack/match-sorter-utils`, `@dnd-kit/*`, `date-fns`, `papaparse`, `xlsx`, `lucide-react` (plus `@types/papaparse`). The headless component library (Radix UI or Base UI) comes with the primitives below, matching your flavor.
+1. **Installs npm dependencies** — `@tanstack/react-table`, `@tanstack/react-virtual`, `@tanstack/match-sorter-utils`, `@dnd-kit/*`, `date-fns`, `papaparse`, `xlsx`, `radix-ui`, `@remixicon/react` (plus `@types/papaparse`).
 2. **Pulls the shadcn primitives** it uses (`badge`, `button`, `calendar`, `checkbox`, `command`, `context-menu`, `dialog`, `dropdown-menu`, `input`, `label`, `popover`, `select`, `skeleton`, `slider`, `table`, `tooltip`) in your style — and skips any you already have.
 3. **Writes the table** to `components/ui/data-table/`.
 4. **Injects design tokens** (`--highlight`, `--highlight-foreground`) into your `globals.css`.
