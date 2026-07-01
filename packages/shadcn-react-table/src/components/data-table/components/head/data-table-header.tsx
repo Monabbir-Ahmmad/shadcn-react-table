@@ -1,12 +1,12 @@
 "use client"
 
-import * as React from "react"
-import type { Header, RowData } from "@tanstack/react-table"
 import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable"
+import type { Header, RowData } from "@tanstack/react-table"
 import type { VirtualItem } from "@tanstack/react-virtual"
+import * as React from "react"
 
 import {
   TableHead,
@@ -15,18 +15,18 @@ import {
 } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { DENSITY_CELL_PADDING } from "../../core/constants"
+import type { DataTableInstance } from "../../core/types"
+import {
+  headerControlsOptionsFromTable,
+  shouldShowColumnDragGrip,
+} from "../../helpers/header-controls"
+import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
 import {
   getColumnPinningClass,
   getColumnPinningStyle,
   getWidthStyle,
 } from "../../utils/column-styles"
-import { DENSITY_CELL_PADDING } from "../../core/constants"
-import {
-  headerControlsOptionsFromTable,
-  shouldShowColumnDragGrip,
-} from "../../helpers/header-controls"
-import type { DataTableInstance } from "../../core/types"
-import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
 import { DataTableHeadCell } from "../body/dnd"
 import { DataTableColumnFilter } from "./data-table-column-filter"
 import { DataTableColumnHeader } from "./data-table-column-header"
@@ -56,7 +56,7 @@ export function DataTableHeader<TData extends RowData>({
     columnFilterDisplayMode,
     enableStickyHeader,
     refs,
-  } = table.cnTable
+  } = table.tableInstance
 
   const controls = headerControlsOptionsFromTable(table)
   const padding = DENSITY_CELL_PADDING[density]

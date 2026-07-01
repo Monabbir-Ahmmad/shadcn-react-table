@@ -28,7 +28,7 @@ export function DataTableBottomToolbar<TData extends RowData>({
     renderBottomToolbar,
     renderBottomToolbarCustomActions,
     refs,
-  } = table.cnTable
+  } = table.tableInstance
 
   if (renderBottomToolbar) return <>{renderBottomToolbar({ table })}</>
   if (!enableBottomToolbar) return null

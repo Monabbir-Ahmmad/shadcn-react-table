@@ -12,9 +12,9 @@ import {
 } from "@workspace/ui/components/popover"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { VALUELESS_MODES } from "../../../fns/filter-fns"
 import { getColumnLabel } from "../../../helpers/column-label"
 import { getEffectiveMode } from "../../../helpers/effective-filter-mode"
-import { VALUELESS_MODES } from "../../../fns/filter-fns"
 import { DateRangeFilterField } from "./date-range"
 import {
   CALENDAR_NAV_PROPS,
@@ -27,7 +27,7 @@ export function DateFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization, icons } = table.cnTable
+  const { localization, icons } = table.tableInstance
   const mode = getEffectiveMode(column, table)
 
   if (VALUELESS_MODES.has(mode)) {
@@ -46,14 +46,19 @@ export function DateFilterField<TData extends RowData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          className={cn(FIELD_CLASS, "w-full justify-start gap-2 px-2 font-normal")}
+          className={cn(
+            FIELD_CLASS,
+            "w-full justify-start gap-2 px-2 font-normal"
+          )}
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           <icons.calendar className="text-muted-foreground" />
           {value ? (
             format(value, "PP")
           ) : (
-            <span className="text-muted-foreground">{localization.pickDate}</span>
+            <span className="text-muted-foreground">
+              {localization.pickDate}
+            </span>
           )}
         </Button>
       </PopoverTrigger>

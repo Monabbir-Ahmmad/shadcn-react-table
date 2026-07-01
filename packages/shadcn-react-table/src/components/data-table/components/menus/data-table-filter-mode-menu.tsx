@@ -18,9 +18,9 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+import type { DataTableInstance } from "../../core/types"
 import { modeOptionsForVariant, type FilterMode } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
-import type { DataTableInstance } from "../../core/types"
 
 /**
  * The `Filter` adornment that opens a mode menu (contains/equals/…; numeric and
@@ -41,7 +41,7 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
     setColumnFilterMode,
     enableColumnFilterModes,
     renderColumnFilterModeMenuItems,
-  } = table.cnTable
+  } = table.tableInstance
   const variant = column.columnDef.meta?.variant ?? "text"
   const perColumn = column.columnDef.meta?.enableColumnFilterModes
   const enabled = perColumn ?? enableColumnFilterModes

@@ -163,7 +163,7 @@ export function PaymentsTable({ data }: { data: Payment[] }) {
 
 `useDataTable` extends the full TanStack `TableOptions`, so `state` +
 `onChange`, `manual*` server-side flags, row models, `getRowId`, etc. all pass
-straight through. Our extras + UI state live on `table.cnTable`.
+straight through. Our extras + UI state live on `table.tableInstance`.
 
 ## Feature flags (the common ones)
 

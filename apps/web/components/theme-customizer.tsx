@@ -27,13 +27,104 @@ type ColorPreset = { name: string; label: string; light: Accent; dark: Accent }
 const WHITE = "oklch(0.985 0 0)"
 
 const ACCENTS: ColorPreset[] = [
-  { name: "lime", label: "Lime", light: { primary: "oklch(0.841 0.238 128.85)", primaryForeground: "oklch(0.405 0.101 131.063)", ring: "oklch(0.711 0.019 323.02)" }, dark: { primary: "oklch(0.768 0.233 130.85)", primaryForeground: "oklch(0.405 0.101 131.063)", ring: "oklch(0.542 0.034 322.5)" } },
-  { name: "blue", label: "Blue", light: { primary: "oklch(0.55 0.22 258)", primaryForeground: WHITE, ring: "oklch(0.55 0.22 258)" }, dark: { primary: "oklch(0.62 0.19 258)", primaryForeground: WHITE, ring: "oklch(0.62 0.19 258)" } },
-  { name: "violet", label: "Violet", light: { primary: "oklch(0.55 0.25 293)", primaryForeground: WHITE, ring: "oklch(0.55 0.25 293)" }, dark: { primary: "oklch(0.61 0.22 293)", primaryForeground: WHITE, ring: "oklch(0.61 0.22 293)" } },
-  { name: "rose", label: "Rose", light: { primary: "oklch(0.59 0.24 14)", primaryForeground: WHITE, ring: "oklch(0.59 0.24 14)" }, dark: { primary: "oklch(0.64 0.22 14)", primaryForeground: WHITE, ring: "oklch(0.64 0.22 14)" } },
-  { name: "orange", label: "Orange", light: { primary: "oklch(0.67 0.19 47)", primaryForeground: WHITE, ring: "oklch(0.67 0.19 47)" }, dark: { primary: "oklch(0.71 0.18 47)", primaryForeground: "oklch(0.21 0.02 47)", ring: "oklch(0.71 0.18 47)" } },
-  { name: "emerald", label: "Emerald", light: { primary: "oklch(0.60 0.16 150)", primaryForeground: WHITE, ring: "oklch(0.60 0.16 150)" }, dark: { primary: "oklch(0.70 0.17 150)", primaryForeground: "oklch(0.20 0.03 150)", ring: "oklch(0.70 0.17 150)" } },
-  { name: "zinc", label: "Zinc", light: { primary: "oklch(0.32 0.01 280)", primaryForeground: WHITE, ring: "oklch(0.55 0.01 280)" }, dark: { primary: "oklch(0.92 0 0)", primaryForeground: "oklch(0.21 0 0)", ring: "oklch(0.55 0 0)" } },
+  {
+    name: "lime",
+    label: "Lime",
+    light: {
+      primary: "oklch(0.841 0.238 128.85)",
+      primaryForeground: "oklch(0.405 0.101 131.063)",
+      ring: "oklch(0.711 0.019 323.02)",
+    },
+    dark: {
+      primary: "oklch(0.768 0.233 130.85)",
+      primaryForeground: "oklch(0.405 0.101 131.063)",
+      ring: "oklch(0.542 0.034 322.5)",
+    },
+  },
+  {
+    name: "blue",
+    label: "Blue",
+    light: {
+      primary: "oklch(0.55 0.22 258)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.55 0.22 258)",
+    },
+    dark: {
+      primary: "oklch(0.62 0.19 258)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.62 0.19 258)",
+    },
+  },
+  {
+    name: "violet",
+    label: "Violet",
+    light: {
+      primary: "oklch(0.55 0.25 293)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.55 0.25 293)",
+    },
+    dark: {
+      primary: "oklch(0.61 0.22 293)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.61 0.22 293)",
+    },
+  },
+  {
+    name: "rose",
+    label: "Rose",
+    light: {
+      primary: "oklch(0.59 0.24 14)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.59 0.24 14)",
+    },
+    dark: {
+      primary: "oklch(0.64 0.22 14)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.64 0.22 14)",
+    },
+  },
+  {
+    name: "orange",
+    label: "Orange",
+    light: {
+      primary: "oklch(0.67 0.19 47)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.67 0.19 47)",
+    },
+    dark: {
+      primary: "oklch(0.71 0.18 47)",
+      primaryForeground: "oklch(0.21 0.02 47)",
+      ring: "oklch(0.71 0.18 47)",
+    },
+  },
+  {
+    name: "emerald",
+    label: "Emerald",
+    light: {
+      primary: "oklch(0.60 0.16 150)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.60 0.16 150)",
+    },
+    dark: {
+      primary: "oklch(0.70 0.17 150)",
+      primaryForeground: "oklch(0.20 0.03 150)",
+      ring: "oklch(0.70 0.17 150)",
+    },
+  },
+  {
+    name: "zinc",
+    label: "Zinc",
+    light: {
+      primary: "oklch(0.32 0.01 280)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.55 0.01 280)",
+    },
+    dark: {
+      primary: "oklch(0.92 0 0)",
+      primaryForeground: "oklch(0.21 0 0)",
+      ring: "oklch(0.55 0 0)",
+    },
+  },
 ]
 
 // --- Base color presets (the neutral ramp), generated from hue + chroma -----
@@ -87,7 +178,11 @@ function ramp(hue: number, c: number) {
 const FONTS = [
   { name: "raleway", label: "Raleway", value: "var(--font-raleway)" },
   { name: "geist", label: "Geist", value: "var(--font-geist)" },
-  { name: "system", label: "System", value: "ui-sans-serif, system-ui, sans-serif" },
+  {
+    name: "system",
+    label: "System",
+    value: "ui-sans-serif, system-ui, sans-serif",
+  },
   { name: "serif", label: "Serif", value: "var(--font-noto-serif)" },
 ] as const
 
@@ -151,7 +246,12 @@ export function ThemeCustomizer({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="size-8" aria-label="Customize theme">
+        <Button
+          variant="outline"
+          size="icon"
+          className="size-8"
+          aria-label="Customize theme"
+        >
           <RiPaletteLine />
         </Button>
       </PopoverTrigger>

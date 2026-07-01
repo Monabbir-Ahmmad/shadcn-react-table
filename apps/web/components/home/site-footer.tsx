@@ -69,9 +69,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t pt-6 text-sm text-muted-foreground sm:flex-row">
-          <p>
-            Built with shadcn/ui and TanStack Table. MIT licensed.
-          </p>
+          <p>Built with shadcn/ui and TanStack Table. MIT licensed.</p>
           <a
             href={GITHUB_URL}
             target="_blank"

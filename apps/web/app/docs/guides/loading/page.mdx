@@ -37,7 +37,7 @@ return <DataTable table={table} />
 You can read the current value back from the table instance:
 
 ```tsx
-if (table.cnTable.isLoading) {
+if (table.tableInstance.isLoading) {
   // skeletons + progress bar are showing
 }
 ```
@@ -76,7 +76,16 @@ useDataTable({
 
 ## Relevant options
 
-<ApiTable of="useDataTableOptions" only={["isLoading", "isSaving", "showProgressBars", "showSkeletons", "showLoadingOverlay"]} />
+<ApiTable
+  of="useDataTableOptions"
+  only={[
+    "isLoading",
+    "isSaving",
+    "showProgressBars",
+    "showSkeletons",
+    "showLoadingOverlay",
+  ]}
+/>
 
 ## Related
 

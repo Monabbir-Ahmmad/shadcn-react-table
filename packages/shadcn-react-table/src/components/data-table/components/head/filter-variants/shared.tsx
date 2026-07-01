@@ -7,7 +7,10 @@ import { Input } from "@workspace/ui/components/input"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { IconComponent } from "../../../core/icons"
-import type { DataTableFilterOption, DataTableInstance } from "../../../core/types"
+import type {
+  DataTableFilterOption,
+  DataTableInstance,
+} from "../../../core/types"
 
 export interface FilterFieldProps<TData extends RowData, TValue> {
   column: Column<TData, TValue>

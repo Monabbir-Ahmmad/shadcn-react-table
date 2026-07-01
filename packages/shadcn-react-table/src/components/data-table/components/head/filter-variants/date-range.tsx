@@ -23,8 +23,11 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization, icons } = table.cnTable
-  const value = (column.getFilterValue() as [Date?, Date?]) ?? [undefined, undefined]
+  const { localization, icons } = table.tableInstance
+  const value = (column.getFilterValue() as [Date?, Date?]) ?? [
+    undefined,
+    undefined,
+  ]
   const from = value[0]
   const to = value[1]
   return (
@@ -33,7 +36,10 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          className={cn(FIELD_CLASS, "w-full justify-start gap-2 px-2 font-normal")}
+          className={cn(
+            FIELD_CLASS,
+            "w-full justify-start gap-2 px-2 font-normal"
+          )}
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           <icons.calendar className="text-muted-foreground" />

@@ -54,8 +54,18 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
   children: React.ReactNode
 }) {
   const column = header.column
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, isDragging } =
-    useSortable({ id: column.id, disabled: !draggable, data: { type: "column" } })
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    isDragging,
+  } = useSortable({
+    id: column.id,
+    disabled: !draggable,
+    data: { type: "column" },
+  })
 
   const style: React.CSSProperties = {
     ...widthStyle,

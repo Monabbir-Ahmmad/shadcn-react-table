@@ -1,8 +1,8 @@
 "use client"
 
-import * as React from "react"
 import type { Row, RowData } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
+import * as React from "react"
 
 import type { DataTableInstance } from "../core/types"
 
@@ -38,7 +38,7 @@ export function useTableVirtualizers<TData extends RowData>(
     columnVirtualizerOptions,
     rowVirtualizerInstanceRef,
     columnVirtualizerInstanceRef,
-  } = table.cnTable
+  } = table.tableInstance
 
   // Flatten center rows (+ expanded detail panels) into a virtualization list.
   const virtualItems: VirtualRowItem<TData>[] = []

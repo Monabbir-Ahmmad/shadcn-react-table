@@ -81,7 +81,7 @@ export function DataTable<TData extends RowData>({
     renderCaption,
     renderTopToolbar,
     refs,
-  } = table.cnTable
+  } = table.tableInstance
 
   const { ref: gridRef, onKeyDown } = useGridNavigation<HTMLDivElement>(
     enableKeyboardNavigation

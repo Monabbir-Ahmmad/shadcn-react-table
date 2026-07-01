@@ -753,7 +753,7 @@ export const columnOptions: ApiMember[] = [
     "type": "(props: CellRenderProps<TData, TValue>) => React.ReactNode",
     "required": false,
     "default": null,
-    "description": "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; drive the value via `table.cnTable` (`rowDraft`/`setRowDraftValue` or `onEditCellSave`)."
+    "description": "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; drive the value via `table.tableInstance` (`rowDraft`/`setRowDraftValue` or `onEditCellSave`)."
   },
   {
     "name": "renderGroupedCell",
@@ -1895,7 +1895,7 @@ export const localizationKeys: ApiMember[] = [
     "name": "filterModes",
     "type": "Record<string, string>",
     "required": true,
-    "default": "{\r\n    fuzzy: \"Fuzzy\",\r\n    contains: \"Contains\",\r\n    startsWith: \"Starts with\",\r\n    endsWith: \"Ends with\",\r\n    equals: \"Equals\",\r\n    notEquals: \"Not equals\",\r\n    empty: \"Empty\",\r\n    notEmpty: \"Not empty\",\r\n    between: \"Between (exclusive)\",\r\n    betweenInclusive: \"Between (inclusive)\",\r\n    greaterThan: \"Greater than\",\r\n    greaterThanOrEqualTo: \"Greater than or equal to\",\r\n    lessThan: \"Less than\",\r\n    lessThanOrEqualTo: \"Less than or equal to\",\r\n    before: \"Before\",\r\n    after: \"After\",\r\n    betweenDates: \"Between\",\r\n    equalsString: \"Equals\",\r\n    arrIncludesSome: \"Includes\",\r\n    equalsBool: \"Equals\",\r\n  }",
+    "default": "{\n    fuzzy: \"Fuzzy\",\n    contains: \"Contains\",\n    startsWith: \"Starts with\",\n    endsWith: \"Ends with\",\n    equals: \"Equals\",\n    notEquals: \"Not equals\",\n    empty: \"Empty\",\n    notEmpty: \"Not empty\",\n    between: \"Between (exclusive)\",\n    betweenInclusive: \"Between (inclusive)\",\n    greaterThan: \"Greater than\",\n    greaterThanOrEqualTo: \"Greater than or equal to\",\n    lessThan: \"Less than\",\n    lessThanOrEqualTo: \"Less than or equal to\",\n    before: \"Before\",\n    after: \"After\",\n    betweenDates: \"Between\",\n    equalsString: \"Equals\",\n    arrIncludesSome: \"Includes\",\n    equalsBool: \"Equals\",\n  }",
     "description": "Labels for each filter mode, keyed by the `FilterMode` string."
   },
   {
@@ -1993,7 +1993,7 @@ export const localizationKeys: ApiMember[] = [
     "name": "advancedFilterOperators",
     "type": "Record<string, string>",
     "required": true,
-    "default": "{\r\n    contains: \"contains\",\r\n    notContains: \"does not contain\",\r\n    startsWith: \"starts with\",\r\n    endsWith: \"ends with\",\r\n    equals: \"equals\",\r\n    notEquals: \"does not equal\",\r\n    isEmpty: \"is empty\",\r\n    isNotEmpty: \"is not empty\",\r\n    greaterThan: \"greater than\",\r\n    greaterThanOrEqual: \"greater than or equal\",\r\n    lessThan: \"less than\",\r\n    lessThanOrEqual: \"less than or equal\",\r\n    between: \"is between\",\r\n  }",
+    "default": "{\n    contains: \"contains\",\n    notContains: \"does not contain\",\n    startsWith: \"starts with\",\n    endsWith: \"ends with\",\n    equals: \"equals\",\n    notEquals: \"does not equal\",\n    isEmpty: \"is empty\",\n    isNotEmpty: \"is not empty\",\n    greaterThan: \"greater than\",\n    greaterThanOrEqual: \"greater than or equal\",\n    lessThan: \"less than\",\n    lessThanOrEqual: \"less than or equal\",\n    between: \"is between\",\n  }",
     "description": "Operator labels, keyed by `AdvancedFilterOperator`."
   },
   {

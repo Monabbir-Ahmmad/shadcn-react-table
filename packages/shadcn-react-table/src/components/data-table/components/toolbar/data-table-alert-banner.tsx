@@ -15,7 +15,7 @@ export function DataTableAlertBanner<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, enableRowSelection } = table.cnTable
+  const { localization, enableRowSelection } = table.tableInstance
   if (!enableRowSelection) return null
 
   const selectedCount = table.getSelectedRowModel().rows.length

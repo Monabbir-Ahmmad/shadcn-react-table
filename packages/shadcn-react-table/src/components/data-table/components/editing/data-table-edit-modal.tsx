@@ -38,7 +38,7 @@ export function DataTableEditModal<TData extends RowData>({
     cancelEdit,
     onSaveRow,
     onCreateRow,
-  } = table.cnTable
+  } = table.tableInstance
 
   const editingRow =
     editingRowId != null ? table.getRow(editingRowId) : undefined

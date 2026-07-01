@@ -19,7 +19,7 @@ export function DataTableFilterToggle<TData extends RowData>({
   table: DataTableInstance<TData>
 }) {
   const { localization, icons, showColumnFilters, setShowColumnFilters } =
-    table.cnTable
+    table.tableInstance
   const label = showColumnFilters
     ? localization.hideColumnFilters
     : localization.showColumnFilters
@@ -32,7 +32,10 @@ export function DataTableFilterToggle<TData extends RowData>({
           aria-label={label}
           aria-pressed={showColumnFilters}
           onClick={() => setShowColumnFilters((prev) => !prev)}
-          className={cn("size-8", showColumnFilters && "bg-muted text-foreground")}
+          className={cn(
+            "size-8",
+            showColumnFilters && "bg-muted text-foreground"
+          )}
         >
           <icons.filter />
         </Button>

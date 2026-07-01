@@ -68,7 +68,11 @@ export function useResolvedColumns<TData extends RowData>({
     }
     if (enableRowSelection) {
       leading.push(
-        createSelectionColumn<TData>(localization, selectAllMode, enableSelectAll)
+        createSelectionColumn<TData>(
+          localization,
+          selectAllMode,
+          enableSelectAll
+        )
       )
     }
     if (needsExpandColumn) {

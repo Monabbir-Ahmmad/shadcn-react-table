@@ -1,4 +1,3 @@
-import type * as React from "react"
 import type {
   Cell,
   Column,
@@ -7,12 +6,13 @@ import type {
   Table,
   TableOptions,
 } from "@tanstack/react-table"
+import type * as React from "react"
 
 import type { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual"
 
-import type { DataTableLocalization } from "./localization"
 import type { FilterMode, GlobalFilterMode } from "../fns/filter-fns"
 import type { DataTableIcons } from "./icons"
+import type { DataTableLocalization } from "./localization"
 
 // Re-exported as part of the public type surface: these describe column-`meta`
 // filter config, while the runtime filter fns stay internal.
@@ -49,7 +49,7 @@ export type ColumnVirtualizerOptions<TData extends RowData> = ValueOrFunc<
 
 /**
  * DOM refs to the table's structural elements, exposed on
- * `table.cnTable.refs` for imperative access (focus, measure, scroll). Each is
+ * `table.tableInstance.refs` for imperative access (focus, measure, scroll). Each is
  * populated after mount and may be `null` when its element isn't rendered
  * (e.g. `bottomToolbarRef` with no bottom toolbar, `tableFooterRef` with no
  * footer, `searchInputRef` before the search box is expanded).
@@ -175,7 +175,7 @@ declare module "@tanstack/react-table" {
     /** Options for the "select" edit variant. */
     editSelectOptions?: DataTableFilterOption[]
     /** Custom inline editor for this column (escape hatch). Replaces the built-in
-     *  editor while the cell/row is editing; drive the value via `table.cnTable`
+     *  editor while the cell/row is editing; drive the value via `table.tableInstance`
      *  (`rowDraft`/`setRowDraftValue` or `onEditCellSave`). */
     renderEditCell?: (props: CellRenderProps<TData, TValue>) => React.ReactNode
     /** Custom render for this column's group header cell (when grouped). */
@@ -234,7 +234,7 @@ export interface CellRenderProps<TData extends RowData, TValue = unknown> {
 
 /**
  * Our configuration + UI state, attached to the TanStack table instance under
- * `table.cnTable`. Sub-components read it from the instance rather than via
+ * `table.tableInstance`. Sub-components read it from the instance rather than via
  * prop drilling (mirrors Material React Table's `table.options` pattern).
  */
 export interface DataTableConfig<TData extends RowData> {
@@ -408,10 +408,10 @@ export interface DataTableConfig<TData extends RowData> {
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 
-/** A TanStack table instance enriched with our `cnTable` config. */
+/** A TanStack table instance enriched with our `tableInstance` config. */
 export type DataTableInstance<TData extends RowData = unknown> =
   Table<TData> & {
-    cnTable: DataTableConfig<TData>
+    tableInstance: DataTableConfig<TData>
   }
 
 /**

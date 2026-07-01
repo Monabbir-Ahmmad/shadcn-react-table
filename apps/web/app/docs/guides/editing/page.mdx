@@ -74,7 +74,7 @@ const table = useDataTable({
 
 ## Modal editing & creating
 
-`editDisplayMode: "modal"` edits (and creates) rows in a dialog. Use `onSaveRow` for edits and `onCreateRow` for new rows; both receive `exit()` to close the dialog. Seed the create form with `createRowDefaults`, and open it from the toolbar via `table.cnTable.beginCreate()`.
+`editDisplayMode: "modal"` edits (and creates) rows in a dialog. Use `onSaveRow` for edits and `onCreateRow` for new rows; both receive `exit()` to close the dialog. Seed the create form with `createRowDefaults`, and open it from the toolbar via `table.tableInstance.beginCreate()`.
 
 <Example slug="editing-modal" />
 
@@ -97,7 +97,7 @@ const table = useDataTable({
     exit()
   },
   renderToolbarActions: ({ table }) => (
-    <Button size="sm" onClick={() => table.cnTable.beginCreate()}>
+    <Button size="sm" onClick={() => table.tableInstance.beginCreate()}>
       New row
     </Button>
   ),
@@ -153,7 +153,7 @@ When `editVariant` isn't enough, supply your own editor with `meta.renderEditCel
       <MyStatusPicker
         value={cell.getValue() as string}
         onChange={(value) =>
-          table.cnTable.setRowDraftValue(cell.column.id, value)
+          table.tableInstance.setRowDraftValue(cell.column.id, value)
         }
       />
     ),
@@ -165,11 +165,32 @@ When `editVariant` isn't enough, supply your own editor with `meta.renderEditCel
 
 `useDataTable` options that drive editing and creating:
 
-<ApiTable of="useDataTableOptions" only={["enableEditing", "editDisplayMode", "createDisplayMode", "createRowDefaults", "onEditCellSave", "onSaveRow", "onCreateRow"]} />
+<ApiTable
+  of="useDataTableOptions"
+  only={[
+    "enableEditing",
+    "editDisplayMode",
+    "createDisplayMode",
+    "createRowDefaults",
+    "onEditCellSave",
+    "onSaveRow",
+    "onCreateRow",
+  ]}
+/>
 
 Per-column, via `columnDef.meta`:
 
-<ApiTable of="columnOptions" propLabel="meta key" only={["enableEditing", "editVariant", "editSelectOptions", "renderEditCell", "validate"]} />
+<ApiTable
+  of="columnOptions"
+  propLabel="meta key"
+  only={[
+    "enableEditing",
+    "editVariant",
+    "editSelectOptions",
+    "renderEditCell",
+    "validate",
+  ]}
+/>
 
 ## Related
 

@@ -38,7 +38,7 @@ export function createRowNumberColumn<TData extends RowData>(
 
       if (!enableRowPinning) {
         return (
-          <span className="text-xs tabular-nums text-muted-foreground">
+          <span className="text-xs text-muted-foreground tabular-nums">
             {number}
           </span>
         )
@@ -49,7 +49,7 @@ export function createRowNumberColumn<TData extends RowData>(
         <span className="group/rownum relative flex items-center justify-center">
           <span
             className={cn(
-              "text-xs tabular-nums text-muted-foreground",
+              "text-xs text-muted-foreground tabular-nums",
               "group-hover/rownum:opacity-0"
             )}
           >
@@ -60,7 +60,7 @@ export function createRowNumberColumn<TData extends RowData>(
             aria-label={pinned ? localization.unpinRow : localization.pinRow}
             onClick={() => row.pin(pinned ? false : "top")}
             className={cn(
-              "absolute inset-0 flex items-center justify-center text-muted-foreground opacity-0 transition-opacity hover:text-foreground focus-visible:opacity-100 group-hover/rownum:opacity-100",
+              "absolute inset-0 flex items-center justify-center text-muted-foreground opacity-0 transition-opacity group-hover/rownum:opacity-100 hover:text-foreground focus-visible:opacity-100",
               pinned && "text-primary opacity-100"
             )}
           >
