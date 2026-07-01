@@ -32,7 +32,9 @@ const NPM_DEPENDENCIES = [
   "date-fns",
   "papaparse",
   "xlsx",
-  "radix-ui",
+  // NOT radix-ui: the module has no direct radix import. The primitive blocks
+  // in registryDependencies bring the right headless library for the
+  // consumer's flavor (radix-ui or @base-ui/react) on their own.
   "lucide-react",
 ]
 
