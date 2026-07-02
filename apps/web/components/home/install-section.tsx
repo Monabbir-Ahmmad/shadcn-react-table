@@ -28,7 +28,7 @@ export function InstallSection() {
         <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
           Drop it in with the shadcn CLI
         </h2>
-        <p className="mt-4 text-muted-foreground text-pretty">
+        <p className="mt-4 text-pretty text-muted-foreground">
           One command installs the table source, the primitives it uses in your
           style, and its dependencies.
         </p>

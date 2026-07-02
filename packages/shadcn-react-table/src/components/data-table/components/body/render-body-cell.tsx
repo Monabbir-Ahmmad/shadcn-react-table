@@ -1,13 +1,13 @@
 "use client"
 
-import * as React from "react"
 import { flexRender, type Cell, type RowData } from "@tanstack/react-table"
+import * as React from "react"
 
+import type { DataTableInstance } from "../../core/types"
 import { SUBSTRING_MODES } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
 import { DataTableBodyCellContent } from "../editing/data-table-edit-cell"
 import { Highlight } from "./highlight"
-import type { DataTableInstance } from "../../core/types"
 
 /**
  * Resolves a body cell's content, handling grouped / aggregated / placeholder
@@ -18,10 +18,10 @@ export function renderBodyCell<TData extends RowData>(
   table: DataTableInstance<TData>,
   enableHighlight: boolean,
   columnsWithCustomCell: ReadonlySet<string>,
-  localization: DataTableInstance<TData>["cnTable"]["localization"]
+  localization: DataTableInstance<TData>["tableInstance"]["localization"]
 ): React.ReactNode {
   const { row, column } = cell
-  const icons = table.cnTable.icons
+  const icons = table.tableInstance.icons
   const meta = column.columnDef.meta
 
   // Grouped/aggregated/placeholder cells are a grouping concept. Tree data
@@ -132,7 +132,7 @@ function resolveHighlightQuery<TData extends RowData>(
   if (
     typeof globalFilter === "string" &&
     globalFilter.length > 0 &&
-    SUBSTRING_MODES.has(table.cnTable.globalFilterMode)
+    SUBSTRING_MODES.has(table.tableInstance.globalFilterMode)
   ) {
     return globalFilter
   }

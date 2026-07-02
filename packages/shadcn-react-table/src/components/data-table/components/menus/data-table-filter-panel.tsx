@@ -52,7 +52,7 @@ function valueInputType(variant: FilterVariant): "text" | "number" | "date" {
 }
 
 type Localization<TData extends RowData> =
-  DataTableInstance<TData>["cnTable"]["localization"]
+  DataTableInstance<TData>["tableInstance"]["localization"]
 
 /**
  * Modal dialog for building compound AND/OR filter rules. Edits accumulate in a
@@ -65,7 +65,8 @@ export function DataTableFilterPanel<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { showAdvancedFilterPanel, setShowAdvancedFilterPanel } = table.cnTable
+  const { showAdvancedFilterPanel, setShowAdvancedFilterPanel } =
+    table.tableInstance
   return (
     <Dialog
       open={showAdvancedFilterPanel}
@@ -87,7 +88,7 @@ function FilterPanelContent<TData extends RowData>({
     advancedFilter,
     setAdvancedFilter,
     setShowAdvancedFilterPanel,
-  } = table.cnTable
+  } = table.tableInstance
 
   // Seeded once on mount (the dialog body remounts each open).
   const [draft, setDraft] = React.useState<AdvancedFilterGroup>(advancedFilter)
@@ -213,7 +214,11 @@ function FilterPanelContent<TData extends RowData>({
                   <div className="flex items-center gap-2">
                     <Select
                       value={rule.columnId}
-                      onValueChange={(v) => changeColumn(rule, v)}
+                      // Base UI's Select can emit null (cleared value); Radix
+                      // never does. Guard so both flavors type-check.
+                      onValueChange={(v) => {
+                        if (v != null) changeColumn(rule, v)
+                      }}
                     >
                       <SelectTrigger className="h-8 flex-1">
                         <SelectValue

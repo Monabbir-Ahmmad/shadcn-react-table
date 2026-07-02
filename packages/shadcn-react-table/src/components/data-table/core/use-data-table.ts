@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
   getCoreRowModel,
   getExpandedRowModel,
@@ -13,6 +12,7 @@ import {
   useReactTable,
   type RowData,
 } from "@tanstack/react-table"
+import * as React from "react"
 
 import { VALUELESS_MODES, type FilterMode } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
@@ -25,13 +25,13 @@ import {
   type HeaderControlsOptions,
 } from "../helpers/header-controls"
 import { measureColumnWidth } from "../helpers/measure-column-width"
+import { useAdvancedFilter } from "../hooks/use-advanced-filter"
+import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
 import { useControllableState } from "../hooks/use-controllable-state"
 import { useEditingState } from "../hooks/use-editing-state"
-import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
 import { useGlobalFilterMode } from "../hooks/use-global-filter-mode"
-import { useAdvancedFilter } from "../hooks/use-advanced-filter"
-import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { usePageResetOnFilterChange } from "../hooks/use-page-reset-on-filter-change"
+import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { useDataTableConfigContext } from "./config-context"
 import { defaultIcons } from "./icons"
 import { defaultLocalization } from "./localization"
@@ -45,7 +45,7 @@ import type {
 /**
  * Core hook. Wraps `useReactTable` with MRT-flavoured defaults (row models,
  * auto-injected selection column, localization) and attaches our presentation
- * state + feature flags to the instance as `table.cnTable`. Returns the
+ * state + feature flags to the instance as `table.tableInstance`. Returns the
  * enriched instance to hand to `<DataTable table={table} />`.
  *
  * Controlled data state (sorting/filtering/pagination/selection/visibility),
@@ -53,7 +53,7 @@ import type {
  * TanStack via the spread options. The presentation state is split into focused
  * hooks (`use-editing-state`, `use-column-filter-modes`, `use-global-filter-mode`,
  * `use-resolved-columns`, `use-page-reset-on-filter-change`); this hook wires
- * them together and assembles the `cnTable` config.
+ * them together and assembles the `tableInstance` config.
  */
 export function useDataTable<TData extends RowData>(
   options: UseDataTableOptions<TData>
@@ -445,7 +445,7 @@ export function useDataTable<TData extends RowData>(
     [table, setColumnFilterModes]
   )
 
-  // Structural DOM refs, exposed on `table.cnTable.refs` and attached to the
+  // Structural DOM refs, exposed on `table.tableInstance.refs` and attached to the
   // corresponding elements in DataTable / toolbar / global-filter.
   const tablePaperRef = React.useRef<HTMLDivElement>(null)
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
@@ -632,7 +632,7 @@ export function useDataTable<TData extends RowData>(
     renderEmpty,
   }
 
-  table.cnTable = config
+  table.tableInstance = config
 
   return table
 }

@@ -39,7 +39,13 @@ export function measureColumnWidth(
   headerText: string,
   options: MeasureColumnWidthOptions
 ): number {
-  const { font, padding, extraWidth = 0, minWidth = 0, maxWidth = 400 } = options
+  const {
+    font,
+    padding,
+    extraWidth = 0,
+    minWidth = 0,
+    maxWidth = 400,
+  } = options
   const ctx = getContext()
 
   let contentWidth: number

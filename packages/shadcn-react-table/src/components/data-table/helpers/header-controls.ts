@@ -39,7 +39,7 @@ const HEADER_LABEL_MAX = 260
 export function headerControlsOptionsFromTable<TData extends RowData>(
   table: DataTableInstance<TData>
 ): HeaderControlsOptions {
-  const config = table.cnTable
+  const config = table.tableInstance
   return {
     enableColumnActions: config.enableColumnActions,
     enableColumnOrdering: config.enableColumnOrdering,

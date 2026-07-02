@@ -19,9 +19,9 @@ MRT is the most complete React table, but it's tied to Material UI. This table b
 
 It is a thin, opinionated layer over TanStack Table:
 
-- It wraps `useReactTable` with sensible defaults (row models, an auto-injected selection column, localization) and attaches its presentation state + feature flags to the instance as `table.cnTable`.
+- It wraps `useReactTable` with sensible defaults (row models, an auto-injected selection column, localization) and attaches its presentation state + feature flags to the instance as `table.tableInstance`.
 - Controlled state (`sorting`, `columnFilters`, `pagination`, `rowSelection`, …), the `manual*` server-side flags, and `getRowId` all **pass straight through** to TanStack. If you know TanStack Table, you already know this table.
-- The `<DataTable />` component reads `table.cnTable` to render the toolbar, filter row, body, footer, and pagination — no prop drilling.
+- The `<DataTable />` component reads `table.tableInstance` to render the toolbar, filter row, body, footer, and pagination — no prop drilling.
 
 ## Next steps
 

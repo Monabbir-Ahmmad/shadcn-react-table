@@ -26,7 +26,7 @@ export function DataTableAdvancedFilterToggle<TData extends RowData>({
     advancedFilter,
     showAdvancedFilterPanel,
     setShowAdvancedFilterPanel,
-  } = table.cnTable
+  } = table.tableInstance
   const count = advancedFilter.rules.length
 
   return (

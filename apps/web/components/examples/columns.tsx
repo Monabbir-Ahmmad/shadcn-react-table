@@ -61,7 +61,11 @@ export function userColumns(): ColumnDef<User>[] {
       enableSorting: false,
       enableColumnFilter: false,
       size: 90,
-      meta: { disableColumnActions: true, enableEditing: false, enableClickToCopy: true },
+      meta: {
+        disableColumnActions: true,
+        enableEditing: false,
+        enableClickToCopy: true,
+      },
       cell: ({ getValue }) => (
         <span className="font-mono text-xs text-muted-foreground">
           {getValue<string>()}
@@ -140,7 +144,7 @@ export function userColumns(): ColumnDef<User>[] {
         <span className="tabular-nums">{getValue<number>()}</span>
       ),
       aggregatedCell: ({ getValue }) => (
-        <span className="tabular-nums text-muted-foreground">
+        <span className="text-muted-foreground tabular-nums">
           ~{Math.round(getValue<number>())}
         </span>
       ),
@@ -180,7 +184,7 @@ export function userColumns(): ColumnDef<User>[] {
       header: "Start date",
       meta: { variant: "date", enableEditing: false },
       cell: ({ getValue }) => (
-        <span className="tabular-nums text-muted-foreground">
+        <span className="text-muted-foreground tabular-nums">
           {dateFmt.format(getValue<Date>())}
         </span>
       ),
@@ -199,7 +203,7 @@ export function userColumns(): ColumnDef<User>[] {
                 style={{ width: `${value}%` }}
               />
             </div>
-            <span className="w-8 text-right text-xs tabular-nums text-muted-foreground">
+            <span className="w-8 text-right text-xs text-muted-foreground tabular-nums">
               {value}%
             </span>
           </div>

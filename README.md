@@ -32,8 +32,11 @@ dependencies, and injects the `--highlight` theme token (falls back to
 `--accent` if dropped). The shadcn **primitives** it relies on (button, table,
 select, …) are pulled from the shadcn registry **in your own configured style**
 (Vega / Nova / Sera / …) and base color — and any you already have are reused,
-not overwritten. The table only uses standard primitive APIs, so it inherits
-whatever look your project uses. No manual wiring.
+not overwritten. **Radix UI and Base UI flavors are both supported** with this
+same URL: a current shadcn CLI (4.x, the one with `init -b radix|base`) adapts
+the source to your project's flavor at install time. The table only uses
+standard primitive APIs, so it inherits whatever look your project uses. No
+manual wiring.
 
 > **Trying it from this repo:** run the demo (`pnpm dev`) and point the CLI at
 > the locally served descriptor:
@@ -49,7 +52,8 @@ whatever look your project uses. No manual wiring.
 <summary>Prefer to install manually?</summary>
 
 First make sure the shadcn primitives the table uses are in your project (this
-also pulls their own deps like `react-day-picker`, `cmdk`, `radix-ui`):
+also pulls their own deps like `react-day-picker`, `cmdk`, and your flavor's
+headless library — `radix-ui` or `@base-ui/react`):
 
 ```bash
 npx shadcn@latest add badge button calendar checkbox command context-menu dialog dropdown-menu input label popover select skeleton slider table tooltip
@@ -59,7 +63,7 @@ Copy `packages/shadcn-react-table/src/components/data-table/` into your `@/compo
 then add the table's own npm deps:
 
 ```bash
-pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns papaparse xlsx @remixicon/react radix-ui
+pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns papaparse xlsx lucide-react
 ```
 
 Only `@tanstack/react-table` is strictly required; the rest are per-feature:
@@ -71,8 +75,7 @@ Only `@tanstack/react-table` is strictly required; the rest are per-feature:
 | `@dnd-kit/core` `@dnd-kit/sortable` `@dnd-kit/utilities` | column / row drag-and-drop                    |
 | `date-fns`                                               | date / date-range filters                     |
 | `papaparse` `xlsx`                                       | CSV / Excel export                            |
-| `@remixicon/react`                                       | default icons (override via the `icons` prop) |
-| `radix-ui`                                               | the indeterminate select-all checkbox         |
+| `lucide-react`                                           | default icons (override via the `icons` prop) |
 
 Tailwind v4 + the shadcn token theme are required. Import the stylesheet **once**
 in your root layout (it ships the `--highlight` token, falling back to
@@ -160,7 +163,7 @@ export function PaymentsTable({ data }: { data: Payment[] }) {
 
 `useDataTable` extends the full TanStack `TableOptions`, so `state` +
 `onChange`, `manual*` server-side flags, row models, `getRowId`, etc. all pass
-straight through. Our extras + UI state live on `table.cnTable`.
+straight through. Our extras + UI state live on `table.tableInstance`.
 
 ## Feature flags (the common ones)
 

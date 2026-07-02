@@ -33,7 +33,7 @@ export function WhySection() {
           <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
             Why this table
           </h2>
-          <p className="mt-4 text-muted-foreground text-pretty">
+          <p className="mt-4 text-pretty text-muted-foreground">
             MRT is the most complete React table, but it&apos;s tied to Material
             UI. This brings that breadth to the shadcn/ui ecosystem.
           </p>

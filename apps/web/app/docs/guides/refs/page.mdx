@@ -2,7 +2,7 @@ export const metadata = { title: "Table refs" }
 
 # Table refs
 
-The table instance exposes DOM refs to its structural elements on `table.cnTable.refs`. Use them for imperative access — focusing the search box, measuring the toolbar, or scrolling the container — without wiring up your own refs.
+The table instance exposes DOM refs to its structural elements on `table.tableInstance.refs`. Use them for imperative access — focusing the search box, measuring the toolbar, or scrolling the container — without wiring up your own refs.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
@@ -10,10 +10,10 @@ import { DataTable, useDataTable } from "@/components/ui/data-table"
 const table = useDataTable({ data, columns })
 
 // e.g. focus the global search box in an effect or event handler:
-table.cnTable.refs.searchInputRef.current?.focus()
+table.tableInstance.refs.searchInputRef.current?.focus()
 
 // or scroll the table body back to the top:
-table.cnTable.refs.tableContainerRef.current?.scrollTo({ top: 0 })
+table.tableInstance.refs.tableContainerRef.current?.scrollTo({ top: 0 })
 
 return <DataTable table={table} />
 ```

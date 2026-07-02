@@ -12,8 +12,9 @@ interface IconLibraryContextValue {
   setIconLibrary: (lib: IconLibrary) => void
 }
 
-const IconLibraryContext =
-  React.createContext<IconLibraryContextValue | null>(null)
+const IconLibraryContext = React.createContext<IconLibraryContextValue | null>(
+  null
+)
 
 /**
  * App-wide icon-library state. Mounted once at the root so the shared header

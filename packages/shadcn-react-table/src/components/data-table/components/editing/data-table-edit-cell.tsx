@@ -1,7 +1,7 @@
 "use client"
 
-import * as React from "react"
 import type { Cell, RowData } from "@tanstack/react-table"
+import * as React from "react"
 
 import {
   ContextMenu,
@@ -9,11 +9,11 @@ import {
   ContextMenuTrigger,
 } from "@workspace/ui/components/context-menu"
 
-import { ClickToCopy } from "../body/click-to-copy"
+import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
+import { ClickToCopy } from "../body/click-to-copy"
 import { DataTableEditField } from "./data-table-edit-field"
-import type { DataTableInstance } from "../../core/types"
 
 /**
  * Resolves a leaf data cell's interactive content: an inline editor when this
@@ -30,7 +30,7 @@ export function DataTableBodyCellContent<TData extends RowData>({
   table: DataTableInstance<TData>
   fallback: React.ReactNode
 }) {
-  const cn = table.cnTable
+  const cn = table.tableInstance
   const { row, column } = cell
   const editable = cn.enableEditing && isColumnEditable(column)
   const mode = cn.editDisplayMode
@@ -110,7 +110,7 @@ function RowDraftEditor<TData extends RowData>({
   cell: Cell<TData, unknown>
   table: DataTableInstance<TData>
 }) {
-  const cn = table.cnTable
+  const cn = table.tableInstance
   const { column } = cell
   const meta = column.columnDef.meta
   const value =
@@ -138,7 +138,7 @@ function LocalDraftEditor<TData extends RowData>({
   table: DataTableInstance<TData>
   exitOnCommit: boolean
 }) {
-  const cn = table.cnTable
+  const cn = table.tableInstance
   const { row, column } = cell
   const meta = column.columnDef.meta
   const [draft, setDraft] = React.useState<unknown>(() => cell.getValue())

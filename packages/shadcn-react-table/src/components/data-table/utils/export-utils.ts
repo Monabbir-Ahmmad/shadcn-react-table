@@ -3,7 +3,11 @@ import Papa from "papaparse"
 import * as XLSX from "xlsx"
 
 import { getColumnLabel } from "../helpers/column-label"
-import { EXPAND_COLUMN_ID, ROW_DRAG_COLUMN_ID, ROW_NUMBER_COLUMN_ID } from "../injected-columns/injected-columns"
+import {
+  EXPAND_COLUMN_ID,
+  ROW_DRAG_COLUMN_ID,
+  ROW_NUMBER_COLUMN_ID,
+} from "../injected-columns/injected-columns"
 import { ROW_ACTIONS_COLUMN_ID } from "../injected-columns/data-table-row-actions"
 import { SELECTION_COLUMN_ID } from "../injected-columns/selection-column"
 import type { DataTableInstance } from "../core/types"
@@ -31,7 +35,9 @@ export function getExportableColumns<TData extends RowData>(
 ): Column<TData, unknown>[] {
   return table
     .getVisibleLeafColumns()
-    .filter((column) => column.accessorFn != null && !NON_DATA_COLUMNS.has(column.id))
+    .filter(
+      (column) => column.accessorFn != null && !NON_DATA_COLUMNS.has(column.id)
+    )
 }
 
 function resolveRows<TData extends RowData>(

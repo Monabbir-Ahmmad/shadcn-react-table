@@ -17,8 +17,9 @@ export interface DataTableConfigContextValue {
   localization?: Partial<DataTableLocalization>
 }
 
-const DataTableConfigContext =
-  React.createContext<DataTableConfigContextValue>({})
+const DataTableConfigContext = React.createContext<DataTableConfigContextValue>(
+  {}
+)
 
 export function DataTableConfigProvider({
   icons,

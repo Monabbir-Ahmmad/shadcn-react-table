@@ -12,4 +12,7 @@ export {
   createRowDragHandleColumn,
   type RowDragHandleProps,
 } from "./row-drag-column"
-export { ROW_NUMBER_COLUMN_ID, createRowNumberColumn } from "./row-number-column"
+export {
+  ROW_NUMBER_COLUMN_ID,
+  createRowNumberColumn,
+} from "./row-number-column"

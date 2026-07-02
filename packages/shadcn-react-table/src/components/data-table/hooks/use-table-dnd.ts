@@ -36,13 +36,11 @@ export function useTableDnd<TData extends RowData>(
   // fall back to closestCenter for column/row reordering (and keyboard dnd,
   // where pointerWithin yields nothing).
   const collisionDetection: CollisionDetection = (args) => {
-    const groupHit = pointerWithin(args).find(
-      (c) => c.id === GROUP_DROPZONE_ID
-    )
+    const groupHit = pointerWithin(args).find((c) => c.id === GROUP_DROPZONE_ID)
     return groupHit ? [groupHit] : closestCenter(args)
   }
 
-  const onRowOrderChange = table.cnTable.onRowOrderChange
+  const onRowOrderChange = table.tableInstance.onRowOrderChange
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -64,7 +62,7 @@ export function useTableDnd<TData extends RowData>(
     }
     // Otherwise it's a reorder, which only applies when ordering is enabled
     // (a column may be draggable solely to support drag-to-group).
-    if (!table.cnTable.enableColumnOrdering) return
+    if (!table.tableInstance.enableColumnOrdering) return
     if (active.id === over.id) return
     const base =
       table.getState().columnOrder.length > 0

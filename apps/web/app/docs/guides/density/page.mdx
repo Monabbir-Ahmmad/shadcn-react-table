@@ -27,10 +27,10 @@ You can read or change the current density at any time through the table instanc
 
 ```tsx
 // current density: "comfortable" | "compact" | "spacious"
-const density = table.cnTable.density
+const density = table.tableInstance.density
 
 // switch to compact programmatically
-table.cnTable.setDensity("compact")
+table.tableInstance.setDensity("compact")
 ```
 
 This is handy when you want to drive density from your own controls instead of the built-in toolbar button.

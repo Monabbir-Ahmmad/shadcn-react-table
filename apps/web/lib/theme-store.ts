@@ -21,7 +21,10 @@ export const DEFAULT_PREFS: ThemePrefs = {
 export function readPrefs(): ThemePrefs {
   if (typeof window === "undefined") return DEFAULT_PREFS
   try {
-    return { ...DEFAULT_PREFS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }
+    return {
+      ...DEFAULT_PREFS,
+      ...JSON.parse(localStorage.getItem(KEY) || "{}"),
+    }
   } catch {
     return DEFAULT_PREFS
   }

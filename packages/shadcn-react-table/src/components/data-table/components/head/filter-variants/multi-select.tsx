@@ -21,17 +21,13 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import { getColumnLabel } from "../../../helpers/column-label"
-import {
-  FIELD_CLASS,
-  useSelectOptions,
-  type FilterFieldProps,
-} from "./shared"
+import { FIELD_CLASS, useSelectOptions, type FilterFieldProps } from "./shared"
 
 export function MultiSelectFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization } = table.cnTable
+  const { localization } = table.tableInstance
   const { options, counts } = useSelectOptions(column)
   const selected = (column.getFilterValue() as string[]) ?? []
 
@@ -80,9 +76,12 @@ export function MultiSelectFilterField<TData extends RowData, TValue>({
                     onSelect={() => toggle(option.value)}
                     className="gap-2"
                   >
-                    <Checkbox checked={isSelected} className="pointer-events-none" />
+                    <Checkbox
+                      checked={isSelected}
+                      className="pointer-events-none"
+                    />
                     <span className="flex-1 truncate">{option.label}</span>
-                    <span className="text-xs tabular-nums text-muted-foreground">
+                    <span className="text-xs text-muted-foreground tabular-nums">
                       {counts.get(option.value) ?? 0}
                     </span>
                   </CommandItem>

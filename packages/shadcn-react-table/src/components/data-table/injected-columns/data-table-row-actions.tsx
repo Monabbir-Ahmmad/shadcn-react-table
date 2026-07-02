@@ -63,7 +63,7 @@ function RowActionsCell<TData extends RowData>({
     cancelEdit,
     renderRowActions,
     renderRowActionMenuItems,
-  } = table.cnTable
+  } = table.tableInstance
 
   const isEditingThisRow = editDisplayMode === "row" && editingRowId === row.id
 

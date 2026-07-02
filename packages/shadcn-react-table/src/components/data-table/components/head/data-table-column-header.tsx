@@ -1,10 +1,6 @@
 "use client"
 
-import {
-  flexRender,
-  type Header,
-  type RowData,
-} from "@tanstack/react-table"
+import { flexRender, type Header, type RowData } from "@tanstack/react-table"
 
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -20,16 +16,16 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { ColumnDragHandle } from "../body/dnd"
-import { DataTableColumnActions } from "../menus/data-table-column-actions"
+import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import {
   headerControlsOptionsFromTable,
   shouldShowColumnActions,
   shouldShowColumnFilterButton,
 } from "../../helpers/header-controls"
+import { ColumnDragHandle } from "../body/dnd"
+import { DataTableColumnActions } from "../menus/data-table-column-actions"
 import { DataTableColumnFilter } from "./data-table-column-filter"
-import type { DataTableInstance } from "../../core/types"
 
 interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
   header: Header<TData, TValue>
@@ -53,7 +49,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   table,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   const { column } = header
-  const { localization, icons } = table.cnTable
+  const { localization, icons } = table.tableInstance
   const controls = headerControlsOptionsFromTable(table)
   const align = column.columnDef.meta?.align ?? "left"
 
@@ -82,7 +78,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
         </TooltipContent>
       </Tooltip>
       <PopoverContent align="start" className="w-64 gap-2">
-        <span className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">
+        <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
           {localization.filterByColumn(getColumnLabel(column))}
         </span>
         <DataTableColumnFilter header={header} table={table} />
@@ -97,8 +93,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   const canSort = column.getCanSort()
   const sorted = column.getIsSorted() // false | "asc" | "desc"
   const sortIndex = column.getSortIndex()
-  const isMultiSort =
-    table.getState().sorting.length > 1 && sortIndex >= 0
+  const isMultiSort = table.getState().sorting.length > 1 && sortIndex >= 0
 
   const showActions = shouldShowColumnActions(column, controls)
 
@@ -143,7 +138,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
               type="button"
               onClick={column.getToggleSortingHandler()}
               aria-label={sortTooltip}
-              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider uppercase text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground"
+              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground"
               data-sorted={!!sorted}
             >
               <span className="min-w-0 truncate">{labelNode}</span>
@@ -184,7 +179,7 @@ function SortIndicator({
   icons,
 }: {
   sorted: false | "asc" | "desc"
-  icons: DataTableInstance["cnTable"]["icons"]
+  icons: DataTableInstance["tableInstance"]["icons"]
 }) {
   if (sorted === "asc")
     return <icons.sortAscending className="size-3.5 shrink-0" />

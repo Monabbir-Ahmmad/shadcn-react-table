@@ -17,8 +17,8 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { getColumnLabel } from "../../helpers/column-label"
 import type { DataTableInstance } from "../../core/types"
+import { getColumnLabel } from "../../helpers/column-label"
 
 interface DataTableColumnActionsProps<TData extends RowData, TValue> {
   column: Column<TData, TValue>
@@ -45,7 +45,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
     enableColumnPinning,
     enableGrouping,
     renderColumnActionsMenuItems,
-  } = table.cnTable
+  } = table.tableInstance
   const canSort = column.getCanSort()
   const canHide = column.getCanHide()
   const canFilter = column.getCanFilter()

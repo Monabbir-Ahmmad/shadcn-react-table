@@ -48,7 +48,7 @@ const table = useDataTable({
   getRowId: (row) => row.id,
   renderRowActionMenuItems: ({ row, table }) => (
     <>
-      <DropdownMenuItem onClick={() => table.cnTable.beginRowEdit(row)}>
+      <DropdownMenuItem onClick={() => table.tableInstance.beginRowEdit(row)}>
         Edit
       </DropdownMenuItem>
       <DropdownMenuItem variant="destructive" onClick={() => remove(row.id)}>

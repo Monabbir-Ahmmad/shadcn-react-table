@@ -44,7 +44,8 @@ const FEATURES: Feature[] = [
   {
     icon: RiEdit2Line,
     title: "Inline editing",
-    description: "Edit by cell, row, table, or modal with create and save hooks.",
+    description:
+      "Edit by cell, row, table, or modal with create and save hooks.",
   },
   {
     icon: RiListCheck2,
@@ -55,8 +56,7 @@ const FEATURES: Feature[] = [
   {
     icon: RiFlashlightLine,
     title: "Virtualization",
-    description:
-      "Row and column virtualization keep thousands of rows smooth.",
+    description: "Row and column virtualization keep thousands of rows smooth.",
   },
   {
     icon: RiDownloadLine,
@@ -81,7 +81,7 @@ export function FeatureGrid() {
         <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
           Everything Material React Table does
         </h2>
-        <p className="mt-4 text-muted-foreground text-pretty">
+        <p className="mt-4 text-pretty text-muted-foreground">
           The full breadth of MRT, rebuilt on TanStack Table v8 and driven by a
           single hook — nothing bolted on.
         </p>

@@ -14,8 +14,7 @@ export function DocsPrevNext() {
   if (index === -1) return null
 
   const prev = index > 0 ? docsFlatNav[index - 1] : null
-  const next =
-    index < docsFlatNav.length - 1 ? docsFlatNav[index + 1] : null
+  const next = index < docsFlatNav.length - 1 ? docsFlatNav[index + 1] : null
 
   return (
     <div className="mt-12 flex items-center justify-between gap-4 border-t pt-6">

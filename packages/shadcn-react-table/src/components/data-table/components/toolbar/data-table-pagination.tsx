@@ -1,7 +1,7 @@
 "use client"
 
-import type * as React from "react"
 import type { RowData } from "@tanstack/react-table"
+import type * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -33,7 +33,7 @@ export function DataTablePagination<TData extends RowData>({
   table,
   pageSizeOptions = [5, 10, 25, 50, 100],
 }: DataTablePaginationProps<TData>) {
-  const { localization, icons, paginationDisplayMode } = table.cnTable
+  const { localization, icons, paginationDisplayMode } = table.tableInstance
   if (paginationDisplayMode === "custom") return null
 
   const { pageIndex, pageSize } = table.getState().pagination
@@ -157,10 +157,7 @@ export function DataTablePagination<TData extends RowData>({
  * the current page ± 1, collapsing the gaps to an `"ellipsis"` marker. Lists
  * every page when there are 7 or fewer. Page numbers are 1-based.
  */
-function getPageList(
-  current: number,
-  total: number
-): (number | "ellipsis")[] {
+function getPageList(current: number, total: number): (number | "ellipsis")[] {
   if (total <= 1) return total === 1 ? [1] : []
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
   const wanted = [1, total, current, current - 1, current + 1].filter(

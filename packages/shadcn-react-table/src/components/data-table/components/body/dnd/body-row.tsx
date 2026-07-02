@@ -30,8 +30,15 @@ export function DataTableBodyRow<TData extends RowData>({
   onClick?: React.MouseEventHandler<HTMLTableRowElement>
   onDoubleClick?: React.MouseEventHandler<HTMLTableRowElement>
 }) {
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
-    useSortable({ id: row.id, disabled: !draggable, data: { type: "row" } })
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: row.id, disabled: !draggable, data: { type: "row" } })
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
