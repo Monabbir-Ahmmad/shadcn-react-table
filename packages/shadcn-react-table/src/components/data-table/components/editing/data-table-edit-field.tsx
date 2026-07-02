@@ -47,7 +47,9 @@ export function DataTableEditField({
     return (
       <div className="flex flex-col gap-0.5">
         <Select
-          value={value == null ? undefined : String(value)}
+          // Always controlled: "" shows the placeholder in both Radix and
+          // Base UI, while `undefined` would flip to uncontrolled.
+          value={value == null ? "" : String(value)}
           onValueChange={(next) => {
             onChange(next)
             onCommit?.()

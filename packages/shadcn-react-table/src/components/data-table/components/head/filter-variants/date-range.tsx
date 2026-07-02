@@ -44,11 +44,11 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
         >
           <icons.calendar className="text-muted-foreground" />
           {from || to ? (
-            <span>
+            <span className="truncate">
               {from ? format(from, "PP") : "…"} – {to ? format(to, "PP") : "…"}
             </span>
           ) : (
-            <span className="text-muted-foreground">
+            <span className="truncate text-muted-foreground">
               {localization.pickDateRange}
             </span>
           )}

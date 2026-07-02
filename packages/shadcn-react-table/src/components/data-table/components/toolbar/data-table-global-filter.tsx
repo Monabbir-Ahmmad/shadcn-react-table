@@ -7,6 +7,7 @@ import { Button } from "@workspace/ui/components/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -153,9 +154,13 @@ export function DataTableGlobalFilter<TData extends RowData>({
             <TooltipContent>{localization.globalFilterMode}</TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>
-              {localization.globalFilterMode}
-            </DropdownMenuLabel>
+            {/* Base UI's GroupLabel requires a Group ancestor; Radix renders
+                the group as an inert wrapper. */}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                {localization.globalFilterMode}
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             {renderGlobalFilterModeMenuItems ? (
               renderGlobalFilterModeMenuItems({

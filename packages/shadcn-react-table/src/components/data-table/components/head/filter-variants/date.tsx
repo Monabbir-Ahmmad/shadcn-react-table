@@ -54,9 +54,9 @@ export function DateFilterField<TData extends RowData, TValue>({
         >
           <icons.calendar className="text-muted-foreground" />
           {value ? (
-            format(value, "PP")
+            <span className="truncate">{format(value, "PP")}</span>
           ) : (
-            <span className="text-muted-foreground">
+            <span className="truncate text-muted-foreground">
               {localization.pickDate}
             </span>
           )}

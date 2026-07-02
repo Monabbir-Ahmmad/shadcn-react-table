@@ -187,3 +187,25 @@ primitives arrive via `registryDependencies` anyway).
 2. Rebuild registry (single variant, unchanged pipeline).
 3. Re-validate against a fresh Base probe (former Task 6, now the acceptance gate).
 4. Document in installation docs: same URL for both flavors; requires shadcn CLI ≥ the version that flavor-transforms (`-b base` era, shadcn 4.x).
+
+## Addendum (2026-07-02): D4 — bare `DropdownMenuLabel` throws at runtime in Base
+
+Found by real-world Base consumer testing after the validation passes above.
+`tsc` and `next build` could not catch it because it is a **runtime-only**
+invariant: the Base flavor maps `DropdownMenuLabel` → `Menu.GroupLabel`,
+which throws `MenuGroupContext is missing` unless rendered inside
+`<Menu.Group>` / `<Menu.RadioGroup>`. Radix's `Label` has no such
+requirement, so the spike's typecheck-centric gate passed while every menu
+with a heading crashed on open in Base apps.
+
+- **Affected sites (3):** `components/menus/data-table-filter-mode-menu.tsx`,
+  `components/toolbar/data-table-global-filter.tsx`,
+  `components/toolbar/data-table-view-options.tsx` — each rendered a bare
+  `DropdownMenuLabel` directly under `DropdownMenuContent`.
+- **Flavor-neutral fix (applied):** wrap each label in `DropdownMenuGroup`
+  (Radix: inert `role="group"` wrapper; Base: provides the required
+  `MenuGroupContext`). Registry rebuilt; no other `*Label` primitives are
+  used anywhere in the module (`ContextMenuLabel`/`SelectLabel`: 0 hits).
+- **Lesson for future deltas:** Base context-dependency errors surface only
+  when the component *renders* — the acceptance gate must include opening
+  every menu/popover at runtime (plan Task 1 Step 5), not just compiling.

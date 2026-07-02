@@ -48,14 +48,14 @@ export function MultiSelectFilterField<TData extends RowData, TValue>({
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           {selected.length > 0 ? (
-            <span className="flex items-center gap-1">
+            <span className="flex min-w-0 items-center gap-1">
               <Badge variant="secondary" className="rounded-sm px-1">
                 {selected.length}
               </Badge>
               <span className="truncate">{selected.join(", ")}</span>
             </span>
           ) : (
-            <span className="text-muted-foreground">
+            <span className="truncate text-muted-foreground">
               {localization.filterPlaceholder(getColumnLabel(column))}
             </span>
           )}

@@ -5,6 +5,7 @@ import type { Column, RowData } from "@tanstack/react-table"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -75,7 +76,11 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
         <TooltipContent>{localization.filterMode}</TooltipContent>
       </Tooltip>
       <DropdownMenuContent align="start" className="w-52">
-        <DropdownMenuLabel>{localization.filterMode}</DropdownMenuLabel>
+        {/* Base UI's GroupLabel requires a Group ancestor; Radix renders the
+            group as an inert wrapper. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>{localization.filterMode}</DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {renderColumnFilterModeMenuItems ? (
           renderColumnFilterModeMenuItems({

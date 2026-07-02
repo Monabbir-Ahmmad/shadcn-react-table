@@ -25,12 +25,14 @@ export function SelectFilterField<TData extends RowData, TValue>({
   return (
     <div className="flex items-center gap-1">
       <Select
-        value={value || undefined}
+        // Always controlled: "" shows the placeholder in both Radix and Base
+        // UI, while `undefined` would flip to uncontrolled and go stale.
+        value={value}
         onValueChange={(next) => column.setFilterValue(next || undefined)}
       >
         <SelectTrigger
           size="sm"
-          className={cn(FIELD_CLASS, "flex-1 px-2")}
+          className={cn(FIELD_CLASS, "w-full min-w-0 flex-1 px-2")}
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           <SelectValue

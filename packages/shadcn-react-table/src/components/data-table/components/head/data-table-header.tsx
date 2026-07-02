@@ -100,7 +100,7 @@ export function DataTableHeader<TData extends RowData>({
         ...getColumnPinningStyle(header.column),
       }}
       className={cn(
-        "bg-background pt-0 pb-2",
+        "bg-background",
         getColumnPinningClass(header.column)
       )}
     >
