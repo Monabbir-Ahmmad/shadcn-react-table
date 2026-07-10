@@ -48,9 +48,16 @@ export function useAdvancedFilter<TData extends RowData>({
     React.useState(false)
 
   const groupRef = React.useRef<AdvancedFilterGroup>(EMPTY_GROUP)
+  // Render-phase latest-ref write is load-bearing: TanStack computes row
+  // models during render, and the stable factory below must see this render's
+  // group (an effect write would filter with a stale group for a full frame).
+  // eslint-disable-next-line react-hooks/refs
   groupRef.current = enableAdvancedFilter ? advancedFilter : EMPTY_GROUP
 
   const advancedFilteredRowModel = React.useMemo(
+    // The getter runs inside TanStack's row-model computation, not during
+    // this hook's render.
+    // eslint-disable-next-line react-hooks/refs
     () => createAdvancedFilteredRowModel<TData>(() => groupRef.current),
     []
   )

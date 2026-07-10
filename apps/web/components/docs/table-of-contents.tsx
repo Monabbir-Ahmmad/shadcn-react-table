@@ -35,6 +35,9 @@ function useTableOfContents(): { items: TocItem[]; activeId: string | null } {
         }
       }
     }
+    // The TOC is derived from the rendered article DOM, which only exists
+    // after render — a synchronous setState in this effect is intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(built)
 
     const hash = window.location.hash.slice(1)

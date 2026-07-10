@@ -99,10 +99,7 @@ export function DataTableHeader<TData extends RowData>({
         ...getWidthStyle(header.column, table),
         ...getColumnPinningStyle(header.column),
       }}
-      className={cn(
-        "bg-background",
-        getColumnPinningClass(header.column)
-      )}
+      className={cn("bg-background", getColumnPinningClass(header.column))}
     >
       <DataTableColumnFilter header={header} table={table} />
     </TableHead>
@@ -110,6 +107,9 @@ export function DataTableHeader<TData extends RowData>({
 
   return (
     <TableHeader
+      // Forwarding the exposed DOM ref object as a JSX ref (not reading
+      // .current during render).
+      // eslint-disable-next-line react-hooks/refs
       ref={refs.tableHeadRef}
       className={cn(enableStickyHeader && "sticky top-0 z-20 bg-background")}
     >

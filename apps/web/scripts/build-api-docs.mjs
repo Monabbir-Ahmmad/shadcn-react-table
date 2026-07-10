@@ -215,7 +215,10 @@ const body =
     .join("\n")
 
 mkdirSync(dirname(OUT), { recursive: true })
-writeFileSync(OUT, banner + body)
+// Normalize CRLF that JSON.stringify escaped into the string literals when
+// the source was checked out with Windows line endings (git autocrlf), so
+// the artifact is identical on every machine.
+writeFileSync(OUT, (banner + body).replaceAll("\\r\\n", "\\n"))
 
 console.log(
   `api reference built → apps/web/lib/api-reference.generated.ts ` +

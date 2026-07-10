@@ -49,3 +49,5 @@ graphify-out/
 
 # Claude Code: share project settings, ignore per-developer local overrides
 .claude/settings.local.json
+# registry verification fixture (verify-registry.mjs)
+.registry-fixture/

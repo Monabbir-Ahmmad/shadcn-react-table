@@ -66,6 +66,10 @@ export function useGlobalFilterMode<TData extends RowData>({
     manualFiltering: boolean
     grouping: boolean
   }>(null!)
+  // Render-phase latest-ref write is load-bearing: TanStack computes row
+  // models during render, and the stable factory below must see this render's
+  // config (an effect write would rank with stale config for a full frame).
+  // eslint-disable-next-line react-hooks/refs
   rankingRef.current = {
     enabled: enableGlobalFilterRankedResults,
     mode: globalFilterMode,
@@ -75,6 +79,9 @@ export function useGlobalFilterMode<TData extends RowData>({
   }
   const rankedSortedRowModel = React.useMemo(
     () =>
+      // The predicate runs inside TanStack's row-model computation, not
+      // during this hook's render.
+      // eslint-disable-next-line react-hooks/refs
       createRankedSortedRowModel<TData>((t) => {
         const c = rankingRef.current
         if (!c.enabled || c.mode !== "fuzzy") return false

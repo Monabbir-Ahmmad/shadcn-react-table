@@ -41,5 +41,18 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Test
+        run: pnpm test
+
       - name: Build
         run: pnpm build
+
+      # The build regenerates the committed artifacts (registry JSON, API
+      # reference); a diff here means source changed without regenerating.
+      - name: Generated artifacts are fresh
+        run: git diff --exit-code -- apps/web/public/r apps/web/lib/api-reference.generated.ts
+
+      # Typechecks the registry output in a consumer-shaped fixture (the `@/`
+      # aliases `shadcn add` produces), guarding the exact bytes consumers get.
+      - name: Registry output compiles for consumers
+        run: pnpm --filter shadcn-react-table-web registry:verify

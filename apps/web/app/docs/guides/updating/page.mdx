@@ -1,0 +1,43 @@
+export const metadata = { title: "Updating" }
+
+# Updating your copy
+
+`shadcn add` copies this block's source into your project — after that,
+the code is yours, and upstream releases don't reach it automatically.
+This page is the manual update path.
+
+## Know what you have
+
+Every release stamps its version into the registry item. When you
+install, note the `meta.version` of
+[`/r/data-table.json`](/r/data-table.json) somewhere in your project
+(a comment, your PR description). The
+[changelog](https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/packages/shadcn-react-table/CHANGELOG.md)
+lists what changed in each version.
+
+## Update recipe
+
+1. Start from a clean branch.
+2. Re-run the install command with `--overwrite`:
+
+   ```bash
+   npx shadcn@latest add --overwrite <registry-url>/r/data-table.json
+   ```
+
+3. Review the diff. Everything under `components/ui/data-table/` is
+   replaced with the new upstream source — `git diff` shows upstream
+   changes mixed with the loss of any local edits you made.
+4. Re-apply your local edits on top, or cherry-pick hunks with
+   `git checkout -p` against the pre-update commit.
+5. Check the changelog for entries marked as breaking and adjust your
+   usage.
+
+<Callout variant="tip" title="Keep local edits separate">
+  The less you edit the copied files directly — prefer wrapping the
+  table or using the many `render*` slots — the closer step 3's diff is
+  to a pure upstream update.
+</Callout>
+
+## Related
+
+- [Installation](/docs/installation)

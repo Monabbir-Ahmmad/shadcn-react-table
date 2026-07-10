@@ -340,6 +340,8 @@ export function useDataTable<TData extends RowData>(
     [resolvedColumns, headerControlsOptions, baseColumnSize]
   )
 
+  // The React Compiler bails on TanStack Table's mutable instance; expected.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable<TData>({
     ...tableOptions,
     columns: sizedColumns,

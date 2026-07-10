@@ -31,13 +31,12 @@ export function ApiTable({
   only?: string[]
   search?: boolean
 }) {
-  const all = SECTIONS[of] ?? []
-
   const rows = React.useMemo(() => {
+    const all = SECTIONS[of] ?? []
     if (!only) return all
     const byName = new Map(all.map((m) => [m.name, m]))
     return only.map((name) => byName.get(name)).filter(Boolean) as ApiMember[]
-  }, [all, only])
+  }, [of, only])
 
   // Drop columns that carry no data for this section (e.g. slots have no
   // Type/Default; refs have no Default).

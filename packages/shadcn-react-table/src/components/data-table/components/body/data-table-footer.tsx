@@ -47,6 +47,9 @@ export function DataTableFooter<TData extends RowData>({
 
   return (
     <TableFooter
+      // Forwarding the exposed DOM ref object as a JSX ref (not reading
+      // .current during render).
+      // eslint-disable-next-line react-hooks/refs
       ref={refs.tableFooterRef}
       className={cn(enableStickyFooter && "sticky bottom-0 z-20")}
     >

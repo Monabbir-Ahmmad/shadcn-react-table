@@ -17,14 +17,26 @@ export function useControllableState<T>(
   const isControlled = controlled !== undefined
   const value = isControlled ? controlled : uncontrolled
 
+  // Functional updaters must chain within a single React batch (useState
+  // semantics), so resolve them against the latest dispatched value rather
+  // than the render-captured one. The effect re-syncs after the controlling
+  // parent applies (or rejects) the change.
+  const latest = React.useRef(value)
+  React.useEffect(() => {
+    latest.current = value
+  })
+
   const setValue = React.useCallback<React.Dispatch<React.SetStateAction<T>>>(
     (next) => {
       const resolved =
-        typeof next === "function" ? (next as (prev: T) => T)(value) : next
+        typeof next === "function"
+          ? (next as (prev: T) => T)(latest.current)
+          : next
+      latest.current = resolved
       if (!isControlled) setUncontrolled(resolved)
       onChange?.(resolved)
     },
-    [isControlled, onChange, value]
+    [isControlled, onChange]
   )
 
   return [value, setValue]
