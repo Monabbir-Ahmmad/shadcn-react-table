@@ -32,6 +32,24 @@ When row selection is on, users can export just the selected rows. Otherwise, th
   the rows they want in the file. See [Row selection](/docs/guides/row-selection).
 </Callout>
 
+## Bundle cost
+
+The CSV and Excel engines (`papaparse`, `xlsx`) are loaded on demand the
+first time a user exports — they are never in your initial bundle, even
+with `enableExport: true`.
+
+## Removing export entirely
+
+If you never use export, you can delete it from your copy of the block:
+
+1. Delete `components/ui/data-table/utils/export-utils.ts` and
+   `components/ui/data-table/components/menus/data-table-export-menu.tsx`.
+2. Remove the `DataTableExportMenu` import and usage from
+   `components/ui/data-table/components/toolbar/data-table-toolbar.tsx`.
+3. Remove the export re-exports from `components/ui/data-table/index.ts`
+   (search for `export-utils`).
+4. Uninstall the dependencies: `npm rm xlsx papaparse @types/papaparse`.
+
 ## Related
 
 - [Row selection](/docs/guides/row-selection)

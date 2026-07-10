@@ -1,6 +1,4 @@
 import type { Column, Row, RowData } from "@tanstack/react-table"
-import Papa from "papaparse"
-import * as XLSX from "xlsx"
 
 import { getColumnLabel } from "../helpers/column-label"
 import {
@@ -90,24 +88,46 @@ function normalize(value: unknown): string | number | boolean | null {
   return String(value)
 }
 
+// Spreadsheet apps execute cells starting with these as formulas when a CSV
+// is opened, so exported user data could inject commands (CSV injection).
+// A leading apostrophe forces text. Only strings are at risk \u2014 typed numbers
+// (e.g. -5) survive as numbers.
+const FORMULA_TRIGGERS = /^[=+\-@\t\r]/
+
+export function escapeCsvCell(
+  value: string | number | boolean | null
+): string | number | boolean | null {
+  if (typeof value === "string" && FORMULA_TRIGGERS.test(value)) {
+    return `'${value}`
+  }
+  return value
+}
+
 /** Export to CSV via PapaParse + a Blob download. */
-export function exportToCsv<TData extends RowData>(
+export async function exportToCsv<TData extends RowData>(
   table: DataTableInstance<TData>,
   options: ExportOptions = {}
-): void {
+): Promise<void> {
+  // Loaded on demand so consumers who never export don't bundle papaparse.
+  const { default: Papa } = await import("papaparse")
   const scope = effectiveScope(table, options.scope)
-  const aoa = toAOA(table, scope)
+  const aoa = toAOA(table, scope).map((row) => row.map(escapeCsvCell))
   const csv = Papa.unparse(aoa)
   // Prepend a UTF-8 BOM so Excel detects the encoding.
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
   triggerDownload(blob, `${options.fileName ?? "export"}.csv`)
 }
 
-/** Export to an .xlsx worksheet via SheetJS. */
-export function exportToExcel<TData extends RowData>(
+/**
+ * Export to an .xlsx worksheet via SheetJS. No formula escaping needed here:
+ * `aoa_to_sheet` writes strings as string-typed cells, never formulas.
+ */
+export async function exportToExcel<TData extends RowData>(
   table: DataTableInstance<TData>,
   options: ExportOptions = {}
-): void {
+): Promise<void> {
+  // Loaded on demand so consumers who never export don't bundle xlsx.
+  const XLSX = await import("xlsx")
   const scope = effectiveScope(table, options.scope)
   const aoa = toAOA(table, scope)
   const worksheet = XLSX.utils.aoa_to_sheet(aoa)

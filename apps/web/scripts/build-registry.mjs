@@ -111,7 +111,11 @@ function walk(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name)
     if (entry.isDirectory()) out.push(...walk(abs))
-    else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx"))
+    else if (
+      (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) &&
+      // In-repo test files are not part of the shipped block.
+      !entry.name.includes(".test.")
+    )
       out.push(abs)
   }
   return out

@@ -48,11 +48,13 @@ export function DataTableExportMenu<TData extends RowData>({
         <TooltipContent>{localization.export}</TooltipContent>
       </Tooltip>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={() => exportToCsv(table, { fileName })}>
+        <DropdownMenuItem onClick={() => void exportToCsv(table, { fileName })}>
           <icons.fileCsv />
           {localization.exportCsv}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => exportToExcel(table, { fileName })}>
+        <DropdownMenuItem
+          onClick={() => void exportToExcel(table, { fileName })}
+        >
           <icons.fileExcel />
           {localization.exportExcel}
         </DropdownMenuItem>
