@@ -4,6 +4,9 @@
   "type": "registry:block",
   "title": "Data Table",
   "description": "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
+  "meta": {
+    "version": "0.1.0"
+  },
   "dependencies": [
     "@tanstack/react-table",
     "@tanstack/match-sorter-utils",

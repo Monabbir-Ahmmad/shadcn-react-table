@@ -12,6 +12,11 @@ import { fileURLToPath } from "node:url"
 // Anchor to the repo root from this file (apps/web/scripts/), so the script
 // works regardless of the cwd `pnpm --filter` runs it in.
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
+// Single source of truth for the block's version (stamped into meta.version
+// so consumers can tell which release their copy came from).
+const PKG = JSON.parse(
+  readFileSync(join(REPO, "packages/shadcn-react-table/package.json"), "utf8")
+)
 // The data-table module lives in the @monabbir/shadcn-react-table package; the
 // shadcn primitives it imports live in @workspace/ui. Only the data-table source
 // is shipped (primitives come from the consumer's own shadcn setup), so we read
@@ -143,6 +148,7 @@ const item = {
   title: "Data Table",
   description:
     "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
+  meta: { version: PKG.version },
   dependencies: NPM_DEPENDENCIES,
   devDependencies: DEV_DEPENDENCIES,
   registryDependencies: REGISTRY_DEPENDENCIES,
@@ -160,6 +166,7 @@ const registry = {
       type: item.type,
       title: item.title,
       description: item.description,
+      meta: { version: PKG.version },
     },
   ],
 }
@@ -171,5 +178,5 @@ writeFileSync(join(OUT, "registry.json"), JSON.stringify(registry, null, 2))
 console.log(
   `registry built → apps/web/public/r/data-table.json (${files.length} files, ` +
     `${item.dependencies.length} npm deps, ${item.devDependencies.length} dev deps, ` +
-    `${item.registryDependencies.length} registry deps)`
+    `${item.registryDependencies.length} registry deps, v${PKG.version})`
 )

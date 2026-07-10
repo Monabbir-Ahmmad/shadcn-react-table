@@ -20,6 +20,7 @@ export const docsNav: DocsNavGroup[] = [
       { title: "Installation", href: "/docs/installation" },
       { title: "Quick start", href: "/docs/quick-start" },
       { title: "Usage", href: "/docs/usage" },
+      { title: "Updating", href: "/docs/guides/updating" },
     ],
   },
   {
