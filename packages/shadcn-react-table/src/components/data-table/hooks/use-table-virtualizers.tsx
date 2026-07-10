@@ -61,6 +61,8 @@ export function useTableVirtualizers<TData extends RowData>(
       ? columnVirtualizerOptions({ table })
       : columnVirtualizerOptions
 
+  // The React Compiler bails on TanStack Virtual's mutable instance; expected.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: virtualItems.length,
     getScrollElement: () => gridRef.current,

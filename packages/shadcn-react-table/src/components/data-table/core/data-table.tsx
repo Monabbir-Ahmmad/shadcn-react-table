@@ -118,6 +118,9 @@ export function DataTable<TData extends RowData>({
       } as Partial<React.ComponentProps<typeof TooltipProvider>>)}
     >
       <div
+        // Forwarding the exposed DOM ref object as a JSX ref (not reading
+        // .current during render).
+        // eslint-disable-next-line react-hooks/refs
         ref={refs.tablePaperRef}
         data-slot="data-table"
         className={cn(
@@ -134,7 +137,11 @@ export function DataTable<TData extends RowData>({
           : enableTopToolbar && (
               <DataTableToolbar
                 table={table}
+                // Forwarding the exposed ref objects as props (not reading
+                // .current during render).
+                // eslint-disable-next-line react-hooks/refs
                 toolbarRef={refs.topToolbarRef}
+                // eslint-disable-next-line react-hooks/refs
                 searchInputRef={refs.searchInputRef}
               />
             )}
@@ -162,8 +169,13 @@ export function DataTable<TData extends RowData>({
             )}
 
           <div
+            // Callback refs run after render; assigning .current there is
+            // legal React.
+            // eslint-disable-next-line react-hooks/immutability
             ref={(node) => {
               gridRef.current = node
+              // The exposed container ref is a RefObject, mutable by contract.
+              // eslint-disable-next-line react-hooks/immutability
               refs.tableContainerRef.current = node
             }}
             onKeyDown={onKeyDown}

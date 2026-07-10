@@ -53,9 +53,14 @@ export function useColumnFilterModes<TData extends RowData>(
 
   // Refs let the dynamic filterFn read current modes without re-creating its
   // identity (which would thrash the filtered row model on every render).
+  // The render-phase writes are load-bearing: TanStack filters during render,
+  // so the filterFn must see this render's modes (an effect write would
+  // filter with stale modes for a full frame).
   const modesRef = React.useRef(columnFilterModes)
+  // eslint-disable-next-line react-hooks/refs
   modesRef.current = columnFilterModes
   const defaultModesRef = React.useRef(defaultModes)
+  // eslint-disable-next-line react-hooks/refs
   defaultModesRef.current = defaultModes
 
   const getColumnMode = React.useCallback(
@@ -67,6 +72,9 @@ export function useColumnFilterModes<TData extends RowData>(
   )
 
   const dynamicFilterFn = React.useMemo(
+    // getColumnMode reads refs inside TanStack's filtering pass, not during
+    // this hook's render.
+    // eslint-disable-next-line react-hooks/refs
     () => createDynamicFilterFn<TData>(getColumnMode),
     [getColumnMode]
   )
