@@ -87,6 +87,9 @@ const cssVars = {
 /** Rewrite internal package imports to the portable shadcn `@/` aliases. */
 function rewrite(content) {
   return content
+    // Normalize CRLF from Windows checkouts (git autocrlf) so the embedded
+    // file contents — and therefore the artifact — are machine-independent.
+    .replaceAll("\r\n", "\n")
     .replaceAll("@workspace/ui/components/", "@/components/ui/")
     .replaceAll("@workspace/ui/lib/", "@/lib/")
 }
