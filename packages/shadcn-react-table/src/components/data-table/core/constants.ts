@@ -48,4 +48,4 @@ export const NON_DATA_COLUMN_IDS = new Set([
  * `group-data-[state=selected]` so the tint shows through.
  */
 export const SELECTED_ROW_CLASS =
-  "group data-[state=selected]:bg-primary/20 data-[state=selected]:hover:bg-primary/20 dark:data-[state=selected]:bg-primary/30 dark:data-[state=selected]:hover:bg-primary/30 data-[state=selected]:shadow-[inset_2px_0_0_0_var(--primary)]"
+  "group data-[state=selected]:bg-primary/20 data-[state=selected]:hover:bg-primary/20 data-[state=selected]:shadow-[inset_2px_0_0_0_var(--primary)]"
