@@ -15,7 +15,7 @@ const ITEM = JSON.parse(
   readFileSync(join(REPO, "apps/web/public/r/data-table.json"), "utf8")
 )
 // The fixture lives inside the table package so the block's npm dependencies
-// (@tanstack/*, @dnd-kit/*, xlsx, …) resolve from its node_modules.
+// (@tanstack/*, @dnd-kit/*, date-fns, …) resolve from its node_modules.
 const PKG_DIR = join(REPO, "packages/shadcn-react-table")
 const FIXTURE = join(PKG_DIR, ".registry-fixture")
 

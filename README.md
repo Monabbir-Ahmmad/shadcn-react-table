@@ -1,42 +1,86 @@
+<div align="center">
+
 # shadcn-react-table
 
-> An MRT-complete data grid for shadcn/ui. Published as `@monabbir/shadcn-react-table`.
+**A fully featured shadcn/ui implementation of TanStack React Table V8, with Material React Table (MRT V3) feature parity — shipped as a shadcn registry block, not a library.**
 
-A shadcn/ui data table with **Material React Table (MRT V3)** feature parity,
-built on **TanStack Table v8** and **Tailwind v4** — distributed as a shadcn
-registry. All 38 MRT V3 feature guides are implemented: sorting, the full
-filter row (modes, variants, faceting, match highlighting), fuzzy global
-search, column ordering/pinning/resizing/visibility, density, full screen,
-row selection, row/column virtualization, grouping + aggregation, detail
-panels, tree sub-rows, sticky header/footer, inline editing (cell/row/table/
-modal) + create, row/cell actions, click-to-copy, CSV/Excel export,
-localization, custom icons, and server-side/manual mode.
+[![Release](https://img.shields.io/github/v/release/Monabbir-Ahmmad/shadcn-react-table)](https://github.com/Monabbir-Ahmmad/shadcn-react-table/releases)
+[![CI](https://github.com/Monabbir-Ahmmad/shadcn-react-table/actions/workflows/ci.yml/badge.svg)](https://github.com/Monabbir-Ahmmad/shadcn-react-table/actions/workflows/ci.yml)
+[![GitHub Stars](https://img.shields.io/github/stars/Monabbir-Ahmmad/shadcn-react-table)](https://github.com/Monabbir-Ahmmad/shadcn-react-table/stargazers)
+[![License](https://img.shields.io/github/license/Monabbir-Ahmmad/shadcn-react-table)](LICENSE)
 
-## [View the full documentation](https://monabbir-ahmmad.github.io/shadcn-react-table)
+### [View Documentation](https://monabbir-ahmmad.github.io/shadcn-react-table)
 
-## Installation
+</div>
 
-The data table ships as a **shadcn registry**, so in any shadcn/ui project (Tailwind
-v4, CSS variables on — the default) you install it with one command:
+## About
+
+Quickly create high-quality React data tables that look and feel like the rest
+of your shadcn/ui project.
+
+Built with [shadcn/ui](https://ui.shadcn.com), [TanStack Table <sup>V8</sup>](https://tanstack.com/table/v8),
+and [Tailwind CSS <sup>V4</sup>](https://tailwindcss.com). The API and feature
+set are modeled on [Material React Table <sup>V3</sup>](https://www.material-react-table.com)
+— all of MRT V3's feature guides are implemented.
+
+Because it ships as a **shadcn registry block**, the source is copied into your
+project: no library to version-match, nothing hidden, every file yours to edit.
+
+## Learn More
+
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation)
+- [Quick start](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/quick-start)
+- [Feature guides & live examples](https://monabbir-ahmmad.github.io/shadcn-react-table/docs)
+- [`useDataTable` API reference](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table)
+
+## Features
+
+_All features can be enabled or disabled per table._
+
+- [x] Sorting (multi-sort, per-column config)
+- [x] Column filtering with filter **modes** (contains, between, empty, …) and
+      **variants** (`text`, `select`, `multi-select`, `checkbox`, `range`,
+      `range-slider`, `date`, `date-range`) + faceted values
+- [x] Advanced filter panel (compound and/or rules)
+- [x] Fuzzy global search (`@tanstack/match-sorter-utils`) with search modes
+- [x] Filter match highlighting
+- [x] Column ordering (drag & drop), pinning (freeze columns), resizing, visibility
+- [x] Row selection (multi / single), select-all, alert banner
+- [x] Row ordering (drag & drop), row pinning, row numbers
+- [x] Grouping + aggregation (drop zone, group menu, aggregated cells, footers)
+- [x] Expansion: detail panels and tree data (`getSubRows`)
+- [x] Inline editing (`cell` / `row` / `table` / `modal`) + row creation
+- [x] Row actions, cell action menus, click-to-copy
+- [x] Row and column virtualization (`@tanstack/react-virtual`)
+- [x] Sticky header / footer, density toggle, full-screen toggle
+- [x] Pagination (default or numbered pages) + keyboard grid navigation
+- [x] Localization (full string table) and custom icons (any icon library)
+- [x] Server-side / manual mode (`manualPagination` / `manualSorting` / `manualFiltering`)
+- [x] Theming via shadcn tokens only — inherits your style, base color, and dark mode
+- [x] Radix UI **and** Base UI flavors supported from the same registry URL
+
+No built-in export — like MRT, exporting is a few lines against the table
+state model; the [export guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/export)
+has a copy-paste recipe.
+
+## Getting Started
+
+### Installation
+
+In any shadcn/ui project (Tailwind v4, CSS variables on — the default):
 
 ```bash
 pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
 ```
-
-(Deploy `apps/web` anywhere — e.g. Vercel — and the descriptor is served at
-`/r/data-table.json`.)
 
 That copies the data-table files into your `@/components/ui/data-table/`
 (rewriting import aliases to match your project), installs the npm
 dependencies, and injects the `--highlight` theme token (falls back to
 `--accent` if dropped). The shadcn **primitives** it relies on (button, table,
 select, …) are pulled from the shadcn registry **in your own configured style**
-(Vega / Nova / Sera / …) and base color — and any you already have are reused,
-not overwritten. **Radix UI and Base UI flavors are both supported** with this
-same URL: a current shadcn CLI (4.x, the one with `init -b radix|base`) adapts
-the source to your project's flavor at install time. The table only uses
-standard primitive APIs, so it inherits whatever look your project uses. No
-manual wiring.
+and base color — any you already have are reused, not overwritten. A current
+shadcn CLI (4.x, the one with `init -b radix|base`) adapts the source to your
+project's flavor at install time. No manual wiring.
 
 > **Trying it from this repo:** run the demo (`pnpm dev`) and point the CLI at
 > the locally served descriptor:
@@ -63,7 +107,7 @@ Copy `packages/shadcn-react-table/src/components/data-table/` into your `@/compo
 then add the table's own npm deps:
 
 ```bash
-pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns papaparse xlsx lucide-react
+pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns lucide-react
 ```
 
 Only `@tanstack/react-table` is strictly required; the rest are per-feature:
@@ -74,7 +118,6 @@ Only `@tanstack/react-table` is strictly required; the rest are per-feature:
 | `@tanstack/react-virtual`                                | row / column virtualization                   |
 | `@dnd-kit/core` `@dnd-kit/sortable` `@dnd-kit/utilities` | column / row drag-and-drop                    |
 | `date-fns`                                               | date / date-range filters                     |
-| `papaparse` `xlsx`                                       | CSV / Excel export                            |
 | `lucide-react`                                           | default icons (override via the `icons` prop) |
 
 Tailwind v4 + the shadcn token theme are required. Import the stylesheet **once**
@@ -91,7 +134,7 @@ import "@monabbir/shadcn-react-table/globals.css"
 > Tooltips are wrapped in a local `TooltipProvider` inside the table, so you do
 > **not** need a global provider.
 
-## Quick start
+### Usage
 
 Define your data type and columns, hand them to `useDataTable`, and render
 `<DataTable>`. Per-column behaviour (filter variant, alignment, edit variant,
@@ -165,7 +208,7 @@ export function PaymentsTable({ data }: { data: Payment[] }) {
 `onChange`, `manual*` server-side flags, row models, `getRowId`, etc. all pass
 straight through. Our extras + UI state live on `table.tableInstance`.
 
-## Feature flags (the common ones)
+### Feature flags (the common ones)
 
 Pass these to `useDataTable`:
 
@@ -183,7 +226,6 @@ Pass these to `useDataTable`:
 | Inline editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`) + `onEditCellSave`/`onSaveRow`/`onCreateRow`  |
 | Row / cell actions            | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy`                                            |
 | Virtualization                | `enableRowVirtualization`, `enableColumnVirtualization` (give the surface a bounded height)                     |
-| Export                        | `enableExport`                                                                                                  |
 | Row/cell clicks               | `onRowClick` / `onCellClick` (+ double-click)                                                                   |
 | Custom icons / i18n           | `icons`, `localization`                                                                                         |
 | Server-side data              | `manualPagination` / `manualSorting` / `manualFiltering` + `rowCount` + controlled `state`                      |
@@ -192,18 +234,25 @@ The component-level [data-table README](packages/shadcn-react-table/src/componen
 documents the full option set, `columnDef.meta` fields, server-side mode, and
 stability requirements.
 
-## Monorepo layout
+## Versioning & Changelog
+
+The registry block carries its version in `meta.version` (from
+`packages/shadcn-react-table/package.json`). Every version is documented in the
+[changelog](packages/shadcn-react-table/CHANGELOG.md) and published as a
+[GitHub release](https://github.com/Monabbir-Ahmmad/shadcn-react-table/releases);
+see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating)
+for pulling a new version into your project.
+
+## Development
 
 Turborepo + pnpm workspaces (`apps/*`, `packages/*`):
 
-- `apps/web` — Next.js 16 demo / examples browser
+- `apps/web` — Next.js 16 docs site / examples browser / registry host
 - `packages/shadcn-react-table` — the `@monabbir/shadcn-react-table` data-table (the product; consumed as
   source via `transpilePackages`, no build step)
 - `packages/ui` — `@workspace/ui`, the shared shadcn primitives + `lib/utils` +
   `globals.css` the data-table depends on (also consumed as source)
 - `packages/eslint-config`, `packages/typescript-config` — shared config
-
-## Commands
 
 ```bash
 pnpm dev         # run the demo app
@@ -213,13 +262,19 @@ pnpm typecheck   # tsc --noEmit
 pnpm format      # prettier --write
 ```
 
-## Adding shadcn/ui primitives
-
-Run from the repo root (components land in `packages/ui/src/components`, the
-`@workspace/ui` package):
+To add a shadcn/ui primitive, run from the repo root (components land in
+`packages/ui/src/components`, the `@workspace/ui` package):
 
 ```bash
 pnpm dlx shadcn@latest add <component> -c apps/web
 ```
 
 Import shared primitives with `import { Foo } from "@workspace/ui/components/foo"`.
+
+## Acknowledgments
+
+The API surface, option names, and feature set are openly modeled on
+[Material React Table](https://www.material-react-table.com) by
+[Kevin Van Cott](https://github.com/KevinVandy) — years of API design iteration
+this project gratefully stands on. Powering everything underneath:
+[TanStack Table](https://tanstack.com/table/v8) and [shadcn/ui](https://ui.shadcn.com).
