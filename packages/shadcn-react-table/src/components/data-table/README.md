@@ -62,8 +62,6 @@ Notes:
 - **Faceting is client-only.** In manual mode, supply `select`/`multi-select`
   options via `meta.options` (faceted unique values aren't computed server-side).
 - **Fuzzy ranking is off** in manual mode — ranking is the server's job.
-- **Export** (`exportToCsv`/`exportToExcel`) only sees rows currently loaded in
-  the table; for full-dataset export, fetch all rows server-side first.
 
 ## Stability requirements
 
