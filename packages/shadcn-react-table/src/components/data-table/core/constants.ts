@@ -39,3 +39,13 @@ export const NON_DATA_COLUMN_IDS = new Set([
   EXPAND_COLUMN_ID,
   ROW_ACTIONS_COLUMN_ID,
 ])
+
+/**
+ * Selected-row styling shared by the virtualized row and the DnD/normal row
+ * so both paths stay in sync: a primary-tinted background (hover variants
+ * keep it stable under the base row hover) plus the 2px inset accent bar.
+ * `group` lets cells clear their opaque background via
+ * `group-data-[state=selected]` so the tint shows through.
+ */
+export const SELECTED_ROW_CLASS =
+  "group data-[state=selected]:bg-primary/20 data-[state=selected]:hover:bg-primary/20 dark:data-[state=selected]:bg-primary/30 dark:data-[state=selected]:hover:bg-primary/30 data-[state=selected]:shadow-[inset_2px_0_0_0_var(--primary)]"
