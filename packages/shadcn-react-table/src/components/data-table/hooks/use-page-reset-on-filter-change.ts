@@ -16,23 +16,25 @@ interface PageResetParams {
  * replacing TanStack's render-phase auto-reset (which warns in React 19 dev).
  * Runs after mount so there is no state update during render. Skipped under
  * manual pagination (server owns it) and when the consumer opted into the
- * native auto-reset.
+ * native auto-reset. Guarded by comparing the previous filters key — not by
+ * counting effect runs — so StrictMode's double-invoke on mount is a no-op.
  */
 export function usePageResetOnFilterChange<TData extends RowData>(
   table: DataTableInstance<TData>,
   { enablePagination, manualPagination, autoResetPageIndex }: PageResetParams
 ): void {
-  const columnFiltersKey = JSON.stringify(table.getState().columnFilters)
-  const globalFilterValue = table.getState().globalFilter
-  const didMountRef = React.useRef(false)
+  const filtersKey = JSON.stringify([
+    table.getState().columnFilters,
+    table.getState().globalFilter,
+  ])
+  const prevFiltersKeyRef = React.useRef<string | undefined>(undefined)
   React.useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true
-      return
-    }
+    const prevFiltersKey = prevFiltersKeyRef.current
+    prevFiltersKeyRef.current = filtersKey
+    if (prevFiltersKey === undefined || prevFiltersKey === filtersKey) return
     if (enablePagination && !manualPagination && autoResetPageIndex == null) {
       table.setPageIndex(0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnFiltersKey, globalFilterValue])
+  }, [filtersKey])
 }
