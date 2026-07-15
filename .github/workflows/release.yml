@@ -1,0 +1,60 @@
+name: Release
+
+# Publishes a GitHub release whenever the block's version changes on main.
+# The tag is v<version> from packages/shadcn-react-table/package.json and the
+# notes are that version's section of the package CHANGELOG, so the changelog
+# and the Releases page always tell the same story.
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/shadcn-react-table/package.json
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./packages/shadcn-react-table/package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if release already exists
+        id: exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.version.outputs.version }}" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract changelog section
+        if: steps.exists.outputs.exists == 'false'
+        run: |
+          awk -v ver="${{ steps.version.outputs.version }}" '
+            /^## / { if (found) exit; found = ($2 == ver); next }
+            found { print }
+          ' packages/shadcn-react-table/CHANGELOG.md > release-notes.md
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "See [CHANGELOG.md](https://github.com/$GITHUB_REPOSITORY/blob/main/packages/shadcn-react-table/CHANGELOG.md)." > release-notes.md
+          fi
+
+      - name: Create release
+        if: steps.exists.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "v${{ steps.version.outputs.version }}" \
+            --notes-file release-notes.md
