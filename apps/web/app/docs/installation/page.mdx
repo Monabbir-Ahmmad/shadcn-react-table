@@ -36,14 +36,8 @@ Import the public API from your `@/components/ui/data-table` alias:
 import { DataTable, useDataTable } from "@/components/ui/data-table"
 ```
 
-If `tsc` reports a missing `papaparse` declaration, install its types:
-
-```bash
-pnpm add -D @types/papaparse
-```
-
 <Callout variant="tip" title="react-day-picker v9+">
-If your shadcn `calendar.tsx` predates react-day-picker v9, its `classNames` may use the old `table` key (renamed to `month_grid`). Re-run `shadcn add calendar` or rename the key — this only affects the date filter variant.
+If your shadcn `calendar.tsx` predates react-day-picker v9, its `classNames` may use the old `table` key (renamed to `month_grid`). Re-run `shadcn add calendar` or rename the key — this only affects the date filter variant. The calendar itself comes from your own shadcn setup via `registryDependencies` — the table isn't tied to react-day-picker, and any calendar with a compatible props surface drops in.
 </Callout>
 
 ## Next

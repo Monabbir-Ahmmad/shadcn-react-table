@@ -14,6 +14,7 @@ import * as React from "react"
 import {
   DataTable,
   useDataTable,
+  type DataTableInstance,
   type EditDisplayMode,
 } from "@monabbir/shadcn-react-table/components/data-table"
 import { Button } from "@workspace/ui/components/button"
@@ -601,6 +602,33 @@ function CustomIconsExample() {
   return <DataTable table={table} />
 }
 
+function exportUsersToCsv(table: DataTableInstance<User>) {
+  const selected = table.getSelectedRowModel().rows
+  const rows = selected.length > 0 ? selected : table.getFilteredRowModel().rows
+  const columns = table
+    .getVisibleLeafColumns()
+    .filter((column) => column.accessorFn != null)
+  const escape = (value: unknown) => {
+    const text = value == null ? "" : String(value)
+    // Guard CSV injection: spreadsheets treat leading =+-@ as formulas.
+    const guarded = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text
+    return /[",\n]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded
+  }
+  const csv = [
+    columns.map((column) => column.id),
+    ...rows.map((row) => columns.map((column) => row.getValue(column.id))),
+  ]
+    .map((row) => row.map(escape).join(","))
+    .join("\n")
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = "users.csv"
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 function ExportExample() {
   const data = React.useMemo(() => baseUsers, [])
   const columns = useUserColumns()
@@ -609,8 +637,15 @@ function ExportExample() {
     columns,
     getRowId: (row) => row.id,
     enableRowSelection: true,
-    enableExport: true,
-    exportFileName: "users",
+    renderToolbarActions: ({ table }) => (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => exportUsersToCsv(table)}
+      >
+        Export CSV
+      </Button>
+    ),
     initialState: { pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
@@ -701,8 +736,6 @@ function AdvancedExample() {
     enableRowPinning: true,
     enableGrouping: true,
     enableStickyFooter: true,
-    enableExport: true,
-    exportFileName: "users",
     enableEditing: true,
     editDisplayMode: "row",
     defaultShowColumnFilters: true,
@@ -978,7 +1011,7 @@ export const EXAMPLES: ExampleDef[] = [
   {
     slug: "export",
     title: "Export",
-    description: "Export selected or filtered rows to CSV / Excel.",
+    description: "Bring-your-own CSV export from a toolbar action.",
     category: "Data",
     Component: ExportExample,
   },

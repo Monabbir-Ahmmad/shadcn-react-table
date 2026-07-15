@@ -2,55 +2,95 @@ export const metadata = { title: "Export" }
 
 # Export
 
-Set `enableExport: true` to add a CSV/Excel export menu to the toolbar.
+The table ships no built-in export — the same stance as Material React
+Table — so the block carries no CSV or spreadsheet dependencies. Everything
+an exporter needs is already on the table instance: pick the rows, map them
+through the visible columns, and hand the result to whichever writer you
+prefer.
 
 <Example slug="export" />
 
-```tsx
-import { DataTable, useDataTable } from "@/components/ui/data-table"
+## Reading the data
 
+Pick a row scope from the table's row models, then build an array-of-arrays
+(header + rows) from the visible data columns:
+
+```tsx
+import type { DataTableInstance } from "@/components/ui/data-table"
+
+function toRows<TData>(table: DataTableInstance<TData>) {
+  // Selected rows when any are selected, else the filtered set (all pages).
+  const selected = table.getSelectedRowModel().rows
+  const rows = selected.length > 0 ? selected : table.getFilteredRowModel().rows
+  // Data columns only — injected columns (selection, actions, …) have no accessor.
+  const columns = table
+    .getVisibleLeafColumns()
+    .filter((column) => column.accessorFn != null)
+  return [
+    columns.map((column) => column.id),
+    ...rows.map((row) => columns.map((column) => row.getValue(column.id))),
+  ]
+}
+```
+
+Other scopes: `table.getRowModel().rows` (current page) and
+`table.getPreFilteredRowModel().rows` (everything, ignoring filters).
+
+## Writing a CSV
+
+No library needed for CSV. Two details matter: quote cells containing
+delimiters, and neutralize formula injection (spreadsheets execute cells
+starting with `=`, `+`, `-`, `@`, tab, or CR when a CSV is opened):
+
+```tsx
+function toCsv(rows: unknown[][]) {
+  const escape = (value: unknown) => {
+    const text = value == null ? "" : String(value)
+    const guarded = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text
+    return /[",\n]/.test(guarded)
+      ? `"${guarded.replace(/"/g, '""')}"`
+      : guarded
+  }
+  return rows.map((row) => row.map(escape).join(",")).join("\n")
+}
+
+function downloadCsv(csv: string, fileName: string) {
+  // The BOM makes Excel detect UTF-8.
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = `${fileName}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+```
+
+Wire it to the toolbar with `renderToolbarActions`:
+
+```tsx
 const table = useDataTable({
   data,
   columns,
-  getRowId: (row) => row.id,
-  enableExport: true,
-  exportFileName: "users",
   enableRowSelection: true,
+  renderToolbarActions: ({ table }) => (
+    <Button onClick={() => downloadCsv(toCsv(toRows(table)), "users")}>
+      Export CSV
+    </Button>
+  ),
 })
-
-return <DataTable table={table} />
 ```
 
-`exportFileName` sets the base file name for downloads (default `"export"`).
+## Excel and richer formats
 
-## What gets exported
-
-When row selection is on, users can export just the selected rows. Otherwise, the current filtered rows are exported.
-
-<Callout variant="tip" title="Combine with selection">
-  Enable `enableRowSelection` alongside `enableExport` to let users hand-pick
-  the rows they want in the file. See [Row selection](/docs/guides/row-selection).
-</Callout>
-
-## Bundle cost
-
-The CSV and Excel engines (`papaparse`, `xlsx`) are loaded on demand the
-first time a user exports — they are never in your initial bundle, even
-with `enableExport: true`.
-
-## Removing export entirely
-
-If you never use export, you can delete it from your copy of the block:
-
-1. Delete `components/ui/data-table/utils/export-utils.ts` and
-   `components/ui/data-table/components/menus/data-table-export-menu.tsx`.
-2. Remove the `DataTableExportMenu` import and usage from
-   `components/ui/data-table/components/toolbar/data-table-toolbar.tsx`.
-3. Remove the export re-exports from `components/ui/data-table/index.ts`
-   (search for `export-utils`).
-4. Uninstall the dependencies: `npm rm xlsx papaparse @types/papaparse`.
+For `.xlsx`, feed the same array-of-arrays to
+[SheetJS](https://docs.sheetjs.com/docs/getting-started/installation/nodejs)
+(`XLSX.utils.aoa_to_sheet` → `XLSX.writeFile`) — note SheetJS is installed
+from their CDN tarball, not npm. For heavier CSV needs (custom delimiters,
+streaming), [PapaParse](https://www.papaparse.com/)'s `unparse` accepts the
+same shape.
 
 ## Related
 
 - [Row selection](/docs/guides/row-selection)
-- [useDataTable options](/docs/api/use-data-table)
+- [Toolbar customization](/docs/guides/toolbar)

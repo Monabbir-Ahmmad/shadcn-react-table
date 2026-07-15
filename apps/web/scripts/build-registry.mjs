@@ -35,8 +35,6 @@ const NPM_DEPENDENCIES = [
   "@dnd-kit/sortable",
   "@dnd-kit/utilities",
   "date-fns",
-  "papaparse",
-  "xlsx",
   // NOT radix-ui: the module has no direct radix import. The primitive blocks
   // in registryDependencies bring the right headless library for the
   // consumer's flavor (radix-ui or @base-ui/react) on their own.
@@ -44,9 +42,9 @@ const NPM_DEPENDENCIES = [
 ]
 
 // Type-only packages for deps that don't ship their own declarations. Without
-// these the consumer's `tsc --noEmit` fails (e.g. papaparse has no bundled
-// types). shadcn installs these into the consumer's devDependencies.
-const DEV_DEPENDENCIES = ["@types/papaparse"]
+// these the consumer's `tsc --noEmit` fails. shadcn installs these into the
+// consumer's devDependencies.
+const DEV_DEPENDENCIES = []
 
 // shadcn primitives the table imports. Declared as registryDependencies (bare
 // names) so the consumer's `shadcn add` installs them from the shadcn registry
@@ -108,7 +106,7 @@ function read(relPath) {
 // `@/lib/utils`), so the table inherits their style and nothing is overwritten.
 //
 // The module has a small public root (data-table, use-data-table, types,
-// config-context, icons, localization, export-utils + the index barrel) and an
+// config-context, icons, localization + the index barrel) and an
 // internal/ subtree of building blocks, so we walk recursively and preserve
 // each file's subpath in the registry `path`/`target`. The table's internal
 // imports are relative, so the consumer's install must reproduce the same

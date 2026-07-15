@@ -487,20 +487,6 @@ export const useDataTableOptions: ApiMember[] = [
     "description": "Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`."
   },
   {
-    "name": "enableExport",
-    "type": "boolean",
-    "required": false,
-    "default": "false",
-    "description": "Show a CSV/Excel export menu in the toolbar."
-  },
-  {
-    "name": "exportFileName",
-    "type": "string",
-    "required": false,
-    "default": null,
-    "description": "Base file name for exports (no extension). Default \"export\"."
-  },
-  {
     "name": "enableStickyHeader",
     "type": "boolean",
     "required": false,
@@ -1382,20 +1368,6 @@ export const tableInstance: ApiMember[] = [
     "description": ""
   },
   {
-    "name": "enableExport",
-    "type": "boolean",
-    "required": true,
-    "default": null,
-    "description": ""
-  },
-  {
-    "name": "exportFileName",
-    "type": "string",
-    "required": false,
-    "default": null,
-    "description": ""
-  },
-  {
     "name": "enableStickyHeader",
     "type": "boolean",
     "required": true,
@@ -2200,27 +2172,6 @@ export const localizationKeys: ApiMember[] = [
     "description": ""
   },
   {
-    "name": "export",
-    "type": "string",
-    "required": true,
-    "default": "Export",
-    "description": ""
-  },
-  {
-    "name": "exportCsv",
-    "type": "string",
-    "required": true,
-    "default": "Export to CSV",
-    "description": ""
-  },
-  {
-    "name": "exportExcel",
-    "type": "string",
-    "required": true,
-    "default": "Export to Excel",
-    "description": ""
-  },
-  {
     "name": "noRecordsToDisplay",
     "type": "string",
     "required": true,
@@ -2438,27 +2389,6 @@ export const iconSlots: ApiMember[] = [
     "type": "IconComponent",
     "required": true,
     "default": "X",
-    "description": ""
-  },
-  {
-    "name": "export",
-    "type": "IconComponent",
-    "required": true,
-    "default": "Download",
-    "description": ""
-  },
-  {
-    "name": "fileCsv",
-    "type": "IconComponent",
-    "required": true,
-    "default": "FileText",
-    "description": ""
-  },
-  {
-    "name": "fileExcel",
-    "type": "IconComponent",
-    "required": true,
-    "default": "FileSpreadsheet",
     "description": ""
   },
   {
