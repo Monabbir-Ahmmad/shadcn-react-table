@@ -9,12 +9,9 @@ import {
   RiCalendarLine,
   RiCheckLine,
   RiCloseLine,
-  RiDownloadLine,
   RiDraggable,
   RiExpandUpDownLine,
   RiEyeOffLine,
-  RiFileExcel2Line,
-  RiFileTextLine,
   RiFilter3Line,
   RiFilterLine,
   RiFilterOffLine,
@@ -70,9 +67,6 @@ export const remixIcons: DataTableIcons = {
   edit: RiPencilLine,
   save: RiCheckLine,
   cancel: RiCloseLine,
-  export: RiDownloadLine,
-  fileCsv: RiFileTextLine,
-  fileExcel: RiFileExcel2Line,
   calendar: RiCalendarLine,
 }
 

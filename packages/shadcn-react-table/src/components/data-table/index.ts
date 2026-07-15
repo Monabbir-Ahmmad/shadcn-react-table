@@ -20,9 +20,6 @@ export type { DataTableIcons, IconComponent } from "./core/icons"
 export { defaultLocalization } from "./core/localization"
 export type { DataTableLocalization } from "./core/localization"
 
-export { exportToCsv, exportToExcel } from "./utils/export-utils"
-export type { ExportScope, ExportOptions } from "./utils/export-utils"
-
 export type {
   Density,
   FilterVariant,

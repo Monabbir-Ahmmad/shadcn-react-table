@@ -120,11 +120,6 @@ export interface DataTableLocalization {
   copied: string
   cellActions: string
 
-  // Export
-  export: string
-  exportCsv: string
-  exportExcel: string
-
   // Empty / loading
   noRecordsToDisplay: string
   loading: string
@@ -266,10 +261,6 @@ export const defaultLocalization: DataTableLocalization = {
   copy: "Copy",
   copied: "Copied",
   cellActions: "Cell actions",
-
-  export: "Export",
-  exportCsv: "Export to CSV",
-  exportExcel: "Export to Excel",
 
   noRecordsToDisplay: "No records to display",
   loading: "Loading…",

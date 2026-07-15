@@ -30,7 +30,6 @@ through. Our presentation/feature options and UI state live on `table.tableInsta
 | Editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditCellSave`/`onSaveRow`/`onCreateRow`                   |
 | Actions / copy         | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy`                                                            |
 | Virtualization         | `enableRowVirtualization` and `enableColumnVirtualization` (give the surface a bounded height)                                  |
-| Export                 | `enableExport` (CSV/Excel) or call `exportToCsv` / `exportToExcel`                                                              |
 | Event listeners        | `onRowClick` / `onRowDoubleClick` / `onCellClick` / `onCellDoubleClick`                                                         |
 | Custom icons           | `icons` (override any subset; see `DataTableIcons`)                                                                             |
 | Column widths          | `columnDef.size` is honored even without resizing                                                                               |

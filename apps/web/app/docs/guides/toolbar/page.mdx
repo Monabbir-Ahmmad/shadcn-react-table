@@ -18,7 +18,7 @@ const table = useDataTable({
 
 ## Internal actions (the icon cluster)
 
-The right-hand cluster holds global search, the filter toggle, column visibility, export, the density toggle, and the full-screen toggle. Hide individual items, or the whole cluster:
+The right-hand cluster holds global search, the filter toggle, column visibility, the density toggle, and the full-screen toggle. Hide individual items, or the whole cluster:
 
 ```tsx
 useDataTable({
@@ -26,7 +26,6 @@ useDataTable({
   enableGlobalFilter: false,
   enableColumnFilters: false,
   enableColumnActions: false, // column visibility menu
-  enableExport: false,
   enableDensityToggle: false,
   enableFullscreenToggle: false,
   // …or hide all of them at once
