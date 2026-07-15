@@ -8,6 +8,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { TableRow } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { SELECTED_ROW_CLASS } from "../../../core/constants"
 import { RowDragContext } from "../../../injected-columns/injected-columns"
 
 /**
@@ -65,7 +66,7 @@ export function DataTableBodyRow<TData extends RowData>({
         onClick={onClick}
         onDoubleClick={onDoubleClick}
         className={cn(
-          "data-[state=selected]:shadow-[inset_2px_0_0_0_var(--primary)]",
+          SELECTED_ROW_CLASS,
           isDragging && "bg-muted",
           (onClick || onDoubleClick) && "cursor-pointer",
           className
