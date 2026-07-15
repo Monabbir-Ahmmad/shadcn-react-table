@@ -10,10 +10,7 @@ import {
   ChevronsRight,
   ChevronsUpDown,
   Columns3,
-  Download,
   EyeOff,
-  FileSpreadsheet,
-  FileText,
   Filter,
   FilterX,
   GripVertical,
@@ -73,9 +70,6 @@ export interface DataTableIcons {
   edit: IconComponent
   save: IconComponent
   cancel: IconComponent
-  export: IconComponent
-  fileCsv: IconComponent
-  fileExcel: IconComponent
   calendar: IconComponent
 }
 
@@ -109,8 +103,5 @@ export const defaultIcons: DataTableIcons = {
   edit: Pencil,
   save: Check,
   cancel: X,
-  export: Download,
-  fileCsv: FileText,
-  fileExcel: FileSpreadsheet,
   calendar: Calendar,
 }

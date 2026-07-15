@@ -4,7 +4,6 @@ import type { RowData } from "@tanstack/react-table"
 import type * as React from "react"
 
 import type { DataTableInstance } from "../../core/types"
-import { DataTableExportMenu } from "../menus/data-table-export-menu"
 import { DataTableFilterPanel } from "../menus/data-table-filter-panel"
 import {
   DataTableAdvancedFilterToggle,
@@ -44,10 +43,8 @@ export function DataTableToolbar<TData extends RowData>({
     columnFilterDisplayMode,
     enableAdvancedFilter,
     enableColumnActions,
-    enableExport,
     enableDensityToggle,
     enableFullscreenToggle,
-    exportFileName,
   } = table.tableInstance
 
   const anyFilterable = table
@@ -100,12 +97,6 @@ export function DataTableToolbar<TData extends RowData>({
                   <DataTableAdvancedFilterToggle table={table} />
                 )}
                 {enableColumnActions && <DataTableViewOptions table={table} />}
-                {enableExport && (
-                  <DataTableExportMenu
-                    table={table}
-                    fileName={exportFileName}
-                  />
-                )}
                 {enableDensityToggle && (
                   <DataTableDensityToggle table={table} />
                 )}

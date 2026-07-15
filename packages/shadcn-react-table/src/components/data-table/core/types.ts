@@ -377,8 +377,6 @@ export interface DataTableConfig<TData extends RowData> {
   columnVirtualizerOptions?: ColumnVirtualizerOptions<TData>
   rowVirtualizerInstanceRef?: React.RefObject<DataTableRowVirtualizer | null>
   columnVirtualizerInstanceRef?: React.RefObject<DataTableColumnVirtualizer | null>
-  enableExport: boolean
-  exportFileName?: string
   enableStickyHeader: boolean
   enablePagination: boolean
   positionPagination: "top" | "bottom" | "both" | "none"
@@ -630,10 +628,6 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Ref populated with the column `Virtualizer` instance. Only set when
    *  `enableColumnVirtualization`. */
   columnVirtualizerInstanceRef?: React.RefObject<DataTableColumnVirtualizer | null>
-  /** Show a CSV/Excel export menu in the toolbar. */
-  enableExport?: boolean
-  /** Base file name for exports (no extension). Default "export". */
-  exportFileName?: string
   enableStickyHeader?: boolean
   enablePagination?: boolean
   /** Where the pagination controls render. Default "bottom". "none" keeps
