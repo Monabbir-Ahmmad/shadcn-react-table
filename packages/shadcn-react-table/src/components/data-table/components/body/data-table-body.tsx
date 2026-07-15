@@ -12,6 +12,7 @@ import {
   ALIGN_CELL,
   DENSITY_CELL_PADDING,
   NON_DATA_COLUMN_IDS,
+  SELECTED_ROW_CLASS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
 import type {
@@ -126,7 +127,7 @@ export function DataTableBody<TData extends RowData>({
             : undefined
         }
         className={cn(
-          "relative bg-background",
+          "relative bg-background group-data-[state=selected]:bg-transparent",
           padding,
           ALIGN_CELL[align],
           // Fixed layout (resizing on) clips overflowing content with an
@@ -299,7 +300,7 @@ export function DataTableBody<TData extends RowData>({
                           : undefined
                       }
                       className={cn(
-                        "data-[state=selected]:shadow-[inset_2px_0_0_0_var(--primary)]",
+                        SELECTED_ROW_CLASS,
                         (onRowClick || onRowDoubleClick) && "cursor-pointer"
                       )}
                     >
