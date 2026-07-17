@@ -6,6 +6,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
+import prettier from "prettier"
 import { Project, SyntaxKind } from "ts-morph"
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
@@ -218,7 +219,15 @@ mkdirSync(dirname(OUT), { recursive: true })
 // Normalize CRLF that JSON.stringify escaped into the string literals when
 // the source was checked out with Windows line endings (git autocrlf), so
 // the artifact is identical on every machine.
-writeFileSync(OUT, (banner + body).replaceAll("\\r\\n", "\\n"))
+const raw = (banner + body).replaceAll("\\r\\n", "\\n")
+// Run the repo's Prettier over the output so `pnpm format` is a no-op on the
+// artifact — otherwise CI's freshness check trips on formatting alone.
+const prettierConfig = await prettier.resolveConfig(OUT)
+const formatted = await prettier.format(raw, {
+  ...prettierConfig,
+  filepath: OUT,
+})
+writeFileSync(OUT, formatted)
 
 console.log(
   `api reference built → apps/web/lib/api-reference.generated.ts ` +
