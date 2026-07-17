@@ -33,8 +33,7 @@ export type DataTableColumnVirtualizer = Virtualizer<
 
 /** A value, or a function of the table instance returning that value. */
 type ValueOrFunc<TData extends RowData, TValue> =
-  | TValue
-  | ((props: { table: DataTableInstance<TData> }) => TValue)
+  TValue | ((props: { table: DataTableInstance<TData> }) => TValue)
 
 /** Partial passthrough merged into the row `useVirtualizer` call. */
 export type RowVirtualizerOptions<TData extends RowData> = ValueOrFunc<

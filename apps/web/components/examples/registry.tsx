@@ -534,19 +534,16 @@ function VirtualizedExample() {
 }
 
 function wideColumns(): ColumnDef<User>[] {
-  const extra = Array.from(
-    { length: 24 },
-    (_, i): ColumnDef<User> => ({
-      id: `metric${i}`,
-      header: `Metric ${i + 1}`,
-      accessorFn: (row) => (row.age * (i + 3)) % 100,
-      size: 110,
-      meta: { align: "right" },
-      cell: ({ getValue }) => (
-        <span className="tabular-nums">{getValue<number>()}</span>
-      ),
-    })
-  )
+  const extra = Array.from({ length: 24 }, (_, i): ColumnDef<User> => ({
+    id: `metric${i}`,
+    header: `Metric ${i + 1}`,
+    accessorFn: (row) => (row.age * (i + 3)) % 100,
+    size: 110,
+    meta: { align: "right" },
+    cell: ({ getValue }) => (
+      <span className="tabular-nums">{getValue<number>()}</span>
+    ),
+  }))
   return [...userColumns(), ...extra]
 }
 

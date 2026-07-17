@@ -1,10 +1,6 @@
 /** Global-search modes offered in the global filter-mode menu. */
 export type GlobalFilterMode =
-  | "fuzzy"
-  | "contains"
-  | "startsWith"
-  | "endsWith"
-  | "equals"
+  "fuzzy" | "contains" | "startsWith" | "endsWith" | "equals"
 
 /** All supported filter modes across variants. */
 export type FilterMode =
