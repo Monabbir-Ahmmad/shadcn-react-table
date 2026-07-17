@@ -19,7 +19,7 @@ This repo uses **Next.js 16.2.6** (with React 19.2.4). Per `AGENTS.md`, this ver
 
 ## Commands
 
-Package manager is **pnpm 10.33.4** (Node ≥ 20). All top-level tasks are orchestrated by Turborepo and fan out via `dependsOn: ["^task"]`.
+Package manager is **pnpm 11.13.1** (Node ≥ 20). All top-level tasks are orchestrated by Turborepo and fan out via `dependsOn: ["^task"]`.
 
 From repo root:
 - `pnpm dev` — runs `next dev` for `apps/web` (persistent, uncached)

@@ -7,7 +7,7 @@ and outside contributors.
 ## Prerequisites
 
 - Node.js ≥ 20
-- pnpm 10.33.4 (`corepack enable` will pick up the pinned version)
+- pnpm 11.13.1 (`corepack enable` will pick up the pinned version)
 
 ## Setup
 
