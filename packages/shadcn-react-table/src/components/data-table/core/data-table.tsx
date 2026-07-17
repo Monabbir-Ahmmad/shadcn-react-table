@@ -194,7 +194,7 @@ export function DataTable<TData extends RowData>({
               // header instead of stretching the page. `surfaceClassName`
               // (via tailwind-merge) or `enableStickyHeader: false` opts out.
               enableStickyHeader &&
-                "max-h-[clamp(350px,calc(100vh_-_200px),9999px)]",
+                "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
               enableRowVirtualization && "max-h-150",
               surfaceClassName
             )}

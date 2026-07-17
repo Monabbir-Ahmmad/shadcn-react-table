@@ -8,7 +8,7 @@ The header row (`enableStickyHeader`, default `true`) sticks to the top of the s
 
 ## Bounded surface height
 
-Sticky behavior requires a **bounded** scroll surface — there is nothing to stick to if the table grows to fit all its rows. While `enableStickyHeader` is on (the default), the surface is automatically capped near the viewport height (`clamp(350px, 100vh - 200px, 9999px)`), so tall tables scroll internally out of the box. To pick your own bound, set a max height with `surfaceClassName` on `<DataTable />` — it overrides the default:
+Sticky behavior requires a **bounded** scroll surface — there is nothing to stick to if the table grows to fit all its rows. While `enableStickyHeader` is on (the default), the surface is automatically capped near the viewport height (`clamp(350px, 100dvh - 200px, 9999px)`), so tall tables scroll internally out of the box. The `- 200px` is a heuristic that reserves room for the toolbar and pagination — if the table sits below a lot of other page content, the surface can still extend past the viewport; pick your own bound in that case. To do so, set a max height with `surfaceClassName` on `<DataTable />` — it overrides the default:
 
 ```tsx
 const table = useDataTable({
@@ -23,6 +23,10 @@ return <DataTable table={table} surfaceClassName="max-h-[460px]" />
 ```
 
 Once the content overflows the bound, the header pins to the top and the footer pins to the bottom while the rows scroll between them. Setting `enableStickyHeader: false` removes both the pinning and the default bound, letting the table grow to its full height.
+
+<Callout variant="note" title="MRT parity note">
+Material React Table defaults `enableStickyHeader` and `enableStickyFooter` to `false`; this table deliberately defaults both to `true` so headers stay useful out of the box. The sticky-implies-bounded-surface behavior itself matches MRT.
+</Callout>
 
 ## Footer cells
 

@@ -628,9 +628,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  `enableColumnVirtualization`. */
   columnVirtualizerInstanceRef?: React.RefObject<DataTableColumnVirtualizer | null>
   /** Pin the header rows to the top of the scrollable surface. Also gives the
-   *  surface a default viewport-bound max-height (`clamp(350px, 100vh - 200px,
-   *  9999px)`) so tall content scrolls internally; override the bound with
-   *  `surfaceClassName`. Default true. */
+   *  surface a default viewport-bound max-height (`clamp(350px, 100dvh -
+   *  200px, 9999px)`) so tall content scrolls internally; override the bound
+   *  with `surfaceClassName`. Default true. */
   enableStickyHeader?: boolean
   enablePagination?: boolean
   /** Where the pagination controls render. Default "bottom". "none" keeps
