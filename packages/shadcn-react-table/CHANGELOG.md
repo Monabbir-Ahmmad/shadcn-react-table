@@ -4,6 +4,16 @@ The version applies to the registry block: `/r/data-table.json` carries it
 in `meta.version`. After installing, record the version you received —
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
 
+## 0.3.0
+
+- While `enableStickyHeader` is on (the default), the scroll surface now gets
+  a default viewport-bound max-height
+  (`clamp(350px, calc(100dvh - 200px), 9999px)`), so tall content (long
+  groups, trees, detail panels) scrolls internally under the pinned header
+  instead of stretching the page — matching MRT's sticky-implies-bounded
+  behavior. Override the bound with any `max-h-*` via `surfaceClassName`, or
+  remove it (and the pinning) with `enableStickyHeader: false`.
+
 ## 0.2.0
 
 - **Breaking:** removed the built-in export feature — `enableExport`,

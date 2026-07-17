@@ -527,7 +527,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `surfaceClassName`. Default true.",
   },
   {
     name: "enablePagination",
@@ -1625,7 +1626,7 @@ export const dataTableProps: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Extra classes for the scrollable table surface (e.g. a max-height to engage the sticky header/footer or to bound a virtualized list).",
+      "Extra classes for the scrollable table surface (e.g. a max-height that overrides the default sticky-header/virtualization bound).",
   },
 ]
 

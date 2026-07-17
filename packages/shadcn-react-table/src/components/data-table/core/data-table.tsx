@@ -45,8 +45,8 @@ interface DataTableProps<
   table: DataTableInstance<TData>
   /** Page-size options for the bottom pagination control. */
   pageSizeOptions?: number[]
-  /** Extra classes for the scrollable table surface (e.g. a max-height to
-   *  engage the sticky header/footer or to bound a virtualized list). */
+  /** Extra classes for the scrollable table surface (e.g. a max-height that
+   *  overrides the default sticky-header/virtualization bound). */
   surfaceClassName?: string
 }
 
@@ -72,6 +72,7 @@ export function DataTable<TData extends RowData>({
     enableColumnResizing,
     enableGrouping,
     enableRowVirtualization,
+    enableStickyHeader,
     enablePagination,
     positionPagination,
     positionToolbarAlertBanner,
@@ -187,6 +188,13 @@ export function DataTable<TData extends RowData>({
               // <Table> wrapper's own overflow so it doesn't become a second
               // (unbounded) scroll container that breaks sticky positioning.
               "relative overflow-auto rounded-md border *:data-[slot=table-container]:overflow-visible",
+              // MRT-parity default bound: with a sticky header the surface
+              // caps near the viewport height, so tall content (long groups,
+              // trees, detail panels) scrolls internally under the pinned
+              // header instead of stretching the page. `surfaceClassName`
+              // (via tailwind-merge) or `enableStickyHeader: false` opts out.
+              enableStickyHeader &&
+                "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
               enableRowVirtualization && "max-h-150",
               surfaceClassName
             )}
