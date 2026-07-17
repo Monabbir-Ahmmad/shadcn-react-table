@@ -120,13 +120,28 @@ Only `@tanstack/react-table` is strictly required; the rest are per-feature:
 | `date-fns`                                               | date / date-range filters                     |
 | `lucide-react`                                           | default icons (override via the `icons` prop) |
 
-Tailwind v4 + the shadcn token theme are required. Import the stylesheet **once**
-in your root layout (it ships the `--highlight` token, falling back to
-`--accent`):
+Tailwind v4 + the shadcn token theme are required. Finally, add the
+`--highlight` tokens to your `globals.css` (the registry install injects these
+for you; they fall back to `--accent` if omitted):
 
-```tsx
-// app/layout.tsx
-import "@monabbir/shadcn-react-table/globals.css"
+```css
+@theme inline {
+  --color-highlight: var(--highlight, var(--accent));
+  --color-highlight-foreground: var(
+    --highlight-foreground,
+    var(--accent-foreground)
+  );
+}
+
+:root {
+  --highlight: oklch(0.905 0.158 96.5);
+  --highlight-foreground: oklch(0.35 0.07 72);
+}
+
+.dark {
+  --highlight: oklch(0.85 0.16 96.5);
+  --highlight-foreground: oklch(0.26 0.05 72);
+}
 ```
 
 </details>

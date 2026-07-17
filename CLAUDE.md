@@ -27,10 +27,9 @@ From repo root:
 - `pnpm lint` — ESLint across workspaces
 - `pnpm typecheck` — `tsc --noEmit` across workspaces
 - `pnpm format` — Prettier `--write` across workspaces
+- `pnpm test` — Vitest across workspaces (currently only `packages/shadcn-react-table` has tests, colocated as `*.test.ts(x)` next to the source; jsdom + Testing Library)
 
 Per-package: the same scripts exist in each workspace's `package.json` and can be run directly, e.g. `pnpm --filter shadcn-react-table-web <script>`, `pnpm --filter @monabbir/shadcn-react-table <script>`, or `pnpm --filter @workspace/ui <script>`.
-
-There is no test runner configured in this repo.
 
 ## Plans, reviews, and commits
 
