@@ -4,6 +4,24 @@ The version applies to the registry block: `/r/data-table.json` carries it
 in `meta.version`. After installing, record the version you received —
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
 
+## 0.4.0
+
+- **Infinite row loading** (`enableInfiniteScroll`): append the next chunk of
+  rows as the user scrolls near the bottom, driven by controlled
+  `onLoadMore` / `hasNextPage` / `isFetchingNextPage` props (maps directly onto
+  TanStack Query's `useInfiniteQuery`). A bottom sentinel + `IntersectionObserver`
+  triggers the load; `infiniteScrollThreshold` (px, default 200) sets the
+  prefetch distance. Enabling it hides the pager and renders one growing page.
+  Works with or without row virtualization. New `loadingMore` localization
+  string. See the [infinite scroll guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/infinite-scroll).
+- **Row height control** (`rowHeight`, `getRowHeight`): set a flat pixel height
+  for every row, or a per-row height via `getRowHeight(row) => number | "auto" |
+  null`. `"auto"` wraps and grows the row to fit its content — even with column
+  resizing on (which otherwise clips cells to one line); a number pins the row
+  and clips overflow. Per-row heights feed the virtualizer estimate, and `"auto"`
+  rows are measured after render so variable heights virtualize accurately. See
+  the [row height guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-height).
+
 ## 0.3.0
 
 - While `enableStickyHeader` is on (the default), the scroll surface now gets
