@@ -6,7 +6,10 @@ import { resolveRowHeight } from "../helpers/resolve-row-height"
 import { useDataTable } from "./use-data-table"
 
 const columns = [{ accessorKey: "name", header: "Name" }]
-const data = [{ name: "a" }, { name: "b" }]
+const data = [
+  { id: "1", name: "a" },
+  { id: "2", name: "b" },
+]
 
 function render(options: Record<string, unknown> = {}) {
   return renderHook(() =>
