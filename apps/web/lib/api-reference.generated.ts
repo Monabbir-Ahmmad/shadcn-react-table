@@ -491,6 +491,22 @@ export const useDataTableOptions: ApiMember[] = [
     description: "Extra rows rendered above/below the viewport. Default 8.",
   },
   {
+    name: "rowHeight",
+    type: "number",
+    required: false,
+    default: null,
+    description:
+      "Flat height (px) applied to every row. Overridden per-row by `getRowHeight`. Also seeds the virtualizer estimate.",
+  },
+  {
+    name: "getRowHeight",
+    type: '(row: Row<TData>) => number | "auto" | null',
+    required: false,
+    default: null,
+    description:
+      'Per-row height. Return a px number to pin the row, `"auto"` to let it wrap and grow to fit its content (even with column resizing on), or `null` to fall back to `rowHeight` / the density default. Applies to data rows.',
+  },
+  {
     name: "rowVirtualizerOptions",
     type: "RowVirtualizerOptions<TData>",
     required: false,
@@ -1452,6 +1468,21 @@ export const tableInstance: ApiMember[] = [
     required: true,
     default: null,
     description: "",
+  },
+  {
+    name: "rowHeight",
+    type: "number",
+    required: false,
+    default: null,
+    description: "Flat height (px) applied to every row.",
+  },
+  {
+    name: "getRowHeight",
+    type: '(row: Row<TData>) => number | "auto" | null',
+    required: false,
+    default: null,
+    description:
+      'Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default.',
   },
   {
     name: "rowVirtualizerOptions",

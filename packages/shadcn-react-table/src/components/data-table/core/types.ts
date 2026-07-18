@@ -372,6 +372,10 @@ export interface DataTableConfig<TData extends RowData> {
   enableColumnVirtualization: boolean
   estimateRowHeight: number
   virtualOverscan: number
+  /** Flat height (px) applied to every row. */
+  rowHeight?: number
+  /** Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default. */
+  getRowHeight?: (row: Row<TData>) => number | "auto" | null
   rowVirtualizerOptions?: RowVirtualizerOptions<TData>
   columnVirtualizerOptions?: ColumnVirtualizerOptions<TData>
   rowVirtualizerInstanceRef?: React.RefObject<DataTableRowVirtualizer | null>
@@ -624,6 +628,13 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   estimateRowHeight?: number
   /** Extra rows rendered above/below the viewport. Default 8. */
   virtualOverscan?: number
+  /** Flat height (px) applied to every row. Overridden per-row by
+   *  `getRowHeight`. Also seeds the virtualizer estimate. */
+  rowHeight?: number
+  /** Per-row height. Return a px number to pin the row, `"auto"` to let it wrap
+   *  and grow to fit its content (even with column resizing on), or `null` to
+   *  fall back to `rowHeight` / the density default. Applies to data rows. */
+  getRowHeight?: (row: Row<TData>) => number | "auto" | null
   /** Partial `@tanstack/react-virtual` options merged into the row virtualizer
    *  (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`).
    *  Accepts an object or a `({ table }) => options` function. */

@@ -15,6 +15,7 @@ import {
   SELECTED_ROW_CLASS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
+import { resolveRowHeight } from "../../helpers/resolve-row-height"
 import type {
   VirtualRowItem,
   WithColumnSpacers,
@@ -68,6 +69,8 @@ export function DataTableBody<TData extends RowData>({
     enablePagination,
     showSkeletons,
     localization,
+    rowHeight,
+    getRowHeight,
   } = table.tableInstance
 
   const padding = DENSITY_CELL_PADDING[density]
@@ -89,9 +92,12 @@ export function DataTableBody<TData extends RowData>({
     cell: Cell<TData, unknown>,
     row: Row<TData>,
     rowIndex: number,
-    colIndex: number
+    colIndex: number,
+    rowHeightValue: number | "auto" | undefined
   ) => {
     const align = cell.column.columnDef.meta?.align ?? "left"
+    const isAutoHeight = rowHeightValue === "auto"
+    const isFixedHeight = typeof rowHeightValue === "number"
     const treeIndent =
       isTreeData &&
       cell.column.id === firstDataColumnId &&
@@ -99,6 +105,24 @@ export function DataTableBody<TData extends RowData>({
       row.depth > 0
         ? row.depth
         : 0
+    const content = renderBodyCell(
+      cell,
+      table,
+      enableFilterMatchHighlighting,
+      columnsWithCustomCell,
+      localization
+    )
+    const indented =
+      treeIndent > 0 ? (
+        <span
+          className="flex items-center"
+          style={{ paddingInlineStart: `${treeIndent}rem` }}
+        >
+          {content}
+        </span>
+      ) : (
+        content
+      )
     return (
       <TableCell
         key={cell.id}
@@ -131,51 +155,42 @@ export function DataTableBody<TData extends RowData>({
           padding,
           ALIGN_CELL[align],
           // Fixed layout (resizing on) clips overflowing content with an
-          // ellipsis instead of letting it bleed into the next column.
-          enableColumnResizing && "overflow-hidden text-ellipsis",
+          // ellipsis instead of letting it bleed into the next column. An
+          // "auto" row opts out so its content wraps and the row grows.
+          enableColumnResizing && !isAutoHeight && "overflow-hidden text-ellipsis",
+          isAutoHeight && "align-top whitespace-normal wrap-break-word",
           getColumnPinningClass(cell.column),
           enableKeyboardNavigation &&
             "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:-outline-offset-2 focus-visible:outline-none"
         )}
       >
-        {treeIndent > 0 ? (
-          <span
-            className="flex items-center"
-            style={{ paddingInlineStart: `${treeIndent}rem` }}
-          >
-            {renderBodyCell(
-              cell,
-              table,
-              enableFilterMatchHighlighting,
-              columnsWithCustomCell,
-              localization
-            )}
-          </span>
+        {isFixedHeight ? (
+          // Pin the content box to the requested height and clip overflow.
+          <div className="overflow-hidden" style={{ height: rowHeightValue }}>
+            {indented}
+          </div>
         ) : (
-          renderBodyCell(
-            cell,
-            table,
-            enableFilterMatchHighlighting,
-            columnsWithCustomCell,
-            localization
-          )
+          indented
         )}
       </TableCell>
     )
   }
 
   const renderCells = (row: Row<TData>, rowIndex: number): React.ReactNode => {
+    const rowHeightValue = resolveRowHeight(row, { rowHeight, getRowHeight })
     const cells = row.getVisibleCells()
     if (!enableColumnVirtualization) {
       return cells.map((cell, colIndex) =>
-        renderCell(cell, row, rowIndex, colIndex)
+        renderCell(cell, row, rowIndex, colIndex, rowHeightValue)
       )
     }
     return withColumnSpacers(
       virtualColumns
         .map((vc) => {
           const cell = cells[vc.index]
-          return cell ? renderCell(cell, row, rowIndex, vc.index) : null
+          return cell
+            ? renderCell(cell, row, rowIndex, vc.index, rowHeightValue)
+            : null
         })
         .filter(Boolean) as React.ReactNode[],
       `row-${row.id}`

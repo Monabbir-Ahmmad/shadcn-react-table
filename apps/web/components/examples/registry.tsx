@@ -757,6 +757,32 @@ function InfiniteScrollExample() {
   return <DataTable table={table} surfaceClassName="max-h-[460px]" />
 }
 
+function AutoRowHeightExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<ColumnDef<User>[]>(() => {
+    const bio: ColumnDef<User> = {
+      id: "bio",
+      header: "Bio",
+      size: 300,
+      accessorFn: (row) =>
+        `${row.firstName} ${row.lastName} is a ${row.role} in ${row.department}, ` +
+        `based in ${row.city}, ${row.country}. Reach them at ${row.email}.`,
+      cell: ({ getValue }) => <span>{getValue<string>()}</span>,
+    }
+    return [...userColumns().slice(0, 3), bio]
+  }, [])
+  // getRowHeight: "auto" wraps and grows each row — even with resizing on.
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableColumnResizing: true,
+    getRowHeight: () => "auto",
+    initialState: { pagination: { pageSize: 8 } },
+  })
+  return <DataTable table={table} />
+}
+
 function AdvancedExample() {
   const [data, setData] = React.useState(() => baseUsers)
   const columns = useUserColumns()
@@ -1073,6 +1099,14 @@ export const EXAMPLES: ExampleDef[] = [
       "Append the next chunk as you scroll near the bottom (auto-hides the pager).",
     category: "Data",
     Component: InfiniteScrollExample,
+  },
+  {
+    slug: "auto-row-height",
+    title: "Auto row height",
+    description:
+      "getRowHeight: 'auto' wraps and grows rows to fit content, even with resizing.",
+    category: "Data",
+    Component: AutoRowHeightExample,
   },
   {
     slug: "advanced",
