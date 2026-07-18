@@ -5,6 +5,7 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import * as React from "react"
 
 import type { DataTableInstance } from "../core/types"
+import { resolveRowHeight } from "../helpers/resolve-row-height"
 
 export interface VirtualRowItem<TData extends RowData> {
   row: Row<TData>
@@ -33,6 +34,8 @@ export function useTableVirtualizers<TData extends RowData>(
     enableColumnVirtualization,
     renderDetailPanel,
     estimateRowHeight,
+    rowHeight,
+    getRowHeight,
     virtualOverscan,
     rowVirtualizerOptions,
     columnVirtualizerOptions,
@@ -66,7 +69,15 @@ export function useTableVirtualizers<TData extends RowData>(
   const rowVirtualizer = useVirtualizer({
     count: virtualItems.length,
     getScrollElement: () => gridRef.current,
-    estimateSize: () => estimateRowHeight,
+    // Per-row estimate: an exact px number pins the row; "auto" (or no override)
+    // uses the flat estimate and lets `measureElement` correct to the real
+    // height. Detail-panel rows always fall back to the flat estimate.
+    estimateSize: (index) => {
+      const item = virtualItems[index]
+      if (!item || item.detail) return estimateRowHeight
+      const resolved = resolveRowHeight(item.row, { rowHeight, getRowHeight })
+      return typeof resolved === "number" ? resolved : estimateRowHeight
+    },
     overscan: virtualOverscan,
     measureElement:
       typeof window !== "undefined"

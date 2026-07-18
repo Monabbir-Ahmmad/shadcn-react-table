@@ -491,6 +491,22 @@ export const useDataTableOptions: ApiMember[] = [
     description: "Extra rows rendered above/below the viewport. Default 8.",
   },
   {
+    name: "rowHeight",
+    type: "number",
+    required: false,
+    default: null,
+    description:
+      "Flat height (px) applied to every row. Overridden per-row by `getRowHeight`. Also seeds the virtualizer estimate.",
+  },
+  {
+    name: "getRowHeight",
+    type: '(row: Row<TData>) => number | "auto" | null',
+    required: false,
+    default: null,
+    description:
+      'Per-row height. Return a px number to pin the row, `"auto"` to let it wrap and grow to fit its content (even with column resizing on), or `null` to fall back to `rowHeight` / the density default. Applies to data rows.',
+  },
+  {
     name: "rowVirtualizerOptions",
     type: "RowVirtualizerOptions<TData>",
     required: false,
@@ -536,6 +552,45 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "true",
     description: "",
+  },
+  {
+    name: "enableInfiniteScroll",
+    type: "boolean",
+    required: false,
+    default: "false",
+    description:
+      "Load more rows as the user scrolls near the bottom (infinite append). When on, the pager is hidden and pagination is forced to a single growing page, so all appended rows render. Fully controlled: the table calls `onLoadMore` only when the bottom sentinel nears the viewport AND `hasNextPage` AND `!isFetchingNextPage`. Pairs directly with TanStack Query's `useInfiniteQuery` (`fetchNextPage`/`hasNextPage`/`isFetchingNextPage`). Default false.",
+  },
+  {
+    name: "onLoadMore",
+    type: "() => void",
+    required: false,
+    default: null,
+    description:
+      "Called to request the next chunk. Should be stable (memoized) so the table doesn't re-trigger on every render. Append the result to `data`.",
+  },
+  {
+    name: "hasNextPage",
+    type: "boolean",
+    required: false,
+    default: "false",
+    description: "Whether more rows remain to be loaded. Default false.",
+  },
+  {
+    name: "isFetchingNextPage",
+    type: "boolean",
+    required: false,
+    default: "false",
+    description:
+      "Whether a load is currently in flight (blocks re-triggering). Default false.",
+  },
+  {
+    name: "infiniteScrollThreshold",
+    type: "number",
+    required: false,
+    default: "200",
+    description:
+      "Distance in px from the bottom at which to prefetch. Default 200.",
   },
   {
     name: "positionPagination",
@@ -1415,6 +1470,21 @@ export const tableInstance: ApiMember[] = [
     description: "",
   },
   {
+    name: "rowHeight",
+    type: "number",
+    required: false,
+    default: null,
+    description: "Flat height (px) applied to every row.",
+  },
+  {
+    name: "getRowHeight",
+    type: '(row: Row<TData>) => number | "auto" | null',
+    required: false,
+    default: null,
+    description:
+      'Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default.',
+  },
+  {
     name: "rowVirtualizerOptions",
     type: "RowVirtualizerOptions<TData>",
     required: false,
@@ -1455,6 +1525,43 @@ export const tableInstance: ApiMember[] = [
     required: true,
     default: null,
     description: "",
+  },
+  {
+    name: "enableInfiniteScroll",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Load more rows as the user scrolls near the bottom (auto-hides the pager).",
+  },
+  {
+    name: "onLoadMore",
+    type: "() => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the sentinel nears the viewport and more rows can be loaded.",
+  },
+  {
+    name: "hasNextPage",
+    type: "boolean",
+    required: true,
+    default: null,
+    description: "Consumer flag: more rows exist to load.",
+  },
+  {
+    name: "isFetchingNextPage",
+    type: "boolean",
+    required: true,
+    default: null,
+    description: "Consumer flag: a load is currently in flight.",
+  },
+  {
+    name: "infiniteScrollThreshold",
+    type: "number",
+    required: true,
+    default: null,
+    description: "Distance (px) from the bottom at which to prefetch.",
   },
   {
     name: "positionPagination",
@@ -2265,6 +2372,13 @@ export const localizationKeys: ApiMember[] = [
     default: "Loading…",
     description: "",
   },
+  {
+    name: "loadingMore",
+    type: "string",
+    required: true,
+    default: "Loading more…",
+    description: "",
+  },
 ]
 
 export const iconSlots: ApiMember[] = [
@@ -2566,6 +2680,20 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: 'Inline create row (createDisplayMode: "row").',
+  },
+  {
+    name: "data-table-infinite-loader",
+    type: "",
+    required: true,
+    default: null,
+    description: "",
+  },
+  {
+    name: "data-table-infinite-sentinel",
+    type: "",
+    required: true,
+    default: null,
+    description: "",
   },
   {
     name: "data-table-pagination",

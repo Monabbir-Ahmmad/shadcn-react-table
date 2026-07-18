@@ -1,0 +1,70 @@
+export const metadata = { title: "Row height" }
+
+# Row height
+
+By default rows size to their content (and the virtualizer measures them). For explicit control, set a flat `rowHeight` or a per-row `getRowHeight`.
+
+<Example slug="auto-row-height" />
+
+## Auto height (wrap & grow)
+
+Return `"auto"` from `getRowHeight` to let a row wrap its content and grow to fit — even when column resizing is on (which otherwise clips cells to a single line).
+
+```tsx
+import { DataTable, useDataTable } from "@/components/ui/data-table"
+
+const table = useDataTable({
+  data,
+  columns,
+  enableColumnResizing: true,
+  getRowHeight: () => "auto",
+})
+
+return <DataTable table={table} />
+```
+
+## Fixed height
+
+A number pins the row to that pixel height and clips overflowing content. Use a flat `rowHeight` for every row, or return a number per row from `getRowHeight`.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  rowHeight: 64, // every row is 64px
+})
+```
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  // Tall rows only where there's extra content; default height elsewhere.
+  getRowHeight: (row) => (row.original.notes ? "auto" : 44),
+})
+```
+
+## Precedence
+
+For each row: `getRowHeight(row)` wins unless it returns `null`/`undefined`, then `rowHeight`, then the density default.
+
+<Callout variant="tip" title="Works with virtualization">
+  Per-row heights feed the row virtualizer's estimate; `"auto"` rows are
+  measured after render, so large virtualized datasets with variable heights
+  scroll accurately. See [Virtualization](/docs/guides/virtualization).
+</Callout>
+
+<Callout variant="warning" title="Per row, not per column">
+  `getRowHeight` sets the height of the whole row. There's no per-column wrap
+  toggle — an `"auto"` row wraps all of its cells.
+</Callout>
+
+## Relevant options
+
+<ApiTable of="useDataTableOptions" only={["rowHeight", "getRowHeight", "estimateRowHeight"]} />
+
+## Related
+
+- [Virtualization](/docs/guides/virtualization)
+- [Density](/docs/guides/density)
+- [useDataTable options](/docs/api/use-data-table)

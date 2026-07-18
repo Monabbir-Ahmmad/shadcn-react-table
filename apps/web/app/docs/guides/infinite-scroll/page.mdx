@@ -1,0 +1,98 @@
+export const metadata = { title: "Infinite scroll" }
+
+# Infinite scroll
+
+Infinite scroll loads more rows as the user scrolls toward the bottom, instead of paging through the data. Set `enableInfiniteScroll: true` and drive it with three controlled props: `onLoadMore`, `hasNextPage`, and `isFetchingNextPage`.
+
+<Example slug="infinite-scroll" />
+
+When infinite scroll is on, the pager is hidden and pagination is forced to a single growing page, so every appended row renders. The table watches a sentinel near the bottom of the scroll surface and calls `onLoadMore` only when the sentinel nears the viewport **and** `hasNextPage` is true **and** a fetch is not already in flight.
+
+## Controlled fetch state
+
+You own the data and the loading flags; the table only decides *when* to ask for more. Append the next chunk to `data` in your `onLoadMore` handler.
+
+```tsx
+import { DataTable, useDataTable } from "@/components/ui/data-table"
+
+function Table() {
+  const [rows, setRows] = React.useState(() => firstPage)
+  const [isFetchingNextPage, setIsFetchingNextPage] = React.useState(false)
+  const hasNextPage = rows.length < total
+
+  // Memoize so the table doesn't re-trigger on every render.
+  const loadMore = React.useCallback(() => {
+    setIsFetchingNextPage(true)
+    fetchNextPage(rows.length).then((next) => {
+      setRows((prev) => [...prev, ...next])
+      setIsFetchingNextPage(false)
+    })
+  }, [rows.length])
+
+  const table = useDataTable({
+    data: rows,
+    columns,
+    getRowId: (row) => row.id,
+    enableInfiniteScroll: true,
+    hasNextPage,
+    isFetchingNextPage,
+    onLoadMore: loadMore,
+  })
+
+  return <DataTable table={table} />
+}
+```
+
+<Callout variant="tip" title="Pairs with TanStack Query">
+  The contract maps one-to-one onto TanStack Query's `useInfiniteQuery`: pass
+  `fetchNextPage` as `onLoadMore`, and forward `hasNextPage` /
+  `isFetchingNextPage` straight through.
+</Callout>
+
+## Prefetch distance
+
+`infiniteScrollThreshold` (default `200`) is the distance in pixels from the bottom at which the next chunk is requested, so data arrives before the user hits the end.
+
+```tsx
+const table = useDataTable({
+  data: rows,
+  columns,
+  enableInfiniteScroll: true,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore: loadMore,
+  infiniteScrollThreshold: 400,
+})
+```
+
+## Works with or without virtualization
+
+The sentinel sits after the rendered window, so infinite scroll works whether or not row virtualization is on. For very large loaded datasets, pair it with `enableRowVirtualization` so only the visible rows render.
+
+```tsx
+const table = useDataTable({
+  data: rows,
+  columns,
+  enableInfiniteScroll: true,
+  enableRowVirtualization: true,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore: loadMore,
+})
+```
+
+<Callout variant="warning" title="Reset on sort / filter changes">
+  In server mode, resetting the query (on a new sort or filter) is your job:
+  replace `data` with the first page again. The sentinel re-observes the new
+  rows automatically.
+</Callout>
+
+## Relevant options
+
+<ApiTable of="useDataTableOptions" only={["enableInfiniteScroll", "onLoadMore", "hasNextPage", "isFetchingNextPage", "infiniteScrollThreshold"]} />
+
+## Related
+
+- [Server-side data](/docs/guides/server-side)
+- [Virtualization](/docs/guides/virtualization)
+- [useDataTable options](/docs/api/use-data-table)

@@ -372,12 +372,26 @@ export interface DataTableConfig<TData extends RowData> {
   enableColumnVirtualization: boolean
   estimateRowHeight: number
   virtualOverscan: number
+  /** Flat height (px) applied to every row. */
+  rowHeight?: number
+  /** Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default. */
+  getRowHeight?: (row: Row<TData>) => number | "auto" | null
   rowVirtualizerOptions?: RowVirtualizerOptions<TData>
   columnVirtualizerOptions?: ColumnVirtualizerOptions<TData>
   rowVirtualizerInstanceRef?: React.RefObject<DataTableRowVirtualizer | null>
   columnVirtualizerInstanceRef?: React.RefObject<DataTableColumnVirtualizer | null>
   enableStickyHeader: boolean
   enablePagination: boolean
+  /** Load more rows as the user scrolls near the bottom (auto-hides the pager). */
+  enableInfiniteScroll: boolean
+  /** Called when the sentinel nears the viewport and more rows can be loaded. */
+  onLoadMore?: () => void
+  /** Consumer flag: more rows exist to load. */
+  hasNextPage: boolean
+  /** Consumer flag: a load is currently in flight. */
+  isFetchingNextPage: boolean
+  /** Distance (px) from the bottom at which to prefetch. */
+  infiniteScrollThreshold: number
   positionPagination: "top" | "bottom" | "both" | "none"
   paginationDisplayMode: PaginationDisplayMode
   columnFilterDisplayMode: ColumnFilterDisplayMode
@@ -614,6 +628,13 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   estimateRowHeight?: number
   /** Extra rows rendered above/below the viewport. Default 8. */
   virtualOverscan?: number
+  /** Flat height (px) applied to every row. Overridden per-row by
+   *  `getRowHeight`. Also seeds the virtualizer estimate. */
+  rowHeight?: number
+  /** Per-row height. Return a px number to pin the row, `"auto"` to let it wrap
+   *  and grow to fit its content (even with column resizing on), or `null` to
+   *  fall back to `rowHeight` / the density default. Applies to data rows. */
+  getRowHeight?: (row: Row<TData>) => number | "auto" | null
   /** Partial `@tanstack/react-virtual` options merged into the row virtualizer
    *  (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`).
    *  Accepts an object or a `({ table }) => options` function. */
@@ -633,6 +654,23 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  with `surfaceClassName`. Default true. */
   enableStickyHeader?: boolean
   enablePagination?: boolean
+  /** Load more rows as the user scrolls near the bottom (infinite append). When
+   *  on, the pager is hidden and pagination is forced to a single growing page,
+   *  so all appended rows render. Fully controlled: the table calls `onLoadMore`
+   *  only when the bottom sentinel nears the viewport AND `hasNextPage` AND
+   *  `!isFetchingNextPage`. Pairs directly with TanStack Query's
+   *  `useInfiniteQuery` (`fetchNextPage`/`hasNextPage`/`isFetchingNextPage`).
+   *  Default false. */
+  enableInfiniteScroll?: boolean
+  /** Called to request the next chunk. Should be stable (memoized) so the table
+   *  doesn't re-trigger on every render. Append the result to `data`. */
+  onLoadMore?: () => void
+  /** Whether more rows remain to be loaded. Default false. */
+  hasNextPage?: boolean
+  /** Whether a load is currently in flight (blocks re-triggering). Default false. */
+  isFetchingNextPage?: boolean
+  /** Distance in px from the bottom at which to prefetch. Default 200. */
+  infiniteScrollThreshold?: number
   /** Where the pagination controls render. Default "bottom". "none" keeps
    *  pagination active but hides the controls. */
   positionPagination?: "top" | "bottom" | "both" | "none"

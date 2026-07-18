@@ -21,6 +21,7 @@ import { DataTableDropToGroupZone } from "../components/toolbar/data-table-group
 import { DataTablePagination } from "../components/toolbar/data-table-pagination"
 import { DataTableToolbar } from "../components/toolbar/data-table-toolbar"
 import { useGridNavigation } from "../hooks/use-grid-navigation"
+import { useInfiniteScroll } from "../hooks/use-infinite-scroll"
 import { useTableDnd } from "../hooks/use-table-dnd"
 import { useTableVirtualizers } from "../hooks/use-table-virtualizers"
 import { getColumnSizeVars } from "../utils/column-styles"
@@ -74,11 +75,17 @@ export function DataTable<TData extends RowData>({
     enableRowVirtualization,
     enableStickyHeader,
     enablePagination,
+    enableInfiniteScroll,
+    onLoadMore,
+    hasNextPage,
+    isFetchingNextPage,
+    infiniteScrollThreshold,
     positionPagination,
     positionToolbarAlertBanner,
     positionToolbarDropZone,
     enableTopToolbar,
     enableKeyboardNavigation,
+    localization,
     renderCaption,
     renderTopToolbar,
     refs,
@@ -90,6 +97,19 @@ export function DataTable<TData extends RowData>({
   const { sensors, collisionDetection, handleDragEnd } = useTableDnd(table)
   const { rowVirtualizer, virtualItems, virtualColumns, withColumnSpacers } =
     useTableVirtualizers(table, gridRef)
+
+  // Infinite scroll: observe a bottom sentinel against the scroll surface and
+  // ask the consumer to append the next chunk when it nears the viewport.
+  const sentinelRef = React.useRef<HTMLDivElement>(null)
+  useInfiniteScroll({
+    enabled: enableInfiniteScroll,
+    hasNextPage,
+    isFetchingNextPage,
+    onLoadMore,
+    threshold: infiniteScrollThreshold,
+    scrollRef: gridRef,
+    sentinelRef,
+  })
 
   const hasRows =
     table.getTopRows().length +
@@ -263,6 +283,34 @@ export function DataTable<TData extends RowData>({
                 />
               )}
             </Table>
+
+            {enableInfiniteScroll && hasRows && (
+              <>
+                {/* Bottom sentinel: when it scrolls near the viewport (within
+                    `infiniteScrollThreshold`px) the table asks for the next
+                    chunk. Sits after the rendered window, so it works with or
+                    without row virtualization. */}
+                <div
+                  ref={sentinelRef}
+                  data-slot="data-table-infinite-sentinel"
+                  aria-hidden
+                  className="h-px w-full"
+                />
+                {isFetchingNextPage && (
+                  <div
+                    data-slot="data-table-infinite-loader"
+                    role="status"
+                    className="flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground"
+                  >
+                    <span
+                      aria-hidden
+                      className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                    />
+                    {localization.loadingMore}
+                  </div>
+                )}
+              </>
+            )}
 
             {showLoadingOverlay && hasRows && (
               <div
