@@ -86,6 +86,7 @@ export const docsNav: DocsNavGroup[] = [
     items: [
       { title: "Loading state", href: "/docs/guides/loading" },
       { title: "Server-side data", href: "/docs/guides/server-side" },
+      { title: "Infinite scroll", href: "/docs/guides/infinite-scroll" },
       { title: "Virtualization", href: "/docs/guides/virtualization" },
       { title: "Export", href: "/docs/guides/export" },
       { title: "State management", href: "/docs/guides/state" },

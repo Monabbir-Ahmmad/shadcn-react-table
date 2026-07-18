@@ -717,6 +717,46 @@ function ServerSideExample() {
   return <DataTable table={table} />
 }
 
+const INFINITE_CHUNK = 20
+const INFINITE_TOTAL = 200
+
+function InfiniteScrollExample() {
+  const all = React.useMemo(() => makeUsers(INFINITE_TOTAL), [])
+  const [rows, setRows] = React.useState(() => all.slice(0, INFINITE_CHUNK))
+  const [isFetchingNextPage, setIsFetchingNextPage] = React.useState(false)
+  const hasNextPage = rows.length < all.length
+
+  // Stable loader (memoized on `all`) so the table doesn't re-trigger every
+  // render. The hook already gates on hasNextPage / isFetchingNextPage.
+  const loadMore = React.useCallback(() => {
+    setIsFetchingNextPage(true)
+    // Simulate a server round-trip, then append the next chunk.
+    setTimeout(() => {
+      setRows((prev) =>
+        all.slice(0, Math.min(prev.length + INFINITE_CHUNK, all.length))
+      )
+      setIsFetchingNextPage(false)
+    }, 600)
+  }, [all])
+
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data: rows,
+    columns,
+    getRowId: (row) => row.id,
+    enableInfiniteScroll: true,
+    hasNextPage,
+    isFetchingNextPage,
+    onLoadMore: loadMore,
+    renderToolbarActions: () => (
+      <span className="text-xs tabular-nums text-muted-foreground">
+        Loaded {rows.length} of {all.length}
+      </span>
+    ),
+  })
+  return <DataTable table={table} surfaceClassName="max-h-[460px]" />
+}
+
 function AdvancedExample() {
   const [data, setData] = React.useState(() => baseUsers)
   const columns = useUserColumns()
@@ -1025,6 +1065,14 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Manual pagination against a simulated server.",
     category: "Data",
     Component: ServerSideExample,
+  },
+  {
+    slug: "infinite-scroll",
+    title: "Infinite scroll",
+    description:
+      "Append the next chunk as you scroll near the bottom (auto-hides the pager).",
+    category: "Data",
+    Component: InfiniteScrollExample,
   },
   {
     slug: "advanced",

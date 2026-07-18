@@ -123,6 +123,7 @@ export interface DataTableLocalization {
   // Empty / loading
   noRecordsToDisplay: string
   loading: string
+  loadingMore: string
 }
 
 export const defaultLocalization: DataTableLocalization = {
@@ -264,4 +265,5 @@ export const defaultLocalization: DataTableLocalization = {
 
   noRecordsToDisplay: "No records to display",
   loading: "Loading…",
+  loadingMore: "Loading more…",
 }

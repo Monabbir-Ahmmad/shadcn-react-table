@@ -71,7 +71,12 @@ export function useDataTable<TData extends RowData>(
     enableFacetedValues = true,
     enableColumnActions = true,
     enableStickyHeader = true,
-    enablePagination = true,
+    enablePagination: enablePaginationProp = true,
+    enableInfiniteScroll = false,
+    onLoadMore,
+    hasNextPage = false,
+    isFetchingNextPage = false,
+    infiniteScrollThreshold = 200,
     positionPagination = "bottom",
     paginationDisplayMode = "default",
     columnFilterDisplayMode = "subheader",
@@ -156,6 +161,10 @@ export function useDataTable<TData extends RowData>(
     columns,
     ...tableOptions
   } = options
+
+  // Infinite scroll implies a single growing page: hide the pager and drop the
+  // pagination row model so every appended row renders.
+  const enablePagination = enableInfiniteScroll ? false : enablePaginationProp
 
   // App-wide defaults from a surrounding DataTableConfigProvider (if any) sit
   // between the built-in defaults and per-call options.
@@ -603,6 +612,11 @@ export function useDataTable<TData extends RowData>(
     columnVirtualizerInstanceRef,
     enableStickyHeader,
     enablePagination,
+    enableInfiniteScroll,
+    onLoadMore,
+    hasNextPage,
+    isFetchingNextPage,
+    infiniteScrollThreshold,
     positionPagination,
     paginationDisplayMode,
     columnFilterDisplayMode,
