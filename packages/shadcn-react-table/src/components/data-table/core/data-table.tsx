@@ -289,18 +289,22 @@ export function DataTable<TData extends RowData>({
                 {/* Bottom sentinel: when it scrolls near the viewport (within
                     `infiniteScrollThreshold`px) the table asks for the next
                     chunk. Sits after the rendered window, so it works with or
-                    without row virtualization. */}
+                    without row virtualization. `sticky left-0` keeps it within
+                    the horizontal viewport so a wide (horizontally scrolled)
+                    table still triggers — the IntersectionObserver checks both
+                    axes, and a left-anchored sentinel would otherwise scroll
+                    out of the root rect. */}
                 <div
                   ref={sentinelRef}
                   data-slot="data-table-infinite-sentinel"
                   aria-hidden
-                  className="h-px w-full"
+                  className="sticky left-0 h-px w-full"
                 />
                 {isFetchingNextPage && (
                   <div
                     data-slot="data-table-infinite-loader"
                     role="status"
-                    className="flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground"
+                    className="sticky left-0 flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground"
                   >
                     <span
                       aria-hidden

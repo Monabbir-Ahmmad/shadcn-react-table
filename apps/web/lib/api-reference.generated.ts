@@ -317,9 +317,9 @@ export const useDataTableOptions: ApiMember[] = [
     name: "enableStickyFooter",
     type: "boolean",
     required: false,
-    default: "true",
+    default: "false",
     description:
-      "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default true (matches the sticky header).",
+      "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
   },
   {
     name: "renderDetailPanel",

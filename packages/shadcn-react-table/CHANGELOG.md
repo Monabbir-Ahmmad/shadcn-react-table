@@ -4,6 +4,16 @@ The version applies to the registry block: `/r/data-table.json` carries it
 in `meta.version`. After installing, record the version you received —
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
 
+## 0.4.1
+
+- **Fix (infinite scroll):** the load trigger now fires when the table is
+  scrolled horizontally. The bottom sentinel is pinned to the horizontal
+  viewport (`position: sticky; left: 0`) so a wide, horizontally-scrolled table
+  still registers the intersection and requests the next chunk.
+- **Changed default:** `enableStickyFooter` now defaults to `false` (was `true`).
+  `enableStickyHeader` still defaults to `true`; opt into a pinned footer
+  explicitly when you have an aggregation/footer row.
+
 ## 0.4.0
 
 - **Infinite row loading** (`enableInfiniteScroll`): append the next chunk of
