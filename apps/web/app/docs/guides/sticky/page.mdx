@@ -2,7 +2,7 @@ export const metadata = { title: "Sticky header & footer" }
 
 # Sticky header & footer
 
-The header row (`enableStickyHeader`, default `true`) sticks to the top of the scroll surface, and the aggregation/footer row (`enableStickyFooter`, default `true`) sticks to the bottom. As you scroll through rows, both stay pinned in view.
+The header row (`enableStickyHeader`, default `true`) sticks to the top of the scroll surface. Enable `enableStickyFooter` (default `false`) to also pin the aggregation/footer row to the bottom. As you scroll through rows, both stay pinned in view.
 
 <Example slug="sticky" />
 
@@ -25,7 +25,7 @@ return <DataTable table={table} surfaceClassName="max-h-[460px]" />
 Once the content overflows the bound, the header pins to the top and the footer pins to the bottom while the rows scroll between them. Setting `enableStickyHeader: false` removes both the pinning and the default bound, letting the table grow to its full height.
 
 <Callout variant="note" title="MRT parity note">
-Material React Table defaults `enableStickyHeader` and `enableStickyFooter` to `false`; this table deliberately defaults both to `true` so headers stay useful out of the box. The sticky-implies-bounded-surface behavior itself matches MRT.
+Material React Table defaults `enableStickyHeader` and `enableStickyFooter` to `false`. This table deliberately defaults `enableStickyHeader` to `true` so headers stay useful out of the box, but leaves `enableStickyFooter` at `false` (opt in when you have an aggregation/footer row). The sticky-implies-bounded-surface behavior itself matches MRT.
 </Callout>
 
 ## Footer cells
