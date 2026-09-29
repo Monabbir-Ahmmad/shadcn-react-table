@@ -216,7 +216,9 @@ export function DataTableBody<TData extends RowData>({
         <DataTableBodyRow
           row={row}
           draggable={
-            enableRowOrdering &&
+            (typeof enableRowOrdering === "function"
+              ? enableRowOrdering(row)
+              : enableRowOrdering) &&
             !enableRowVirtualization &&
             !row.getIsPinned() &&
             !isGrouped
