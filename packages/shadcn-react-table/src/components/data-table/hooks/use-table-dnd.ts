@@ -34,10 +34,23 @@ export function useTableDnd<TData extends RowData>(
   // The group drop zone should accept a drop anywhere inside its bounds, not
   // only near its center. Prefer a pointer-within hit on the zone; otherwise
   // fall back to closestCenter for column/row reordering (and keyboard dnd,
-  // where pointerWithin yields nothing).
+  // where pointerWithin yields nothing). Only targets of the dragged item's
+  // own type are considered, so a row can't land on a header and vice versa;
+  // the untyped group zone is reachable by column drags only.
   const collisionDetection: CollisionDetection = (args) => {
-    const groupHit = pointerWithin(args).find((c) => c.id === GROUP_DROPZONE_ID)
-    return groupHit ? [groupHit] : closestCenter(args)
+    const activeType = args.active.data.current?.type
+    if (activeType === "column") {
+      const groupHit = pointerWithin(args).find(
+        (c) => c.id === GROUP_DROPZONE_ID
+      )
+      if (groupHit) return [groupHit]
+    }
+    const sameType = args.droppableContainers.filter(
+      (c) =>
+        c.data.current?.type === activeType ||
+        (activeType === "column" && c.id === GROUP_DROPZONE_ID)
+    )
+    return closestCenter({ ...args, droppableContainers: sameType })
   }
 
   const onRowOrderChange = table.tableInstance.onRowOrderChange
