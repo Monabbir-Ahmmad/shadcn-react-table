@@ -280,7 +280,7 @@ export interface DataTableConfig<TData extends RowData> {
   autoSizeColumn: (columnId: string) => void
   /** Auto-size every resizable visible column. */
   autoSizeAllColumns: () => void
-  enableRowOrdering: boolean
+  enableRowOrdering: boolean | ((row: Row<TData>) => boolean)
   enableRowPinning: boolean
   enableRowNumbers: boolean
   rowNumberMode: "static" | "original"
@@ -517,8 +517,10 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    * the column to its default size instead.
    */
   enableColumnAutosize?: boolean
-  /** Drag-and-drop row reordering (adds a drag-handle column). */
-  enableRowOrdering?: boolean
+  /** Drag-and-drop row reordering (adds a drag-handle column).
+   *  A function disables reordering, and hides the drag handle, for rows it
+   *  returns false for (e.g. group headers that aren't themselves movable). */
+  enableRowOrdering?: boolean | ((row: Row<TData>) => boolean)
   /** Row pinning (top) via a pin toggle in the row-number column. */
   enableRowPinning?: boolean
   /** Adds a leading row-number column. */

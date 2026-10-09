@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { ColumnDef, Row, RowData } from "@tanstack/react-table"
 
 import { Button } from "@workspace/ui/components/button"
 
@@ -25,7 +25,8 @@ export const RowDragContext = React.createContext<RowDragHandleProps | null>(
  *  {@link RowDragContext}, set by the sortable row wrapper. */
 export function createRowDragHandleColumn<TData extends RowData>(
   localization: DataTableLocalization,
-  icons: DataTableIcons
+  icons: DataTableIcons,
+  enableRowOrdering: boolean | ((row: Row<TData>) => boolean)
 ): ColumnDef<TData> {
   return {
     id: ROW_DRAG_COLUMN_ID,
@@ -37,9 +38,16 @@ export function createRowDragHandleColumn<TData extends RowData>(
     minSize: 40,
     meta: { disableColumnActions: true, align: "center" },
     header: () => null,
-    cell: () => (
-      <RowDragHandle label={localization.reorderRow} Icon={icons.dragHandle} />
-    ),
+    cell: ({ row }) => {
+      const canReorder =
+        typeof enableRowOrdering === "function"
+          ? enableRowOrdering(row)
+          : enableRowOrdering
+      if (!canReorder) return null
+      return (
+        <RowDragHandle label={localization.reorderRow} Icon={icons.dragHandle} />
+      )
+    },
   }
 }
 

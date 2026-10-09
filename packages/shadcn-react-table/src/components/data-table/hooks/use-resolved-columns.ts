@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { ColumnDef, Row, RowData } from "@tanstack/react-table"
 
 import {
   createExpandColumn,
@@ -16,7 +16,7 @@ import type { EditDisplayMode, UseDataTableOptions } from "../core/types"
 
 interface UseResolvedColumnsParams<TData extends RowData> {
   columns: ColumnDef<TData, unknown>[]
-  enableRowOrdering: boolean
+  enableRowOrdering: boolean | ((row: Row<TData>) => boolean)
   enableRowSelection: boolean
   selectAllMode: "page" | "all"
   enableSelectAll: boolean
@@ -63,8 +63,12 @@ export function useResolvedColumns<TData extends RowData>({
   return React.useMemo(() => {
     const leading = []
     const trailing = []
+    // enableRowOrdering may also be a per-row predicate — forwarded to the
+    // drag column so it can hide the handle on rows it excludes.
     if (enableRowOrdering) {
-      leading.push(createRowDragHandleColumn<TData>(localization, icons))
+      leading.push(
+        createRowDragHandleColumn<TData>(localization, icons, enableRowOrdering)
+      )
     }
     if (enableRowSelection) {
       leading.push(
