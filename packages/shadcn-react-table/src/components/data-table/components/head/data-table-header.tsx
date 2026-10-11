@@ -4,7 +4,7 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable"
-import type { Header, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import type { VirtualItem } from "@tanstack/react-virtual"
 import * as React from "react"
 
@@ -30,6 +30,7 @@ import {
 import { DataTableHeadCell } from "../body/dnd"
 import { DataTableColumnFilter } from "./data-table-column-filter"
 import { DataTableColumnHeader } from "./data-table-column-header"
+import type { DataTableHeader } from "../../core/table-types"
 
 interface DataTableHeaderProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -71,7 +72,7 @@ export function DataTableHeader<TData extends RowData>({
     anyFilterable &&
     columnFilterDisplayMode === "subheader"
 
-  const renderHeadCell = (header: Header<TData, unknown>) => (
+  const renderHeadCell = (header: DataTableHeader<TData, unknown>) => (
     <DataTableHeadCell
       key={header.id}
       header={header}
@@ -91,7 +92,7 @@ export function DataTableHeader<TData extends RowData>({
     </DataTableHeadCell>
   )
 
-  const renderFilterCell = (header: Header<TData, unknown>) => (
+  const renderFilterCell = (header: DataTableHeader<TData, unknown>) => (
     <TableHead
       key={header.id}
       colSpan={header.colSpan}

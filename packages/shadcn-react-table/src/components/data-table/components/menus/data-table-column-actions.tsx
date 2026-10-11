@@ -1,6 +1,6 @@
 "use client"
 
-import type { Column, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -19,9 +19,10 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
+import type { DataTableColumn } from "../../core/table-types"
 
 interface DataTableColumnActionsProps<TData extends RowData, TValue> {
-  column: Column<TData, TValue>
+  column: DataTableColumn<TData, TValue>
   table: DataTableInstance<TData>
   className?: string
 }
@@ -185,7 +186,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
               <DropdownMenuSeparator />
             )}
             {renderColumnActionsMenuItems({
-              column: column as Column<TData, unknown>,
+              column: column as DataTableColumn<TData, unknown>,
               table,
             })}
           </>

@@ -1,9 +1,10 @@
 "use client"
 
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { SelectionCheckbox } from "../components/body/selection-checkbox"
 import type { DataTableLocalization } from "../core/localization"
+import type { DataTableColumnDef } from "../core/table-types"
 
 export const SELECTION_COLUMN_ID = "cn-select"
 
@@ -19,7 +20,7 @@ export function createSelectionColumn<TData extends RowData>(
   localization: DataTableLocalization,
   selectAllMode: "page" | "all" = "page",
   enableSelectAll = true
-): ColumnDef<TData> {
+): DataTableColumnDef<TData> {
   return {
     id: SELECTION_COLUMN_ID,
     enableSorting: false,

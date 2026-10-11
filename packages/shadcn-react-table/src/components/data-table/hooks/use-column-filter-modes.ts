@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { ColumnDef, FilterFn, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import {
   createDynamicFilterFn,
@@ -9,6 +9,7 @@ import {
   type FilterMode,
 } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
+import type { DataTableColumnDef, DataTableFilterFn } from "../core/table-types"
 
 export interface ColumnFilterModes<TData extends RowData> {
   columnFilterModes: Record<string, FilterMode>
@@ -18,7 +19,7 @@ export interface ColumnFilterModes<TData extends RowData> {
   /** Resolve the active mode for a column (active → default → "contains"). */
   getColumnMode: (columnId: string) => FilterMode
   /** Single dynamic filter fn assigned to every column via `defaultColumn`. */
-  dynamicFilterFn: FilterFn<TData>
+  dynamicFilterFn: DataTableFilterFn<TData>
 }
 
 /**
@@ -32,7 +33,7 @@ export interface ColumnFilterModes<TData extends RowData> {
  * supplies `dynamicFilterFn`.
  */
 export function useColumnFilterModes<TData extends RowData>(
-  columns: ColumnDef<TData, unknown>[]
+  columns: DataTableColumnDef<TData, unknown>[]
 ): ColumnFilterModes<TData> {
   const [columnFilterModes, setColumnFilterModes] = React.useState<
     Record<string, FilterMode>

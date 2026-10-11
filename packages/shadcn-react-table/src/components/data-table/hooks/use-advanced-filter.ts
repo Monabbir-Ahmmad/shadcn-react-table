@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
-import type { RowData, RowModel, Table } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { createAdvancedFilteredRowModel } from "../fns/advanced-filter"
 import type { AdvancedFilterGroup } from "../core/types"
 import { useControllableState } from "./use-controllable-state"
+import type { DataTableCoreTable, DataTableRowModel } from "../core/table-types"
 
 const EMPTY_GROUP: AdvancedFilterGroup = { logic: "and", rules: [] }
 
@@ -23,7 +24,9 @@ export interface AdvancedFilterState<TData extends RowData> {
   setShowAdvancedFilterPanel: React.Dispatch<React.SetStateAction<boolean>>
   /** Filtered row model that applies the advanced group on top of the normal
    *  column/global filters. Stable identity (preserves TanStack memoization). */
-  advancedFilteredRowModel: (table: Table<TData>) => () => RowModel<TData>
+  advancedFilteredRowModel: (
+    table: DataTableCoreTable<TData>
+  ) => () => DataTableRowModel<TData>
 }
 
 /**

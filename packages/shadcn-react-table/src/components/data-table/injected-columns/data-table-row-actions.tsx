@@ -1,6 +1,6 @@
 "use client"
 
-import type { ColumnDef, Row, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -10,6 +10,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu"
 
 import type { DataTableInstance } from "../core/types"
+import type { DataTableColumnDef, DataTableRow } from "../core/table-types"
 
 export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
 
@@ -18,7 +19,7 @@ export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
  *  left edge; when `"last"` (default) they align to the right. */
 export function createRowActionsColumn<TData extends RowData>(
   position: "first" | "last" = "last"
-): ColumnDef<TData> {
+): DataTableColumnDef<TData> {
   const align = position === "first" ? "left" : "right"
   return {
     id: ROW_ACTIONS_COLUMN_ID,
@@ -46,7 +47,7 @@ function RowActionsCell<TData extends RowData>({
   table,
   align,
 }: {
-  row: Row<TData>
+  row: DataTableRow<TData>
   table: DataTableInstance<TData>
   align: "left" | "right"
 }) {

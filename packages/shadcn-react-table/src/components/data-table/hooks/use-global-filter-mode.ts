@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { FilterFn, RowData, RowModel, Table } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import {
   createGlobalFilterFn,
@@ -9,6 +9,11 @@ import {
   type GlobalFilterMode,
 } from "../fns/filter-fns"
 import { useControllableState } from "./use-controllable-state"
+import type {
+  DataTableCoreTable,
+  DataTableFilterFn,
+  DataTableRowModel,
+} from "../core/table-types"
 
 interface UseGlobalFilterModeParams {
   globalFilterMode?: GlobalFilterMode
@@ -24,9 +29,11 @@ export interface GlobalFilterModeState<TData extends RowData> {
   globalFilterMode: GlobalFilterMode
   setGlobalFilterMode: (mode: GlobalFilterMode) => void
   /** Mode-aware global filter fn (new identity per mode → re-runs filtering). */
-  dynamicGlobalFilterFn: FilterFn<TData>
+  dynamicGlobalFilterFn: DataTableFilterFn<TData>
   /** Sorted row model that re-orders by fuzzy rank when ranking is active. */
-  rankedSortedRowModel: (table: Table<TData>) => () => RowModel<TData>
+  rankedSortedRowModel: (
+    table: DataTableCoreTable<TData>
+  ) => () => DataTableRowModel<TData>
 }
 
 /**

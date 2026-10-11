@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import type { Row, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import type { EditingCell } from "../core/types"
+import type { DataTableRow } from "../core/table-types"
 
 export interface EditingState<TData extends RowData> {
   editingCell: EditingCell | null
@@ -12,7 +13,7 @@ export interface EditingState<TData extends RowData> {
   isCreating: boolean
   rowDraft: Record<string, unknown>
   setRowDraftValue: (columnId: string, value: unknown) => void
-  beginRowEdit: (row: Row<TData>) => void
+  beginRowEdit: (row: DataTableRow<TData>) => void
   beginCreate: () => void
   cancelEdit: () => void
 }
@@ -37,7 +38,7 @@ export function useEditingState<TData extends RowData>(
     []
   )
 
-  const beginRowEdit = React.useCallback((row: Row<TData>) => {
+  const beginRowEdit = React.useCallback((row: DataTableRow<TData>) => {
     const draft: Record<string, unknown> = {}
     for (const cell of row.getAllCells()) {
       if (cell.column.accessorFn != null) {

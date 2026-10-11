@@ -114,15 +114,19 @@ describe("useDataTable engine behaviour", () => {
     ).toEqual(["1", "2"])
     expect(
       ids(
-        setup({ initialState, enablePagination: false }).result.current.getRowModel()
-          .rows
+        setup({
+          initialState,
+          enablePagination: false,
+        }).result.current.getRowModel().rows
       )
     ).toEqual(["1", "2", "3", "4"])
   })
 
   it("computes faceted values, and skips them when faceting is off or manual", () => {
     const on = setup().result.current
-    expect(Object.fromEntries(on.getColumn("dept")!.getFacetedUniqueValues())).toEqual({
+    expect(
+      Object.fromEntries(on.getColumn("dept")!.getFacetedUniqueValues())
+    ).toEqual({
       eng: 2,
       ops: 2,
     })
@@ -162,13 +166,16 @@ describe("useDataTable engine behaviour", () => {
       { id: "t3", name: "Solo", dept: "ops", age: 30, salary: 1 },
     ]
     const base = { data: tree, getSubRows: (row: Person) => row.children }
-    expect(
-      ids(setup(base).result.current.getRowModel().rows)
-    ).toEqual(["t1", "t3"])
+    expect(ids(setup(base).result.current.getRowModel().rows)).toEqual([
+      "t1",
+      "t3",
+    ])
     expect(
       ids(
-        setup({ ...base, initialState: { expanded: true } }).result.current.getRowModel()
-          .rows
+        setup({
+          ...base,
+          initialState: { expanded: true },
+        }).result.current.getRowModel().rows
       )
     ).toEqual(["t1", "t2", "t3"])
   })

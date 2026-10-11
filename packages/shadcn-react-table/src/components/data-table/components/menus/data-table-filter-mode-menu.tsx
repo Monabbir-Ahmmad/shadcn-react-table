@@ -1,6 +1,6 @@
 "use client"
 
-import type { Column, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import {
   DropdownMenu,
@@ -22,6 +22,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableInstance } from "../../core/types"
 import { modeOptionsForVariant, type FilterMode } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
+import type { DataTableColumn } from "../../core/table-types"
 
 /**
  * The `Filter` adornment that opens a mode menu (contains/equals/…; numeric and
@@ -33,7 +34,7 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
   column,
   table,
 }: {
-  column: Column<TData, TValue>
+  column: DataTableColumn<TData, TValue>
   table: DataTableInstance<TData>
 }) {
   const {
@@ -84,7 +85,7 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
         <DropdownMenuSeparator />
         {renderColumnFilterModeMenuItems ? (
           renderColumnFilterModeMenuItems({
-            column: column as Column<TData, unknown>,
+            column: column as DataTableColumn<TData, unknown>,
             modes,
             currentMode: current,
             onSelect: (mode) => setColumnFilterMode(column.id, mode),

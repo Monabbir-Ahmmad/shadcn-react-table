@@ -1,11 +1,4 @@
-import type {
-  Cell,
-  Column,
-  Row,
-  RowData,
-  Table,
-  TableOptions,
-} from "@tanstack/react-table"
+import type { RowData, TableOptions, Column } from "@tanstack/react-table"
 import type * as React from "react"
 
 import type { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual"
@@ -13,6 +6,12 @@ import type { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual"
 import type { FilterMode, GlobalFilterMode } from "../fns/filter-fns"
 import type { DataTableIcons } from "./icons"
 import type { DataTableLocalization } from "./localization"
+import type {
+  DataTableCell,
+  DataTableColumn,
+  DataTableCoreTable,
+  DataTableRow,
+} from "./table-types"
 
 // Re-exported as part of the public type surface: these describe column-`meta`
 // filter config, while the runtime filter fns stay internal.
@@ -211,23 +210,23 @@ export interface DataTableSlotProps<TData extends RowData> {
 }
 
 export interface RowEvent<TData extends RowData> {
-  row: Row<TData>
+  row: DataTableRow<TData>
   table: DataTableInstance<TData>
   event: React.MouseEvent<HTMLTableRowElement>
 }
 
 export interface CellEvent<TData extends RowData> {
-  cell: Cell<TData, unknown>
-  row: Row<TData>
+  cell: DataTableCell<TData, unknown>
+  row: DataTableRow<TData>
   table: DataTableInstance<TData>
   event: React.MouseEvent<HTMLTableCellElement>
 }
 
 /** Props passed to per-column cell render hooks on `columnDef.meta`. */
 export interface CellRenderProps<TData extends RowData, TValue = unknown> {
-  cell: Cell<TData, TValue>
-  row: Row<TData>
-  column: Column<TData, TValue>
+  cell: DataTableCell<TData, TValue>
+  row: DataTableRow<TData>
+  column: DataTableColumn<TData, TValue>
   table: DataTableInstance<TData>
 }
 
@@ -290,7 +289,7 @@ export interface DataTableConfig<TData extends RowData> {
   enableExpanding: boolean
   enableStickyFooter: boolean
   renderDetailPanel?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
 
@@ -306,20 +305,20 @@ export interface DataTableConfig<TData extends RowData> {
   rowDraft: Record<string, unknown>
   setRowDraftValue: (columnId: string, value: unknown) => void
   /** Enter row/modal editing for a row, seeding the draft from its values. */
-  beginRowEdit: (row: Row<TData>) => void
+  beginRowEdit: (row: DataTableRow<TData>) => void
   /** Open the create form, seeding the draft from `createRowDefaults`. */
   beginCreate: () => void
   /** Exit any editing/creating state, discarding the draft. */
   cancelEdit: () => void
   enableClickToCopy: boolean
   onEditCellSave?: (props: {
-    row: Row<TData>
-    column: Column<TData, unknown>
+    row: DataTableRow<TData>
+    column: DataTableColumn<TData, unknown>
     value: unknown
     table: DataTableInstance<TData>
   }) => void
   onSaveRow?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
@@ -330,24 +329,24 @@ export interface DataTableConfig<TData extends RowData> {
     exit: () => void
   }) => void
   renderRowActions?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   renderCellActionMenuItems?: (props: {
-    cell: Cell<TData, unknown>
-    row: Row<TData>
+    cell: DataTableCell<TData, unknown>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   renderRowActionMenuItems?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   renderColumnActionsMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   renderColumnFilterModeMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     modes: FilterMode[]
     currentMode: FilterMode
     onSelect: (mode: FilterMode) => void
@@ -375,7 +374,7 @@ export interface DataTableConfig<TData extends RowData> {
   /** Flat height (px) applied to every row. */
   rowHeight?: number
   /** Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default. */
-  getRowHeight?: (row: Row<TData>) => number | "auto" | null
+  getRowHeight?: (row: DataTableRow<TData>) => number | "auto" | null
   rowVirtualizerOptions?: RowVirtualizerOptions<TData>
   columnVirtualizerOptions?: ColumnVirtualizerOptions<TData>
   rowVirtualizerInstanceRef?: React.RefObject<DataTableRowVirtualizer | null>
@@ -421,7 +420,7 @@ export interface DataTableConfig<TData extends RowData> {
 
 /** A TanStack table instance enriched with our `tableInstance` config. */
 export type DataTableInstance<TData extends RowData = unknown> =
-  Table<TData> & {
+  DataTableCoreTable<TData> & {
     tableInstance: DataTableConfig<TData>
   }
 
@@ -537,7 +536,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableStickyFooter?: boolean
   /** Render an expanding detail panel for each row. */
   renderDetailPanel?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
 
@@ -555,13 +554,13 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Show a click-to-copy affordance on all cells (per-column override via meta). */
   enableClickToCopy?: boolean
   onEditCellSave?: (props: {
-    row: Row<TData>
-    column: Column<TData, unknown>
+    row: DataTableRow<TData>
+    column: DataTableColumn<TData, unknown>
     value: unknown
     table: DataTableInstance<TData>
   }) => void
   onSaveRow?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
@@ -572,30 +571,30 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
     exit: () => void
   }) => void
   renderRowActions?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   renderCellActionMenuItems?: (props: {
-    cell: Cell<TData, unknown>
-    row: Row<TData>
+    cell: DataTableCell<TData, unknown>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   /** Render a kebab menu in the row-actions column. Returns the menu items
    *  (e.g. `<DropdownMenuItem>`); injects the actions column automatically. */
   renderRowActionMenuItems?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   /** Append custom items to the bottom of every column-actions menu. Returns the
    *  items (e.g. `<DropdownMenuItem>`); a separator is added before them. */
   renderColumnActionsMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   /** Replace the radio items in a column's filter-mode menu. Render your own
    *  items and call `onSelect(mode)` to switch; `modes` is the allowed set. */
   renderColumnFilterModeMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     modes: FilterMode[]
     currentMode: FilterMode
     onSelect: (mode: FilterMode) => void
@@ -634,7 +633,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Per-row height. Return a px number to pin the row, `"auto"` to let it wrap
    *  and grow to fit its content (even with column resizing on), or `null` to
    *  fall back to `rowHeight` / the density default. Applies to data rows. */
-  getRowHeight?: (row: Row<TData>) => number | "auto" | null
+  getRowHeight?: (row: DataTableRow<TData>) => number | "auto" | null
   /** Partial `@tanstack/react-virtual` options merged into the row virtualizer
    *  (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`).
    *  Accepts an object or a `({ table }) => options` function. */

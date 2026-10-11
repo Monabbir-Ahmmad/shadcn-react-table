@@ -1,11 +1,12 @@
 "use client"
 
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
+import type { DataTableColumnDef } from "../core/table-types"
 
 export const ROW_NUMBER_COLUMN_ID = "cn-row-number"
 
@@ -16,7 +17,7 @@ export function createRowNumberColumn<TData extends RowData>(
   mode: "static" | "original",
   enableRowPinning: boolean,
   icons: DataTableIcons
-): ColumnDef<TData> {
+): DataTableColumnDef<TData> {
   return {
     id: ROW_NUMBER_COLUMN_ID,
     enableSorting: false,

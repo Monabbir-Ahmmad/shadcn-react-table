@@ -1,6 +1,6 @@
 "use client"
 
-import { flexRender, type Header, type RowData } from "@tanstack/react-table"
+import { flexRender, type RowData } from "@tanstack/react-table"
 
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -26,9 +26,10 @@ import {
 import { ColumnDragHandle } from "../body/dnd"
 import { DataTableColumnActions } from "../menus/data-table-column-actions"
 import { DataTableColumnFilter } from "./data-table-column-filter"
+import type { DataTableHeader } from "../../core/table-types"
 
 interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
-  header: Header<TData, TValue>
+  header: DataTableHeader<TData, TValue>
   table: DataTableInstance<TData>
 }
 

@@ -1,10 +1,4 @@
-import {
-  getFilteredRowModel,
-  type Row,
-  type RowData,
-  type RowModel,
-  type Table,
-} from "@tanstack/react-table"
+import { getFilteredRowModel, type RowData } from "@tanstack/react-table"
 
 import type {
   AdvancedFilterGroup,
@@ -12,6 +6,11 @@ import type {
   AdvancedFilterRule,
   FilterVariant,
 } from "../core/types"
+import type {
+  DataTableCoreTable,
+  DataTableRow,
+  DataTableRowModel,
+} from "../core/table-types"
 
 /** A value that contributes nothing to a filter (no cell value / no input). */
 function isEmptyValue(value: unknown): boolean {
@@ -142,7 +141,7 @@ export function applyOperator(
 
 /** Evaluate a single rule against a row. */
 export function evaluateRule<TData extends RowData>(
-  row: Row<TData>,
+  row: DataTableRow<TData>,
   rule: AdvancedFilterRule
 ): boolean {
   return applyOperator(
@@ -155,7 +154,7 @@ export function evaluateRule<TData extends RowData>(
 
 /** Evaluate the whole group against a row (AND/OR over its rules). */
 export function evaluateAdvancedFilterGroup<TData extends RowData>(
-  row: Row<TData>,
+  row: DataTableRow<TData>,
   group: AdvancedFilterGroup
 ): boolean {
   if (group.rules.length === 0) return true
@@ -220,13 +219,13 @@ export function isValuelessOperator(operator: AdvancedFilterOperator): boolean {
 /** Rebuild a row model from a filtered set of top-level rows, recomputing the
  *  flat list + id map from the kept rows and their descendants. */
 function filterRowModel<TData extends RowData>(
-  model: RowModel<TData>,
-  predicate: (row: Row<TData>) => boolean
-): RowModel<TData> {
+  model: DataTableRowModel<TData>,
+  predicate: (row: DataTableRow<TData>) => boolean
+): DataTableRowModel<TData> {
   const rows = model.rows.filter(predicate)
-  const flatRows: Row<TData>[] = []
-  const rowsById: Record<string, Row<TData>> = {}
-  const collect = (rs: Row<TData>[]) => {
+  const flatRows: DataTableRow<TData>[] = []
+  const rowsById: Record<string, DataTableRow<TData>> = {}
+  const collect = (rs: DataTableRow<TData>[]) => {
     for (const row of rs) {
       flatRows.push(row)
       rowsById[row.id] = row
@@ -246,13 +245,13 @@ function filterRowModel<TData extends RowData>(
  */
 export function createAdvancedFilteredRowModel<TData extends RowData>(
   getGroup: () => AdvancedFilterGroup
-): (table: Table<TData>) => () => RowModel<TData> {
+): (table: DataTableCoreTable<TData>) => () => DataTableRowModel<TData> {
   const base = getFilteredRowModel<TData>()
   return (table) => {
     const delegate = base(table)
-    let cachedFor: RowModel<TData> | null = null
+    let cachedFor: DataTableRowModel<TData> | null = null
     let cachedGroup: AdvancedFilterGroup | null = null
-    let cached: RowModel<TData> | null = null
+    let cached: DataTableRowModel<TData> | null = null
     return () => {
       const model = delegate()
       const group = getGroup()

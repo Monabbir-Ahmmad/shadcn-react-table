@@ -1,12 +1,13 @@
 "use client"
 
 import * as React from "react"
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { Button } from "@workspace/ui/components/button"
 
 import type { DataTableIcons, IconComponent } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
+import type { DataTableColumnDef } from "../core/table-types"
 
 export const ROW_DRAG_COLUMN_ID = "cn-row-drag"
 
@@ -26,7 +27,7 @@ export const RowDragContext = React.createContext<RowDragHandleProps | null>(
 export function createRowDragHandleColumn<TData extends RowData>(
   localization: DataTableLocalization,
   icons: DataTableIcons
-): ColumnDef<TData> {
+): DataTableColumnDef<TData> {
   return {
     id: ROW_DRAG_COLUMN_ID,
     enableSorting: false,

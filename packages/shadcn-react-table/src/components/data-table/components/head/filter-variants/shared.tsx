@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { Column, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { Input } from "@workspace/ui/components/input"
 import { cn } from "@workspace/ui/lib/utils"
@@ -11,9 +11,10 @@ import type {
   DataTableFilterOption,
   DataTableInstance,
 } from "../../../core/types"
+import type { DataTableColumn } from "../../../core/table-types"
 
 export interface FilterFieldProps<TData extends RowData, TValue> {
-  column: Column<TData, TValue>
+  column: DataTableColumn<TData, TValue>
   table: DataTableInstance<TData>
 }
 
@@ -44,7 +45,7 @@ export function ValuelessLabel({ label }: { label: string }) {
 
 /** Options for select-style variants: explicit `meta.options` or faceted values. */
 export function useSelectOptions<TData extends RowData, TValue>(
-  column: Column<TData, TValue>
+  column: DataTableColumn<TData, TValue>
 ): { options: DataTableFilterOption[]; counts: Map<string, number> } {
   const facets = column.getFacetedUniqueValues()
   return React.useMemo(() => {

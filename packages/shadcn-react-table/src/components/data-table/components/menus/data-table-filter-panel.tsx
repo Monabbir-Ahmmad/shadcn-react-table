@@ -1,6 +1,6 @@
 "use client"
 
-import type { Column, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -33,6 +33,7 @@ import {
   isValuelessOperator,
 } from "../../fns/advanced-filter"
 import { getColumnLabel } from "../../helpers/column-label"
+import type { DataTableColumn } from "../../core/table-types"
 
 // Monotonic ids for new rules. Panel is client-only, so a module counter is
 // stable enough (and avoids crypto/uuid deps).
@@ -40,7 +41,7 @@ let ruleSeq = 0
 const nextRuleId = () => `cn-adv-rule-${++ruleSeq}`
 
 function columnVariant<TData extends RowData>(
-  column: Column<TData, unknown> | undefined
+  column: DataTableColumn<TData, unknown> | undefined
 ): FilterVariant {
   return column?.columnDef.meta?.variant ?? "text"
 }
@@ -321,7 +322,7 @@ function RuleValueInput<TData extends RowData>({
 }: {
   rule: AdvancedFilterRule
   variant: FilterVariant
-  column: Column<TData, unknown> | undefined
+  column: DataTableColumn<TData, unknown> | undefined
   localization: Localization<TData>
   onChange: (patch: Partial<AdvancedFilterRule>) => void
 }) {

@@ -1,17 +1,18 @@
 "use client"
 
-import type { Header, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../../core/types"
+import type { DataTableHeader } from "../../../core/table-types"
 
 /** Drag handle to grab the resize edge of a column header. */
 export function ColumnResizeHandle<TData extends RowData, TValue>({
   header,
   table,
 }: {
-  header: Header<TData, TValue>
+  header: DataTableHeader<TData, TValue>
   table: DataTableInstance<TData>
 }) {
   if (!header.column.getCanResize()) return null

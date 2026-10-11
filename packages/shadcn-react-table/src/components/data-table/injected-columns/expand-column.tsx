@@ -1,9 +1,10 @@
 "use client"
 
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
+import type { DataTableColumnDef } from "../core/table-types"
 
 export const EXPAND_COLUMN_ID = "cn-expand"
 
@@ -11,7 +12,7 @@ export const EXPAND_COLUMN_ID = "cn-expand"
 export function createExpandColumn<TData extends RowData>(
   localization: DataTableLocalization,
   icons: DataTableIcons
-): ColumnDef<TData> {
+): DataTableColumnDef<TData> {
   return {
     id: EXPAND_COLUMN_ID,
     enableSorting: false,

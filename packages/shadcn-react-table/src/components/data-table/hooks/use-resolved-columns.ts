@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import {
   createExpandColumn,
@@ -13,9 +13,10 @@ import { createSelectionColumn } from "../injected-columns/selection-column"
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { EditDisplayMode, UseDataTableOptions } from "../core/types"
+import type { DataTableColumnDef } from "../core/table-types"
 
 interface UseResolvedColumnsParams<TData extends RowData> {
-  columns: ColumnDef<TData, unknown>[]
+  columns: DataTableColumnDef<TData, unknown>[]
   enableRowOrdering: boolean
   enableRowSelection: boolean
   selectAllMode: "page" | "all"
@@ -59,7 +60,7 @@ export function useResolvedColumns<TData extends RowData>({
   editDisplayMode,
   localization,
   icons,
-}: UseResolvedColumnsParams<TData>): ColumnDef<TData, unknown>[] {
+}: UseResolvedColumnsParams<TData>): DataTableColumnDef<TData, unknown>[] {
   return React.useMemo(() => {
     const leading = []
     const trailing = []

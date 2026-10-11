@@ -1,7 +1,8 @@
-import type { Column, ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { DISPLAY_COLUMN_IDS } from "../core/constants"
 import type { ColumnFilterDisplayMode, DataTableInstance } from "../core/types"
+import type { DataTableColumn, DataTableColumnDef } from "../core/table-types"
 
 /**
  * Feature flags that decide which affordances a column header renders. Single
@@ -52,7 +53,7 @@ export function headerControlsOptionsFromTable<TData extends RowData>(
 
 /** Whether the column-reorder drag grip renders in this column's header. */
 export function shouldShowColumnDragGrip<TData extends RowData, TValue>(
-  column: Column<TData, TValue>,
+  column: DataTableColumn<TData, TValue>,
   opts: HeaderControlsOptions
 ): boolean {
   if (DISPLAY_COLUMN_IDS.has(column.id)) return false
@@ -66,7 +67,7 @@ export function shouldShowColumnDragGrip<TData extends RowData, TValue>(
 
 /** Whether the column-actions (⋮) trigger renders in this column's header. */
 export function shouldShowColumnActions<TData extends RowData, TValue>(
-  column: Column<TData, TValue>,
+  column: DataTableColumn<TData, TValue>,
   opts: HeaderControlsOptions
 ): boolean {
   return (
@@ -82,7 +83,7 @@ export function shouldShowColumnActions<TData extends RowData, TValue>(
 
 /** Whether the popover filter button renders in this column's header. */
 export function shouldShowColumnFilterButton<TData extends RowData, TValue>(
-  column: Column<TData, TValue>,
+  column: DataTableColumn<TData, TValue>,
   opts: HeaderControlsOptions
 ): boolean {
   return opts.columnFilterDisplayMode === "popover" && column.getCanFilter()
@@ -95,7 +96,7 @@ export function shouldShowColumnFilterButton<TData extends RowData, TValue>(
  * autosizing and as the controls portion of {@link getHeaderControlsMinWidth}.
  */
 export function getHeaderControlsWidth<TData extends RowData, TValue>(
-  column: Column<TData, TValue>,
+  column: DataTableColumn<TData, TValue>,
   opts: HeaderControlsOptions
 ): number {
   return (
@@ -119,7 +120,10 @@ export function getHeaderControlsWidth<TData extends RowData, TValue>(
 // is always ≥ what actually renders — controls can never end up clipped.
 // ----------------------------------------------------------------------------
 
-type AnyColumnDef<TData extends RowData> = ColumnDef<TData, unknown> & {
+type AnyColumnDef<TData extends RowData> = DataTableColumnDef<
+  TData,
+  unknown
+> & {
   accessorKey?: unknown
   accessorFn?: unknown
   columns?: unknown
@@ -176,7 +180,7 @@ function getColumnDefControlsWidth<TData extends RowData>(
 
 /** {@link getHeaderControlsMinWidth} computed from a column def (pre-build). */
 export function getColumnDefMinWidth<TData extends RowData>(
-  def: ColumnDef<TData, unknown>,
+  def: DataTableColumnDef<TData, unknown>,
   opts: HeaderControlsOptions
 ): number {
   return LABEL_AND_PADDING_MIN + getColumnDefControlsWidth(def, opts)
@@ -184,7 +188,7 @@ export function getColumnDefMinWidth<TData extends RowData>(
 
 /** {@link getHeaderPreferredWidth} computed from a column def (pre-build). */
 export function getColumnDefPreferredWidth<TData extends RowData>(
-  def: ColumnDef<TData, unknown>,
+  def: DataTableColumnDef<TData, unknown>,
   opts: HeaderControlsOptions
 ): number {
   const labelWidth = Math.min(
@@ -199,7 +203,7 @@ export function getColumnDefPreferredWidth<TData extends RowData>(
 /** True for a leaf user/data column def (not an injected display column or a
  *  header group) — the only defs that get a control-aware size/minSize. */
 export function isDataColumnDef<TData extends RowData>(
-  def: ColumnDef<TData, unknown>
+  def: DataTableColumnDef<TData, unknown>
 ): boolean {
   const anyDef = def as AnyColumnDef<TData>
   if (Array.isArray(anyDef.columns)) return false

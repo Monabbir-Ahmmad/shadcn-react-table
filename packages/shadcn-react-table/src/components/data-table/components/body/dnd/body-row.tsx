@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { Row, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
@@ -10,6 +10,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { BODY_ROW_CLASS } from "../../../core/constants"
 import { RowDragContext } from "../../../injected-columns/injected-columns"
+import type { DataTableRow } from "../../../core/table-types"
 
 /**
  * Body row. `useSortable` is always called (disabled when row ordering is off).
@@ -24,7 +25,7 @@ export function DataTableBodyRow<TData extends RowData>({
   onClick,
   onDoubleClick,
 }: {
-  row: Row<TData>
+  row: DataTableRow<TData>
   draggable: boolean
   children: React.ReactNode
   className?: string

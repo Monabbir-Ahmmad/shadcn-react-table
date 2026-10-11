@@ -1,4 +1,4 @@
-import type { FilterFn, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import { rankItem } from "@tanstack/match-sorter-utils"
 
 import {
@@ -7,6 +7,7 @@ import {
   type FilterMode,
   type GlobalFilterMode,
 } from "./filter-modes"
+import type { DataTableFilterFn } from "../core/table-types"
 
 /**
  * Single dynamic filter function assigned to every column via `defaultColumn`.
@@ -16,8 +17,8 @@ import {
  */
 export function createDynamicFilterFn<TData extends RowData>(
   getMode: (columnId: string) => FilterMode
-): FilterFn<TData> {
-  const fn: FilterFn<TData> = (row, columnId, filterValue) => {
+): DataTableFilterFn<TData> {
+  const fn: DataTableFilterFn<TData> = (row, columnId, filterValue) => {
     const mode = getMode(columnId)
     const modeFn = MODE_FNS[mode] ?? MODE_FNS.contains
     return modeFn(row.getValue(columnId), filterValue)
@@ -34,8 +35,13 @@ export function createDynamicFilterFn<TData extends RowData>(
  */
 export function createGlobalFilterFn<TData extends RowData>(
   getMode: () => GlobalFilterMode
-): FilterFn<TData> {
-  const fn: FilterFn<TData> = (row, columnId, filterValue, addMeta) => {
+): DataTableFilterFn<TData> {
+  const fn: DataTableFilterFn<TData> = (
+    row,
+    columnId,
+    filterValue,
+    addMeta
+  ) => {
     const value = String(filterValue ?? "")
     if (value === "") return true
     const mode = getMode()

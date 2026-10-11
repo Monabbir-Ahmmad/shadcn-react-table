@@ -1,7 +1,7 @@
 "use client"
 
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { type Cell, type Row, type RowData } from "@tanstack/react-table"
+import { type RowData } from "@tanstack/react-table"
 import type { Virtualizer } from "@tanstack/react-virtual"
 import * as React from "react"
 
@@ -30,6 +30,7 @@ import { DataTableCreateRow } from "../editing/data-table-create-row"
 import { DataTableBodyRow } from "./dnd"
 import { renderBodyCell } from "./render-body-cell"
 import { SkeletonRows } from "./skeleton-rows"
+import type { DataTableCell, DataTableRow } from "../../core/table-types"
 
 interface DataTableBodyProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -90,8 +91,8 @@ export function DataTableBody<TData extends RowData>({
     .find((c) => !NON_DATA_COLUMN_IDS.has(c.id))?.id
 
   const renderCell = (
-    cell: Cell<TData, unknown>,
-    row: Row<TData>,
+    cell: DataTableCell<TData, unknown>,
+    row: DataTableRow<TData>,
     rowIndex: number,
     colIndex: number,
     rowHeightValue: number | "auto" | undefined
@@ -178,7 +179,10 @@ export function DataTableBody<TData extends RowData>({
     )
   }
 
-  const renderCells = (row: Row<TData>, rowIndex: number): React.ReactNode => {
+  const renderCells = (
+    row: DataTableRow<TData>,
+    rowIndex: number
+  ): React.ReactNode => {
     const rowHeightValue = resolveRowHeight(row, { rowHeight, getRowHeight })
     const cells = row.getVisibleCells()
     if (!enableColumnVirtualization) {
@@ -199,7 +203,7 @@ export function DataTableBody<TData extends RowData>({
     )
   }
 
-  const detailRow = (row: Row<TData>) => (
+  const detailRow = (row: DataTableRow<TData>) => (
     <TableRow className="hover:bg-transparent">
       <TableCell colSpan={visibleColumnCount} className="bg-muted/20 p-0">
         <div className="p-3">{renderDetailPanel?.({ row, table })}</div>
@@ -208,7 +212,7 @@ export function DataTableBody<TData extends RowData>({
   )
 
   let runningRowIndex = 0
-  const renderRow = (row: Row<TData>) => {
+  const renderRow = (row: DataTableRow<TData>) => {
     const rowIndex = runningRowIndex++
     const isGrouped = row.getIsGrouped()
     const showDetail = !!renderDetailPanel && row.getIsExpanded() && !isGrouped

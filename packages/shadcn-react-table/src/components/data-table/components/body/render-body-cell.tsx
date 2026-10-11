@@ -1,6 +1,6 @@
 "use client"
 
-import { flexRender, type Cell, type RowData } from "@tanstack/react-table"
+import { flexRender, type RowData } from "@tanstack/react-table"
 import * as React from "react"
 
 import type { DataTableInstance } from "../../core/types"
@@ -8,13 +8,14 @@ import { SUBSTRING_MODES } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
 import { DataTableBodyCellContent } from "../editing/data-table-edit-cell"
 import { Highlight } from "./highlight"
+import type { DataTableCell } from "../../core/table-types"
 
 /**
  * Resolves a body cell's content, handling grouped / aggregated / placeholder
  * cells and falling back to the highlight-aware value renderer.
  */
 export function renderBodyCell<TData extends RowData>(
-  cell: Cell<TData, unknown>,
+  cell: DataTableCell<TData, unknown>,
   table: DataTableInstance<TData>,
   enableHighlight: boolean,
   columnsWithCustomCell: ReadonlySet<string>,
@@ -92,7 +93,7 @@ export function renderBodyCell<TData extends RowData>(
  * no custom cell renderer and an active string substring filter / global query.
  */
 function renderCellContent<TData extends RowData>(
-  cell: Cell<TData, unknown>,
+  cell: DataTableCell<TData, unknown>,
   table: DataTableInstance<TData>,
   enableHighlight: boolean,
   columnsWithCustomCell: ReadonlySet<string>
@@ -117,7 +118,7 @@ function renderCellContent<TData extends RowData>(
 
 /** The active highlight query for a cell: its column filter, else global search. */
 function resolveHighlightQuery<TData extends RowData>(
-  cell: Cell<TData, unknown>,
+  cell: DataTableCell<TData, unknown>,
   table: DataTableInstance<TData>
 ): string | null {
   const filterValue = cell.column.getFilterValue()

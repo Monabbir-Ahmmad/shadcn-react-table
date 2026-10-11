@@ -1,14 +1,15 @@
-import type { Column, RowData, Table } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import type { CSSProperties } from "react"
 
 import type { DataTableInstance } from "../core/types"
+import type { DataTableColumn, DataTableCoreTable } from "../core/table-types"
 
 /**
  * Sticky positioning for a pinned column. Offsets come from TanStack
  * (`getStart`/`getAfter`) so multiple pinned columns stack correctly.
  */
 export function getColumnPinningStyle<TData extends RowData, TValue>(
-  column: Column<TData, TValue>
+  column: DataTableColumn<TData, TValue>
 ): CSSProperties {
   const pinned = column.getIsPinned()
   if (!pinned) return {}
@@ -26,7 +27,7 @@ export function getColumnPinningStyle<TData extends RowData, TValue>(
  * built from `--border` (via a utility) so it reads in light and dark.
  */
 export function getColumnPinningClass<TData extends RowData, TValue>(
-  column: Column<TData, TValue>
+  column: DataTableColumn<TData, TValue>
 ): string {
   const pinned = column.getIsPinned()
   if (!pinned) return ""
@@ -47,7 +48,7 @@ export function getColumnPinningClass<TData extends RowData, TValue>(
  * resize drag updates a variable instead of re-rendering every cell.
  */
 export function getColumnSizeVars<TData extends RowData>(
-  table: Table<TData>
+  table: DataTableCoreTable<TData>
 ): Record<string, string> {
   const headers = table.getFlatHeaders()
   const vars: Record<string, string> = {}
@@ -70,7 +71,7 @@ export function getColumnWidthStyle(columnId: string): CSSProperties {
  * width.
  */
 export function getWidthStyle<TData extends RowData>(
-  column: Column<TData, unknown>,
+  column: DataTableColumn<TData, unknown>,
   table: DataTableInstance<TData>
 ): CSSProperties {
   const { enableColumnResizing, enableColumnVirtualization } =
