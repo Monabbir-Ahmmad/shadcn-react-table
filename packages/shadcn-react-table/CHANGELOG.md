@@ -4,6 +4,23 @@ The version applies to the registry block: `/r/data-table.json` carries it
 in `meta.version`. After installing, record the version you received —
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
 
+## 0.4.2
+
+- **Changed default (surface color):** the table surface, header and body
+  cells now use the shadcn card color (`bg-card`) instead of the page
+  background, so the table matches a `<Card>` out of the box. No visible change
+  in the default light theme; in dark mode the table reads as a raised card.
+  Restore the old look for one table with
+  `surfaceClassName="[--card:var(--background)]"`.
+- **Fix (row hover and state highlights):** body cells are opaque (so pinned
+  columns cover scrolled content), which hid the row's hover, open-menu and
+  dragging highlights. Rows now publish their tint as `--row-tint` and cells
+  paint it over the card, so hover, open-menu, selected and dragging states all
+  show — including on rows with `onRowClick`.
+- **Fix (pinned columns on selected rows):** selected-row cells no longer turn
+  transparent, so content scrolled under a pinned column stays hidden. The
+  selected accent bar now sits on the row's first cell.
+
 ## 0.4.1
 
 - **Fix (infinite scroll):** the load trigger now fires when the table is

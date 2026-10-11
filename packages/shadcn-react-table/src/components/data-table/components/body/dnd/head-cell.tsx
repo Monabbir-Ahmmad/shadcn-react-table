@@ -97,7 +97,7 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
       data-pinned={column.getIsPinned() || undefined}
       aria-sort={ariaSort(column.getIsSorted())}
       className={cn(
-        "relative bg-background",
+        "relative bg-card",
         padding,
         // Match the body: under fixed layout, keep long header labels from
         // bleeding past the (resizable) column edge.

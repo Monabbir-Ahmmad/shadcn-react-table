@@ -41,11 +41,19 @@ export const NON_DATA_COLUMN_IDS = new Set([
 ])
 
 /**
- * Selected-row styling shared by the virtualized row and the DnD/normal row
- * so both paths stay in sync: a primary-tinted background (hover variants
- * keep it stable under the base row hover) plus the 2px inset accent bar.
- * `group` lets cells clear their opaque background via
- * `group-data-[state=selected]` so the tint shows through.
+ * Body-row state tint, shared by the virtualized row and the DnD/normal row so
+ * both paths stay in sync. Cells are opaque (pinned columns must cover
+ * scrolled content), so the row's own background would be hidden; instead the
+ * row publishes its tint as `--row-tint` and {@link BODY_CELL_CLASS} layers it
+ * over the card. Mirrors shadcn's row states: hover / open menu → muted/50,
+ * selected → primary/20 (kept under hover), dragging → muted.
  */
-export const SELECTED_ROW_CLASS =
-  "group data-[state=selected]:bg-primary/20 data-[state=selected]:hover:bg-primary/20 data-[state=selected]:shadow-[inset_2px_0_0_0_var(--primary)]"
+export const BODY_ROW_CLASS =
+  "group [--row-tint:transparent] hover:[--row-tint:color-mix(in_oklab,var(--muted)_50%,transparent)] has-aria-expanded:[--row-tint:color-mix(in_oklab,var(--muted)_50%,transparent)] data-[state=selected]:[--row-tint:color-mix(in_oklab,var(--primary)_20%,transparent)] data-[state=selected]:hover:[--row-tint:color-mix(in_oklab,var(--primary)_20%,transparent)] data-[dragging=true]:[--row-tint:var(--muted)]!"
+
+/**
+ * Body-cell background: the row's `--row-tint` painted over an opaque card
+ * fill, plus the selected row's 2px accent bar on its first cell.
+ */
+export const BODY_CELL_CLASS =
+  "bg-card bg-[linear-gradient(var(--row-tint),var(--row-tint))] group-data-[state=selected]:first:shadow-[inset_2px_0_0_0_var(--primary)]"

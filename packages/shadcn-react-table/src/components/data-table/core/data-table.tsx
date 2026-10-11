@@ -207,7 +207,7 @@ export function DataTable<TData extends RowData>({
               // stays pinned to the visible bottom. Neutralize the shadcn
               // <Table> wrapper's own overflow so it doesn't become a second
               // (unbounded) scroll container that breaks sticky positioning.
-              "relative overflow-auto rounded-md border *:data-[slot=table-container]:overflow-visible",
+              "relative overflow-auto rounded-md border bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
               // MRT-parity default bound: with a sticky header the surface
               // caps near the viewport height, so tall content (long groups,
               // trees, detail panels) scrolls internally under the pinned
@@ -318,7 +318,7 @@ export function DataTable<TData extends RowData>({
 
             {showLoadingOverlay && hasRows && (
               <div
-                className="absolute inset-0 z-10 bg-background/40"
+                className="absolute inset-0 z-10 bg-card/40"
                 aria-hidden
               />
             )}

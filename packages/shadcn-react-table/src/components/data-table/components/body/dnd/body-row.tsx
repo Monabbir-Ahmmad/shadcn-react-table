@@ -8,7 +8,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { TableRow } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { SELECTED_ROW_CLASS } from "../../../core/constants"
+import { BODY_ROW_CLASS } from "../../../core/constants"
 import { RowDragContext } from "../../../injected-columns/injected-columns"
 
 /**
@@ -63,11 +63,11 @@ export function DataTableBodyRow<TData extends RowData>({
         ref={setNodeRef}
         style={style}
         data-state={row.getIsSelected() ? "selected" : undefined}
+        data-dragging={isDragging || undefined}
         onClick={onClick}
         onDoubleClick={onDoubleClick}
         className={cn(
-          SELECTED_ROW_CLASS,
-          isDragging && "bg-muted",
+          BODY_ROW_CLASS,
           (onClick || onDoubleClick) && "cursor-pointer",
           className
         )}
