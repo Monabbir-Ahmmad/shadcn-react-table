@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
+import { pinColumn } from "../helpers/column-pinning"
 import { getColumnPinningStyle } from "../utils/column-styles"
 import type { DataTableColumnDef } from "./table-types"
 import type { UseDataTableOptions } from "./types"
@@ -259,5 +260,14 @@ describe("useDataTable engine behaviour", () => {
       getColumnPinningStyle(result.current.getColumn("name")!)
     ).toMatchObject({ position: "sticky", left: 0 })
     expect(getColumnPinningStyle(result.current.getColumn("age")!)).toEqual({})
+  })
+
+  it("pins a column interactively without a change handler", () => {
+    const { result } = setup({ enableColumnPinning: true })
+    act(() => pinColumn(result.current.getColumn("age")!, "left"))
+    expect(result.current.getState().columnPinning.left).toEqual(["age"])
+    expect(
+      getColumnPinningStyle(result.current.getColumn("age")!)
+    ).toMatchObject({ position: "sticky", left: 0 })
   })
 })

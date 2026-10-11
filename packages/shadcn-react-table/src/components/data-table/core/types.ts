@@ -5,6 +5,7 @@ import type {
   PaginationState,
   ReactTable,
   RowData,
+  TableFeature,
   TableFeatures,
   TableOptions,
 } from "@tanstack/react-table"
@@ -217,6 +218,30 @@ declare module "@tanstack/react-table" {
     disableColumnActions?: boolean
     /** Human-readable label for menus when the header is not a plain string. */
     label?: string
+  }
+
+  // Registers our feature key (TanStack's plugin mechanism). Optional, and
+  // inert for tables that don't include it.
+  interface Plugins {
+    dataTableInstanceFeature: TableFeature
+  }
+
+  // Our instance members on TanStack's `Table` type, only for tables whose
+  // feature set includes `dataTableInstanceFeature` (i.e. `DataTableFeatures`).
+  // So render contexts (`cell: ({ table }) => …`), `row.table` and
+  // `column.table` type them; other TanStack tables are unaffected.
+  interface Table_FeatureMap<
+    // Unused, but merging requires TanStack's exact type parameters.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    TFeatures extends TableFeatures,
+    TData extends RowData,
+  > {
+    dataTableInstanceFeature: {
+      /** Table state in our stable shape (left/right column pinning). */
+      getState: () => DataTableState
+      /** Our configuration + UI state. */
+      tableInstance: DataTableConfig<TData>
+    }
   }
 }
 

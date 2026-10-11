@@ -268,12 +268,15 @@ export function useDataTable<TData extends RowData>(
     expanding: enableExpanding,
     faceting: enableFacetedValues && !isManualFiltering,
   }
-  // The gates getter runs inside TanStack's row-model computation, not during
-  // this render.
+  // The hook's stable instance (assigned after `useTable` below).
+  const tableRef = React.useRef<DataTableInstance<TData> | null>(null)
+  // The getters run inside TanStack's row-model computation and render
+  // contexts, not during this render.
   // eslint-disable-next-line react-hooks/refs
   const [features] = React.useState(() =>
     createDataTableFeatures({
       gates: () => gatesRef.current,
+      getTableInstance: () => tableRef.current?.tableInstance,
       // The factories are typed for this hook's `TData`; the feature slots are
       // TData-agnostic (TanStack's invariant generics reject the narrower type).
       filteredRowModel:
@@ -424,7 +427,10 @@ export function useDataTable<TData extends RowData>(
         }),
       } as CoreTableState),
     state,
-    onColumnPinningChange: pinningChange,
+    // Only when the consumer handles pinning: TanStack merges these options
+    // over its feature defaults, so an own `undefined` key would replace the
+    // default internal state updater and make pinning a no-op.
+    ...(pinningChange && { onColumnPinningChange: pinningChange }),
     columns: sizedColumns,
     // Default page-reset off: TanStack's auto-reset runs a state update during
     // render (warns in React 19 dev). We reset on filter changes via an effect
@@ -452,7 +458,6 @@ export function useDataTable<TData extends RowData>(
   // v9's useTable returns a fresh wrapper every render; keep one instance for
   // the hook's lifetime (v8 semantics: consumers and our memos rely on a stable
   // `table`) and refresh its fields from the latest wrapper.
-  const tableRef = React.useRef<DataTableInstance<TData> | null>(null)
   const table = Object.assign(
     // eslint-disable-next-line react-hooks/refs
     tableRef.current ?? ({} as DataTableInstance<TData>),
