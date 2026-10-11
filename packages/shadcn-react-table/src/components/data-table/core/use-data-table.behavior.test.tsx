@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 import { pinColumn } from "../helpers/column-pinning"
 import { getColumnPinningStyle } from "../utils/column-styles"
@@ -269,5 +269,88 @@ describe("useDataTable engine behaviour", () => {
     expect(
       getColumnPinningStyle(result.current.getColumn("age")!)
     ).toMatchObject({ position: "sticky", left: 0 })
+  })
+
+  it("returns a stable getState() snapshot while state is unchanged", () => {
+    const { result } = setup({ enableColumnPinning: true })
+    const first = result.current.getState()
+    expect(result.current.getState()).toBe(first)
+    expect(result.current.getState().columnPinning).toBe(first.columnPinning)
+    act(() => result.current.setSorting([{ id: "age", desc: false }]))
+    expect(result.current.getState()).not.toBe(first)
+  })
+
+  it("applies the pagination gate when toggled after mount", () => {
+    const initialState = { pagination: { pageIndex: 0, pageSize: 2 } }
+    const { result, rerender } = renderHook(
+      ({ enablePagination }: { enablePagination: boolean }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          initialState,
+          enablePagination,
+        }),
+      { initialProps: { enablePagination: true } }
+    )
+    expect(result.current.getRowModel().rows).toHaveLength(2)
+    rerender({ enablePagination: false })
+    expect(result.current.getRowModel().rows).toHaveLength(4)
+    rerender({ enablePagination: true })
+    expect(result.current.getRowModel().rows).toHaveLength(2)
+  })
+
+  it("applies the faceting gate when toggled after mount", () => {
+    const { result, rerender } = renderHook(
+      ({ enableFacetedValues }: { enableFacetedValues: boolean }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          enableFacetedValues,
+        }),
+      { initialProps: { enableFacetedValues: true } }
+    )
+    expect(
+      result.current.getColumn("dept")!.getFacetedUniqueValues().size
+    ).toBe(2)
+    rerender({ enableFacetedValues: false })
+    expect(
+      result.current.getColumn("dept")!.getFacetedUniqueValues().size
+    ).toBe(0)
+  })
+
+  it("applies the grouping gate when toggled after mount", () => {
+    const initialState = { grouping: ["dept"] }
+    const { result, rerender } = renderHook(
+      ({ enableGrouping }: { enableGrouping: boolean }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          initialState,
+          enableGrouping,
+        }),
+      { initialProps: { enableGrouping: false } }
+    )
+    expect(result.current.getRowModel().rows).toHaveLength(4)
+    rerender({ enableGrouping: true })
+    expect(result.current.getRowModel().rows).toHaveLength(2)
+  })
+
+  it("reports controlled pinning changes through the left/right handler", () => {
+    const onColumnPinningChange = vi.fn()
+    const { result } = setup({
+      enableColumnPinning: true,
+      state: { columnPinning: { left: [], right: [] } },
+      onColumnPinningChange,
+    })
+    act(() => pinColumn(result.current.getColumn("age")!, "left"))
+    expect(onColumnPinningChange).toHaveBeenCalledTimes(1)
+    const updater = onColumnPinningChange.mock.calls[0]![0]
+    expect(updater({ left: [], right: [] })).toEqual({
+      left: ["age"],
+      right: [],
+    })
   })
 })
