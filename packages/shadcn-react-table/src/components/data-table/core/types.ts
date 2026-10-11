@@ -483,8 +483,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   CoreTableOptions<TData>,
   "features" | "initialState" | "state" | "onColumnPinningChange"
 > {
-  /** Seed state. `pagination` may be partial (TanStack fills the rest from its
-   *  defaults), as on TanStack v8. */
+  /** Initial values for uncontrolled table state. `pagination` may be partial
+   *  (TanStack fills the rest from its defaults); column pinning uses `left` /
+   *  `right`. */
   initialState?: Omit<
     NonNullable<CoreTableOptions<TData>["initialState"]>,
     "columnPinning" | "pagination"
@@ -492,12 +493,16 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
     columnPinning?: DataTableColumnPinningState
     pagination?: Partial<PaginationState>
   }
+  /** Controlled table state slices. Column pinning uses `left` / `right` (not
+   *  TanStack v9's `start` / `end`). */
   state?: Omit<
     NonNullable<CoreTableOptions<TData>["state"]>,
     "columnPinning"
   > & {
     columnPinning?: DataTableColumnPinningState
   }
+  /** Called with an updater over the `left` / `right` pinning state when the
+   *  user pins or unpins a column. */
   onColumnPinningChange?: OnChangeFn<DataTableColumnPinningState>
   localization?: Partial<DataTableLocalization>
   /** Override any subset of the table's icons. */

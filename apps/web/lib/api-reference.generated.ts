@@ -16,21 +16,23 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Seed state. `pagination` may be partial (TanStack fills the rest from its defaults), as on TanStack v8.",
+      "Initial values for uncontrolled table state. `pagination` may be partial (TanStack fills the rest from its defaults); column pinning uses `left` / `right`.",
   },
   {
     name: "state",
     type: 'Omit< NonNullable<CoreTableOptions<TData>["state"]>, "columnPinning" > & { columnPinning?: DataTableColumnPinningState }',
     required: false,
     default: null,
-    description: "",
+    description:
+      "Controlled table state slices. Column pinning uses `left` / `right` (not TanStack v9's `start` / `end`).",
   },
   {
     name: "onColumnPinningChange",
     type: "OnChangeFn<DataTableColumnPinningState>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called with an updater over the `left` / `right` pinning state when the user pins or unpins a column.",
   },
   {
     name: "localization",
