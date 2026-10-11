@@ -16,10 +16,20 @@ export type DataTableState = Omit<CoreState, "columnPinning"> & {
   columnSizingInfo: CoreState["columnResizing"]
 }
 
+// TanStack v9 replaces the store's state object only when a slice changes, so
+// keying on it hands back the same snapshot (and the same slice references)
+// until the next change, like v8's stored state.
+const snapshots = new WeakMap<CoreState, DataTableState>()
+
 export function toDataTableState(state: CoreState): DataTableState {
-  return {
-    ...state,
-    columnPinning: fromCorePinning(state.columnPinning),
-    columnSizingInfo: state.columnResizing,
+  let snapshot = snapshots.get(state)
+  if (!snapshot) {
+    snapshot = {
+      ...state,
+      columnPinning: fromCorePinning(state.columnPinning),
+      columnSizingInfo: state.columnResizing,
+    }
+    snapshots.set(state, snapshot)
   }
+  return snapshot
 }
