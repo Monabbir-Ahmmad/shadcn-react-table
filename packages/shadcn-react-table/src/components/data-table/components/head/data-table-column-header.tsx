@@ -32,10 +32,12 @@ interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
   table: DataTableInstance<TData>
 }
 
+// Right alignment reverses the row so the label hugs the right edge with its
+// controls on the inside; a reversed main axis starts on the right.
 const ALIGN_CLASS = {
   left: "justify-start text-left",
   center: "justify-center text-center",
-  right: "justify-end text-right",
+  right: "flex-row-reverse justify-start text-right",
 } as const
 
 /**
@@ -127,7 +129,6 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
     <div
       className={cn(
         "group/th flex items-center gap-0.5",
-        align === "right" && "flex-row-reverse",
         ALIGN_CLASS[align]
       )}
     >
