@@ -18,7 +18,8 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   feature-set parameter.
 - **Unchanged API:** column pinning in `initialState` / `state` /
   `onColumnPinningChange` and in `table.getState()` keeps `left` / `right`, and
-  `getState().columnSizingInfo` keeps its name. The table instance keeps a
+  the value returned by `table.getState()` keeps its `columnSizingInfo` name
+  (the `columnSizingInfo` options below are renamed). The table instance keeps a
   stable identity across renders, and render contexts
   (`cell: ({ table }) => …`, likewise `header`, `footer`, `aggregatedCell`)
   still receive the enriched instance and are typed as such, so
@@ -27,8 +28,20 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   the table wires every row model itself.
 - **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
   `column.getIsPinned()` returns `"start" | "end"`, and
-  `getPrePaginationRowModel()` is now `getPrePaginatedRowModel()`. Custom
-  aggregation functions use `constructAggregationFn({ aggregate })`.
+  `getPrePaginationRowModel()` is now `getPrePaginatedRowModel()` and
+  `getPaginationRowModel()` is now `getPaginatedRowModel()`. `getLeft*` /
+  `getRight*` are `getStart*` / `getEnd*` (leaf columns, visible cells, header
+  groups, total size), and `column.getStart("left")` / `column.getAfter("right")`
+  take `"start"` / `"end"`. Custom aggregation functions use
+  `constructAggregationFn({ aggregate })`.
+- **Renamed options reach you too:** the column option `sortingFn` is now
+  `sortFn`, and `state.columnSizingInfo`, `initialState.columnSizingInfo` and
+  `onColumnSizingInfoChange` are now `columnResizing` and
+  `onColumnResizingChange`.
+- **Removed options:** `filterFns`, `sortingFns` and `aggregationFns`. Pass
+  custom functions inline on the column (`filterFn`, `sortFn`,
+  `aggregationFn`); built-in string names still work. Type inline filter
+  functions with the exported `DataTableFilterFn<TData>`.
 - **Row type must satisfy `RowData`:** TanStack v9 requires
   `Record<string, any> | Array<any>`, so `unknown` is no longer accepted.
   `DataTableInstance<unknown>` and `useDataTable<unknown>` need a concrete row

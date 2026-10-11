@@ -61,22 +61,36 @@ lists what changed in each version.
    `"mean"`, …) are unchanged.
 4. **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
    `column.getIsPinned()` returns `"start" | "end"`, `getPrePaginatedRowModel()`.
-   Table options and `table.getState()` keep the `left`/`right` pinning shape and
-   the `columnSizingInfo` name.
-5. **Don't destructure row/column/cell methods** (`const { getValue } = row`); call
+   Table options and `table.getState()` keep the `left`/`right` pinning shape,
+   and `table.getState().columnSizingInfo` keeps its name. Other renames:
+   `getLeft*`/`getRight*` are `getStart*`/`getEnd*` (leaf columns, visible
+   cells, header groups, total size), `column.getStart("left")` and
+   `column.getAfter("right")` take `"start"` / `"end"`, and
+   `getPaginationRowModel()` is `getPaginatedRowModel()`.
+5. **Option and column-def renames reach you too.** The column option
+   `sortingFn` is now `sortFn`. `state.columnSizingInfo`,
+   `initialState.columnSizingInfo` and `onColumnSizingInfoChange` are now
+   `columnResizing` and `onColumnResizingChange` (only the value returned by
+   `table.getState()` keeps the `columnSizingInfo` name).
+6. **`filterFns`, `sortingFns` and `aggregationFns` options are gone.** The hook
+   owns the feature set, so pass custom functions inline on the column
+   (`filterFn: myFilterFn`, `sortFn: myCompare`, `aggregationFn: myAgg`). Built-in
+   string names still work. Type inline filter functions with the exported
+   `DataTableFilterFn<TData>`.
+7. **Don't destructure row/column/cell methods** (`const { getValue } = row`); call
    them on the object. Cell-renderer `({ getValue })` still works.
-6. **Row data must satisfy TanStack's `RowData`** (`Record<string, any> | Array<any>`).
+8. **Row data must satisfy TanStack's `RowData`** (`Record<string, any> | Array<any>`).
    `unknown` is no longer accepted, so use a concrete row type for
    `useDataTable<TData>` and `DataTableInstance<TData>`. `DataTableInstance`
    with no type argument now defaults to `RowData`.
-7. **Render contexts are unchanged.** Column renderers (`cell`, `header`,
+9. **Render contexts are unchanged.** Column renderers (`cell`, `header`,
    `footer`, `aggregatedCell`) still receive the enriched instance, so
    `({ table }) => table.getState()` and `table.tableInstance` type-check and
    work as before. TanStack v9's own contexts don't include `getState`.
-8. **`table.options` is the options object you passed in** on the latest render
+10. **`table.options` is the options object you passed in** on the latest render
    (TanStack v9's React adapter behavior), not TanStack's internally merged
    options with feature defaults.
-9. **A small TanStack feature is registered by the block.** Its types add
+11. **A small TanStack feature is registered by the block.** Its types add
    `dataTableInstanceFeature` through TanStack's `Plugins` / `Table_FeatureMap`
    interfaces, scoped to tables built with the block's feature set. Other
    TanStack tables in your app are unaffected, except ones typed
