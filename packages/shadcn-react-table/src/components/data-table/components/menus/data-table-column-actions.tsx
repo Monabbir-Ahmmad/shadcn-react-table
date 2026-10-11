@@ -19,6 +19,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
+import { getPinSide, pinColumn } from "../../helpers/column-pinning"
 import type { DataTableColumn } from "../../core/table-types"
 
 interface DataTableColumnActionsProps<TData extends RowData, TValue> {
@@ -54,7 +55,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
   const canGroup = enableGrouping && column.getCanGroup()
   const isGrouped = column.getIsGrouped()
   const sorted = column.getIsSorted()
-  const pinned = column.getIsPinned()
+  const pinned = getPinSide(column)
   const hasFilter = column.getFilterValue() != null
 
   return (
@@ -157,21 +158,21 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
               <DropdownMenuSeparator />
             )}
             <DropdownMenuItem
-              onClick={() => column.pin("left")}
+              onClick={() => pinColumn(column, "left")}
               disabled={pinned === "left"}
             >
               <icons.pin />
               {localization.pinToLeft}
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => column.pin("right")}
+              onClick={() => pinColumn(column, "right")}
               disabled={pinned === "right"}
             >
               <icons.pin />
               {localization.pinToRight}
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => column.pin(false)}
+              onClick={() => pinColumn(column, false)}
               disabled={!pinned}
             >
               <icons.unpin />

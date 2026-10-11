@@ -16,6 +16,7 @@ import {
   NON_DATA_COLUMN_IDS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
+import { getPinSide } from "../../helpers/column-pinning"
 import { resolveRowHeight } from "../../helpers/resolve-row-height"
 import type {
   VirtualRowItem,
@@ -130,7 +131,7 @@ export function DataTableBody<TData extends RowData>({
         key={cell.id}
         data-cell-row={rowIndex}
         data-cell-col={colIndex}
-        data-pinned={cell.column.getIsPinned() || undefined}
+        data-pinned={getPinSide(cell.column) || undefined}
         tabIndex={
           enableKeyboardNavigation
             ? rowIndex === 0 && colIndex === 0

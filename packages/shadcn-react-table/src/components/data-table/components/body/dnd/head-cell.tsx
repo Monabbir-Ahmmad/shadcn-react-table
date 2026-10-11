@@ -15,6 +15,7 @@ import {
 } from "../../../utils/column-styles"
 import type { IconComponent } from "../../../core/icons"
 import type { DataTableInstance } from "../../../core/types"
+import { getPinSide } from "../../../helpers/column-pinning"
 import { ColumnResizeHandle } from "./column-resize-handle"
 import type { DataTableHeader } from "../../../core/table-types"
 
@@ -95,7 +96,7 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
       ref={setNodeRef}
       colSpan={header.colSpan}
       style={style}
-      data-pinned={column.getIsPinned() || undefined}
+      data-pinned={getPinSide(column) || undefined}
       aria-sort={ariaSort(column.getIsSorted())}
       className={cn(
         "relative bg-card",

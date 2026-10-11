@@ -3,6 +3,11 @@ import type { CSSProperties } from "react"
 
 import type { DataTableInstance } from "../core/types"
 import type { DataTableColumn, DataTableCoreTable } from "../core/table-types"
+import {
+  getPinOffset,
+  getPinSide,
+  isPinnedEdgeColumn,
+} from "../helpers/column-pinning"
 
 /**
  * Sticky positioning for a pinned column. Offsets come from TanStack
@@ -11,15 +16,9 @@ import type { DataTableColumn, DataTableCoreTable } from "../core/table-types"
 export function getColumnPinningStyle<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>
 ): CSSProperties {
-  const pinned = column.getIsPinned()
-  if (!pinned) return {}
-  return {
-    position: "sticky",
-    zIndex: 2,
-    ...(pinned === "left"
-      ? { left: column.getStart("left") }
-      : { right: column.getAfter("right") }),
-  }
+  const side = getPinSide(column)
+  if (!side) return {}
+  return { position: "sticky", zIndex: 2, [side]: getPinOffset(column, side) }
 }
 
 /**
@@ -29,17 +28,11 @@ export function getColumnPinningStyle<TData extends RowData, TValue>(
 export function getColumnPinningClass<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>
 ): string {
-  const pinned = column.getIsPinned()
-  if (!pinned) return ""
-  const isLastLeft = pinned === "left" && column.getIsLastColumn("left")
-  const isFirstRight = pinned === "right" && column.getIsFirstColumn("right")
-  if (isLastLeft) {
-    return "after:pointer-events-none after:absolute after:inset-y-0 after:-right-px after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/60 after:to-transparent"
-  }
-  if (isFirstRight) {
-    return "before:pointer-events-none before:absolute before:inset-y-0 before:-left-px before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/60 before:to-transparent"
-  }
-  return ""
+  const side = getPinSide(column)
+  if (!side || !isPinnedEdgeColumn(column, side)) return ""
+  return side === "left"
+    ? "after:pointer-events-none after:absolute after:inset-y-0 after:-right-px after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/60 after:to-transparent"
+    : "before:pointer-events-none before:absolute before:inset-y-0 before:-left-px before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/60 before:to-transparent"
 }
 
 /**
