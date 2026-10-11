@@ -38,6 +38,50 @@ lists what changed in each version.
   to a pure upstream update.
 </Callout>
 
+## Upgrading to 0.5.0 (TanStack Table v9)
+
+0.5.0 moves the engine to TanStack Table v9. Re-add the block, then:
+
+1. **Type columns with `DataTableColumnDef`.** TanStack v9's `ColumnDef` needs a
+   feature-set type parameter; ours supplies it.
+
+   ```ts
+   import type { DataTableColumnDef } from "@/components/ui/data-table"
+   const columns: DataTableColumnDef<Person>[] = [...]
+   ```
+
+   `DataTableRow`, `DataTableColumn`, `DataTableCell`, and `DataTableHeader` are
+   the matching instance types. Install `@tanstack/react-table@^9` and
+   `@tanstack/match-sorter-utils@^9` (the registry item pins both).
+
+2. **Drop row-model options.** `getCoreRowModel`, `getSortedRowModel`, … are no
+   longer accepted; the table wires every row model itself.
+3. **Custom aggregation functions** use TanStack v9's
+   `constructAggregationFn({ aggregate })` shape. Built-in names (`"sum"`,
+   `"mean"`, …) are unchanged.
+4. **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
+   `column.getIsPinned()` returns `"start" | "end"`, `getPrePaginatedRowModel()`.
+   Table options and `table.getState()` keep the `left`/`right` pinning shape and
+   the `columnSizingInfo` name.
+5. **Don't destructure row/column/cell methods** (`const { getValue } = row`); call
+   them on the object. Cell-renderer `({ getValue })` still works.
+6. **Row data must satisfy TanStack's `RowData`** (`Record<string, any> | Array<any>`).
+   `unknown` is no longer accepted, so use a concrete row type for
+   `useDataTable<TData>` and `DataTableInstance<TData>`. `DataTableInstance`
+   with no type argument now defaults to `RowData`.
+7. **Render contexts are unchanged.** Column renderers (`cell`, `header`,
+   `footer`, `aggregatedCell`) still receive the enriched instance, so
+   `({ table }) => table.getState()` and `table.tableInstance` type-check and
+   work as before. TanStack v9's own contexts don't include `getState`.
+8. **`table.options` is the options object you passed in** on the latest render
+   (TanStack v9's React adapter behavior), not TanStack's internally merged
+   options with feature defaults.
+9. **A small TanStack feature is registered by the block.** Its types add
+   `dataTableInstanceFeature` through TanStack's `Plugins` / `Table_FeatureMap`
+   interfaces, scoped to tables built with the block's feature set. Other
+   TanStack tables in your app are unaffected, except ones typed
+   `Table<any, …>`.
+
 ## Related
 
 - [Installation](/docs/installation)

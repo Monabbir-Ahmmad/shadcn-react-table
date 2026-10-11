@@ -28,8 +28,8 @@ const OUT = join(REPO, "apps/web/public/r")
 // (below) bring their own deps (radix, cmdk, react-day-picker, cva, …) when the
 // consumer's CLI installs them, so those are intentionally NOT listed here.
 const NPM_DEPENDENCIES = [
-  "@tanstack/react-table",
-  "@tanstack/match-sorter-utils",
+  "@tanstack/react-table@^9.2.8",
+  "@tanstack/match-sorter-utils@^9.2.6",
   "@tanstack/react-virtual",
   "@dnd-kit/core",
   "@dnd-kit/sortable",
@@ -145,7 +145,7 @@ const item = {
   type: "registry:block",
   title: "Data Table",
   description:
-    "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
+    "An MRT-complete data table for shadcn/ui (TanStack Table v9): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
   meta: { version: PKG.version },
   dependencies: NPM_DEPENDENCIES,
   devDependencies: DEV_DEPENDENCIES,

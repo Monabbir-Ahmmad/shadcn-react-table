@@ -2,14 +2,17 @@ export const metadata = { title: "Quick start" }
 
 # Quick start
 
-A minimal table is two pieces: **columns** (standard TanStack `ColumnDef`s) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
+A minimal table is two pieces: **columns** (TanStack column defs, typed with `DataTableColumnDef`) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
 
 ```tsx
 "use client"
 
 import * as React from "react"
-import type { ColumnDef } from "@tanstack/react-table"
-import { DataTable, useDataTable } from "@/components/ui/data-table"
+import {
+  DataTable,
+  useDataTable,
+  type DataTableColumnDef,
+} from "@/components/ui/data-table"
 
 type Person = { id: string; name: string; email: string; age: number }
 
@@ -19,7 +22,7 @@ const data: Person[] = [
   { id: "3", name: "Grace Hopper", email: "grace@example.com", age: 85 },
 ]
 
-const columns: ColumnDef<Person>[] = [
+const columns: DataTableColumnDef<Person>[] = [
   { accessorKey: "name", header: "Name" },
   { accessorKey: "email", header: "Email" },
   { accessorKey: "age", header: "Age", meta: { align: "right" } },

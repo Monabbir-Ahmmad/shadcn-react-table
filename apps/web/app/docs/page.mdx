@@ -2,7 +2,7 @@ export const metadata = { title: "Introduction" }
 
 # Shadcn React Table
 
-A **shadcn/ui data table** with [Material React Table](https://www.material-react-table.com/) (MRT V3) feature parity, built on [TanStack Table v8](https://tanstack.com/table/v8). It ships as a shadcn **registry** component — you install the source into your own project with the shadcn CLI, so it inherits your style, base color, and theme tokens and you own every line.
+A **shadcn/ui data table** with [Material React Table](https://www.material-react-table.com/) (MRT V3) feature parity, built on [TanStack Table v9](https://tanstack.com/table/latest). It ships as a shadcn **registry** component — you install the source into your own project with the shadcn CLI, so it inherits your style, base color, and theme tokens and you own every line.
 
 <Example slug="advanced" />
 
@@ -19,7 +19,7 @@ MRT is the most complete React table, but it's tied to Material UI. This table b
 
 It is a thin, opinionated layer over TanStack Table:
 
-- It wraps `useReactTable` with sensible defaults (row models, an auto-injected selection column, localization) and attaches its presentation state + feature flags to the instance as `table.tableInstance`.
+- It wraps TanStack's `useTable` with sensible defaults (row models wired for you, an auto-injected selection column, localization) and attaches its presentation state + feature flags to the instance as `table.tableInstance`.
 - Controlled state (`sorting`, `columnFilters`, `pagination`, `rowSelection`, …), the `manual*` server-side flags, and `getRowId` all **pass straight through** to TanStack. If you know TanStack Table, you already know this table.
 - The `<DataTable />` component reads `table.tableInstance` to render the toolbar, filter row, body, footer, and pagination — no prop drilling.
 

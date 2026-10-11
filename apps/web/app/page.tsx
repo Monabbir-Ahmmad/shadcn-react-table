@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/home/site-footer"
 export const metadata: Metadata = {
   title: "Shadcn React Table — a data table with Material React Table parity",
   description:
-    "A shadcn/ui data table with Material React Table (MRT V3) parity, built on TanStack Table v8 and installed as source you own via the shadcn registry.",
+    "A shadcn/ui data table with Material React Table (MRT V3) parity, built on TanStack Table v9 and installed as source you own via the shadcn registry.",
 }
 
 export default function HomePage() {

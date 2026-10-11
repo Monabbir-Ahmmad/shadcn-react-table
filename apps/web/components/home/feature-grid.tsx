@@ -82,7 +82,7 @@ export function FeatureGrid() {
           Everything Material React Table does
         </h2>
         <p className="mt-4 text-pretty text-muted-foreground">
-          The full breadth of MRT, rebuilt on TanStack Table v8 and driven by a
+          The full breadth of MRT, rebuilt on TanStack Table v9 and driven by a
           single hook — nothing bolted on.
         </p>
       </div>

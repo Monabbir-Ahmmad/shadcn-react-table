@@ -88,7 +88,7 @@ const optionDefaults = destructureDefaults(
 )
 const useDataTableOptions = membersOf(
   typesSf.getInterfaceOrThrow("UseDataTableOptions"),
-  { defaults: optionDefaults, omit: ["getCoreRowModel"] }
+  { defaults: optionDefaults, omit: [] }
 )
 
 // --- Column options (the ColumnMeta augmentation)

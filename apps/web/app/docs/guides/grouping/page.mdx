@@ -27,7 +27,7 @@ return <DataTable table={table} />
 
 ## Aggregations
 
-Aggregations use the standard TanStack Table column options. Set `aggregationFn` to a built-in (`"sum"`, `"mean"`, ...) or a custom function, render the rolled-up value with `aggregatedCell`, and add a `footer` for a grand total.
+Aggregations use the standard TanStack Table column options. Set `aggregationFn` to a built-in (`"sum"`, `"mean"`, ...) or a custom function (built with TanStack v9's `constructAggregationFn({ aggregate })`), render the rolled-up value with `aggregatedCell`, and add a `footer` for a grand total.
 
 ```tsx
 const columns = [

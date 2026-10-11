@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-**shadcn-react-table** (`@monabbir/shadcn-react-table`) is a shadcn/ui data table with **Material React Table (MRT V3) parity**, built on TanStack Table v8 and distributed as a **shadcn registry block** (consumers run `npx shadcn add` and the source is copied into their project). Workspaces:
+**shadcn-react-table** (`@monabbir/shadcn-react-table`) is a shadcn/ui data table with **Material React Table (MRT V3) parity**, built on TanStack Table v9 and distributed as a **shadcn registry block** (consumers run `npx shadcn add` and the source is copied into their project). Workspaces:
 
 - **`packages/shadcn-react-table`** (`@monabbir/shadcn-react-table`) — the product: the data-table module only. Depends on `@workspace/ui` for the shadcn primitives it renders.
 - **`packages/ui`** (`@workspace/ui`) — the shared shadcn primitives (button, dialog, table, …), `lib/utils` (`cn`), and the single `globals.css`. This is the shadcn target — `pnpm dlx shadcn add` writes here. Consumed by both `@monabbir/shadcn-react-table` and `apps/web`.

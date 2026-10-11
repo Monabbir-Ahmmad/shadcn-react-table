@@ -1,7 +1,7 @@
 # Shadcn React Table
 
 A shadcn/ui data table with Material React Table (MRT V3) parity, built on
-TanStack Table v8. Import from `@monabbir/shadcn-react-table/components/data-table`.
+TanStack Table v9. Import from `@monabbir/shadcn-react-table/components/data-table`.
 
 ```tsx
 const table = useDataTable({ data, columns /* + feature flags */ })
@@ -80,5 +80,5 @@ token is `--highlight` (match highlighting), shipped with a fallback to
 
 - Column virtualization applies fixed column widths and is not combined with
   column pinning/ordering or grouped (multi-row) headers.
-- React Compiler is disabled around `useReactTable`/`useVirtualizer` (a known
-  TanStack v8 interaction); the lint warning is expected and benign.
+- React Compiler is disabled around `useTable`/`useVirtualizer` (TanStack's
+  mutable instance); the lint warning is expected and benign.

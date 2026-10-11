@@ -35,7 +35,7 @@ Sorting is standard TanStack, so the usual column knobs apply:
 - `sortingFn` — a custom comparator.
 
 ```tsx
-const columns: ColumnDef<Person>[] = [
+const columns: DataTableColumnDef<Person>[] = [
   { accessorKey: "id", header: "ID", enableSorting: false },
   { accessorKey: "salary", header: "Salary", sortDescFirst: true },
 ]
@@ -59,4 +59,4 @@ const table = useDataTable({
 ## Related
 
 - [useDataTable options](/docs/api/use-data-table) — `enableMultiSort` and other sort flags pass through to TanStack.
-- TanStack Table [sorting guide](https://tanstack.com/table/v8/docs/guide/sorting).
+- TanStack Table [sorting guide](https://tanstack.com/table/latest).

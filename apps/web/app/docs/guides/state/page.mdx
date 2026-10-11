@@ -6,7 +6,7 @@ The data table has two layers of state, and both can be left uncontrolled, obser
 
 ## TanStack table state
 
-All the standard table state — sorting, column filters, global filter, pagination, row selection, column visibility, ordering, pinning, sizing, expansion, grouping — is plain TanStack Table state. `useDataTable` spreads its options straight into `useReactTable`, so you control it exactly as you would in TanStack: pass `state` + the matching `onXChange` setter (and optionally `initialState` for uncontrolled seeds).
+All the standard table state — sorting, column filters, global filter, pagination, row selection, column visibility, ordering, pinning, sizing, expansion, grouping — is plain TanStack Table state. `useDataTable` spreads its options straight into TanStack's `useTable`, so you control it exactly as you would in TanStack: pass `state` + the matching `onXChange` setter (and optionally `initialState` for uncontrolled seeds).
 
 ```tsx
 const [sorting, setSorting] = React.useState<SortingState>([])

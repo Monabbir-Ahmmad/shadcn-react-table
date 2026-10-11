@@ -8,7 +8,7 @@ import { DemoShowcase } from "@/components/home/demo-showcase"
 
 const GITHUB_URL = "https://github.com/Monabbir-Ahmmad/shadcn-react-table"
 
-const META = ["MRT V3 parity", "TanStack Table v8", "shadcn registry"]
+const META = ["MRT V3 parity", "TanStack Table v9", "shadcn registry"]
 
 /**
  * Landing hero: a serif headline and CTAs over a faint grid, anchored by a

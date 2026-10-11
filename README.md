@@ -2,7 +2,7 @@
 
 # shadcn-react-table
 
-**A fully featured shadcn/ui implementation of TanStack React Table V8, with Material React Table (MRT V3) feature parity — shipped as a shadcn registry block, not a library.**
+**A fully featured shadcn/ui implementation of TanStack React Table V9, with Material React Table (MRT V3) feature parity — shipped as a shadcn registry block, not a library.**
 
 [![Release](https://img.shields.io/github/v/release/Monabbir-Ahmmad/shadcn-react-table)](https://github.com/Monabbir-Ahmmad/shadcn-react-table/releases)
 [![CI](https://github.com/Monabbir-Ahmmad/shadcn-react-table/actions/workflows/ci.yml/badge.svg)](https://github.com/Monabbir-Ahmmad/shadcn-react-table/actions/workflows/ci.yml)
@@ -18,7 +18,7 @@
 Quickly create high-quality React data tables that look and feel like the rest
 of your shadcn/ui project.
 
-Built with [shadcn/ui](https://ui.shadcn.com), [TanStack Table <sup>V8</sup>](https://tanstack.com/table/v8),
+Built with [shadcn/ui](https://ui.shadcn.com), [TanStack Table <sup>V9</sup>](https://tanstack.com/table/latest),
 and [Tailwind CSS <sup>V4</sup>](https://tailwindcss.com). The API and feature
 set are modeled on [Material React Table <sup>V3</sup>](https://www.material-react-table.com)
 — all of MRT V3's feature guides are implemented.
@@ -107,7 +107,7 @@ Copy `packages/shadcn-react-table/src/components/data-table/` into your `@/compo
 then add the table's own npm deps:
 
 ```bash
-pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns lucide-react
+pnpm add @tanstack/react-table@^9 @tanstack/match-sorter-utils@^9 @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns lucide-react
 ```
 
 Only `@tanstack/react-table` is strictly required; the rest are per-feature:
@@ -159,9 +159,12 @@ aggregation, click-to-copy, …) is configured via `columnDef.meta`.
 "use client"
 
 import * as React from "react"
-import type { ColumnDef } from "@tanstack/react-table"
 // after `shadcn add` it lands here; inside this monorepo it's @monabbir/shadcn-react-table/components/data-table
-import { DataTable, useDataTable } from "@/components/ui/data-table"
+import {
+  DataTable,
+  useDataTable,
+  type DataTableColumnDef,
+} from "@/components/ui/data-table"
 
 type Payment = {
   id: string
@@ -171,7 +174,7 @@ type Payment = {
   amount: number
 }
 
-const columns: ColumnDef<Payment>[] = [
+const columns: DataTableColumnDef<Payment>[] = [
   { accessorKey: "customer", header: "Customer" },
   {
     accessorKey: "email",
@@ -292,4 +295,4 @@ The API surface, option names, and feature set are openly modeled on
 [Material React Table](https://www.material-react-table.com) by
 [Kevin Van Cott](https://github.com/KevinVandy) — years of API design iteration
 this project gratefully stands on. Powering everything underneath:
-[TanStack Table](https://tanstack.com/table/v8) and [shadcn/ui](https://ui.shadcn.com).
+[TanStack Table](https://tanstack.com/table/latest) and [shadcn/ui](https://ui.shadcn.com).
