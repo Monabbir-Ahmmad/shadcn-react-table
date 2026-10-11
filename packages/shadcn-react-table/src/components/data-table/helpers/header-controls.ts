@@ -3,6 +3,7 @@ import type { RowData } from "@tanstack/react-table"
 import { DISPLAY_COLUMN_IDS } from "../core/constants"
 import type { ColumnFilterDisplayMode, DataTableInstance } from "../core/types"
 import type { DataTableColumn, DataTableColumnDef } from "../core/table-types"
+import { getPinSide } from "./column-pinning"
 
 /**
  * Feature flags that decide which affordances a column header renders. Single
@@ -61,7 +62,7 @@ export function shouldShowColumnDragGrip<TData extends RowData, TValue>(
     (opts.enableColumnOrdering ||
       (opts.enableGrouping && column.getCanGroup())) &&
     !opts.enableColumnVirtualization &&
-    !column.getIsPinned()
+    !getPinSide(column)
   )
 }
 
