@@ -1,15 +1,26 @@
-import type { RowData, TableOptions, Column } from "@tanstack/react-table"
+import type {
+  CellData,
+  Column,
+  OnChangeFn,
+  PaginationState,
+  ReactTable,
+  RowData,
+  TableFeatures,
+  TableOptions,
+} from "@tanstack/react-table"
 import type * as React from "react"
 
 import type { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual"
 
 import type { FilterMode, GlobalFilterMode } from "../fns/filter-fns"
+import type { DataTableColumnPinningState } from "../helpers/column-pinning"
+import type { DataTableState } from "../helpers/table-state"
+import type { DataTableFeatures } from "./features"
 import type { DataTableIcons } from "./icons"
 import type { DataTableLocalization } from "./localization"
 import type {
   DataTableCell,
   DataTableColumn,
-  DataTableCoreTable,
   DataTableRow,
 } from "./table-types"
 
@@ -148,7 +159,11 @@ export type EditVariant = "text" | "number" | "select"
 // Per-column configuration carried on `columnDef.meta`. Augments the TanStack
 // `ColumnMeta` interface so it is strongly typed everywhere `meta` is read.
 declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<
+    TFeatures extends TableFeatures,
+    TData extends RowData,
+    TValue extends CellData = CellData,
+  > {
     /** Filter UI variant rendered in the filter row. Defaults to "text". */
     variant?: FilterVariant
     /** Options for `select` / `multi-select` filter variants. If omitted for a
@@ -160,7 +175,7 @@ declare module "@tanstack/react-table" {
     enableColumnFilterModes?: boolean
     /** Custom filter UI for this column (escape hatch). Replaces the variant. */
     renderColumnFilter?: (props: {
-      column: Column<TData, TValue>
+      column: Column<TFeatures, TData, TValue>
       table: DataTableInstance<TData>
     }) => React.ReactNode
     /** Restrict (and order) the filter-mode menu for this column to this subset
@@ -418,23 +433,47 @@ export interface DataTableConfig<TData extends RowData> {
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 
-/** A TanStack table instance enriched with our `tableInstance` config. */
-export type DataTableInstance<TData extends RowData = unknown> =
-  DataTableCoreTable<TData> & {
-    tableInstance: DataTableConfig<TData>
-  }
+/** The TanStack v9 React table enriched with our `tableInstance` config and a
+ *  `getState()` that returns state in our stable (left/right) shape. */
+export type DataTableInstance<TData extends RowData = RowData> = ReactTable<
+  DataTableFeatures,
+  TData
+> & {
+  tableInstance: DataTableConfig<TData>
+  getState: () => DataTableState
+}
+
+type CoreTableOptions<TData extends RowData> = TableOptions<
+  DataTableFeatures,
+  TData
+>
 
 /**
- * Options for {@link useDataTable}. Extends the full TanStack `TableOptions`
- * (so controlled state, `manual*` flags, `getRowId`, etc. all pass through)
- * and adds our presentation/feature options. `getCoreRowModel` and the other
- * row models are supplied with sensible defaults but can be overridden.
+ * Options for {@link useDataTable}. Extends TanStack's `TableOptions` (so
+ * controlled state, `manual*` flags, `getRowId`, etc. pass through) minus the
+ * feature set and row models, which the hook owns. Column pinning keeps our
+ * left/right shape in `initialState` / `state` / `onColumnPinningChange`.
  */
 export interface UseDataTableOptions<TData extends RowData> extends Omit<
-  TableOptions<TData>,
-  "getCoreRowModel"
+  CoreTableOptions<TData>,
+  "features" | "initialState" | "state" | "onColumnPinningChange"
 > {
-  getCoreRowModel?: TableOptions<TData>["getCoreRowModel"]
+  /** Seed state. `pagination` may be partial (TanStack fills the rest from its
+   *  defaults), as on TanStack v8. */
+  initialState?: Omit<
+    NonNullable<CoreTableOptions<TData>["initialState"]>,
+    "columnPinning" | "pagination"
+  > & {
+    columnPinning?: DataTableColumnPinningState
+    pagination?: Partial<PaginationState>
+  }
+  state?: Omit<
+    NonNullable<CoreTableOptions<TData>["state"]>,
+    "columnPinning"
+  > & {
+    columnPinning?: DataTableColumnPinningState
+  }
+  onColumnPinningChange?: OnChangeFn<DataTableColumnPinningState>
   localization?: Partial<DataTableLocalization>
   /** Override any subset of the table's icons. */
   icons?: Partial<DataTableIcons>

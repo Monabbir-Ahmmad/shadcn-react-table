@@ -10,9 +10,8 @@ import {
 } from "../fns/filter-fns"
 import { useControllableState } from "./use-controllable-state"
 import type {
-  DataTableCoreTable,
   DataTableFilterFn,
-  DataTableRowModel,
+  DataTableRowModelFactory,
 } from "../core/table-types"
 
 interface UseGlobalFilterModeParams {
@@ -31,9 +30,7 @@ export interface GlobalFilterModeState<TData extends RowData> {
   /** Mode-aware global filter fn (new identity per mode → re-runs filtering). */
   dynamicGlobalFilterFn: DataTableFilterFn<TData>
   /** Sorted row model that re-orders by fuzzy rank when ranking is active. */
-  rankedSortedRowModel: (
-    table: DataTableCoreTable<TData>
-  ) => () => DataTableRowModel<TData>
+  rankedSortedRowModel: DataTableRowModelFactory<TData>
 }
 
 /**
@@ -93,7 +90,7 @@ export function useGlobalFilterMode<TData extends RowData>({
         const c = rankingRef.current
         if (!c.enabled || c.mode !== "fuzzy") return false
         if (c.manualSorting || c.manualFiltering) return false
-        const s = t.getState()
+        const s = t.store.state
         if (!s.globalFilter) return false
         if (s.sorting.some(Boolean)) return false
         if (c.grouping && s.grouping.length > 0) return false

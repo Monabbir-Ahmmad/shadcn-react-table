@@ -49,7 +49,10 @@ export function renderBodyCell<TData extends RowData>(
         <span className="font-medium">
           {meta?.renderGroupedCell
             ? meta.renderGroupedCell({ cell, row, column, table })
-            : flexRender(column.columnDef.cell, cell.getContext())}
+            : flexRender(column.columnDef.cell, {
+                ...cell.getContext(),
+                table,
+              })}
         </span>
         <span className="text-xs text-muted-foreground">
           ({row.subRows.length})
@@ -64,7 +67,7 @@ export function renderBodyCell<TData extends RowData>(
     }
     return flexRender(
       column.columnDef.aggregatedCell ?? column.columnDef.cell,
-      cell.getContext()
+      { ...cell.getContext(), table }
     )
   }
 
@@ -113,7 +116,7 @@ function renderCellContent<TData extends RowData>(
     }
   }
 
-  return flexRender(column.columnDef.cell, cell.getContext())
+  return flexRender(column.columnDef.cell, { ...cell.getContext(), table })
 }
 
 /** The active highlight query for a cell: its column filter, else global search. */

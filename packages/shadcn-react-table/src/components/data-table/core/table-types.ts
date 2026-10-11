@@ -1,5 +1,6 @@
 import type {
   Cell,
+  CellData,
   Column,
   ColumnDef,
   FilterFn,
@@ -10,39 +11,51 @@ import type {
   Table,
 } from "@tanstack/react-table"
 
+import type { DataTableFeatures } from "./features"
+
 // Our names for TanStack's generic types. This file is the only place that
-// knows TanStack's generic arity, so a TanStack major bump changes these
-// definitions instead of every call site. Consumers type their columns with
-// `DataTableColumnDef<TData>`.
+// knows TanStack's generic arity (v9 adds the feature-set parameter), so
+// consumers type columns with `DataTableColumnDef<TData>` and never see it.
+
+export type { DataTableFeatures } from "./features"
 
 export type DataTableColumnDef<
   TData extends RowData,
-  TValue = unknown,
-> = ColumnDef<TData, TValue>
+  TValue extends CellData = CellData,
+> = ColumnDef<DataTableFeatures, TData, TValue>
 
-export type DataTableRow<TData extends RowData> = Row<TData>
+export type DataTableRow<TData extends RowData> = Row<DataTableFeatures, TData>
 
-export type DataTableColumn<TData extends RowData, TValue = unknown> = Column<
-  TData,
-  TValue
->
+export type DataTableColumn<
+  TData extends RowData,
+  TValue extends CellData = CellData,
+> = Column<DataTableFeatures, TData, TValue>
 
-export type DataTableCell<TData extends RowData, TValue = unknown> = Cell<
-  TData,
-  TValue
->
+export type DataTableCell<
+  TData extends RowData,
+  TValue extends CellData = CellData,
+> = Cell<DataTableFeatures, TData, TValue>
 
-export type DataTableHeader<TData extends RowData, TValue = unknown> = Header<
-  TData,
-  TValue
->
+export type DataTableHeader<
+  TData extends RowData,
+  TValue extends CellData = CellData,
+> = Header<DataTableFeatures, TData, TValue>
 
 /** The raw TanStack table (no `tableInstance` config attached). */
-export type DataTableCoreTable<TData extends RowData> = Table<TData>
+export type DataTableCoreTable<TData extends RowData> = Table<
+  DataTableFeatures,
+  TData
+>
 
-export type DataTableRowModel<TData extends RowData> = RowModel<TData>
+export type DataTableRowModel<TData extends RowData> = RowModel<
+  DataTableFeatures,
+  TData
+>
 
-export type DataTableFilterFn<TData extends RowData> = FilterFn<TData>
+export type DataTableFilterFn<TData extends RowData> = FilterFn<
+  DataTableFeatures,
+  TData
+>
 
 /** A row-model factory: called once per table, returns the memoized getter. */
 export type DataTableRowModelFactory<TData extends RowData> = (

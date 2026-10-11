@@ -34,8 +34,8 @@ export function createRowNumberColumn<TData extends RowData>(
           ? row.index + 1
           : table.getRowModel().rows.indexOf(row) +
             1 +
-            table.getState().pagination.pageIndex *
-              table.getState().pagination.pageSize
+            table.store.state.pagination.pageIndex *
+              table.store.state.pagination.pageSize
 
       if (!enableRowPinning) {
         return (

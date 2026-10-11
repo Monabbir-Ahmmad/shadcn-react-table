@@ -17,7 +17,7 @@ function makeTable() {
   const table = {
     getState: () => ({ ...state }),
     setPageIndex,
-  } as unknown as DataTableInstance<unknown>
+  } as unknown as DataTableInstance
   return { table, state, setPageIndex }
 }
 

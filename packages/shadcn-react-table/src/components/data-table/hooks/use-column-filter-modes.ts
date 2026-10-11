@@ -33,7 +33,7 @@ export interface ColumnFilterModes<TData extends RowData> {
  * supplies `dynamicFilterFn`.
  */
 export function useColumnFilterModes<TData extends RowData>(
-  columns: DataTableColumnDef<TData, unknown>[]
+  columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>
 ): ColumnFilterModes<TData> {
   const [columnFilterModes, setColumnFilterModes] = React.useState<
     Record<string, FilterMode>

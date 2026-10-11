@@ -23,14 +23,15 @@ export interface CoreColumnPinningState {
 export function getPinSide<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>
 ): PinSide | false {
-  return column.getIsPinned()
+  const pinned = column.getIsPinned()
+  return pinned === "start" ? "left" : pinned === "end" ? "right" : false
 }
 
 export function pinColumn<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>,
   side: PinSide | false
 ): void {
-  column.pin(side)
+  column.pin(side === "left" ? "start" : side === "right" ? "end" : false)
 }
 
 /** Sticky offset from the pinned edge, so stacked pinned columns line up. */
@@ -38,7 +39,7 @@ export function getPinOffset<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>,
   side: PinSide
 ): number {
-  return side === "left" ? column.getStart("left") : column.getAfter("right")
+  return side === "left" ? column.getStart("start") : column.getAfter("end")
 }
 
 /** The boundary column of a pinned group: last on the left, first on the right. */
@@ -47,8 +48,8 @@ export function isPinnedEdgeColumn<TData extends RowData, TValue>(
   side: PinSide
 ): boolean {
   return side === "left"
-    ? column.getIsLastColumn("left")
-    : column.getIsFirstColumn("right")
+    ? column.getIsLastColumn("start")
+    : column.getIsFirstColumn("end")
 }
 
 export function toCorePinning(

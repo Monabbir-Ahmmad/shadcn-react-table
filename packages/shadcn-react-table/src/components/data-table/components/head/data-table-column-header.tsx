@@ -91,7 +91,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
 
   const labelNode = header.isPlaceholder
     ? null
-    : flexRender(column.columnDef.header, header.getContext())
+    : flexRender(column.columnDef.header, { ...header.getContext(), table })
 
   const canSort = column.getCanSort()
   const sorted = column.getIsSorted() // false | "asc" | "desc"

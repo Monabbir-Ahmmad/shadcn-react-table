@@ -4,7 +4,7 @@ import { resolveRowHeight } from "./resolve-row-height"
 import type { DataTableRow } from "../core/table-types"
 
 // The resolver only forwards the row to getRowHeight, so a stub id is enough.
-const row = { id: "r1" } as unknown as DataTableRow<unknown>
+const row = { id: "r1" } as unknown as DataTableRow<Record<string, unknown>>
 
 describe("resolveRowHeight", () => {
   it("returns the number from getRowHeight", () => {

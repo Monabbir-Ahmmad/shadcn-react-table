@@ -1,4 +1,3 @@
-import { getCoreRowModel } from "@tanstack/react-table"
 import { renderHook } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
@@ -17,7 +16,6 @@ function render(options: Record<string, unknown> = {}) {
       columns,
       data,
       getRowId: (row) => row.id,
-      getCoreRowModel: getCoreRowModel(),
       ...options,
     })
   )

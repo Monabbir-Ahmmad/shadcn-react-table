@@ -1,9 +1,11 @@
-import { getSortedRowModel, type RowData } from "@tanstack/react-table"
+import { createSortedRowModel, type RowData } from "@tanstack/react-table"
 import type { RankingInfo } from "@tanstack/match-sorter-utils"
 import type {
   DataTableCoreTable,
+  DataTableFeatures,
   DataTableRow,
   DataTableRowModel,
+  DataTableRowModelFactory,
 } from "../core/table-types"
 
 /**
@@ -39,8 +41,8 @@ export function rankGlobalFuzzy<TData extends RowData>(
  */
 export function createRankedSortedRowModel<TData extends RowData>(
   isActive: (table: DataTableCoreTable<TData>) => boolean
-): (table: DataTableCoreTable<TData>) => () => DataTableRowModel<TData> {
-  const base = getSortedRowModel<TData>()
+): DataTableRowModelFactory<TData> {
+  const base = createSortedRowModel<DataTableFeatures, TData>()
   return (table) => {
     const delegate = base(table)
     let cachedFor: DataTableRowModel<TData> | null = null

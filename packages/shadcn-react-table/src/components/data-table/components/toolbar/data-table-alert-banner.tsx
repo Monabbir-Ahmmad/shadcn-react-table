@@ -21,7 +21,7 @@ export function DataTableAlertBanner<TData extends RowData>({
   const selectedCount = table.getSelectedRowModel().rows.length
   if (selectedCount === 0) return null
 
-  const totalCount = table.getPrePaginationRowModel().rows.length
+  const totalCount = table.getPrePaginatedRowModel().rows.length
 
   return (
     <div

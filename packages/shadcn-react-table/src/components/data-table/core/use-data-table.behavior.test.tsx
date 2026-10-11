@@ -233,4 +233,31 @@ describe("useDataTable engine behaviour", () => {
     act(() => result.current.getRow("2").toggleSelected(true))
     expect(ids(result.current.getSelectedRowModel().rows)).toEqual(["2"])
   })
+
+  it("follows controlled left/right column pinning across rerenders", () => {
+    const { result, rerender } = renderHook(
+      ({ state }: { state: Options["state"] }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          enableColumnPinning: true,
+          state,
+        }),
+      {
+        initialProps: {
+          state: { columnPinning: { left: ["age"], right: [] } },
+        },
+      }
+    )
+    expect(
+      getColumnPinningStyle(result.current.getColumn("age")!)
+    ).toMatchObject({ position: "sticky", left: 0 })
+
+    rerender({ state: { columnPinning: { left: ["name"], right: [] } } })
+    expect(
+      getColumnPinningStyle(result.current.getColumn("name")!)
+    ).toMatchObject({ position: "sticky", left: 0 })
+    expect(getColumnPinningStyle(result.current.getColumn("age")!)).toEqual({})
+  })
 })

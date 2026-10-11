@@ -16,7 +16,7 @@ import type { EditDisplayMode, UseDataTableOptions } from "../core/types"
 import type { DataTableColumnDef } from "../core/table-types"
 
 interface UseResolvedColumnsParams<TData extends RowData> {
-  columns: DataTableColumnDef<TData, unknown>[]
+  columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>
   enableRowOrdering: boolean
   enableRowSelection: boolean
   selectAllMode: "page" | "all"
@@ -60,7 +60,9 @@ export function useResolvedColumns<TData extends RowData>({
   editDisplayMode,
   localization,
   icons,
-}: UseResolvedColumnsParams<TData>): DataTableColumnDef<TData, unknown>[] {
+}: UseResolvedColumnsParams<TData>): ReadonlyArray<
+  DataTableColumnDef<TData, unknown>
+> {
   return React.useMemo(() => {
     const leading = []
     const trailing = []

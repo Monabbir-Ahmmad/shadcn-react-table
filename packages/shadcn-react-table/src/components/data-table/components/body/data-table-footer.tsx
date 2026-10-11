@@ -72,7 +72,10 @@ export function DataTableFooter<TData extends RowData>({
           >
             {header.isPlaceholder
               ? null
-              : flexRender(header.column.columnDef.footer, header.getContext())}
+              : flexRender(header.column.columnDef.footer, {
+                  ...header.getContext(),
+                  table,
+                })}
           </TableCell>
         ))
         return (

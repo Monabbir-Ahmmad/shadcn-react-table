@@ -1,4 +1,4 @@
-import { getFilteredRowModel, type RowData } from "@tanstack/react-table"
+import { createFilteredRowModel, type RowData } from "@tanstack/react-table"
 
 import type {
   AdvancedFilterGroup,
@@ -7,9 +7,10 @@ import type {
   FilterVariant,
 } from "../core/types"
 import type {
-  DataTableCoreTable,
+  DataTableFeatures,
   DataTableRow,
   DataTableRowModel,
+  DataTableRowModelFactory,
 } from "../core/table-types"
 
 /** A value that contributes nothing to a filter (no cell value / no input). */
@@ -245,8 +246,8 @@ function filterRowModel<TData extends RowData>(
  */
 export function createAdvancedFilteredRowModel<TData extends RowData>(
   getGroup: () => AdvancedFilterGroup
-): (table: DataTableCoreTable<TData>) => () => DataTableRowModel<TData> {
-  const base = getFilteredRowModel<TData>()
+): DataTableRowModelFactory<TData> {
+  const base = createFilteredRowModel<DataTableFeatures, TData>()
   return (table) => {
     const delegate = base(table)
     let cachedFor: DataTableRowModel<TData> | null = null

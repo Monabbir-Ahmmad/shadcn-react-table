@@ -1,21 +1,11 @@
 "use client"
 
-import {
-  getCoreRowModel,
-  getExpandedRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getPaginationRowModel,
-  useReactTable,
-  type RowData,
-} from "@tanstack/react-table"
+import { useTable, type RowData, type TableState } from "@tanstack/react-table"
 import * as React from "react"
 
 import { VALUELESS_MODES, type FilterMode } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
+import { mapPinningUpdater, toCorePinning } from "../helpers/column-pinning"
 import { getColumnLabel } from "../helpers/column-label"
 import {
   getColumnDefMinWidth,
@@ -25,6 +15,7 @@ import {
   type HeaderControlsOptions,
 } from "../helpers/header-controls"
 import { measureColumnWidth } from "../helpers/measure-column-width"
+import { toDataTableState } from "../helpers/table-state"
 import { useAdvancedFilter } from "../hooks/use-advanced-filter"
 import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
 import { useControllableState } from "../hooks/use-controllable-state"
@@ -33,6 +24,11 @@ import { useGlobalFilterMode } from "../hooks/use-global-filter-mode"
 import { usePageResetOnFilterChange } from "../hooks/use-page-reset-on-filter-change"
 import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { useDataTableConfigContext } from "./config-context"
+import {
+  createDataTableFeatures,
+  type DataTableFeatures,
+  type RowModelGates,
+} from "./features"
 import { defaultIcons } from "./icons"
 import { defaultLocalization } from "./localization"
 import type {
@@ -42,8 +38,10 @@ import type {
   UseDataTableOptions,
 } from "./types"
 
+type CoreTableState = Partial<TableState<DataTableFeatures>>
+
 /**
- * Core hook. Wraps `useReactTable` with MRT-flavoured defaults (row models,
+ * Core hook. Wraps `useTable` with MRT-flavoured defaults (row models,
  * auto-injected selection column, localization) and attaches our presentation
  * state + feature flags to the instance as `table.tableInstance`. Returns the
  * enriched instance to hand to `<DataTable table={table} />`.
@@ -260,6 +258,68 @@ export function useDataTable<TData extends RowData>(
     onAdvancedFilterChange,
   })
 
+  // Row-model stages our options can switch off. Read through a ref inside the
+  // (cached-once) factories so toggling an option takes effect immediately.
+  const gatesRef = React.useRef<RowModelGates>(null!)
+  // eslint-disable-next-line react-hooks/refs
+  gatesRef.current = {
+    pagination: enablePagination,
+    grouping: enableGrouping,
+    expanding: enableExpanding,
+    faceting: enableFacetedValues && !isManualFiltering,
+  }
+  // The gates getter runs inside TanStack's row-model computation, not during
+  // this render.
+  // eslint-disable-next-line react-hooks/refs
+  const [features] = React.useState(() =>
+    createDataTableFeatures({
+      gates: () => gatesRef.current,
+      // The factories are typed for this hook's `TData`; the feature slots are
+      // TData-agnostic (TanStack's invariant generics reject the narrower type).
+      filteredRowModel:
+        advancedFilteredRowModel as DataTableFeatures["filteredRowModel"],
+      sortedRowModel:
+        rankedSortedRowModel as DataTableFeatures["sortedRowModel"],
+    })
+  )
+
+  // Consumer pinning speaks left/right; TanStack speaks start/end. Memoize on
+  // the consumer's slice so the controlled state handed to TanStack keeps a
+  // stable reference (TanStack republishes controlled state on shallow change;
+  // a fresh object every render would loop).
+  //
+  // The React Compiler skips this hook: the memoized values below flow into the
+  // mutable TanStack instance. Expected (TanStack v8's `useReactTable` was a
+  // known-incompatible library and bailed the same way); the memos are for
+  // TanStack, not the compiler.
+  /* eslint-disable react-hooks/preserve-manual-memoization */
+  const {
+    initialState,
+    state: stateProp,
+    onColumnPinningChange,
+    ...coreOptions
+  } = tableOptions
+  const controlledPinning = stateProp?.columnPinning
+  const corePinning = React.useMemo(
+    () => (controlledPinning ? toCorePinning(controlledPinning) : undefined),
+    [controlledPinning]
+  )
+  const state = React.useMemo(
+    () =>
+      stateProp &&
+      // Only set `columnPinning` when the consumer controls it (an own key
+      // holding `undefined` would pin TanStack to its initial pinning).
+      ({
+        ...stateProp,
+        ...(corePinning && { columnPinning: corePinning }),
+      } as CoreTableState),
+    [stateProp, corePinning]
+  )
+  const pinningChange = React.useMemo(
+    () => onColumnPinningChange && mapPinningUpdater(onColumnPinningChange),
+    [onColumnPinningChange]
+  )
+
   const enableRowSelection =
     tableOptions.enableRowSelection != null
       ? !!tableOptions.enableRowSelection
@@ -348,11 +408,23 @@ export function useDataTable<TData extends RowData>(
       }),
     [resolvedColumns, headerControlsOptions, baseColumnSize]
   )
+  /* eslint-enable react-hooks/preserve-manual-memoization */
 
-  // The React Compiler bails on TanStack Table's mutable instance; expected.
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable<TData>({
-    ...tableOptions,
+  const reactTable = useTable<DataTableFeatures, TData>({
+    ...coreOptions,
+    features,
+    // Only set `columnPinning` when given: TanStack spreads `initialState`
+    // over its defaults, so an own `undefined` key would erase the default.
+    initialState:
+      initialState &&
+      ({
+        ...initialState,
+        ...(initialState.columnPinning && {
+          columnPinning: toCorePinning(initialState.columnPinning),
+        }),
+      } as CoreTableState),
+    state,
+    onColumnPinningChange: pinningChange,
     columns: sizedColumns,
     // Default page-reset off: TanStack's auto-reset runs a state update during
     // render (warns in React 19 dev). We reset on filter changes via an effect
@@ -375,42 +447,20 @@ export function useDataTable<TData extends RowData>(
     getRowCanExpand:
       tableOptions.getRowCanExpand ??
       (renderDetailPanel ? () => true : undefined),
-    getGroupedRowModel: enableGrouping
-      ? (tableOptions.getGroupedRowModel ?? getGroupedRowModel())
-      : tableOptions.getGroupedRowModel,
-    getExpandedRowModel: enableExpanding
-      ? (tableOptions.getExpandedRowModel ?? getExpandedRowModel())
-      : tableOptions.getExpandedRowModel,
-    getCoreRowModel: tableOptions.getCoreRowModel ?? getCoreRowModel(),
-    getSortedRowModel: tableOptions.manualSorting
-      ? tableOptions.getSortedRowModel
-      : (tableOptions.getSortedRowModel ?? rankedSortedRowModel),
-    getFilteredRowModel: isManualFiltering
-      ? tableOptions.getFilteredRowModel
-      : (tableOptions.getFilteredRowModel ??
-        (enableAdvancedFilter
-          ? advancedFilteredRowModel
-          : getFilteredRowModel())),
-    // Client-side faceting powers select/multi-select option lists + counts and
-    // range-slider bounds. Skipped in manual mode (server supplies facets) or
-    // when `enableFacetedValues` is off.
-    getFacetedRowModel:
-      isManualFiltering || !enableFacetedValues
-        ? tableOptions.getFacetedRowModel
-        : (tableOptions.getFacetedRowModel ?? getFacetedRowModel()),
-    getFacetedUniqueValues:
-      isManualFiltering || !enableFacetedValues
-        ? tableOptions.getFacetedUniqueValues
-        : (tableOptions.getFacetedUniqueValues ?? getFacetedUniqueValues()),
-    getFacetedMinMaxValues:
-      isManualFiltering || !enableFacetedValues
-        ? tableOptions.getFacetedMinMaxValues
-        : (tableOptions.getFacetedMinMaxValues ?? getFacetedMinMaxValues()),
-    getPaginationRowModel:
-      !enablePagination || tableOptions.manualPagination
-        ? tableOptions.getPaginationRowModel
-        : (tableOptions.getPaginationRowModel ?? getPaginationRowModel()),
-  }) as DataTableInstance<TData>
+  })
+
+  // v9's useTable returns a fresh wrapper every render; keep one instance for
+  // the hook's lifetime (v8 semantics: consumers and our memos rely on a stable
+  // `table`) and refresh its fields from the latest wrapper.
+  const tableRef = React.useRef<DataTableInstance<TData> | null>(null)
+  const table = Object.assign(
+    // eslint-disable-next-line react-hooks/refs
+    tableRef.current ?? ({} as DataTableInstance<TData>),
+    reactTable,
+    { getState: () => toDataTableState(reactTable.store.state) }
+  )
+  // eslint-disable-next-line react-hooks/refs
+  tableRef.current = table
 
   const enableColumnFilters = tableOptions.enableColumnFilters !== false
 
@@ -648,6 +698,9 @@ export function useDataTable<TData extends RowData>(
     renderEmpty,
   }
 
+  // The instance is TanStack's mutable object; attaching our config is the
+  // contract (`table.tableInstance`).
+  // eslint-disable-next-line react-hooks/immutability
   table.tableInstance = config
 
   return table

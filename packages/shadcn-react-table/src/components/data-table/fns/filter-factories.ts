@@ -49,7 +49,7 @@ export function createGlobalFilterFn<TData extends RowData>(
       // Stash the rank so `enableGlobalFilterRankedResults` can order rows by
       // match quality; `rankGlobalFuzzy` reads it back off columnFiltersMeta.
       const itemRank = rankItem(row.getValue(columnId), value)
-      addMeta(itemRank)
+      addMeta?.(itemRank)
       return itemRank.passed
     }
     const modeFn = MODE_FNS[mode] ?? MODE_FNS.contains
