@@ -10,9 +10,10 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import {
   ALIGN_CELL,
+  BODY_CELL_CLASS,
+  BODY_ROW_CLASS,
   DENSITY_CELL_PADDING,
   NON_DATA_COLUMN_IDS,
-  SELECTED_ROW_CLASS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
 import { resolveRowHeight } from "../../helpers/resolve-row-height"
@@ -151,7 +152,8 @@ export function DataTableBody<TData extends RowData>({
             : undefined
         }
         className={cn(
-          "relative bg-background group-data-[state=selected]:bg-transparent",
+          "relative",
+          BODY_CELL_CLASS,
           padding,
           ALIGN_CELL[align],
           // Fixed layout (resizing on) clips overflowing content with an
@@ -315,7 +317,7 @@ export function DataTableBody<TData extends RowData>({
                           : undefined
                       }
                       className={cn(
-                        SELECTED_ROW_CLASS,
+                        BODY_ROW_CLASS,
                         (onRowClick || onRowDoubleClick) && "cursor-pointer"
                       )}
                     >
