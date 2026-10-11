@@ -1,6 +1,6 @@
 "use client"
 
-import type { ColumnDef } from "@tanstack/react-table"
+import type { DataTableColumnDef } from "@monabbir/shadcn-react-table/components/data-table"
 
 import { Badge } from "@workspace/ui/components/badge"
 
@@ -53,7 +53,7 @@ const STATUS_OPTIONS = [
  * or tweak this; cells, filter variants, edit variants, and aggregation are all
  * wired so any feature flag can be demonstrated against it.
  */
-export function userColumns(): ColumnDef<User>[] {
+export function userColumns(): DataTableColumnDef<User>[] {
   return [
     {
       accessorKey: "id",

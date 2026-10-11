@@ -8,12 +8,12 @@ import {
   RiSortAsc,
   RiSortDesc,
 } from "@remixicon/react"
-import type { ColumnDef } from "@tanstack/react-table"
 import * as React from "react"
 
 import {
   DataTable,
   useDataTable,
+  type DataTableColumnDef,
   type DataTableInstance,
   type EditDisplayMode,
 } from "@monabbir/shadcn-react-table/components/data-table"
@@ -366,7 +366,7 @@ function DetailPanelExample() {
   return <DataTable table={table} />
 }
 
-const orgColumns: ColumnDef<OrgNode>[] = [
+const orgColumns: DataTableColumnDef<OrgNode>[] = [
   { accessorKey: "name", header: "Name" },
   { accessorKey: "title", header: "Title" },
   { accessorKey: "department", header: "Department" },
@@ -533,17 +533,20 @@ function VirtualizedExample() {
   return <DataTable table={table} />
 }
 
-function wideColumns(): ColumnDef<User>[] {
-  const extra = Array.from({ length: 24 }, (_, i): ColumnDef<User> => ({
-    id: `metric${i}`,
-    header: `Metric ${i + 1}`,
-    accessorFn: (row) => (row.age * (i + 3)) % 100,
-    size: 110,
-    meta: { align: "right" },
-    cell: ({ getValue }) => (
-      <span className="tabular-nums">{getValue<number>()}</span>
-    ),
-  }))
+function wideColumns(): DataTableColumnDef<User>[] {
+  const extra = Array.from(
+    { length: 24 },
+    (_, i): DataTableColumnDef<User> => ({
+      id: `metric${i}`,
+      header: `Metric ${i + 1}`,
+      accessorFn: (row) => (row.age * (i + 3)) % 100,
+      size: 110,
+      meta: { align: "right" },
+      cell: ({ getValue }) => (
+        <span className="tabular-nums">{getValue<number>()}</span>
+      ),
+    })
+  )
   return [...userColumns(), ...extra]
 }
 
@@ -759,8 +762,8 @@ function InfiniteScrollExample() {
 
 function AutoRowHeightExample() {
   const data = React.useMemo(() => baseUsers, [])
-  const columns = React.useMemo<ColumnDef<User>[]>(() => {
-    const bio: ColumnDef<User> = {
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(() => {
+    const bio: DataTableColumnDef<User> = {
       id: "bio",
       header: "Bio",
       size: 300,

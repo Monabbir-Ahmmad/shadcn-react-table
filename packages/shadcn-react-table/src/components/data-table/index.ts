@@ -44,3 +44,11 @@ export type {
   RowVirtualizerOptions,
   ColumnVirtualizerOptions,
 } from "./core/types"
+
+export type {
+  DataTableColumnDef,
+  DataTableRow,
+  DataTableColumn,
+  DataTableCell,
+  DataTableHeader,
+} from "./core/table-types"
