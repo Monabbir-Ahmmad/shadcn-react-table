@@ -21,7 +21,8 @@ const FIELD_CLASS =
 /**
  * A controlled inline edit field (text / number / select). The parent owns the
  * draft value; this renders the input, surfaces validation errors, and wires
- * Enter (commit) / Escape (cancel) / blur (commit) for text inputs.
+ * Enter (commit) / Escape (cancel) / blur (commit) for text inputs; select
+ * commits on pick with the picked value.
  */
 export function DataTableEditField({
   value,
@@ -36,7 +37,7 @@ export function DataTableEditField({
 }: {
   value: unknown
   onChange: (value: unknown) => void
-  onCommit?: () => void
+  onCommit?: (value?: unknown) => void
   onCancel?: () => void
   variant?: EditVariant
   options?: DataTableFilterOption[]
@@ -53,7 +54,9 @@ export function DataTableEditField({
           value={value == null ? "" : String(value)}
           onValueChange={(next) => {
             onChange(next)
-            onCommit?.()
+            // Select commits on pick. Pass the value: the parent's draft
+            // state has not updated yet in this tick.
+            onCommit?.(next)
           }}
         >
           <SelectTrigger

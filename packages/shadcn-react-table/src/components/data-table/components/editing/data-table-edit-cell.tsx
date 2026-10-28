@@ -147,10 +147,10 @@ function LocalDraftEditor<TData extends RowData>({
   const [draft, setDraft] = React.useState<unknown>(() => cell.getValue())
   const error = meta?.validate?.(draft)
 
-  const commit = () => {
-    if (error) return
-    if (draft !== cell.getValue()) {
-      cn.onEditCellSave?.({ row, column, value: draft, table })
+  const commit = (next: unknown = draft) => {
+    if (meta?.validate?.(next)) return
+    if (next !== cell.getValue()) {
+      cn.onEditCellSave?.({ row, column, value: next, table })
     }
     if (exitOnCommit) cn.setEditingCell(null)
   }
