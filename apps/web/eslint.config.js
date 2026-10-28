@@ -3,6 +3,6 @@ import { nextJsConfig } from "@workspace/eslint-config/next-js"
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   // Never lint build output (the static export bundles its own minified JS).
-  { ignores: ["out/**", ".next/**"] },
+  { ignores: ["out/**", ".next/**", "scripts/smoke-fixture/**"] },
   ...(Array.isArray(nextJsConfig) ? nextJsConfig : [nextJsConfig]),
 ]
