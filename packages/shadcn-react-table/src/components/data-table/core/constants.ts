@@ -28,6 +28,7 @@ export const ALIGN_CELL = {
 export const DISPLAY_COLUMN_IDS = new Set([
   SELECTION_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
+  ROW_PIN_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
 ])
 

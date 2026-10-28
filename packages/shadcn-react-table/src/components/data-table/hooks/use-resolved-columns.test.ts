@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest"
 
 import type { DataTableColumnDef } from "../core/table-types"
 import { useDataTable } from "../core/use-data-table"
+import {
+  headerControlsOptionsFromTable,
+  shouldShowColumnDragGrip,
+} from "../helpers/header-controls"
 
 type Person = { id: string; name: string }
 const data: Person[] = [{ id: "1", name: "Ann" }]
@@ -28,5 +32,23 @@ describe("row pinning column", () => {
 
   it("injects nothing when pinning is off", () => {
     expect(leafIds({})).toEqual(["name"])
+  })
+
+  it("keeps the pin column out of header reordering", () => {
+    const table = renderHook(() =>
+      useDataTable<Person>({
+        columns,
+        data,
+        getRowId: (r) => r.id,
+        enableRowPinning: true,
+        enableColumnOrdering: true,
+      })
+    ).result.current
+    const opts = headerControlsOptionsFromTable(table)
+    const grip = (id: string) =>
+      shouldShowColumnDragGrip(table.getColumn(id)!, opts)
+
+    expect(grip("name")).toBe(true)
+    expect(grip("cn-row-pin")).toBe(false)
   })
 })
