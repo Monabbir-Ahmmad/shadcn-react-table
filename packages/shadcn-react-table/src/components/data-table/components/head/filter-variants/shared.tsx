@@ -21,6 +21,13 @@ export interface FilterFieldProps<TData extends RowData, TValue> {
 export const FIELD_CLASS =
   "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
 
+/** A filter date in the localization's language (date-fns "PP" equivalent). */
+export function formatDate(value: Date, language: string): string {
+  return new Intl.DateTimeFormat(language, { dateStyle: "medium" }).format(
+    value
+  )
+}
+
 export const BETWEEN_MODES = new Set(["between", "betweenInclusive"])
 
 /**

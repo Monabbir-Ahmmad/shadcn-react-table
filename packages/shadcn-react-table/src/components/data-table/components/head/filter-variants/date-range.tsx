@@ -1,7 +1,6 @@
 "use client"
 
 import type { RowData } from "@tanstack/react-table"
-import { format } from "date-fns"
 
 import { Button } from "@workspace/ui/components/button"
 import { Calendar } from "@workspace/ui/components/calendar"
@@ -16,6 +15,7 @@ import { getColumnLabel } from "../../../helpers/column-label"
 import {
   CALENDAR_NAV_PROPS,
   FIELD_CLASS,
+  formatDate,
   type FilterFieldProps,
 } from "./shared"
 
@@ -45,7 +45,8 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
           <icons.calendar className="text-muted-foreground" />
           {from || to ? (
             <span className="truncate">
-              {from ? format(from, "PP") : "…"} – {to ? format(to, "PP") : "…"}
+              {from ? formatDate(from, localization.language) : "…"} –{" "}
+              {to ? formatDate(to, localization.language) : "…"}
             </span>
           ) : (
             <span className="truncate text-muted-foreground">

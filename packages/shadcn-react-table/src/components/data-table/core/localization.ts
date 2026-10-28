@@ -6,6 +6,10 @@
  * Default is English. Override per instance via `useDataTable({ localization })`.
  */
 export interface DataTableLocalization {
+  // Language
+  /** BCP 47 tag used to format numbers and dates (e.g. "en", "de"). */
+  language: string
+
   // Selection
   selectAll: string
   selectRow: string
@@ -61,6 +65,8 @@ export interface DataTableLocalization {
   max: string
   pickDate: string
   pickDateRange: string
+  true: string
+  false: string
   /** Labels for each filter mode, keyed by the `FilterMode` string. */
   filterModes: Record<string, string>
 
@@ -124,14 +130,24 @@ export interface DataTableLocalization {
   noRecordsToDisplay: string
   loading: string
   loadingMore: string
+
+  // Drag and drop (screen readers)
+  dragStart: (label: string) => string
+  dragOver: (label: string, over: string) => string
+  dragEnd: (label: string, over: string) => string
+  dragCancel: (label: string) => string
+  dragInstructions: string
+  dragRowLabel: (position: number) => string
 }
 
 export const defaultLocalization: DataTableLocalization = {
+  language: "en",
+
   selectAll: "Select all",
   selectRow: "Select row",
   clearSelection: "Clear selection",
   rowsSelected: (selected, total) =>
-    `${selected} of ${total} row${total === 1 ? "" : "s"} selected`,
+    `${selected.toLocaleString("en")} of ${total.toLocaleString("en")} row${total === 1 ? "" : "s"} selected`,
 
   sortByColumnAsc: (column) => `Sort by ${column} ascending`,
   sortByColumnDesc: (column) => `Sort by ${column} descending`,
@@ -177,6 +193,8 @@ export const defaultLocalization: DataTableLocalization = {
   max: "Max",
   pickDate: "Pick a date",
   pickDateRange: "Pick a date range",
+  true: "True",
+  false: "False",
   filterModes: {
     fuzzy: "Fuzzy",
     contains: "Contains",
@@ -243,12 +261,13 @@ export const defaultLocalization: DataTableLocalization = {
   exitFullscreen: "Exit full screen",
 
   rowsPerPage: "Rows per page",
-  paginationRange: (start, end, total) => `${start}–${end} of ${total}`,
+  paginationRange: (start, end, total) =>
+    `${start.toLocaleString("en")}–${end.toLocaleString("en")} of ${total.toLocaleString("en")}`,
   goToFirstPage: "Go to first page",
   goToPreviousPage: "Go to previous page",
   goToNextPage: "Go to next page",
   goToLastPage: "Go to last page",
-  goToPage: (page) => `Go to page ${page}`,
+  goToPage: (page) => `Go to page ${page.toLocaleString("en")}`,
 
   rowActions: "Row actions",
   edit: "Edit",
@@ -266,4 +285,12 @@ export const defaultLocalization: DataTableLocalization = {
   noRecordsToDisplay: "No records to display",
   loading: "Loading…",
   loadingMore: "Loading more…",
+
+  dragStart: (label) => `Picked up ${label}.`,
+  dragOver: (label, over) => `${label} is over ${over}.`,
+  dragEnd: (label, over) => `${label} was dropped on ${over}.`,
+  dragCancel: (label) => `Dragging was cancelled. ${label} was dropped.`,
+  dragInstructions:
+    "To pick up an item, press space or enter. While dragging, use the arrow keys to move it. Press space or enter again to drop it, or press escape to cancel.",
+  dragRowLabel: (position) => `Row ${position.toLocaleString("en")}`,
 }

@@ -21,6 +21,7 @@ import { DataTableDropToGroupZone } from "../components/toolbar/data-table-group
 import { DataTablePagination } from "../components/toolbar/data-table-pagination"
 import { DataTableToolbar } from "../components/toolbar/data-table-toolbar"
 import { useGridNavigation } from "../hooks/use-grid-navigation"
+import { useDragAnnouncements } from "../hooks/use-drag-announcements"
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll"
 import { useTableDnd } from "../hooks/use-table-dnd"
 import { useTableVirtualizers } from "../hooks/use-table-virtualizers"
@@ -124,6 +125,7 @@ export function DataTable<TData extends RowData>({
     enableKeyboardNavigation
   )
   const { sensors, collisionDetection, handleDragEnd } = useTableDnd(table)
+  const accessibility = useDragAnnouncements(table)
   const { rowVirtualizer, virtualItems, virtualColumns, withColumnSpacers } =
     useTableVirtualizers(table, gridRef)
 
@@ -204,6 +206,7 @@ export function DataTable<TData extends RowData>({
 
         <DndContext
           sensors={sensors}
+          accessibility={accessibility}
           collisionDetection={collisionDetection}
           onDragEnd={handleDragEnd}
         >

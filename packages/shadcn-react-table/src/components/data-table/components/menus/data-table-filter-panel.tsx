@@ -359,8 +359,8 @@ function RuleValueInput<TData extends RowData>({
           <SelectValue placeholder={localization.advancedFiltersValue} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="true">True</SelectItem>
-          <SelectItem value="false">False</SelectItem>
+          <SelectItem value="true">{localization.true}</SelectItem>
+          <SelectItem value="false">{localization.false}</SelectItem>
         </SelectContent>
       </Select>
     )
