@@ -282,12 +282,10 @@ export function useDataTable<TData extends RowData>(
     createDataTableFeatures({
       gates: () => gatesRef.current,
       getTableInstance: () => tableRef.current?.tableInstance,
-      // The factories are typed for this hook's `TData`; the feature slots are
-      // TData-agnostic (TanStack's invariant generics reject the narrower type).
-      filteredRowModel:
-        advancedFilteredRowModel as DataTableFeatures["filteredRowModel"],
-      sortedRowModel:
-        rankedSortedRowModel as DataTableFeatures["sortedRowModel"],
+      // Typed for this hook's `TData`; the slots take TanStack's own
+      // custom-row-model type, which any `TData` fits (see `features.ts`).
+      filteredRowModel: advancedFilteredRowModel,
+      sortedRowModel: rankedSortedRowModel,
     })
   )
 

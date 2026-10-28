@@ -17,6 +17,7 @@ import {
   type BuiltInAggregationFn,
   type RowData,
   type TableFeature,
+  type TableFeatures,
 } from "@tanstack/react-table"
 
 import { toDataTableState } from "../helpers/table-state"
@@ -39,6 +40,17 @@ const builtInAggregationFns: BuiltInAggregationFns = aggregationFns
 // table gets the working one from `createDataTableFeatures`.
 const dataTableInstanceFeature: TableFeature = {}
 
+// Filtering and sorting are filled per table with our own factories, each
+// typed for the hook's `TData`. Their slots take TanStack's own declared type
+// for a custom row model (the factory receives the table untyped), which any
+// such factory fits. The type `createFilteredRowModel()` infers on its own
+// expects `Table<any, any>`, whose filter meta is TanStack's empty
+// `FilterMeta`, not our `RankingInfo`, so our factories wouldn't fit it.
+type FilteredRowModelSlot = NonNullable<TableFeatures["filteredRowModel"]>
+type SortedRowModelSlot = NonNullable<TableFeatures["sortedRowModel"]>
+const filteredRowModel: FilteredRowModelSlot = createFilteredRowModel()
+const sortedRowModel: SortedRowModelSlot = createSortedRowModel()
+
 // Every built-in feature (MRT parity) plus every row model and the full fn
 // registries, so string fns like "sum" / "mean" / "includesString" and the
 // "auto" defaults resolve as they did on TanStack v8. `filterMeta` types what
@@ -46,8 +58,8 @@ const dataTableInstanceFeature: TableFeature = {}
 const baseFeatures = tableFeatures({
   ...stockFeatures,
   dataTableInstanceFeature,
-  filteredRowModel: createFilteredRowModel(),
-  sortedRowModel: createSortedRowModel(),
+  filteredRowModel,
+  sortedRowModel,
   groupedRowModel: createGroupedRowModel(),
   expandedRowModel: createExpandedRowModel(),
   paginatedRowModel: createPaginatedRowModel(),
