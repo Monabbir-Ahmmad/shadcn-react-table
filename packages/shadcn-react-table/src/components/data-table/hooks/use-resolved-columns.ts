@@ -7,6 +7,7 @@ import {
   createExpandColumn,
   createRowDragHandleColumn,
   createRowNumberColumn,
+  createRowPinColumn,
 } from "../injected-columns/injected-columns"
 import { createRowActionsColumn } from "../injected-columns/data-table-row-actions"
 import { createSelectionColumn } from "../injected-columns/selection-column"
@@ -39,7 +40,7 @@ interface UseResolvedColumnsParams<TData extends RowData> {
  * Injects the display columns around the user's columns, memoized so TanStack
  * never receives a new `columns` identity per render (a classic infinite-loop /
  * lost-state trap). Leading order: drag handle → selection → expand → row
- * number → user columns. The expand and row-actions columns can move to the
+ * number (or pin) → user columns. The expand and row-actions columns can move to the
  * trailing/leading edge via `positionExpandColumn` / `positionActionsColumn`.
  */
 export function useResolvedColumns<TData extends RowData>({
@@ -92,6 +93,8 @@ export function useResolvedColumns<TData extends RowData>({
           icons
         )
       )
+    } else if (enableRowPinning) {
+      leading.push(createRowPinColumn<TData>(localization, icons))
     }
     const showRowActions =
       !!renderRowActions ||

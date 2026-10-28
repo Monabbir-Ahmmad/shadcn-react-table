@@ -2,6 +2,7 @@ import {
   EXPAND_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
+  ROW_PIN_COLUMN_ID,
 } from "../injected-columns/injected-columns"
 import { ROW_ACTIONS_COLUMN_ID } from "../injected-columns/data-table-row-actions"
 import { SELECTION_COLUMN_ID } from "../injected-columns/selection-column"
@@ -35,6 +36,7 @@ export const DISPLAY_COLUMN_IDS = new Set([
 export const NON_DATA_COLUMN_IDS = new Set([
   SELECTION_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
+  ROW_PIN_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
   EXPAND_COLUMN_ID,
   ROW_ACTIONS_COLUMN_ID,

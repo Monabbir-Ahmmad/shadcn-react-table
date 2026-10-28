@@ -16,3 +16,4 @@ export {
   ROW_NUMBER_COLUMN_ID,
   createRowNumberColumn,
 } from "./row-number-column"
+export { ROW_PIN_COLUMN_ID, createRowPinColumn } from "./row-pin-column"

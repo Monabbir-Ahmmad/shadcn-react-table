@@ -7,7 +7,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
-import { stopPropagation } from "../helpers/stop-propagation"
+import { RowPinButton } from "./row-pin-button"
 
 export const ROW_NUMBER_COLUMN_ID = "cn-row-number"
 
@@ -57,24 +57,15 @@ export function createRowNumberColumn<TData extends RowData>(
           >
             {number}
           </span>
-          <button
-            type="button"
-            aria-label={pinned ? localization.unpinRow : localization.pinRow}
-            onClick={(event) => {
-              stopPropagation(event)
-              row.pin(pinned ? false : "top")
-            }}
+          <RowPinButton
+            row={row}
+            localization={localization}
+            icons={icons}
             className={cn(
-              "absolute inset-0 flex items-center justify-center text-muted-foreground opacity-0 transition-opacity group-hover/rownum:opacity-100 hover:text-foreground focus-visible:opacity-100",
-              pinned && "text-primary opacity-100"
+              "absolute inset-0 opacity-0 group-hover/rownum:opacity-100 focus-visible:opacity-100",
+              pinned && "opacity-100"
             )}
-          >
-            {pinned ? (
-              <icons.pinnedRow className="size-3.5" />
-            ) : (
-              <icons.pin className="size-3.5" />
-            )}
-          </button>
+          />
         </span>
       )
     },
