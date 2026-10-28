@@ -37,7 +37,9 @@ pnpm install
 
 ## Pull requests
 
-- CI (lint, typecheck, build) runs automatically on every PR and must pass.
+- CI runs automatically on every PR and must pass: lint, typecheck, test,
+  build, generated-artifact freshness, `registry:verify`, and the install smoke
+  test (fresh Radix and Base UI apps).
 - At least one approving review is required before merging.
 - Keep PRs focused — smaller PRs are reviewed faster.
 
