@@ -193,23 +193,39 @@ describe("mode sets and isInactive", () => {
   })
 })
 
+// Bounds use full local datetimes: date-only ISO strings parse as UTC while
+// startOfDay/endOfDay are local, which would make these zone-dependent.
 describe("date modes treat the boundary as a whole day", () => {
   it("betweenDates includes a datetime later on the end day", () => {
     expect(
-      MODE_FNS.betweenDates("2025-01-10T15:00:00", ["2025-01-01", "2025-01-10"])
+      MODE_FNS.betweenDates("2025-01-10T15:00:00", [
+        "2025-01-01T00:00:00",
+        "2025-01-10T00:00:00",
+      ])
     ).toBe(true)
     expect(
-      MODE_FNS.betweenDates("2025-01-11T00:00:01", ["2025-01-01", "2025-01-10"])
+      MODE_FNS.betweenDates("2025-01-11T00:00:01", [
+        "2025-01-01T00:00:00",
+        "2025-01-10T00:00:00",
+      ])
     ).toBe(false)
   })
 
   it("after excludes datetimes on the same day", () => {
-    expect(MODE_FNS.after("2025-01-10T15:00:00", "2025-01-10")).toBe(false)
-    expect(MODE_FNS.after("2025-01-11T00:00:01", "2025-01-10")).toBe(true)
+    expect(MODE_FNS.after("2025-01-10T15:00:00", "2025-01-10T00:00:00")).toBe(
+      false
+    )
+    expect(MODE_FNS.after("2025-01-11T00:00:01", "2025-01-10T00:00:00")).toBe(
+      true
+    )
   })
 
   it("before excludes datetimes on the same day", () => {
-    expect(MODE_FNS.before("2025-01-10T15:00:00", "2025-01-10")).toBe(false)
-    expect(MODE_FNS.before("2025-01-09T23:59:59", "2025-01-10")).toBe(true)
+    expect(MODE_FNS.before("2025-01-10T15:00:00", "2025-01-10T00:00:00")).toBe(
+      false
+    )
+    expect(MODE_FNS.before("2025-01-09T23:59:59", "2025-01-10T00:00:00")).toBe(
+      true
+    )
   })
 })
