@@ -243,17 +243,31 @@ function filterRowModel<TData extends RowData>(
  * group is read through `getGroup` at evaluation time (the factory keeps a
  * stable identity to preserve memoization), and results are cached per
  * underlying model + group so they only recompute when something changes.
+ *
+ * TanStack memoizes its filtered model on state only, never on the filter
+ * functions, so the delegate is rebuilt whenever `options.globalFilterFn`
+ * changes identity (e.g. a global filter mode switch or a consumer swapping
+ * the fn); the fresh memo then recomputes with the new function.
  */
 export function createAdvancedFilteredRowModel<TData extends RowData>(
   getGroup: () => AdvancedFilterGroup
 ): DataTableRowModelFactory<TData> {
   const base = createFilteredRowModel<DataTableFeatures, TData>()
   return (table) => {
-    const delegate = base(table)
+    // TanStack memoizes the filtered model on state only (column filters,
+    // global filter, pre-filtered rows), never on the filter functions. Our
+    // global filter fn is recreated per mode, so key the delegate on its
+    // identity and rebuild it when the fn changes; the fresh memo recomputes.
+    let delegate = base(table)
+    let delegateFor = table.options.globalFilterFn
     let cachedFor: DataTableRowModel<TData> | null = null
     let cachedGroup: AdvancedFilterGroup | null = null
     let cached: DataTableRowModel<TData> | null = null
     return () => {
+      if (table.options.globalFilterFn !== delegateFor) {
+        delegate = base(table)
+        delegateFor = table.options.globalFilterFn
+      }
       const model = delegate()
       const group = getGroup()
       if (group.rules.length === 0) return model

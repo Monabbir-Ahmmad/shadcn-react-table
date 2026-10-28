@@ -56,8 +56,10 @@ export function useGlobalFilterMode<TData extends RowData>({
       onGlobalFilterModeChange
     )
 
-  // Recreating the fn when the mode changes gives it a new identity, which
-  // makes TanStack re-run global filtering with the new mode immediately.
+  // Recreated per mode so it has a new identity: the filtered row model
+  // (fns/advanced-filter.ts) keys its TanStack delegate on
+  // `options.globalFilterFn` and rebuilds it when the fn changes. TanStack's
+  // own memo ignores the fn, so without that the switch would not re-filter.
   const dynamicGlobalFilterFn = React.useMemo(
     () => createGlobalFilterFn<TData>(() => globalFilterMode),
     [globalFilterMode]

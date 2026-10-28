@@ -91,8 +91,30 @@ describe("useDataTable engine behaviour", () => {
   it("re-filters when the global filter mode changes", () => {
     const { result } = setup()
     act(() => result.current.setGlobalFilter("ann"))
+    // Warm the cache the way a rendered body does, then switch modes.
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3"])
     act(() => result.current.tableInstance.setGlobalFilterMode("startsWith"))
     expect(ids(result.current.getRowModel().rows)).toEqual(["2", "3"])
+  })
+
+  it("re-filters when a consumer swaps globalFilterFn", () => {
+    const only =
+      (name: string) => () => (row: { getValue: (id: string) => unknown }) =>
+        row.getValue("name") === name
+    const { result, rerender } = renderHook(
+      ({ fn }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          globalFilterFn: fn as never,
+          state: { globalFilter: "x" },
+        }),
+      { initialProps: { fn: only("Joanna")() } }
+    )
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1"])
+    rerender({ fn: only("Bob")() })
+    expect(ids(result.current.getRowModel().rows)).toEqual(["4"])
   })
 
   it("applies the advanced filter group", () => {
