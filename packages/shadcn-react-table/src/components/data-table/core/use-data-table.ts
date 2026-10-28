@@ -22,6 +22,7 @@ import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
 import { useControllableState } from "../hooks/use-controllable-state"
 import { useEditingState } from "../hooks/use-editing-state"
 import { useGlobalFilterMode } from "../hooks/use-global-filter-mode"
+import { usePageIndexClamp } from "../hooks/use-page-index-clamp"
 import { usePageResetOnFilterChange } from "../hooks/use-page-reset-on-filter-change"
 import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { useDataTableConfigContext } from "./config-context"
@@ -474,6 +475,11 @@ export function useDataTable<TData extends RowData>(
     enablePagination,
     manualPagination: tableOptions.manualPagination,
     autoResetPageIndex: tableOptions.autoResetPageIndex,
+  })
+
+  usePageIndexClamp(table, {
+    enablePagination,
+    manualPagination: tableOptions.manualPagination,
   })
 
   // Advanced filter edits can shrink the result set; jump back to the first
