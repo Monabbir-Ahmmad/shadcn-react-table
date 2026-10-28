@@ -61,6 +61,18 @@ export function DataTableGlobalFilter<TData extends RowData>({
   const external = (table.getState().globalFilter ?? "") as string
   const [expanded, setExpanded] = React.useState(external.length > 0)
   const [value, setValue] = React.useState(external)
+
+  // Outside changes (`setGlobalFilter`, `resetGlobalFilter`, controlled state)
+  // win over the local draft. While typing with a debounce, `external` is
+  // unchanged, so this effect does not run and the draft is kept.
+  // Done during render (React's "adjust state on prop change" pattern) rather
+  // than in an effect, which the react-hooks lint rule flags.
+  const [prevExternal, setPrevExternal] = React.useState(external)
+  if (external !== prevExternal) {
+    setPrevExternal(external)
+    setValue(external)
+    if (external.length > 0) setExpanded(true)
+  }
   // Drive focus-on-expand and let consumers focus the box. Use the forwarded
   // ref when provided (so `DataTable` shares its `searchInputRef`), else a
   // local one. React assigns it directly — no manual `.current` mutation.
