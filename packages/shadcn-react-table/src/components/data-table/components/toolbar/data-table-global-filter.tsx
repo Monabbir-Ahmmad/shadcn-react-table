@@ -63,10 +63,10 @@ export function DataTableGlobalFilter<TData extends RowData>({
   const [value, setValue] = React.useState(external)
 
   // Outside changes (`setGlobalFilter`, `resetGlobalFilter`, controlled state)
-  // win over the local draft. While typing with a debounce, `external` is
-  // unchanged, so this effect does not run and the draft is kept.
-  // Done during render (React's "adjust state on prop change" pattern) rather
-  // than in an effect, which the react-hooks lint rule flags.
+  // win over the local draft. Adjusted during render (React's "derive state
+  // from a prop change" pattern) rather than in an effect, which lint forbids.
+  // While typing with a debounce, `external` is unchanged, so the draft is kept:
+  // `value` only resets when `external` itself changes.
   const [prevExternal, setPrevExternal] = React.useState(external)
   if (external !== prevExternal) {
     setPrevExternal(external)
