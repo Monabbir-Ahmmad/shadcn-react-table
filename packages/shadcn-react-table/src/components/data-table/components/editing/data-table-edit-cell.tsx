@@ -12,6 +12,7 @@ import {
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
+import { stopPropagation } from "../../helpers/stop-propagation"
 import { ClickToCopy } from "../body/click-to-copy"
 import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableCell } from "../../core/table-types"
@@ -77,9 +78,10 @@ export function DataTableBodyCellContent<TData extends RowData>({
     node = (
       <button
         type="button"
-        onClick={() =>
+        onClick={(event) => {
+          stopPropagation(event)
           cn.setEditingCell({ rowId: row.id, columnId: column.id })
-        }
+        }}
         className="-mx-1 w-full rounded-sm px-1 text-left transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"
       >
         {node}
@@ -93,7 +95,7 @@ export function DataTableBodyCellContent<TData extends RowData>({
         <ContextMenuTrigger asChild>
           <span className="block">{node}</span>
         </ContextMenuTrigger>
-        <ContextMenuContent>
+        <ContextMenuContent onClick={stopPropagation}>
           {cn.renderCellActionMenuItems({ cell, row, table })}
         </ContextMenuContent>
       </ContextMenu>

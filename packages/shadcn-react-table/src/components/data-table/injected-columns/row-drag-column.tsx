@@ -8,6 +8,7 @@ import { Button } from "@workspace/ui/components/button"
 import type { DataTableIcons, IconComponent } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
+import { stopPropagation } from "../helpers/stop-propagation"
 
 export const ROW_DRAG_COLUMN_ID = "cn-row-drag"
 
@@ -62,6 +63,7 @@ function RowDragHandle({
       suppressHydrationWarning
       {...(ctx?.attributes ?? {})}
       {...(ctx?.listeners ?? {})}
+      onClick={stopPropagation}
       // touch-none: let dnd-kit's pointer sensor own the touch gesture
       // (otherwise the browser scrolls/selects text before a drag can start on
       // a phone). size-7 gives a finger-friendly tap target.

@@ -6,6 +6,7 @@ import * as React from "react"
 import type { DataTableInstance } from "../../core/types"
 import { SUBSTRING_MODES } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
+import { stopPropagation } from "../../helpers/stop-propagation"
 import { DataTableBodyCellContent } from "../editing/data-table-edit-cell"
 import { Highlight } from "./highlight"
 import type { DataTableCell } from "../../core/table-types"
@@ -37,7 +38,10 @@ export function renderBodyCell<TData extends RowData>(
         type="button"
         aria-label={localization.toggleRowExpanded}
         aria-expanded={row.getIsExpanded()}
-        onClick={row.getToggleExpandedHandler()}
+        onClick={(event) => {
+          stopPropagation(event)
+          row.getToggleExpandedHandler()()
+        }}
         style={{ paddingInlineStart: `${row.depth * 1}rem` }}
         className="flex items-center gap-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
       >

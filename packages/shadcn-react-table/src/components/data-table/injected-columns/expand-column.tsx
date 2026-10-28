@@ -5,6 +5,7 @@ import type { RowData } from "@tanstack/react-table"
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
+import { stopPropagation } from "../helpers/stop-propagation"
 
 export const EXPAND_COLUMN_ID = "cn-expand"
 
@@ -44,7 +45,10 @@ export function createExpandColumn<TData extends RowData>(
           type="button"
           aria-label={localization.toggleRowExpanded}
           aria-expanded={row.getIsExpanded()}
-          onClick={row.getToggleExpandedHandler()}
+          onClick={(event) => {
+            stopPropagation(event)
+            row.getToggleExpandedHandler()()
+          }}
           className="flex items-center justify-center text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40"
         >
           {row.getIsExpanded() ? (

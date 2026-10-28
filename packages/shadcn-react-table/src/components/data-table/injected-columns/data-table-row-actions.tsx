@@ -11,6 +11,7 @@ import {
 
 import type { DataTableInstance } from "../core/types"
 import type { DataTableColumnDef, DataTableRow } from "../core/table-types"
+import { stopPropagation } from "../helpers/stop-propagation"
 
 export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
 
@@ -70,7 +71,10 @@ function RowActionsCell<TData extends RowData>({
 
   if (isEditingThisRow) {
     return (
-      <div className={`flex items-center gap-1 ${justify}`}>
+      <div
+        className={`flex items-center gap-1 ${justify}`}
+        onClick={stopPropagation}
+      >
         <Button
           variant="ghost"
           size="icon"
@@ -99,7 +103,10 @@ function RowActionsCell<TData extends RowData>({
     enableEditing && (editDisplayMode === "row" || editDisplayMode === "modal")
 
   return (
-    <div className={`flex items-center gap-1 ${justify}`}>
+    <div
+      className={`flex items-center gap-1 ${justify}`}
+      onClick={stopPropagation}
+    >
       {canInlineEdit && (
         <Button
           variant="ghost"

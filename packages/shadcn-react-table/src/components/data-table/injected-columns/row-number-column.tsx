@@ -7,6 +7,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
+import { stopPropagation } from "../helpers/stop-propagation"
 
 export const ROW_NUMBER_COLUMN_ID = "cn-row-number"
 
@@ -59,7 +60,10 @@ export function createRowNumberColumn<TData extends RowData>(
           <button
             type="button"
             aria-label={pinned ? localization.unpinRow : localization.pinRow}
-            onClick={() => row.pin(pinned ? false : "top")}
+            onClick={(event) => {
+              stopPropagation(event)
+              row.pin(pinned ? false : "top")
+            }}
             className={cn(
               "absolute inset-0 flex items-center justify-center text-muted-foreground opacity-0 transition-opacity group-hover/rownum:opacity-100 hover:text-foreground focus-visible:opacity-100",
               pinned && "text-primary opacity-100"

@@ -13,6 +13,7 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableFilterOption, EditVariant } from "../../core/types"
+import { stopPropagation } from "../../helpers/stop-propagation"
 
 const FIELD_CLASS =
   "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
@@ -45,7 +46,7 @@ export function DataTableEditField({
 }) {
   if (variant === "select") {
     return (
-      <div className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-0.5" onClick={stopPropagation}>
         <Select
           // Always controlled: "" shows the placeholder in both Radix and
           // Base UI, while `undefined` would flip to uncontrolled.
@@ -77,7 +78,7 @@ export function DataTableEditField({
   }
 
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col gap-0.5" onClick={stopPropagation}>
       <Input
         autoFocus={autoFocus}
         type={variant === "number" ? "number" : "text"}
