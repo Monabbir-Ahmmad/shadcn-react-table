@@ -31,7 +31,7 @@ export type FilterMode =
   | "equalsBool"
 
 import { rankItem } from "@tanstack/match-sorter-utils"
-import { isAfter, isBefore, startOfDay } from "date-fns"
+import { endOfDay, isAfter, isBefore, startOfDay } from "date-fns"
 
 const str = (v: unknown): string => (v == null ? "" : String(v))
 const lower = (v: unknown): string => str(v).toLowerCase()
@@ -75,7 +75,7 @@ export const MODE_FNS: Record<FilterMode, ModeFn> = {
   after: (cell, val) => {
     const c = toDate(cell)
     const v = toDate(val)
-    return c != null && v != null && isAfter(c, startOfDay(v))
+    return c != null && v != null && isAfter(c, endOfDay(v))
   },
   betweenDates: (cell, val) => {
     const c = toDate(cell)
@@ -84,7 +84,7 @@ export const MODE_FNS: Record<FilterMode, ModeFn> = {
     const to = toDate(range[1])
     if (c == null) return false
     if (from != null && isBefore(c, startOfDay(from))) return false
-    if (to != null && isAfter(c, startOfDay(to))) return false
+    if (to != null && isAfter(c, endOfDay(to))) return false
     return from != null || to != null
   },
 

@@ -119,10 +119,10 @@ describe("date modes", () => {
     expect(MODE_FNS.before(jan5Midnight, jan5Morning)).toBe(false)
   })
 
-  // KNOWN QUIRK: only the filter side is floored to start-of-day, so a cell
-  // WITH a time-of-day on the same date still counts as "after" that date.
-  it("after: same-day cell with a later clock time matches", () => {
-    expect(MODE_FNS.after(jan5Morning, jan5Midnight)).toBe(true)
+  // The filter date is a whole day, so a cell later on the same date is not
+  // "after" it; only a later date is.
+  it("after: same-day cell with a later clock time does not match", () => {
+    expect(MODE_FNS.after(jan5Morning, jan5Midnight)).toBe(false)
     expect(MODE_FNS.after(jan6, jan5Morning)).toBe(true)
     expect(MODE_FNS.after(jan4, jan5Morning)).toBe(false)
   })
@@ -190,5 +190,26 @@ describe("mode sets and isInactive", () => {
     [["", "5"], false],
   ])("isInactive(%j) -> %j", (value, expected) => {
     expect(isInactive(value)).toBe(expected)
+  })
+})
+
+describe("date modes treat the boundary as a whole day", () => {
+  it("betweenDates includes a datetime later on the end day", () => {
+    expect(
+      MODE_FNS.betweenDates("2025-01-10T15:00:00", ["2025-01-01", "2025-01-10"])
+    ).toBe(true)
+    expect(
+      MODE_FNS.betweenDates("2025-01-11T00:00:01", ["2025-01-01", "2025-01-10"])
+    ).toBe(false)
+  })
+
+  it("after excludes datetimes on the same day", () => {
+    expect(MODE_FNS.after("2025-01-10T15:00:00", "2025-01-10")).toBe(false)
+    expect(MODE_FNS.after("2025-01-11T00:00:01", "2025-01-10")).toBe(true)
+  })
+
+  it("before excludes datetimes on the same day", () => {
+    expect(MODE_FNS.before("2025-01-10T15:00:00", "2025-01-10")).toBe(false)
+    expect(MODE_FNS.before("2025-01-09T23:59:59", "2025-01-10")).toBe(true)
   })
 })
