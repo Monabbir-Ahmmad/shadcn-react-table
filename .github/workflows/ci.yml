@@ -55,3 +55,37 @@ jobs:
       # aliases `shadcn add` produces), guarding the exact bytes consumers get.
       - name: Registry output compiles for consumers
         run: pnpm --filter shadcn-react-table-web registry:verify
+
+  # Installs the PR's own registry block into a fresh shadcn Next.js app for
+  # each base and proves the app typechecks and builds. Catches breakage that
+  # only shows up through the CLI: upstream primitive differences (Radix vs
+  # Base UI), missing registryDependencies, bad import rewrites.
+  install-smoke:
+    name: install smoke (${{ matrix.base }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        base: [radix, base]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the registry
+        run: pnpm --filter shadcn-react-table-web registry:build
+
+      - name: Install into a fresh app, typecheck, build
+        run: pnpm --filter shadcn-react-table-web registry:smoke -- --base ${{ matrix.base }}

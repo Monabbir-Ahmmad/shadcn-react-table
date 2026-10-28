@@ -41,6 +41,22 @@ pnpm install
 - At least one approving review is required before merging.
 - Keep PRs focused — smaller PRs are reviewed faster.
 
+## Install smoke test
+
+CI installs the block from the PR's own registry into a fresh shadcn Next.js
+app for both the Radix and Base UI bases, then typechecks and builds it. To
+run it locally (needs internet, a few minutes per base):
+
+```bash
+pnpm --filter shadcn-react-table-web registry:build
+pnpm --filter shadcn-react-table-web registry:smoke -- --base radix
+pnpm --filter shadcn-react-table-web registry:smoke -- --base base
+```
+
+Pass `--keep` to leave the generated app in place for debugging; its path is
+printed. A failure names the step (`shadcn init`, `shadcn add`, `typecheck`,
+`next build`).
+
 ## Useful commands
 
 | Command          | What it does                                  |
