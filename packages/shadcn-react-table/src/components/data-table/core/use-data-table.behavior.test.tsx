@@ -375,4 +375,15 @@ describe("useDataTable engine behaviour", () => {
     // ages: 41, 29, 35, 52 -> inclusive 30..45 keeps 41 and 35
     expect(ids(result.current.getRowModel().rows)).toEqual(["1", "3"])
   })
+
+  it("ignores column and global filters when enableFilters is false", () => {
+    const { result } = setup({
+      enableFilters: false,
+      state: {
+        columnFilters: [{ id: "name", value: "Joanna" }],
+        globalFilter: "zzz",
+      },
+    })
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
+  })
 })

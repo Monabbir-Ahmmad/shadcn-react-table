@@ -438,6 +438,11 @@ export function useDataTable<TData extends RowData>(
     // render (warns in React 19 dev). We reset on filter changes via an effect
     // below instead. Consumers can re-enable by passing the option explicitly.
     autoResetPageIndex: tableOptions.autoResetPageIndex ?? false,
+    // `enableFilters: false` is the master switch; TanStack v9 still applies
+    // filters handed in through state, so hand the (no-op) filtering to us.
+    // Spread conditionally: an own `undefined` key would override a consumer
+    // `manualFiltering`.
+    ...(tableOptions.enableFilters === false && { manualFiltering: true }),
     defaultColumn: {
       filterFn: dynamicFilterFn,
       ...tableOptions.defaultColumn,
