@@ -51,6 +51,12 @@ interface DataTableProps<
   surfaceClassName?: string
 }
 
+/** Points a callback or object ref at `el`. */
+function assignRef<T>(ref: React.Ref<T> | undefined, el: T | null) {
+  if (typeof ref === "function") ref(el)
+  else if (ref) (ref as React.RefObject<T | null>).current = el
+}
+
 /**
  * Renders a data table from an instance produced by {@link useDataTable}.
  * Vertical stack: top toolbar → alert banner → drop-to-group zone → bordered
@@ -63,6 +69,7 @@ export function DataTable<TData extends RowData>({
   pageSizeOptions,
   surfaceClassName,
   className,
+  ref: refProp,
   ...props
 }: DataTableProps<TData>) {
   const {
@@ -90,6 +97,17 @@ export function DataTable<TData extends RowData>({
     renderTopToolbar,
     refs,
   } = table.tableInstance
+
+  // The paper div feeds `refs.tablePaperRef` and, when given, the consumer's
+  // own ref; a plain `ref={refs.tablePaperRef}` would be overwritten by the
+  // `{...props}` spread.
+  const paperRef = React.useCallback(
+    (el: HTMLDivElement | null) => {
+      assignRef(refs.tablePaperRef, el)
+      assignRef(refProp, el)
+    },
+    [refs.tablePaperRef, refProp]
+  )
 
   const { ref: gridRef, onKeyDown } = useGridNavigation<HTMLDivElement>(
     enableKeyboardNavigation
@@ -139,10 +157,7 @@ export function DataTable<TData extends RowData>({
       } as Partial<React.ComponentProps<typeof TooltipProvider>>)}
     >
       <div
-        // Forwarding the exposed DOM ref object as a JSX ref (not reading
-        // .current during render).
-        // eslint-disable-next-line react-hooks/refs
-        ref={refs.tablePaperRef}
+        ref={paperRef}
         data-slot="data-table"
         className={cn(
           "flex w-full flex-col gap-2",
@@ -160,9 +175,7 @@ export function DataTable<TData extends RowData>({
                 table={table}
                 // Forwarding the exposed ref objects as props (not reading
                 // .current during render).
-                // eslint-disable-next-line react-hooks/refs
                 toolbarRef={refs.topToolbarRef}
-                // eslint-disable-next-line react-hooks/refs
                 searchInputRef={refs.searchInputRef}
               />
             )}
@@ -317,10 +330,7 @@ export function DataTable<TData extends RowData>({
             )}
 
             {showLoadingOverlay && hasRows && (
-              <div
-                className="absolute inset-0 z-10 bg-card/40"
-                aria-hidden
-              />
+              <div className="absolute inset-0 z-10 bg-card/40" aria-hidden />
             )}
           </div>
 
