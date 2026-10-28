@@ -9,6 +9,7 @@ import {
   type FilterMode,
 } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
+import { flattenLeafColumns } from "../helpers/flatten-leaf-columns"
 import type { DataTableColumnDef, DataTableFilterFn } from "../core/table-types"
 
 export interface ColumnFilterModes<TData extends RowData> {
@@ -42,7 +43,7 @@ export function useColumnFilterModes<TData extends RowData>(
   // Per-column default mode derived from `meta.filterMode` / `meta.variant`.
   const defaultModes = React.useMemo(() => {
     const map: Record<string, FilterMode> = {}
-    for (const def of columns) {
+    for (const def of flattenLeafColumns(columns)) {
       const key = columnKey(def as { id?: string; accessorKey?: unknown })
       if (!key) continue
       const meta = def.meta

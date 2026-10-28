@@ -353,4 +353,26 @@ describe("useDataTable engine behaviour", () => {
       right: [],
     })
   })
+
+  it("applies a grouped leaf column's variant mode (range inside a header group)", () => {
+    const grouped: DataTableColumnDef<Person>[] = [
+      { accessorKey: "name", header: "Name" },
+      {
+        header: "Details",
+        columns: [
+          { accessorKey: "age", header: "Age", meta: { variant: "range" } },
+        ],
+      },
+    ]
+    const { result } = renderHook(() =>
+      useDataTable<Person>({
+        columns: grouped,
+        data: people,
+        getRowId: (row) => row.id,
+      })
+    )
+    act(() => result.current.getColumn("age")!.setFilterValue([30, 45]))
+    // ages: 41, 29, 35, 52 -> inclusive 30..45 keeps 41 and 35
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "3"])
+  })
 })

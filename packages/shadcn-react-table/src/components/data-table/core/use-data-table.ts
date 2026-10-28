@@ -5,6 +5,7 @@ import * as React from "react"
 
 import { VALUELESS_MODES, type FilterMode } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
+import { flattenLeafColumns } from "../helpers/flatten-leaf-columns"
 import { mapPinningUpdater, toCorePinning } from "../helpers/column-pinning"
 import { getColumnLabel } from "../helpers/column-label"
 import {
@@ -332,7 +333,7 @@ export function useDataTable<TData extends RowData>(
   // auto-highlighting (the consumer owns their markup).
   const columnsWithCustomCell = React.useMemo(() => {
     const set = new Set<string>()
-    for (const def of columns) {
+    for (const def of flattenLeafColumns(columns)) {
       const key = columnKey(def as { id?: string; accessorKey?: unknown })
       if (key && "cell" in def && def.cell != null) set.add(key)
     }
