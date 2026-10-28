@@ -5,7 +5,14 @@
 // `@/lib/*` aliases (the CLI then maps `@/` to the consumer's own aliases),
 // and writes the registry-item JSON. Run from the repo root:
 //   node apps/web/scripts/build-registry.mjs
-import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs"
+import {
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  rmSync,
+} from "node:fs"
 import { join, dirname, relative } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -89,12 +96,14 @@ const cssVars = {
 
 /** Rewrite internal package imports to the portable shadcn `@/` aliases. */
 function rewrite(content) {
-  return content
-    // Normalize CRLF from Windows checkouts (git autocrlf) so the embedded
-    // file contents — and therefore the artifact — are machine-independent.
-    .replaceAll("\r\n", "\n")
-    .replaceAll("@workspace/ui/components/", "@/components/ui/")
-    .replaceAll("@workspace/ui/lib/", "@/lib/")
+  return (
+    content
+      // Normalize CRLF from Windows checkouts (git autocrlf) so the embedded
+      // file contents — and therefore the artifact — are machine-independent.
+      .replaceAll("\r\n", "\n")
+      .replaceAll("@workspace/ui/components/", "@/components/ui/")
+      .replaceAll("@workspace/ui/lib/", "@/lib/")
+  )
 }
 
 function read(relPath) {
@@ -116,8 +125,11 @@ function walk(dir) {
   const out = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name)
-    if (entry.isDirectory()) out.push(...walk(abs))
-    else if (
+    // Locales ship as their own registry items (one per language), never as
+    // part of the main item.
+    if (entry.isDirectory()) {
+      if (entry.name !== "locales") out.push(...walk(abs))
+    } else if (
       (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) &&
       // In-repo test files are not part of the shipped block.
       !entry.name.includes(".test.")
@@ -154,6 +166,34 @@ const item = {
   cssVars,
 }
 
+// One registry item per locale file (locales/<id>.ts). Each is a single file
+// with no npm/registry dependencies: it only type-imports from the data-table
+// item, which the consumer adds first.
+const LOCALES_DIR = join(DT_DIR, "locales")
+const localeIds = existsSync(LOCALES_DIR)
+  ? readdirSync(LOCALES_DIR)
+      .filter((f) => f.endsWith(".ts") && !f.includes(".test."))
+      .map((f) => f.slice(0, -".ts".length))
+      .sort()
+  : []
+
+const localeItems = localeIds.map((lang) => ({
+  $schema: "https://ui.shadcn.com/schema/registry-item.json",
+  name: `data-table-locale-${lang}`,
+  type: "registry:ui",
+  title: `Data Table locale: ${lang}`,
+  description: `The data table's interface text in ${lang}. Add the data-table item first.`,
+  meta: { version: PKG.version },
+  files: [
+    {
+      path: `ui/data-table/locales/${lang}.ts`,
+      type: "registry:ui",
+      target: `components/ui/data-table/locales/${lang}.ts`,
+      content: read(`components/data-table/locales/${lang}.ts`),
+    },
+  ],
+}))
+
 const registry = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: "shadcn-react-table",
@@ -166,15 +206,35 @@ const registry = {
       description: item.description,
       meta: { version: PKG.version },
     },
+    ...localeItems.map(({ name, type, title, description, meta }) => ({
+      name,
+      type,
+      title,
+      description,
+      meta,
+    })),
   ],
 }
 
 mkdirSync(OUT, { recursive: true })
 writeFileSync(join(OUT, "data-table.json"), JSON.stringify(item, null, 2))
+for (const locale of localeItems) {
+  writeFileSync(
+    join(OUT, `${locale.name}.json`),
+    JSON.stringify(locale, null, 2)
+  )
+}
+// Drop locale items whose source file no longer exists.
+const liveNames = new Set(localeItems.map((l) => `${l.name}.json`))
+for (const f of readdirSync(OUT)) {
+  if (f.startsWith("data-table-locale-") && !liveNames.has(f))
+    rmSync(join(OUT, f))
+}
 writeFileSync(join(OUT, "registry.json"), JSON.stringify(registry, null, 2))
 
 console.log(
   `registry built → apps/web/public/r/data-table.json (${files.length} files, ` +
     `${item.dependencies.length} npm deps, ${item.devDependencies.length} dev deps, ` +
-    `${item.registryDependencies.length} registry deps, v${PKG.version})`
+    `${item.registryDependencies.length} registry deps, v${PKG.version}) + ` +
+    `${localeItems.length} locale items`
 )

@@ -11,6 +11,339 @@
       "meta": {
         "version": "0.5.0"
       }
+    },
+    {
+      "name": "data-table-locale-ar",
+      "type": "registry:ui",
+      "title": "Data Table locale: ar",
+      "description": "The data table's interface text in ar. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-az",
+      "type": "registry:ui",
+      "title": "Data Table locale: az",
+      "description": "The data table's interface text in az. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-bg",
+      "type": "registry:ui",
+      "title": "Data Table locale: bg",
+      "description": "The data table's interface text in bg. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-cs",
+      "type": "registry:ui",
+      "title": "Data Table locale: cs",
+      "description": "The data table's interface text in cs. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-da",
+      "type": "registry:ui",
+      "title": "Data Table locale: da",
+      "description": "The data table's interface text in da. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-de",
+      "type": "registry:ui",
+      "title": "Data Table locale: de",
+      "description": "The data table's interface text in de. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-el",
+      "type": "registry:ui",
+      "title": "Data Table locale: el",
+      "description": "The data table's interface text in el. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-es",
+      "type": "registry:ui",
+      "title": "Data Table locale: es",
+      "description": "The data table's interface text in es. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-et",
+      "type": "registry:ui",
+      "title": "Data Table locale: et",
+      "description": "The data table's interface text in et. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-fa",
+      "type": "registry:ui",
+      "title": "Data Table locale: fa",
+      "description": "The data table's interface text in fa. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-fi",
+      "type": "registry:ui",
+      "title": "Data Table locale: fi",
+      "description": "The data table's interface text in fi. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-fr",
+      "type": "registry:ui",
+      "title": "Data Table locale: fr",
+      "description": "The data table's interface text in fr. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-he",
+      "type": "registry:ui",
+      "title": "Data Table locale: he",
+      "description": "The data table's interface text in he. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-hr",
+      "type": "registry:ui",
+      "title": "Data Table locale: hr",
+      "description": "The data table's interface text in hr. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-hu",
+      "type": "registry:ui",
+      "title": "Data Table locale: hu",
+      "description": "The data table's interface text in hu. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-hy",
+      "type": "registry:ui",
+      "title": "Data Table locale: hy",
+      "description": "The data table's interface text in hy. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-id",
+      "type": "registry:ui",
+      "title": "Data Table locale: id",
+      "description": "The data table's interface text in id. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-it",
+      "type": "registry:ui",
+      "title": "Data Table locale: it",
+      "description": "The data table's interface text in it. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ja",
+      "type": "registry:ui",
+      "title": "Data Table locale: ja",
+      "description": "The data table's interface text in ja. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ko",
+      "type": "registry:ui",
+      "title": "Data Table locale: ko",
+      "description": "The data table's interface text in ko. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ne",
+      "type": "registry:ui",
+      "title": "Data Table locale: ne",
+      "description": "The data table's interface text in ne. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-nl",
+      "type": "registry:ui",
+      "title": "Data Table locale: nl",
+      "description": "The data table's interface text in nl. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-no",
+      "type": "registry:ui",
+      "title": "Data Table locale: no",
+      "description": "The data table's interface text in no. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-pl",
+      "type": "registry:ui",
+      "title": "Data Table locale: pl",
+      "description": "The data table's interface text in pl. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-pt",
+      "type": "registry:ui",
+      "title": "Data Table locale: pt",
+      "description": "The data table's interface text in pt. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-pt-BR",
+      "type": "registry:ui",
+      "title": "Data Table locale: pt-BR",
+      "description": "The data table's interface text in pt-BR. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ro",
+      "type": "registry:ui",
+      "title": "Data Table locale: ro",
+      "description": "The data table's interface text in ro. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ru",
+      "type": "registry:ui",
+      "title": "Data Table locale: ru",
+      "description": "The data table's interface text in ru. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sk",
+      "type": "registry:ui",
+      "title": "Data Table locale: sk",
+      "description": "The data table's interface text in sk. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sr-Cyrl-RS",
+      "type": "registry:ui",
+      "title": "Data Table locale: sr-Cyrl-RS",
+      "description": "The data table's interface text in sr-Cyrl-RS. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sr-Latn-RS",
+      "type": "registry:ui",
+      "title": "Data Table locale: sr-Latn-RS",
+      "description": "The data table's interface text in sr-Latn-RS. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sv",
+      "type": "registry:ui",
+      "title": "Data Table locale: sv",
+      "description": "The data table's interface text in sv. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-tr",
+      "type": "registry:ui",
+      "title": "Data Table locale: tr",
+      "description": "The data table's interface text in tr. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-uk",
+      "type": "registry:ui",
+      "title": "Data Table locale: uk",
+      "description": "The data table's interface text in uk. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-vi",
+      "type": "registry:ui",
+      "title": "Data Table locale: vi",
+      "description": "The data table's interface text in vi. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-zh-Hans",
+      "type": "registry:ui",
+      "title": "Data Table locale: zh-Hans",
+      "description": "The data table's interface text in zh-Hans. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
+    },
+    {
+      "name": "data-table-locale-zh-Hant",
+      "type": "registry:ui",
+      "title": "Data Table locale: zh-Hant",
+      "description": "The data table's interface text in zh-Hant. Add the data-table item first.",
+      "meta": {
+        "version": "0.5.0"
+      }
     }
   ]
 }

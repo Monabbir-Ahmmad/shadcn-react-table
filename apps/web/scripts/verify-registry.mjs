@@ -5,7 +5,13 @@
 // rewritten code that no longer compiles. Run after registry:build:
 //   node apps/web/scripts/verify-registry.mjs
 import { execSync } from "node:child_process"
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import {
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs"
 import { dirname, join } from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
@@ -14,13 +20,34 @@ const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
 const ITEM = JSON.parse(
   readFileSync(join(REPO, "apps/web/public/r/data-table.json"), "utf8")
 )
+const R_DIR = join(REPO, "apps/web/public/r")
+const EXPECTED_LOCALES = 37
+const LOCALE_ITEMS = readdirSync(R_DIR)
+  .filter((f) => f.startsWith("data-table-locale-") && f.endsWith(".json"))
+  .sort()
+  .map((f) => JSON.parse(readFileSync(join(R_DIR, f), "utf8")))
+
+if (LOCALE_ITEMS.length !== EXPECTED_LOCALES) {
+  console.error(
+    `registry verify FAILED: expected ${EXPECTED_LOCALES} locale items, found ${LOCALE_ITEMS.length}`
+  )
+  process.exit(1)
+}
+const leaked = ITEM.files.filter((f) => f.path.includes("/locales/"))
+if (leaked.length > 0) {
+  console.error(
+    `registry verify FAILED: data-table.json must not contain locale files, found: ${leaked.map((f) => f.path).join(", ")}`
+  )
+  process.exit(1)
+}
+
 // The fixture lives inside the table package so the block's npm dependencies
 // (@tanstack/*, @dnd-kit/*, date-fns, …) resolve from its node_modules.
 const PKG_DIR = join(REPO, "packages/shadcn-react-table")
 const FIXTURE = join(PKG_DIR, ".registry-fixture")
 
 rmSync(FIXTURE, { recursive: true, force: true })
-for (const file of ITEM.files) {
+for (const file of [...ITEM.files, ...LOCALE_ITEMS.flatMap((i) => i.files)]) {
   const target = join(FIXTURE, file.target)
   mkdirSync(dirname(target), { recursive: true })
   writeFileSync(target, file.content)
@@ -65,4 +92,6 @@ try {
 }
 
 rmSync(FIXTURE, { recursive: true, force: true })
-console.log(`registry fixture typecheck passed (${ITEM.files.length} files)`)
+console.log(
+  `registry fixture typecheck passed (${ITEM.files.length} files + ${LOCALE_ITEMS.length} locale items)`
+)
