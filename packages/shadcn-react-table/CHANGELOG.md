@@ -39,6 +39,8 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 - **Fixed:** column ids with spaces or punctuation no longer break resizable
   column widths.
 - **Fixed:** changing the global filter mode re-filters the rows.
+- **Fixed:** the block compiles on `@tanstack/react-table` 9.3 (two row-model
+  casts failed `tsc` in fresh installs). The registry now asks for `^9.3.1`.
 
 ## 0.5.0
 

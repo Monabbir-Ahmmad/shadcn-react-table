@@ -28,7 +28,7 @@ const OUT = join(REPO, "apps/web/public/r")
 // (below) bring their own deps (radix, cmdk, react-day-picker, cva, …) when the
 // consumer's CLI installs them, so those are intentionally NOT listed here.
 const NPM_DEPENDENCIES = [
-  "@tanstack/react-table@^9.2.8",
+  "@tanstack/react-table@^9.3.1",
   "@tanstack/match-sorter-utils@^9.2.6",
   "@tanstack/react-virtual",
   "@dnd-kit/core",
