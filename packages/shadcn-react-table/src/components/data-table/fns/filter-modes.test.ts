@@ -23,15 +23,19 @@ describe("text modes", () => {
     expect(MODE_FNS[mode](cell, val)).toBe(expected)
   })
 
+  it("fuzzy matches out-of-order / gapped characters, contains does not", () => {
+    expect(MODE_FNS.fuzzy("Joanna", "jna")).toBe(true)
+    expect(MODE_FNS.contains("Joanna", "jna")).toBe(false)
+    expect(MODE_FNS.fuzzy("Joanna", "xyz")).toBe(false)
+  })
+
+  it("fuzzy still matches plain substrings and ignores case", () => {
+    expect(MODE_FNS.fuzzy("Hello World", "WORLD")).toBe(true)
+  })
+
   it("coerces non-string cells to strings", () => {
     expect(MODE_FNS.contains(12345, "234")).toBe(true)
     expect(MODE_FNS.equals(null, "")).toBe(true)
-  })
-
-  // KNOWN QUIRK: per-column fuzzy is a plain substring match, not ranked.
-  it("fuzzy behaves exactly like contains", () => {
-    expect(MODE_FNS.fuzzy("Hello World", "world")).toBe(true)
-    expect(MODE_FNS.fuzzy("Hello World", "wrld")).toBe(false)
   })
 })
 

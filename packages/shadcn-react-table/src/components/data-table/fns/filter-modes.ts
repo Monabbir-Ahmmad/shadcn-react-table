@@ -30,6 +30,7 @@ export type FilterMode =
   | "arrIncludesSome"
   | "equalsBool"
 
+import { rankItem } from "@tanstack/match-sorter-utils"
 import { isAfter, isBefore, startOfDay } from "date-fns"
 
 const str = (v: unknown): string => (v == null ? "" : String(v))
@@ -54,7 +55,7 @@ export const MODE_FNS: Record<FilterMode, ModeFn> = {
   notEquals: (cell, val) => lower(cell) !== lower(val),
   startsWith: (cell, val) => lower(cell).startsWith(lower(val)),
   endsWith: (cell, val) => lower(cell).endsWith(lower(val)),
-  fuzzy: (cell, val) => lower(cell).includes(lower(val)),
+  fuzzy: (cell, val) => rankItem(str(cell), str(val)).passed,
 
   empty: (cell) => isBlank(cell),
   notEmpty: (cell) => !isBlank(cell),
