@@ -21,11 +21,27 @@ export interface FilterFieldProps<TData extends RowData, TValue> {
 export const FIELD_CLASS =
   "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
 
-/** A filter date in the localization's language (date-fns "PP" equivalent). */
+const dateFormatters = new Map<string, Intl.DateTimeFormat>()
+
+function getDateFormatter(language: string): Intl.DateTimeFormat {
+  let formatter = dateFormatters.get(language)
+  if (!formatter) {
+    try {
+      formatter = new Intl.DateTimeFormat(language, { dateStyle: "medium" })
+    } catch {
+      // A malformed tag ("en_US", "") must not take the table down.
+      if (language === "en") throw new Error("Intl is unavailable")
+      return getDateFormatter("en")
+    }
+    dateFormatters.set(language, formatter)
+  }
+  return formatter
+}
+
+/** A filter date in the localization's language (date-fns "PP" equivalent).
+ *  Falls back to English when the language tag is malformed. */
 export function formatDate(value: Date, language: string): string {
-  return new Intl.DateTimeFormat(language, { dateStyle: "medium" }).format(
-    value
-  )
+  return getDateFormatter(language).format(value)
 }
 
 export const BETWEEN_MODES = new Set(["between", "betweenInclusive"])

@@ -59,15 +59,31 @@ function mount(options: Options = {}) {
 }
 
 describe("localization language", () => {
-  it("renders a custom pagination range from the localization", () => {
+  it("formats a date filter value in the localization language", () => {
+    const born = new Date(2026, 3, 29)
     mount({
-      localization: {
-        ...defaultLocalization,
-        language: "de",
-        paginationRange: (s, e, t) => `${s}–${e} von ${t.toLocaleString("de")}`,
-      },
+      columns: [
+        { accessorKey: "name", header: "Name" },
+        {
+          id: "born",
+          header: "Born",
+          accessorFn: () => born,
+          meta: { variant: "date" },
+        },
+      ],
+      defaultShowColumnFilters: true,
+      initialState: { columnFilters: [{ id: "born", value: born }] },
+      localization: { ...defaultLocalization, language: "de" },
     })
-    expect(screen.getByText("1–3 von 3")).toBeTruthy()
+    const german = new Intl.DateTimeFormat("de", {
+      dateStyle: "medium",
+    }).format(born)
+    const english = new Intl.DateTimeFormat("en", {
+      dateStyle: "medium",
+    }).format(born)
+    expect(german).not.toBe(english)
+    expect(screen.getAllByText(german).length).toBeGreaterThan(0)
+    expect(screen.queryByText(english)).toBeNull()
   })
 
   it("formats large counts in the default English pagination", () => {
