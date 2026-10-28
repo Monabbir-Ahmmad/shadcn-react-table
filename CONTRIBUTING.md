@@ -31,6 +31,7 @@ pnpm install
    ```bash
    pnpm lint
    pnpm typecheck
+   pnpm test
    pnpm build
    ```
 4. Push your branch and open a pull request against `main`.
@@ -55,9 +56,10 @@ pnpm --filter shadcn-react-table-web registry:smoke -- --base radix
 pnpm --filter shadcn-react-table-web registry:smoke -- --base base
 ```
 
-Pass `--keep` to leave the generated app in place for debugging; its path is
-printed. A failure names the step (`shadcn init`, `shadcn add`, `typecheck`,
-`next build`).
+A failed run keeps the generated app for debugging (its path is printed); pass
+`--keep` to keep it after a successful run too. Delete `srt-smoke-*` folders
+under your OS temp directory when you are done. A failure names the step
+(`shadcn init`, `shadcn add`, `typecheck`, `next build`).
 
 ## Useful commands
 
