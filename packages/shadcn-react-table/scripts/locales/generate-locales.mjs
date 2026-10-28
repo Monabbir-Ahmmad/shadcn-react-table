@@ -11,8 +11,9 @@
 // for a language) carries a trailing `// needs review` comment.
 //
 // The generator never overwrites a key: when a locale file already exists, only
-// keys it does not have yet are added (appended at the end of their object;
-// marked `// needs review` when gap-sourced or missing from MRT). Existing
+// keys it does not have yet are added (top-level keys at the end of the file,
+// nested keys at the start of their object; marked `// needs review` when
+// gap-sourced or missing from MRT). Existing
 // values, including hand edits, are kept, but the file is re-formatted by
 // Prettier.
 //
@@ -45,6 +46,31 @@ const outDir = resolve(
 const HEADER = `// Translations adapted from Material React Table (MIT License,
 // Copyright (c) 2022 Kevin Vandy). Lines marked "needs review" were added
 // here and have not yet been checked by a native speaker.
+//
+// The original notice follows.
+/*
+ * MIT License
+ *
+ * Copyright (c) 2022 Kevin Vandy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 `
 const NEEDS_REVIEW = " // needs review"
 
@@ -266,7 +292,8 @@ async function generateNew(lang, entries, file) {
 }
 
 // Adds the keys an existing file lacks. Existing values are kept; the file is
-// re-formatted by Prettier and new keys go at the end of their object.
+// re-formatted by Prettier and new keys go at the end of the file; nested keys go at the start of their
+// object.
 async function appendMissing(lang, entries, file) {
   const existing = (
     await import(`${pathToFileURL(file).href}?t=${Date.now()}`)

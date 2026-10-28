@@ -63,6 +63,13 @@ describe("locales", () => {
     )
   })
 
+  it.each(locales)("%s ships the full MIT permission notice", (lang) => {
+    const source = readFileSync(join(import.meta.dirname, `${lang}.ts`), "utf8")
+    expect(source).toContain("Permission is hereby granted, free of charge")
+    expect(source).toContain("THE SOFTWARE IS PROVIDED")
+    expect(source).toMatch(/included in all\r?\n \* copies or substantial/)
+  })
+
   it.each(locales)("%s is complete and well-formed", (lang, l) => {
     expect(l.language).toBe(lang)
     for (const [key, english] of Object.entries(defaultLocalization)) {
