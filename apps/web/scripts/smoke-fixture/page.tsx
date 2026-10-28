@@ -87,7 +87,7 @@ export default function Page() {
     enableRowVirtualization: true,
     renderDetailPanel: ({ row }) => <div>{row.original.name}</div>,
     renderRowActionMenuItems: ({ row }) => (
-      <DropdownMenuItem onSelect={() => console.log(row.id)}>
+      <DropdownMenuItem onClick={() => console.log(row.id)}>
         Log id
       </DropdownMenuItem>
     ),
