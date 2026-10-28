@@ -16,6 +16,7 @@ import { getColumnLabel } from "../../../helpers/column-label"
 import { getEffectiveMode } from "../../../helpers/effective-filter-mode"
 import { DateRangeFilterField } from "./date-range"
 import {
+  calendarFormatters,
   CALENDAR_NAV_PROPS,
   FIELD_CLASS,
   formatDate,
@@ -70,6 +71,7 @@ export function DateFilterField<TData extends RowData, TValue>({
           selected={value}
           onSelect={(date) => column.setFilterValue(date ?? undefined)}
           autoFocus
+          formatters={calendarFormatters(localization.language)}
           {...CALENDAR_NAV_PROPS}
         />
       </PopoverContent>

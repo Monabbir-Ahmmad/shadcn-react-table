@@ -180,7 +180,7 @@ function FilterPanelContent<TData extends RowData>({
               }))
             }
           >
-            <SelectTrigger className="h-8 w-20">
+            <SelectTrigger className="h-8 w-auto min-w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

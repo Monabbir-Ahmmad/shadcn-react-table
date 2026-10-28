@@ -13,6 +13,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { getColumnLabel } from "../../../helpers/column-label"
 import {
+  calendarFormatters,
   CALENDAR_NAV_PROPS,
   FIELD_CLASS,
   formatDate,
@@ -65,6 +66,7 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
             )
           }
           autoFocus
+          formatters={calendarFormatters(localization.language)}
           {...CALENDAR_NAV_PROPS}
         />
       </PopoverContent>

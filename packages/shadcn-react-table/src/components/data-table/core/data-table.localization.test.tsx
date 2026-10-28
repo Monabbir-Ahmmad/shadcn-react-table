@@ -3,6 +3,7 @@ import * as React from "react"
 import { afterEach, beforeAll, describe, expect, it } from "vitest"
 
 import { DataTable } from "./data-table"
+import { dataTableLocalizationDe } from "../locales/de"
 import { defaultLocalization } from "./localization"
 import type { DataTableColumnDef } from "./table-types"
 import type { DataTableInstance, UseDataTableOptions } from "./types"
@@ -112,6 +113,68 @@ describe("localization language", () => {
         ],
       },
     })
+    act(() => table().tableInstance.setShowAdvancedFilterPanel(true))
+    const triggers = await screen.findAllByRole("combobox")
+    const valueTrigger = triggers[triggers.length - 1]!
+    fireEvent.pointerDown(valueTrigger, { button: 0, ctrlKey: false })
+    fireEvent.click(valueTrigger)
+    expect(await screen.findByRole("option", { name: "Wahr" })).toBeTruthy()
+    expect(screen.getByRole("option", { name: "Falsch" })).toBeTruthy()
+  })
+
+  it("localizes the calendar popup month and weekday names", async () => {
+    const born = new Date(2026, 2, 18)
+    mount({
+      columns: [
+        { accessorKey: "name", header: "Name" },
+        {
+          id: "born",
+          header: "Born",
+          accessorFn: () => born,
+          meta: { variant: "date" },
+        },
+      ],
+      defaultShowColumnFilters: true,
+      initialState: { columnFilters: [{ id: "born", value: born }] },
+      localization: { ...defaultLocalization, language: "de" },
+    })
+    const trigger = screen.getByRole("button", { name: "Filter by Born" })
+    fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false })
+    fireEvent.click(trigger)
+    // The popup opens on the current month, whatever the selected value is.
+    const caption = new Intl.DateTimeFormat("de", {
+      month: "long",
+      year: "numeric",
+      calendar: "gregory",
+    }).format(new Date())
+    const wednesday = new Intl.DateTimeFormat("de", {
+      weekday: "short",
+      calendar: "gregory",
+    }).format(born)
+    expect(wednesday).not.toBe("We")
+    expect((await screen.findAllByText(caption)).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(wednesday).length).toBeGreaterThan(0)
+  })
+
+  it("renders a real locale: German pagination and boolean options", async () => {
+    const { table } = mount({
+      enableAdvancedFilter: true,
+      localization: dataTableLocalizationDe,
+      defaultAdvancedFilter: {
+        logic: "and",
+        rules: [
+          {
+            id: "r1",
+            columnId: "active",
+            operator: "equals",
+            value: undefined,
+          },
+        ],
+      },
+    })
+    expect(
+      screen.getAllByText(dataTableLocalizationDe.rowsPerPage).length
+    ).toBeGreaterThan(0)
     act(() => table().tableInstance.setShowAdvancedFilterPanel(true))
     const triggers = await screen.findAllByRole("combobox")
     const valueTrigger = triggers[triggers.length - 1]!

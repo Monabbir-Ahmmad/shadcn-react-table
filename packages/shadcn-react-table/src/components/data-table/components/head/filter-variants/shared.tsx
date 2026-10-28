@@ -21,28 +21,75 @@ export interface FilterFieldProps<TData extends RowData, TValue> {
 export const FIELD_CLASS =
   "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
 
-const dateFormatters = new Map<string, Intl.DateTimeFormat>()
+const GREGORIAN = "gregory"
 
-function getDateFormatter(language: string): Intl.DateTimeFormat {
-  let formatter = dateFormatters.get(language)
-  if (!formatter) {
-    try {
-      formatter = new Intl.DateTimeFormat(language, { dateStyle: "medium" })
-    } catch {
-      // A malformed tag ("en_US", "") must not take the table down.
-      if (language === "en") throw new Error("Intl is unavailable")
-      return getDateFormatter("en")
+/**
+ * A formatter per language, built once. A malformed tag ("en_US", "") falls
+ * back to English and the fallback is cached under that tag, so a bad tag does
+ * not throw on every render.
+ */
+function memoizeByLanguage<T>(
+  build: (language: string) => T
+): (language: string) => T {
+  const cache = new Map<string, T>()
+  return (language) => {
+    let value = cache.get(language)
+    if (value === undefined) {
+      try {
+        value = build(language)
+      } catch {
+        // A malformed tag must not take the table down.
+        value = build("en")
+      }
+      cache.set(language, value)
     }
-    dateFormatters.set(language, formatter)
+    return value
   }
-  return formatter
 }
 
+const getDateFormatter = memoizeByLanguage(
+  (language) =>
+    new Intl.DateTimeFormat(language, {
+      dateStyle: "medium",
+      calendar: GREGORIAN,
+    })
+)
+
 /** A filter date in the localization's language (date-fns "PP" equivalent).
- *  Falls back to English when the language tag is malformed. */
+ *  Always Gregorian, like the picker. Falls back to English when the language
+ *  tag is malformed. */
 export function formatDate(value: Date, language: string): string {
   return getDateFormatter(language).format(value)
 }
+
+/** react-day-picker formatters that render the calendar in `language`. */
+export type CalendarFormatters = Record<
+  | "formatCaption"
+  | "formatMonthDropdown"
+  | "formatYearDropdown"
+  | "formatWeekdayName"
+  | "formatDay",
+  (date: Date) => string
+>
+
+export const calendarFormatters = memoizeByLanguage(
+  (language): CalendarFormatters => {
+    const format = (options: Intl.DateTimeFormatOptions) => {
+      const formatter = new Intl.DateTimeFormat(language, {
+        ...options,
+        calendar: GREGORIAN,
+      })
+      return (date: Date) => formatter.format(date)
+    }
+    return {
+      formatCaption: format({ month: "long", year: "numeric" }),
+      formatMonthDropdown: format({ month: "short" }),
+      formatYearDropdown: format({ year: "numeric" }),
+      formatWeekdayName: format({ weekday: "short" }),
+      formatDay: format({ day: "numeric" }),
+    }
+  }
+)
 
 export const BETWEEN_MODES = new Set(["between", "betweenInclusive"])
 

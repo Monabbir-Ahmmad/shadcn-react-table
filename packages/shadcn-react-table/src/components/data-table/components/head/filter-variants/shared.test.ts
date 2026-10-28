@@ -12,6 +12,12 @@ describe("formatDate", () => {
     expect(formatDate(date, "de")).not.toBe(formatDate(date, "en"))
   })
 
+  it("uses the Gregorian calendar even for languages that default to another", () => {
+    const text = formatDate(date, "fa")
+    expect(text).toContain((2026).toLocaleString("fa", { useGrouping: false }))
+    expect(text).not.toContain("۱۴۰۵")
+  })
+
   it("falls back to English for a malformed language tag", () => {
     expect(() => formatDate(date, "en_US")).not.toThrow()
     expect(formatDate(date, "en_US")).toBe(formatDate(date, "en"))
