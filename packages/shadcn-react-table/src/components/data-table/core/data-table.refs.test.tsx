@@ -1,6 +1,6 @@
 import { cleanup, render } from "@testing-library/react"
 import * as React from "react"
-import { afterEach, beforeAll, describe, expect, it } from "vitest"
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest"
 
 import { DataTable } from "./data-table"
 import type { DataTableColumnDef } from "./table-types"
@@ -63,7 +63,28 @@ describe("DataTable ref", () => {
     )
   })
 
-  it("supports a callback ref", () => {
+  it("runs a callback ref's cleanup on unmount instead of calling it with null", () => {
+    const cleanup = vi.fn()
+    const callbackRef = vi.fn((el: HTMLDivElement | null) => {
+      if (el) return cleanup
+    })
+    function Consumer() {
+      const table = useDataTable<Person>({
+        columns,
+        data: people,
+        getRowId: (row) => row.id,
+      })
+      return <DataTable table={table} ref={callbackRef} />
+    }
+    const view = render(<Consumer />)
+    expect(callbackRef).toHaveBeenCalledTimes(1)
+    expect(callbackRef.mock.calls[0]![0]).toBeInstanceOf(HTMLDivElement)
+    view.unmount()
+    expect(cleanup).toHaveBeenCalledTimes(1)
+    expect(callbackRef).toHaveBeenCalledTimes(1)
+  })
+
+  it("calls a plain callback ref with null on unmount", () => {
     const seen: (HTMLDivElement | null)[] = []
     function Consumer() {
       const table = useDataTable<Person>({
@@ -73,7 +94,9 @@ describe("DataTable ref", () => {
       })
       return <DataTable table={table} ref={(el) => void seen.push(el)} />
     }
-    render(<Consumer />)
+    const view = render(<Consumer />)
     expect(seen[0]).toBeInstanceOf(HTMLDivElement)
+    view.unmount()
+    expect(seen[seen.length - 1]).toBeNull()
   })
 })

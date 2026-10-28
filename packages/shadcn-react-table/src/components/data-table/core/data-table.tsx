@@ -51,10 +51,13 @@ interface DataTableProps<
   surfaceClassName?: string
 }
 
-/** Points a callback or object ref at `el`. */
+/**
+ * Points a callback or object ref at `el`. Returns the callback's return value
+ * (a React 19 ref cleanup) when `ref` is a function.
+ */
 function assignRef<T>(ref: React.Ref<T> | undefined, el: T | null) {
-  if (typeof ref === "function") ref(el)
-  else if (ref) (ref as React.RefObject<T | null>).current = el
+  if (typeof ref === "function") return ref(el)
+  if (ref) ref.current = el
 }
 
 /**
@@ -104,7 +107,15 @@ export function DataTable<TData extends RowData>({
   const paperRef = React.useCallback(
     (el: HTMLDivElement | null) => {
       assignRef(refs.tablePaperRef, el)
-      assignRef(refProp, el)
+      const consumerCleanup = assignRef(refProp, el)
+      // Returning a cleanup makes React 19 call it on detach instead of
+      // calling this ref with `null`, so a consumer callback ref that returned
+      // its own cleanup is honored and never sees `null`.
+      return () => {
+        assignRef(refs.tablePaperRef, null)
+        if (typeof consumerCleanup === "function") consumerCleanup()
+        else assignRef(refProp, null)
+      }
     },
     [refs.tablePaperRef, refProp]
   )
