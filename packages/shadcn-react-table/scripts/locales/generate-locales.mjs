@@ -10,15 +10,19 @@
 // of `defaultLocalization`; every value that came from a gap (or that MRT lacks
 // for a language) carries a trailing `// needs review` comment.
 //
-// The generator never overwrites: when a locale file already exists, only keys
-// it does not have yet are added (marked `// needs review`); everything already
-// in the file, including hand edits, is left untouched.
+// The generator never overwrites a key: when a locale file already exists, only
+// keys it does not have yet are added (appended at the end of their object;
+// marked `// needs review` when gap-sourced or missing from MRT). Existing
+// values, including hand edits, are kept, but the file is re-formatted by
+// Prettier.
 //
-// Exits 1 on: a gap key missing from a language's gap file, an unresolved
-// `{token}`, or a placeholder that is not one of the key's parameters.
+// Every language is resolved and rendered before any file is written; exits 1
+// without writing anything on: a gap key missing from a language's gap file, an
+// unresolved `{token}`, a placeholder that is not one of the key's parameters,
+// or a mapping of an unknown kind.
 import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs"
 import { writeFile } from "node:fs/promises"
-import { dirname, join, resolve } from "node:path"
+import { basename, dirname, join, resolve } from "node:path"
 import process from "node:process"
 import { fileURLToPath, pathToFileURL } from "node:url"
 
@@ -145,6 +149,10 @@ function resolveLeaf(path, mapping, english, lang, mrt, gaps, fallbacks) {
   if (mapping.fromLocaleId) {
     return { source: JSON.stringify(lang), review: false }
   }
+  if (!mapping.gap && !mapping.mrt && !mapping.template) {
+    fail(`${lang} ${path}: unknown mapping kind`)
+    return { source: '""', review: true }
+  }
   if (mapping.gap) {
     const value = path
       .split(".")
@@ -162,6 +170,10 @@ function resolveLeaf(path, mapping, english, lang, mrt, gaps, fallbacks) {
     text = expand(mapping, mrtEn)
     review = true
     fallbacks.push(`${lang} ${path}`)
+    if (text === undefined) {
+      fail(`${lang} ${path}: no string in MRT ${lang} or MRT en`)
+      return { source: '""', review: true }
+    }
   }
   return { source: render(path, text, english, lang), review }
 }
@@ -250,43 +262,41 @@ async function generateNew(lang, entries, file) {
   if (countReviews(formatted) !== expected) {
     fail(`${lang}: formatting changed the number of "needs review" markers`)
   }
-  await writeFile(file, formatted)
-  return { written: true, added: 0 }
+  return { file, text: formatted, added: 0 }
 }
 
-// Adds the keys a hand-maintained file lacks. Existing content is never
-// modified (apart from Prettier's formatting).
+// Adds the keys an existing file lacks. Existing values are kept; the file is
+// re-formatted by Prettier and new keys go at the end of their object.
 async function appendMissing(lang, entries, file) {
   const existing = (
     await import(`${pathToFileURL(file).href}?t=${Date.now()}`)
   )[exportName(lang)]
   if (!existing) {
     fail(`${lang}: ${file} does not export ${exportName(lang)}`)
-    return { written: false, added: 0 }
+    return { file, text: null, added: 0 }
   }
   let text = readFileSync(file, "utf8").replace(/\r\n/g, "\n")
-  const tail = text.lastIndexOf("\n}")
-  if (tail === -1) {
+  if (!text.includes("\n}")) {
     fail(`${lang}: cannot find the closing brace of ${file}`)
-    return { written: false, added: 0 }
+    return { file, text: null, added: 0 }
   }
   const top = []
   const nested = []
   let added = 0
   for (const [key, entry] of entries) {
     if (!(key in existing)) {
-      top.push(...lines(key, { ...forceReview(entry) }))
+      top.push(...lines(key, entry))
       added += entry.object ? entry.object.length : 1
     } else if (entry.object) {
       for (const [sub, leaf] of entry.object) {
         if (!(sub in existing[key])) {
-          nested.push([key, line(sub, { ...leaf, review: true }, "    ")])
+          nested.push([key, line(sub, leaf, "    ")])
           added += 1
         }
       }
     }
   }
-  if (added === 0) return { written: false, added: 0 }
+  if (added === 0) return { file, text: null, added: 0 }
   for (const [key, newLine] of nested) {
     const open = new RegExp(`^ {2}${key}: \\{\\s*$`, "m").exec(text)
     if (!open) {
@@ -298,46 +308,45 @@ async function appendMissing(lang, entries, file) {
   }
   const end = text.lastIndexOf("\n}")
   text = `${text.slice(0, end)}\n${top.join("\n")}${text.slice(end)}`
-  await writeFile(file, await pretty(text, file))
-  return { written: true, added }
+  return { file, text: await pretty(text, file), added }
 }
 
-const forceReview = (entry) =>
-  entry.object
-    ? { object: entry.object.map(([s, l]) => [s, { ...l, review: true }]) }
-    : { ...entry, review: true }
-
-mkdirSync(outDir, { recursive: true })
-
-const summary = []
+// Phase 1: resolve and render every language; nothing is written yet.
+const results = []
 const allFallbacks = []
 for (const lang of langs) {
   const { entries, fallbacks } = resolveAll(lang)
   allFallbacks.push(...fallbacks)
-  if (errors.length > 0) continue
   const file = join(outDir, `${lang}.ts`)
-  summary.push([
-    lang,
+  results.push(
     existsSync(file)
       ? await appendMissing(lang, entries, file)
-      : await generateNew(lang, entries, file),
-  ])
+      : await generateNew(lang, entries, file)
+  )
 }
 
 if (errors.length > 0) {
-  console.error(`generate-locales: ${errors.length} problem(s)`)
+  console.error(
+    `generate-locales: ${errors.length} problem(s); nothing written`
+  )
   for (const message of errors) console.error(`  ${message}`)
   process.exit(1)
 }
 
-const created = summary.filter(([, r]) => r.written && r.added === 0).length
-const updated = summary.filter(([, r]) => r.added > 0)
+// Phase 2: write.
+mkdirSync(outDir, { recursive: true })
+for (const { file, text } of results) {
+  if (text !== null) await writeFile(file, text)
+}
+
+const created = results.filter((r) => r.text !== null && r.added === 0).length
+const updated = results.filter((r) => r.added > 0)
 console.log(
   `locales: ${langs.length} languages; ${created} written, ` +
     `${updated.length} extended, ${langs.length - created - updated.length} unchanged`
 )
-for (const [lang, result] of updated) {
-  console.log(`  ${lang}: appended ${result.added} missing key(s)`)
+for (const { file, added } of updated) {
+  console.log(`  ${basename(file)}: appended ${added} missing key(s)`)
 }
 if (allFallbacks.length > 0) {
   console.log(
