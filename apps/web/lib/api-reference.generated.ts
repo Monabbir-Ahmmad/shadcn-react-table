@@ -1768,7 +1768,7 @@ export const localizationKeys: ApiMember[] = [
     required: true,
     default: "en",
     description:
-      'BCP 47 tag used to format numbers and dates (e.g. "en", "de").',
+      'BCP 47 tag used to format dates (e.g. "en", "de"). Numbers are formatted by the function keys of each localization, with that file\'s own tag.',
   },
   {
     name: "selectAll",

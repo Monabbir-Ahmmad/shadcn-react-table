@@ -122,7 +122,7 @@ const MAPPING = {
 // deliberate gap from a key that was forgotten.
 const GAP_KEYS = [
   // MRT's string is wrong or unusable for these in some languages; translators
-  // still read MRT's string as a reference (see the README of gaps/).
+  // still read MRT's string as a reference.
   "paginationRange",
   "rowsSelected",
   "pinRow",

@@ -38,6 +38,18 @@ lists what changed in each version.
   to a pure upstream update.
 </Callout>
 
+## Localization keys and installed locales
+
+When a release adds localization keys, re-add every locale you installed,
+otherwise its typecheck fails on the missing keys:
+
+```bash
+pnpm dlx shadcn@latest add --overwrite <registry-url>/r/data-table-locale-de.json
+```
+
+Do this after re-adding the table, and re-apply any edits you made to a locale
+file.
+
 ## Upgrading to 0.5.0 (TanStack Table v9)
 
 0.5.0 moves the engine to TanStack Table v9. Re-add the block, then:

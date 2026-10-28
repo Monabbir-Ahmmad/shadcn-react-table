@@ -40,24 +40,29 @@ To set the language for many tables at once, wrap a subtree in `DataTableConfigP
 import { DataTableConfigProvider } from "@/components/ui/data-table"
 import { dataTableLocalizationDe } from "@/components/ui/data-table/locales/de"
 
-;<DataTableConfigProvider localization={dataTableLocalizationDe}>
-  {children}
-</DataTableConfigProvider>
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <DataTableConfigProvider localization={dataTableLocalizationDe}>
+      {children}
+    </DataTableConfigProvider>
+  )
+}
 ```
 
 ## Change single strings
 
-A language is a plain object, so spread it and replace only the keys you want:
+A language is a plain object, so spread it and replace only the keys you want. Define the object outside the component: a new object on every render rebuilds the columns.
 
 ```tsx
-useDataTable({
-  data,
-  columns,
-  localization: {
-    ...dataTableLocalizationDe,
-    rowsPerPage: "Einträge pro Seite",
-  },
-})
+const localization = {
+  ...dataTableLocalizationDe,
+  rowsPerPage: "Einträge pro Seite",
+}
+
+function PeopleTable() {
+  const table = useDataTable({ data, columns, localization })
+  return <DataTable table={table} />
+}
 ```
 
 <Callout variant="note" title="Partial overrides">
@@ -69,7 +74,16 @@ useDataTable({
 
 ## Numbers and dates
 
-Row counts, pagination and selection summaries format numbers with the localization's `language` (for example `1,000` in English and `1.000` in German), and date filters show dates in that language. Every language file sets `language` for you. If you write your own localization, set `language` to a BCP 47 tag such as `"es"`.
+Dates follow the localization's `language`: date filters and the date picker show dates, month names and weekday names in that language, always in the Gregorian calendar. Every language file sets `language` for you. If you write your own localization, set `language` to a BCP 47 tag such as `"es"`.
+
+Numbers do not follow `language`. Each language file formats its own numbers inside its function keys (for example `1,000` in English and `1.000` in German). A custom localization that only sets `language` keeps English number formatting, so call `toLocaleString` with your tag in the function keys yourself:
+
+```tsx
+rowsSelected: (selected, total) =>
+  `${selected.toLocaleString("es")} de ${total.toLocaleString("es")} filas seleccionadas`,
+```
+
+Numbers and dates come from the runtime's `Intl` data, so the server and the browser can differ slightly for some languages.
 
 ## Available languages
 

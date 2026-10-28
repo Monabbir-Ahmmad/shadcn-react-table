@@ -7,7 +7,10 @@
  */
 export interface DataTableLocalization {
   // Language
-  /** BCP 47 tag used to format numbers and dates (e.g. "en", "de"). */
+  /**
+   * BCP 47 tag used to format dates (e.g. "en", "de"). Numbers are formatted
+   * by the function keys of each localization, with that file's own tag.
+   */
   language: string
 
   // Selection
