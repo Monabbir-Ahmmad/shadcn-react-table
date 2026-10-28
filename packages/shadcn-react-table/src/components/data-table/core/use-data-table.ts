@@ -488,6 +488,8 @@ export function useDataTable<TData extends RowData>(
   usePageIndexClamp(table, {
     enablePagination,
     manualPagination: tableOptions.manualPagination,
+    isLoading,
+    showSkeletons,
   })
 
   // Advanced filter edits can shrink the result set; jump back to the first

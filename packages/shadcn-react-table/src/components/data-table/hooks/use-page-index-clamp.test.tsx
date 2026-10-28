@@ -55,8 +55,26 @@ describe("page index clamp", () => {
         }),
       { initialProps: { data: make(10) } }
     )
-    act(() => result.current.setPageIndex(2))
+    act(() => result.current.setPageIndex(5))
     rerender({ data: make(5) })
+    expect(result.current.getState().pagination.pageIndex).toBe(5)
+  })
+
+  it("leaves the page alone while loading", () => {
+    const { result, rerender } = renderHook(
+      ({ data, isLoading }) =>
+        useDataTable<Person>({
+          columns,
+          data,
+          getRowId: (r) => r.id,
+          isLoading,
+        }),
+      { initialProps: { data: make(25), isLoading: false } }
+    )
+    act(() => result.current.setPageIndex(2))
+    rerender({ data: [], isLoading: true })
+    expect(result.current.getState().pagination.pageIndex).toBe(2)
+    rerender({ data: make(25), isLoading: false })
     expect(result.current.getState().pagination.pageIndex).toBe(2)
   })
 })
