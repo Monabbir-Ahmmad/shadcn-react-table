@@ -2,46 +2,123 @@ export const metadata = { title: "Localization" }
 
 # Localization
 
-Every user-facing string can be translated. Override any subset of strings with the `localization` option, which accepts a partial of the localization table.
+The table ships in 38 languages. English is built in, and each of the other 37 is an optional registry item you install only when you need it. Every user-facing string can also be overridden one by one with the `localization` option.
 
 <Example slug="localization" />
 
+## Install a language
+
+Add the language after the table. Each one is its own registry item, named `data-table-locale-<code>`:
+
+```bash
+pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table-locale-de.json
+```
+
+It writes one file, `components/ui/data-table/locales/de.ts`, and adds no npm packages. Install as many languages as you like.
+
+## Use it on one table
+
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
+import { dataTableLocalizationDe } from "@/components/ui/data-table/locales/de"
 
 const table = useDataTable({
   data,
   columns,
   getRowId: (row) => row.id,
-  localization: {
-    searchPlaceholder: "Buscar...",
-    noResults: "Sin resultados.",
-    paginationRange: (start, end, total) =>
-      `${start}–${end} de ${total}`,
-  },
+  localization: dataTableLocalizationDe,
 })
 
 return <DataTable table={table} />
 ```
 
-Function-valued entries handle interpolation and plurals. For example, `paginationRange: (start, end, total) => ...` builds the range label from the current values.
+## Use it app-wide
 
-## App-wide defaults
-
-To set defaults for many tables at once, wrap a subtree in `DataTableConfigProvider`. Per-call `localization` options still override the provider.
+To set the language for many tables at once, wrap a subtree in `DataTableConfigProvider`. A `localization` option on a single table still overrides the provider.
 
 ```tsx
 import { DataTableConfigProvider } from "@/components/ui/data-table"
+import { dataTableLocalizationDe } from "@/components/ui/data-table/locales/de"
 
-<DataTableConfigProvider localization={{ noResults: "Sin resultados." }}>
+;<DataTableConfigProvider localization={dataTableLocalizationDe}>
   {children}
 </DataTableConfigProvider>
 ```
 
+## Change single strings
+
+A language is a plain object, so spread it and replace only the keys you want:
+
+```tsx
+useDataTable({
+  data,
+  columns,
+  localization: {
+    ...dataTableLocalizationDe,
+    rowsPerPage: "Einträge pro Seite",
+  },
+})
+```
+
 <Callout variant="note" title="Partial overrides">
-  You only need to supply the keys you want to change — everything else falls
-  back to the built-in defaults.
+  Without a language file you only need the keys you want to change — everything
+  else falls back to the built-in English. Function-valued entries, such as
+  `paginationRange: (start, end, total) => ...`, build a label from the current
+  values.
 </Callout>
+
+## Numbers and dates
+
+Row counts, pagination and selection summaries format numbers with the localization's `language` (for example `1,000` in English and `1.000` in German), and date filters show dates in that language. Every language file sets `language` for you. If you write your own localization, set `language` to a BCP 47 tag such as `"es"`.
+
+## Available languages
+
+| Language              | Code         | Export                          |
+| --------------------- | ------------ | ------------------------------- |
+| English (built in)    | `en`         | `defaultLocalization`           |
+| Arabic                | `ar`         | `dataTableLocalizationAr`       |
+| Azerbaijani           | `az`         | `dataTableLocalizationAz`       |
+| Bulgarian             | `bg`         | `dataTableLocalizationBg`       |
+| Czech                 | `cs`         | `dataTableLocalizationCs`       |
+| Danish                | `da`         | `dataTableLocalizationDa`       |
+| German                | `de`         | `dataTableLocalizationDe`       |
+| Greek                 | `el`         | `dataTableLocalizationEl`       |
+| Spanish               | `es`         | `dataTableLocalizationEs`       |
+| Estonian              | `et`         | `dataTableLocalizationEt`       |
+| Persian               | `fa`         | `dataTableLocalizationFa`       |
+| Finnish               | `fi`         | `dataTableLocalizationFi`       |
+| French                | `fr`         | `dataTableLocalizationFr`       |
+| Hebrew                | `he`         | `dataTableLocalizationHe`       |
+| Croatian              | `hr`         | `dataTableLocalizationHr`       |
+| Hungarian             | `hu`         | `dataTableLocalizationHu`       |
+| Armenian              | `hy`         | `dataTableLocalizationHy`       |
+| Indonesian            | `id`         | `dataTableLocalizationId`       |
+| Italian               | `it`         | `dataTableLocalizationIt`       |
+| Japanese              | `ja`         | `dataTableLocalizationJa`       |
+| Korean                | `ko`         | `dataTableLocalizationKo`       |
+| Nepali                | `ne`         | `dataTableLocalizationNe`       |
+| Dutch                 | `nl`         | `dataTableLocalizationNl`       |
+| Norwegian             | `no`         | `dataTableLocalizationNo`       |
+| Polish                | `pl`         | `dataTableLocalizationPl`       |
+| Portuguese            | `pt`         | `dataTableLocalizationPt`       |
+| Portuguese (Brazil)   | `pt-BR`      | `dataTableLocalizationPtBR`     |
+| Romanian              | `ro`         | `dataTableLocalizationRo`       |
+| Russian               | `ru`         | `dataTableLocalizationRu`       |
+| Slovak                | `sk`         | `dataTableLocalizationSk`       |
+| Serbian (Cyrillic)    | `sr-Cyrl-RS` | `dataTableLocalizationSrCyrlRS` |
+| Serbian (Latin)       | `sr-Latn-RS` | `dataTableLocalizationSrLatnRS` |
+| Swedish               | `sv`         | `dataTableLocalizationSv`       |
+| Turkish               | `tr`         | `dataTableLocalizationTr`       |
+| Ukrainian             | `uk`         | `dataTableLocalizationUk`       |
+| Vietnamese            | `vi`         | `dataTableLocalizationVi`       |
+| Chinese (Simplified)  | `zh-Hans`    | `dataTableLocalizationZhHans`   |
+| Chinese (Traditional) | `zh-Hant`    | `dataTableLocalizationZhHant`   |
+
+## Translation quality
+
+The translations are adapted from [Material React Table](https://www.material-react-table.com) (MIT License, Copyright (c) 2022 Kevin Vandy). Strings that Material React Table does not have were added here, and those lines are marked `// needs review` in the file: a native speaker has not checked them yet.
+
+To fix one, edit the file in your project (it is your copy) and delete the comment. To fix it for everyone, send a pull request against the matching file under `packages/shadcn-react-table/src/components/data-table/locales/`.
 
 ## Related
 

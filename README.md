@@ -55,6 +55,7 @@ _All features can be enabled or disabled per table._
 - [x] Sticky header / footer, density toggle, full-screen toggle
 - [x] Pagination (default or numbered pages) + keyboard grid navigation
 - [x] Localization (full string table) and custom icons (any icon library)
+- [x] 38 languages, each an optional registry item
 - [x] Server-side / manual mode (`manualPagination` / `manualSorting` / `manualFiltering`)
 - [x] Theming via shadcn tokens only — inherits your style, base color, and dark mode
 - [x] Radix UI **and** Base UI flavors supported from the same registry URL
@@ -294,5 +295,6 @@ Import shared primitives with `import { Foo } from "@workspace/ui/components/foo
 The API surface, option names, and feature set are openly modeled on
 [Material React Table](https://www.material-react-table.com) by
 [Kevin Van Cott](https://github.com/KevinVandy) — years of API design iteration
-this project gratefully stands on. Powering everything underneath:
+this project gratefully stands on. The translations are adapted from its
+locales (MIT License). Powering everything underneath:
 [TanStack Table](https://tanstack.com/table/latest) and [shadcn/ui](https://ui.shadcn.com).

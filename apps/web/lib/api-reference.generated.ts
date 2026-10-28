@@ -1763,6 +1763,14 @@ export const dataTableProps: ApiMember[] = [
 
 export const localizationKeys: ApiMember[] = [
   {
+    name: "language",
+    type: "string",
+    required: true,
+    default: "en",
+    description:
+      'BCP 47 tag used to format numbers and dates (e.g. "en", "de").',
+  },
+  {
     name: "selectAll",
     type: "string",
     required: true,
@@ -1788,7 +1796,7 @@ export const localizationKeys: ApiMember[] = [
     type: "(selected: number, total: number) => string",
     required: true,
     default:
-      '(selected, total) => `${selected} of ${total} row${total === 1 ? "" : "s"} selected`',
+      '(selected, total) => `${selected.toLocaleString("en")} of ${total.toLocaleString("en")} row${total === 1 ? "" : "s"} selected`',
     description: "",
   },
   {
@@ -2072,6 +2080,20 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
+    name: "true",
+    type: "string",
+    required: true,
+    default: "True",
+    description: "",
+  },
+  {
+    name: "false",
+    type: "string",
+    required: true,
+    default: "False",
+    description: "",
+  },
+  {
     name: "filterModes",
     type: "Record<string, string>",
     required: true,
@@ -2260,7 +2282,8 @@ export const localizationKeys: ApiMember[] = [
     name: "paginationRange",
     type: "(start: number, end: number, total: number) => string",
     required: true,
-    default: "(start, end, total) => `${start}–${end} of ${total}`",
+    default:
+      '(start, end, total) => `${start.toLocaleString("en")}–${end.toLocaleString("en")} of ${total.toLocaleString("en")}`',
     description: "",
   },
   {
@@ -2295,7 +2318,7 @@ export const localizationKeys: ApiMember[] = [
     name: "goToPage",
     type: "(page: number) => string",
     required: true,
-    default: "(page) => `Go to page ${page}`",
+    default: '(page) => `Go to page ${page.toLocaleString("en")}`',
     description: "",
   },
   {
@@ -2401,6 +2424,49 @@ export const localizationKeys: ApiMember[] = [
     type: "string",
     required: true,
     default: "Loading more…",
+    description: "",
+  },
+  {
+    name: "dragStart",
+    type: "(label: string) => string",
+    required: true,
+    default: "(label) => `Picked up ${label}.`",
+    description: "",
+  },
+  {
+    name: "dragOver",
+    type: "(label: string, over: string) => string",
+    required: true,
+    default: "(label, over) => `${label} is over ${over}.`",
+    description: "",
+  },
+  {
+    name: "dragEnd",
+    type: "(label: string, over: string) => string",
+    required: true,
+    default: "(label, over) => `${label} was dropped on ${over}.`",
+    description: "",
+  },
+  {
+    name: "dragCancel",
+    type: "(label: string) => string",
+    required: true,
+    default: "(label) => `Dragging was cancelled. ${label} was dropped.`",
+    description: "",
+  },
+  {
+    name: "dragInstructions",
+    type: "string",
+    required: true,
+    default:
+      "To pick up an item, press space or enter. While dragging, use the arrow keys to move it. Press space or enter again to drop it, or press escape to cancel.",
+    description: "",
+  },
+  {
+    name: "dragRowLabel",
+    type: "(position: number) => string",
+    required: true,
+    default: '(position) => `Row ${position.toLocaleString("en")}`',
     description: "",
   },
 ]

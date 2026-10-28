@@ -6,6 +6,11 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 
 ## Unreleased
 
+- **Added:** 37 locales (38 languages with English), each its own registry
+  item: `data-table-locale-<lang>`. Translations are adapted from Material
+  React Table; lines marked "needs review" await a native speaker.
+- **Added:** localization keys `language`, `true`, `false`, `dragStart`,
+  `dragOver`, `dragEnd`, `dragCancel`, `dragInstructions`, `dragRowLabel`.
 - **Changed:** `range` / `range-slider` filters default to `betweenInclusive`
   (rows equal to a bound are kept, as in Material React Table).
 - **Changed:** the column `fuzzy` filter mode now matches fuzzily, like the
@@ -16,6 +21,12 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   shrinks (not while loading).
 - **Changed:** a consumer-supplied `globalFilterFn` should keep a stable
   identity; a new function each render now re-filters every render.
+- **Changed:** numbers in row counts and pagination follow the localization's
+  `language` (English now shows `1,000`); date filters show dates in that
+  language; drag-and-drop announcements use column labels and row positions.
+- **Changed:** `DataTableLocalization` has nine new required keys. A custom
+  localization that spreads `defaultLocalization` (or a locale) keeps
+  compiling; one written out in full needs the new keys.
 - **Fixed:** clicks on controls inside a row (edit, save, cancel, row-action
   menu and its items, expand, pin, copy, drag handle, inline editors) no longer
   also fire `onRowClick` / `onCellClick`.

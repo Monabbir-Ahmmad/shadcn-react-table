@@ -14,6 +14,7 @@ import {
   useDataTable,
   type DataTableColumnDef,
 } from "@/components/ui/data-table"
+import { dataTableLocalizationDe } from "@/components/ui/data-table/locales/de"
 
 type Person = {
   id: string
@@ -70,6 +71,7 @@ export default function Page() {
   const table = useDataTable<Person>({
     data,
     columns,
+    localization: dataTableLocalizationDe,
     getRowId: (row) => row.id,
     enableRowSelection: true,
     enableRowNumbers: true,

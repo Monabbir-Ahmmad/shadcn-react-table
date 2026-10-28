@@ -1,8 +1,8 @@
 // Installs the built registry block into a freshly scaffolded shadcn Next.js
 // app and proves it typechecks and builds there, for one shadcn base. Serves
 // apps/web/public over a local HTTP server (so the PR's own registry is what
-// gets installed), runs `shadcn init` + `shadcn add`, copies the fixture page
-// in, then `tsc --noEmit` and `next build`. Run after registry:build:
+// gets installed), runs `shadcn init` + `shadcn add` (the table, then the
+// German locale), copies the fixture page in, then `tsc --noEmit` and `next build`. Run after registry:build:
 //   node apps/web/scripts/smoke-install.mjs --base radix|base [--keep]
 // --keep leaves the temp app in place for debugging (its path is printed). A
 // failed step also keeps the app (path printed); delete the `srt-smoke-*`
@@ -20,6 +20,7 @@ const REPO = join(dirname(fileURLToPath(import.meta.url)), "../../..")
 const PUBLIC_DIR = join(REPO, "apps/web/public")
 const FIXTURE = join(REPO, "apps/web/scripts/smoke-fixture/page.tsx")
 const ITEM = "r/data-table.json"
+const LOCALE_ITEM = "r/data-table-locale-de.json"
 const BASES = new Set(["radix", "base"])
 
 const USAGE =
@@ -131,6 +132,7 @@ async function main() {
 
   const { server, port } = await serve(PUBLIC_DIR)
   const itemUrl = `http://127.0.0.1:${port}/${ITEM}`
+  const localeUrl = `http://127.0.0.1:${port}/${LOCALE_ITEM}`
   const work = await mkdtemp(join(tmpdir(), "srt-smoke-"))
   const app = join(work, "app")
   console.log(
@@ -164,6 +166,13 @@ async function main() {
       "shadcn add",
       "pnpm",
       ["dlx", "shadcn@latest", "add", itemUrl, "--yes"],
+      app
+    )
+    await run(
+      base,
+      "shadcn add locale",
+      "pnpm",
+      ["dlx", "shadcn@latest", "add", localeUrl, "--yes"],
       app
     )
     console.log(`\n[smoke:${base}] copy fixture`)
