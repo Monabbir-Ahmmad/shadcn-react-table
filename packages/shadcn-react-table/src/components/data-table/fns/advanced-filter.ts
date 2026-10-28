@@ -248,6 +248,9 @@ function filterRowModel<TData extends RowData>(
  * functions, so the delegate is rebuilt whenever `options.globalFilterFn`
  * changes identity (e.g. a global filter mode switch or a consumer swapping
  * the fn); the fresh memo then recomputes with the new function.
+ *
+ * A consumer `globalFilterFn` must therefore be identity-stable: a new function
+ * on every render re-filters on every render.
  */
 export function createAdvancedFilteredRowModel<TData extends RowData>(
   getGroup: () => AdvancedFilterGroup

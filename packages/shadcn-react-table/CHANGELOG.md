@@ -6,22 +6,27 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 
 ## Unreleased
 
+- **Changed:** `range` / `range-slider` filters default to `betweenInclusive`
+  (rows equal to a bound are kept, as in Material React Table).
+- **Changed:** the column `fuzzy` filter mode now matches fuzzily, like the
+  global search (it was a plain substring match); it does not reorder rows.
+- **Changed:** date filters treat the chosen date as a whole day: `after`
+  excludes the whole chosen day, `betweenDates` includes the whole end day.
+- **Changed:** the page index is clamped to the last page when the row count
+  shrinks (not while loading).
+- **Changed:** a consumer-supplied `globalFilterFn` should keep a stable
+  identity; a new function each render now re-filters every render.
 - **Fixed:** clicks on controls inside a row (edit, save, cancel, row-action
   menu and its items, expand, pin, copy, drag handle, inline editors) no longer
   also fire `onRowClick` / `onCellClick`.
 - **Fixed:** picking a value in a `select` cell editor saves that value (cell
   mode exited without saving; table mode saved the previous pick).
-- **Fixed:** `range` / `range-slider` filters default to `betweenInclusive`,
-  so rows equal to a bound are kept (matches Material React Table).
 - **Fixed:** columns nested inside header groups now get their variant's
   default filter mode and are excluded from auto-highlighting when they have a
   custom `cell`.
-- **Fixed:** the column `fuzzy` filter mode now ranks fuzzily (it was a plain
-  substring match).
 - **Fixed:** `enableRowPinning` without `enableRowNumbers` renders a pin column.
 - **Fixed:** footer cells are opaque (sticky / pinned footers no longer show
   body text through) and honor `meta.align`.
-- **Fixed:** the page index is clamped when the row count shrinks.
 - **Fixed:** `enableFilters: false` also ignores filters supplied through `state`.
 - **Fixed:** a consumer `ref` on `<DataTable>` no longer disables
   `refs.tablePaperRef`.
@@ -31,7 +36,6 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   `resetGlobalFilter` and controlled state.
 - **Fixed:** the edit modal closes instead of throwing when the edited row
   leaves `data`.
-- **Fixed:** `betweenDates` and `after` treat the end date as a whole day.
 - **Fixed:** column ids with spaces or punctuation no longer break resizable
   column widths.
 - **Fixed:** changing the global filter mode re-filters the rows.
