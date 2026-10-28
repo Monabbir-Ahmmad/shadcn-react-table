@@ -1,6 +1,7 @@
 "use client"
 
 import type { RowData } from "@tanstack/react-table"
+import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -40,11 +41,20 @@ export function DataTableEditModal<TData extends RowData>({
     onCreateRow,
   } = table.tableInstance
 
+  // `table.getRow` throws when the id is gone (row deleted / refetched while
+  // the dialog is open); look it up without throwing and bail out below.
   const editingRow =
-    editingRowId != null ? table.getRow(editingRowId) : undefined
+    editingRowId != null
+      ? table.getCoreRowModel().rowsById[editingRowId]
+      : undefined
+  const editingRowMissing = editingRowId != null && editingRow == null
+  React.useEffect(() => {
+    if (editingRowMissing) cancelEdit()
+  }, [editingRowMissing, cancelEdit])
+
   const open =
     (isCreating && createDisplayMode === "modal") ||
-    (editDisplayMode === "modal" && editingRowId != null)
+    (editDisplayMode === "modal" && editingRowId != null && !editingRowMissing)
   if (!open) return null
 
   const editableColumns = table
