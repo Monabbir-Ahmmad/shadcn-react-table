@@ -61,8 +61,8 @@
   "loadingMore": "Učitavanje još…",
   "dragStart": "Podignuto: {label}.",
   "dragOver": "{label} je iznad {over}.",
-  "dragEnd": "{label} je pušteno na {over}.",
-  "dragCancel": "Prevlačenje je otkazano. {label} je pušteno.",
+  "dragEnd": "Pušteno na {over}: {label}.",
+  "dragCancel": "Prevlačenje je otkazano. Pušteno: {label}.",
   "dragInstructions": "Da podigneš stavku, pritisni razmaknicu ili Enter. Tokom prevlačenja koristi tastere sa strelicama da je pomeriš. Ponovo pritisni razmaknicu ili Enter da je pustiš, ili pritisni Escape da otkažeš.",
   "dragRowLabel": "Red {position}"
 }

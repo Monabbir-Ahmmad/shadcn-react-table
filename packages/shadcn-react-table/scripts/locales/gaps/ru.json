@@ -28,9 +28,9 @@
     "betweenDates": "Между"
   },
   "advancedFilters": "Расширенные фильтры",
-  "advancedFiltersMatchLabel": "Соответствие",
-  "advancedFiltersMatchAll": "Все",
-  "advancedFiltersMatchAny": "Любое",
+  "advancedFiltersMatchLabel": "Применять",
+  "advancedFiltersMatchAll": "все",
+  "advancedFiltersMatchAny": "любое",
   "advancedFiltersOf": "из следующих правил",
   "advancedFiltersAddRule": "Добавить фильтр",
   "advancedFiltersApply": "Применить",
@@ -61,8 +61,8 @@
   "loadingMore": "Загрузка ещё…",
   "dragStart": "Взято: {label}.",
   "dragOver": "{label} находится над {over}.",
-  "dragEnd": "{label} отпущено на {over}.",
-  "dragCancel": "Перетаскивание отменено. {label} отпущено.",
+  "dragEnd": "Отпущено на {over}: {label}.",
+  "dragCancel": "Перетаскивание отменено. Отпущено: {label}.",
   "dragInstructions": "Чтобы взять элемент, нажмите пробел или Enter. Во время перетаскивания перемещайте его клавишами со стрелками. Нажмите пробел или Enter ещё раз, чтобы отпустить элемент, или Escape, чтобы отменить.",
   "dragRowLabel": "Строка {position}"
 }

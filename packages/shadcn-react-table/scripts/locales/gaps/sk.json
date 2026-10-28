@@ -61,8 +61,8 @@
   "loadingMore": "Načítava sa viac…",
   "dragStart": "Zdvihnuté: {label}.",
   "dragOver": "{label} je nad {over}.",
-  "dragEnd": "{label} bolo pustené na {over}.",
-  "dragCancel": "Presúvanie bolo zrušené. {label} bolo pustené.",
+  "dragEnd": "Pustené na {over}: {label}.",
+  "dragCancel": "Presúvanie bolo zrušené. Pustené: {label}.",
   "dragInstructions": "Ak chcete zdvihnúť položku, stlačte medzerník alebo Enter. Počas presúvania ju premiestňujte šípkami. Opätovným stlačením medzerníka alebo Enter ju pustíte, alebo stlačením Escape presúvanie zrušíte.",
   "dragRowLabel": "Riadok {position}"
 }

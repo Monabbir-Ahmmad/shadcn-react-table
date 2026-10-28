@@ -13,7 +13,7 @@
   "groupByColumn": "{column} üzrə qruplandır",
   "groupedBy": "Qruplandırılıb",
   "dropToGroupBy": "Qruplandırmaq üçün sütunu bura sürüşdürün",
-  "toggleRowExpanded": "Sətrin genişlənməsini dəyiş",
+  "toggleRowExpanded": "Sətri genişləndir/yığ",
   "filterMode": "Filter rejimi",
   "filterPlaceholder": "{column} filtri…",
   "showColumnFilters": "Filterləri göstər",
@@ -28,10 +28,10 @@
     "betweenDates": "Arasında"
   },
   "advancedFilters": "Qabaqcıl filterlər",
-  "advancedFiltersMatchLabel": "Uyğunlaşdır",
-  "advancedFiltersMatchAll": "Hamısı",
-  "advancedFiltersMatchAny": "İstənilən",
-  "advancedFiltersOf": "aşağıdakı qaydalara",
+  "advancedFiltersMatchLabel": "Aşağıdakı qaydaların",
+  "advancedFiltersMatchAll": "hamısı",
+  "advancedFiltersMatchAny": "istənilən biri",
+  "advancedFiltersOf": "uyğun gəlsin",
   "advancedFiltersAddRule": "Filter əlavə et",
   "advancedFiltersApply": "Tətbiq et",
   "advancedFiltersClearAll": "Hamısını təmizlə",
@@ -41,7 +41,7 @@
   "advancedFiltersEmpty": "Hələ filter yoxdur. Başlamaq üçün birini əlavə edin.",
   "removeFilterRule": "Filteri sil",
   "advancedFilterOperators": {
-    "notContains": "daxil deyil"
+    "notContains": "ehtiva etmir"
   },
   "searchPlaceholder": "Axtar…",
   "densityComfortable": "Rahat",

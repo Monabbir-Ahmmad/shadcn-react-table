@@ -61,8 +61,8 @@
   "loadingMore": "Se încarcă mai multe…",
   "dragStart": "Ridicat: {label}.",
   "dragOver": "{label} este deasupra {over}.",
-  "dragEnd": "{label} a fost plasat pe {over}.",
-  "dragCancel": "Tragerea a fost anulată. {label} a fost plasat.",
+  "dragEnd": "Plasat pe {over}: {label}.",
+  "dragCancel": "Tragerea a fost anulată. Plasat: {label}.",
   "dragInstructions": "Pentru a ridica un element, apasă Spațiu sau Enter. În timpul tragerii, folosește tastele săgeți pentru a-l muta. Apasă din nou Spațiu sau Enter pentru a-l plasa sau apasă Escape pentru a anula.",
   "dragRowLabel": "Linia {position}"
 }

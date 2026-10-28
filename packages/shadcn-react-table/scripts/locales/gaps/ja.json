@@ -20,12 +20,12 @@
   "hideColumnFilters": "検索バーを隠す",
   "pickDate": "日付を選択",
   "pickDateRange": "日付の範囲を選択",
-  "true": "真",
-  "false": "偽",
+  "true": "はい",
+  "false": "いいえ",
   "filterModes": {
     "before": "より前",
     "after": "より後",
-    "betweenDates": "の間"
+    "betweenDates": "範囲内"
   },
   "advancedFilters": "詳細検索",
   "advancedFiltersMatchLabel": "次の条件の",
@@ -41,7 +41,7 @@
   "advancedFiltersEmpty": "条件がありません。追加して始めましょう。",
   "removeFilterRule": "条件を削除",
   "advancedFilterOperators": {
-    "notContains": "を含まない"
+    "notContains": "含まない"
   },
   "searchPlaceholder": "検索…",
   "densityComfortable": "標準",

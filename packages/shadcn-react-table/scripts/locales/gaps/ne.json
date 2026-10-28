@@ -23,8 +23,8 @@
   "true": "सत्य",
   "false": "असत्य",
   "filterModes": {
-    "before": "भन्दा अघि",
-    "after": "भन्दा पछि",
+    "before": "अघि",
+    "after": "पछि",
     "betweenDates": "बीच"
   },
   "advancedFilters": "उन्नत फिल्टरहरू",

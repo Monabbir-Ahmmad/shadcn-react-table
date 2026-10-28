@@ -61,8 +61,8 @@
   "loadingMore": "Учитавање још…",
   "dragStart": "Подигнуто: {label}.",
   "dragOver": "{label} је изнад {over}.",
-  "dragEnd": "{label} је пуштено на {over}.",
-  "dragCancel": "Превлачење је отказано. {label} је пуштено.",
+  "dragEnd": "Пуштено на {over}: {label}.",
+  "dragCancel": "Превлачење је отказано. Пуштено: {label}.",
   "dragInstructions": "Да подигнеш ставку, притисни размакницу или Enter. Током превлачења користи тастере са стрелицама да је помериш. Поново притисни размакницу или Enter да је пустиш, или притисни Escape да откажеш.",
   "dragRowLabel": "Ред {position}"
 }

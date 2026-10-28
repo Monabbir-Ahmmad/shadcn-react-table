@@ -10,7 +10,7 @@
   "pinRow": "Sor rögzítése",
   "unpinRow": "Sor rögzítésének feloldása",
   "resizeColumn": "Oszlop átméretezése",
-  "groupByColumn": "Csoportosítás: {column} alapján",
+  "groupByColumn": "Csoportosítás {column} szerint",
   "groupedBy": "Csoportosítva",
   "dropToGroupBy": "Húzzon ide egy oszlopot a csoportosításhoz",
   "toggleRowExpanded": "Sor kibontása/összecsukása",

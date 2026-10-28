@@ -59,10 +59,10 @@
   "cellActions": "פעולות תא",
   "loading": "טוען…",
   "loadingMore": "טוען עוד…",
-  "dragStart": "{label} הורם.",
-  "dragOver": "{label} נמצא מעל {over}.",
-  "dragEnd": "{label} שוחרר על {over}.",
-  "dragCancel": "הגרירה בוטלה. {label} שוחרר.",
+  "dragStart": "הרמת את {label}.",
+  "dragOver": "{label} מעל {over}.",
+  "dragEnd": "שחררת את {label} על {over}.",
+  "dragCancel": "הגרירה בוטלה. שחררת את {label}.",
   "dragInstructions": "כדי להרים פריט, לחץ על רווח או על Enter. בזמן הגרירה, השתמש במקשי החצים כדי להזיז אותו. לחץ שוב על רווח או על Enter כדי לשחרר, או על Escape כדי לבטל.",
   "dragRowLabel": "שורה {position}"
 }

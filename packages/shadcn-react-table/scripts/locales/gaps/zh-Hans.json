@@ -20,8 +20,8 @@
   "hideColumnFilters": "隐藏过滤条件",
   "pickDate": "选择日期",
   "pickDateRange": "选择日期范围",
-  "true": "真",
-  "false": "假",
+  "true": "是",
+  "false": "否",
   "filterModes": {
     "before": "早于",
     "after": "晚于",
