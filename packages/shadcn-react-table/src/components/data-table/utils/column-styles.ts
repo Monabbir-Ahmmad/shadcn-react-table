@@ -35,6 +35,12 @@ export function getColumnPinningClass<TData extends RowData, TValue>(
     : "before:pointer-events-none before:absolute before:inset-y-0 before:-left-px before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/60 before:to-transparent"
 }
 
+/** Column ids go into CSS custom-property names; anything outside
+ *  `[A-Za-z0-9_-]` (spaces, dots, slashes…) would make `var()` invalid. */
+export function cssVarId(id: string): string {
+  return id.replace(/[^A-Za-z0-9_-]/g, "_")
+}
+
 /**
  * CSS custom properties holding each column's size, set once on the table
  * element. Cells read them via `width: calc(var(--col-…-size) * 1px)` so a
@@ -46,14 +52,15 @@ export function getColumnSizeVars<TData extends RowData>(
   const headers = table.getFlatHeaders()
   const vars: Record<string, string> = {}
   for (const header of headers) {
-    vars[`--header-${header.id}-size`] = `${header.getSize()}`
-    vars[`--col-${header.column.id}-size`] = `${header.column.getSize()}`
+    vars[`--header-${cssVarId(header.id)}-size`] = `${header.getSize()}`
+    vars[`--col-${cssVarId(header.column.id)}-size`] =
+      `${header.column.getSize()}`
   }
   return vars
 }
 
 export function getColumnWidthStyle(columnId: string): CSSProperties {
-  return { width: `calc(var(--col-${columnId}-size) * 1px)` }
+  return { width: `calc(var(--col-${cssVarId(columnId)}-size) * 1px)` }
 }
 
 /**
