@@ -518,7 +518,13 @@ export function useDataTable<TData extends RowData>(
       setColumnFilterModes((prev) => ({ ...prev, [columnId]: mode }))
       const column = table.getColumn(columnId)
       if (!column) return
-      column.setFilterValue(VALUELESS_MODES.has(mode) ? mode : undefined)
+      if (VALUELESS_MODES.has(mode)) {
+        column.setFilterValue(mode)
+      } else if (column.getFilterValue() !== undefined) {
+        // Only clear when a value exists: TanStack always builds a new
+        // `columnFilters` array, which would fire a consumer refetch for nothing.
+        column.setFilterValue(undefined)
+      }
     },
     [table, setColumnFilterModes]
   )

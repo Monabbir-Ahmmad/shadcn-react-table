@@ -386,4 +386,17 @@ describe("useDataTable engine behaviour", () => {
     })
     expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
   })
+
+  it("does not emit onColumnFiltersChange when switching mode on an unfiltered column", () => {
+    const onColumnFiltersChange = vi.fn()
+    const { result } = setup({ onColumnFiltersChange })
+    act(() =>
+      result.current.tableInstance.setColumnFilterMode("name", "startsWith")
+    )
+    expect(onColumnFiltersChange).not.toHaveBeenCalled()
+
+    // A valueless mode still activates (it needs a sentinel value).
+    act(() => result.current.tableInstance.setColumnFilterMode("name", "empty"))
+    expect(onColumnFiltersChange).toHaveBeenCalledTimes(1)
+  })
 })
