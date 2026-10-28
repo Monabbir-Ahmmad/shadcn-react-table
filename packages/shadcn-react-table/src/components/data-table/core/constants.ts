@@ -60,3 +60,11 @@ export const BODY_ROW_CLASS =
  */
 export const BODY_CELL_CLASS =
   "bg-card bg-[linear-gradient(var(--row-tint),var(--row-tint))] group-data-[state=selected]:first:shadow-[inset_2px_0_0_0_var(--primary)]"
+
+/**
+ * Footer-cell background: opaque card fill with the muted footer tint painted
+ * over it, so sticky / pinned footer cells cover body text (the shadcn
+ * `<tfoot>` background is translucent).
+ */
+export const FOOTER_CELL_CLASS =
+  "bg-card bg-[linear-gradient(color-mix(in_oklab,var(--muted)_50%,transparent),color-mix(in_oklab,var(--muted)_50%,transparent))]"

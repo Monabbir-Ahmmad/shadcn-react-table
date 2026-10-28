@@ -10,7 +10,11 @@ import {
 } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { DENSITY_CELL_PADDING } from "../../core/constants"
+import {
+  ALIGN_CELL,
+  DENSITY_CELL_PADDING,
+  FOOTER_CELL_CLASS,
+} from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
 import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
 import {
@@ -35,7 +39,7 @@ export function hasFooter<TData extends RowData>(
 
 /**
  * The table `<tfoot>` (aggregation / footer cells). Stickiness is controlled by
- * `enableStickyFooter` (on by default), independent of whether a footer exists.
+ * `enableStickyFooter` (off by default), independent of whether a footer exists.
  */
 export function DataTableFooter<TData extends RowData>({
   table,
@@ -68,7 +72,12 @@ export function DataTableFooter<TData extends RowData>({
               ...getWidthStyle(header.column, table),
               ...getColumnPinningStyle(header.column),
             }}
-            className={cn(padding, getColumnPinningClass(header.column))}
+            className={cn(
+              FOOTER_CELL_CLASS,
+              padding,
+              ALIGN_CELL[header.column.columnDef.meta?.align ?? "left"],
+              getColumnPinningClass(header.column)
+            )}
           >
             {header.isPlaceholder
               ? null
