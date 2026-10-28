@@ -9,24 +9,24 @@
 //                                placeholders inside the referenced MRT
 //                                strings to our parameter names.
 //   { object: { sub: Mapping } } for `filterModes`/`advancedFilterOperators`
-//   { gap: true }                no MRT equivalent; translated by hand
+//   { fromLocaleId: true }       set from the locale id (`language`)
+//   { gap: true }                translated by hand (no usable MRT equivalent)
+
+// Our locale id -> the name MRT uses for the same language (vendored as
+// mrt-3.2.1/<mrtName>.json). Nepali is `np` in MRT but `ne` in BCP 47.
+export const LOCALE_TO_MRT = { ne: "np" }
 
 const same = (key) => [key, { mrt: key }]
 
 const SAME_NAME = [
-  "language",
   "clearSelection",
-  "sortByColumnAsc",
-  "sortByColumnDesc",
   "clearSort",
   "columnActions",
   "showAllColumns",
   "pinToLeft",
   "pinToRight",
   "unpin",
-  "groupByColumn",
   "ungroupByColumn",
-  "groupedBy",
   "expand",
   "collapse",
   "expandAll",
@@ -62,17 +62,14 @@ const SAME_NAME = [
 const MAPPING = {
   ...Object.fromEntries(SAME_NAME.map(same)),
 
+  // Not from MRT: generated from the locale id (so `ne` gets "ne").
+  language: { fromLocaleId: true },
+
   // By meaning
   selectAll: { mrt: "toggleSelectAll" },
   selectRow: { mrt: "toggleSelectRow" },
-  rowsSelected: {
-    template: "{selectedCountOfRowCountRowsSelected}",
-    params: { selectedCount: "selected", rowCount: "total" },
-  },
-  paginationRange: { template: "{start}–{end} {of} {total}" },
   reorderColumn: { mrt: "move" },
   reorderRow: { mrt: "move" },
-  pinRow: { mrt: "pin" },
   columnVisibility: { mrt: "showHideColumns" },
   toggleColumnVisibility: { mrt: "toggleVisibility" },
   globalFilterMode: { mrt: "changeSearchMode" },
@@ -124,6 +121,15 @@ const MAPPING = {
 // Everything else is a gap. Listed explicitly so `print-gaps.mjs` can tell a
 // deliberate gap from a key that was forgotten.
 const GAP_KEYS = [
+  // MRT's string is wrong or unusable for these in some languages; translators
+  // still read MRT's string as a reference (see the README of gaps/).
+  "paginationRange",
+  "rowsSelected",
+  "pinRow",
+  "sortByColumnAsc",
+  "sortByColumnDesc",
+  "groupByColumn",
+  "groupedBy",
   "sortAscending",
   "sortDescending",
   "sortedAscending",

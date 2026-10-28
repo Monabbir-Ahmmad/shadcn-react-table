@@ -7,10 +7,11 @@
 // MRT string carries a placeholder the target key cannot fill.
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
+import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 import { defaultLocalization } from "../../src/components/data-table/core/localization.ts"
-import MAPPING from "./mapping.mjs"
+import MAPPING, { LOCALE_TO_MRT } from "./mapping.mjs"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const mrtDir = join(here, "mrt-3.2.1")
@@ -18,11 +19,20 @@ const mrtDir = join(here, "mrt-3.2.1")
 const loadMrt = (lang) =>
   JSON.parse(readFileSync(join(mrtDir, `${lang}.json`), "utf8"))
 const mrtEn = loadMrt("en")
+const mrtToLocale = Object.fromEntries(
+  Object.entries(LOCALE_TO_MRT).map(([id, mrt]) => [mrt, id])
+)
+// Our locale ids (MRT's `np` is our `ne`); English is the source, not a locale.
 const langs = readdirSync(mrtDir)
   .filter((file) => file.endsWith(".json"))
   .map((file) => file.slice(0, -5))
+  .map((name) => mrtToLocale[name] ?? name)
+  .filter((id) => id !== "en")
   .sort()
-const mrtByLang = Object.fromEntries(langs.map((l) => [l, loadMrt(l)]))
+const mrtByLang = Object.fromEntries(
+  langs.map((id) => [id, loadMrt(LOCALE_TO_MRT[id] ?? id)])
+)
+mrtByLang.en = mrtEn
 
 const errors = []
 const gaps = []
@@ -82,15 +92,19 @@ const mrtRefs = (mapping) =>
         .filter((word) => word in mrtEn)
 
 const missingInLang = new Map()
+const identical = []
 
 function check(path, mapping, value) {
-  const kinds = ["mrt", "template", "gap"].filter((k) => k in mapping)
+  const kinds = ["mrt", "template", "gap", "fromLocaleId"].filter(
+    (k) => k in mapping
+  )
   if (kinds.length !== 1) return fail(`${path}: mapping must be one shape`)
 
   if (mapping.gap) {
     gaps.push([path, oneLine(value)])
     return
   }
+  if (mapping.fromLocaleId) return
 
   for (const ref of mrtRefs(mapping)) {
     if (!(ref in mrtEn)) fail(`${path}: "${ref}" is not a key of mrt en.json`)
@@ -114,6 +128,8 @@ function check(path, mapping, value) {
       missingInLang.set(lang, list)
       continue
     }
+    // Same text as MRT's English: probably untranslated (or identical by design).
+    if (text === expand(mapping, "en")) identical.push(`${lang} ${path}`)
     for (const name of placeholders(text)) {
       if (!allowed.includes(name)) {
         fail(
@@ -177,5 +193,9 @@ if (missingInLang.size > 0) {
       ` will fall back to English: ` +
       [...missingInLang].map(([l, k]) => `${l}[${k.join(",")}]`).join(" ")
   )
+}
+if (identical.length > 0) {
+  console.log(`identical to MRT English (${identical.length}):`)
+  for (const hit of identical) console.log(`  ${hit}`)
 }
 console.log(`wrote ${join("scripts", "locales", "gaps", "_keys.txt")}`)

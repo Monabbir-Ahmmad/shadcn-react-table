@@ -1,10 +1,16 @@
+rowsSelected	(selected, total) => `${selected.toLocaleString("en")} of ${total.toLocaleString("en")} row${total===1?"":"s"} selected`
+sortByColumnAsc	column => `Sort by ${column} ascending`
+sortByColumnDesc	column => `Sort by ${column} descending`
 sortAscending	Sort ascending
 sortDescending	Sort descending
 sortedAscending	Sorted ascending
 sortedDescending	Sorted descending
 hideColumn	Hide column
+pinRow	Pin row
 unpinRow	Unpin row
 resizeColumn	Resize column
+groupByColumn	column => `Group by ${column}`
+groupedBy	Grouped by
 dropToGroupBy	Drag a column here to group by it
 toggleRowExpanded	Toggle row expanded
 filterMode	Filter mode
@@ -38,6 +44,7 @@ densityCompact	Compact
 densitySpacious	Spacious
 enterFullscreen	Enter full screen
 exitFullscreen	Exit full screen
+paginationRange	(start, end, total) => `${start.toLocaleString("en")}–${end.toLocaleString("en")} of ${total.toLocaleString("en")}`
 goToPage	page => `Go to page ${page.toLocaleString("en")}`
 delete	Delete
 create	Create
