@@ -230,7 +230,10 @@ export function useDataTable<TData extends RowData>(
   const { columnFilterModes, setColumnFilterModes, dynamicFilterFn } =
     useColumnFilterModes<TData>(columns)
 
-  const isManualFiltering = !!tableOptions.manualFiltering
+  // `enableFilters: false` forces manual filtering into TanStack below; the
+  // ranked-sort and faceting gates must see the same switch.
+  const isManualFiltering =
+    !!tableOptions.manualFiltering || tableOptions.enableFilters === false
 
   const {
     globalFilterMode,

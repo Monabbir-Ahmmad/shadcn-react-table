@@ -421,4 +421,23 @@ describe("useDataTable engine behaviour", () => {
     act(() => result.current.tableInstance.setColumnFilterMode("name", "empty"))
     expect(onColumnFiltersChange).toHaveBeenCalledTimes(1)
   })
+
+  it("does not rank rows by a global filter when enableFilters is false", () => {
+    const { result } = setup({
+      enableFilters: false,
+      manualFiltering: false,
+      enableGlobalFilterRankedResults: true,
+      state: { globalFilter: "ann" },
+    })
+    // Filtering is off, so neither the filter nor its ranking applies.
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
+  })
+
+  it("skips faceting when enableFilters is false", () => {
+    const { result } = setup({ enableFilters: false })
+    // Same as manual filtering: no filter UI, so no facet values are computed.
+    expect(
+      result.current.getColumn("dept")!.getFacetedUniqueValues().size
+    ).toBe(0)
+  })
 })
