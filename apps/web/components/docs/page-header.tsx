@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 import * as React from "react"
 import { RiArrowRightSLine } from "@remixicon/react"
 
+import { CopyStatus } from "@/components/copy-status"
+import { copyLabel, useCopy } from "@/hooks/use-copy"
 import { breadcrumbFor, pageLinks, pageMarkdownUrl } from "@/lib/docs-meta"
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
@@ -16,20 +18,13 @@ export function DocsPageHeader() {
   const pathname = usePathname()
   const crumbs = breadcrumbFor(pathname)
   const links = pageLinks(pathname)
-  const [copied, setCopied] = React.useState<"idle" | "copied" | "failed">(
-    "idle"
-  )
+  const { state, copy } = useCopy()
 
-  const copy = async () => {
-    try {
-      const response = await fetch(pageMarkdownUrl(pathname, BASE_PATH))
-      if (!response.ok) throw new Error(String(response.status))
-      await navigator.clipboard.writeText(await response.text())
-      setCopied("copied")
-    } catch {
-      setCopied("failed")
-    }
-    setTimeout(() => setCopied("idle"), 1500)
+  /** The page's Markdown copy (built by `scripts/build-llms.mjs`). */
+  const fetchMarkdown = async () => {
+    const response = await fetch(pageMarkdownUrl(pathname, BASE_PATH))
+    if (!response.ok) throw new Error(String(response.status))
+    return response.text()
   }
 
   return (
@@ -54,13 +49,14 @@ export function DocsPageHeader() {
         ))}
       </nav>
       <div className="flex flex-wrap gap-1">
-        <button type="button" onClick={copy} className={ACTION}>
-          {copied === "copied"
-            ? "Copied"
-            : copied === "failed"
-              ? "Couldn't copy"
-              : "Copy page"}
+        <button
+          type="button"
+          onClick={() => void copy(fetchMarkdown)}
+          className={ACTION}
+        >
+          {copyLabel(state, "Copy page")}
         </button>
+        <CopyStatus state={state} />
         <a href={pageMarkdownUrl(pathname, BASE_PATH)} className={ACTION}>
           Markdown
         </a>

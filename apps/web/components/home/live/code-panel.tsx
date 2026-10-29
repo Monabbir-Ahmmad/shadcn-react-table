@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { RiCheckLine, RiFileCopyLine } from "@remixicon/react"
 
-import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { CopyButton } from "@/components/copy-button"
 
 // Strings, numbers and literals read as values; keywords recede.
 const TOKEN =
@@ -49,21 +49,6 @@ export function CodePanel({
   if (history.current !== code)
     setHistory({ prev: history.current, current: code })
 
-  const [copied, setCopied] = React.useState(false)
-  const timer = React.useRef<ReturnType<typeof setTimeout>>(undefined)
-  React.useEffect(() => () => clearTimeout(timer.current), [])
-
-  const copy = () => {
-    navigator.clipboard
-      ?.writeText(code)
-      .then(() => {
-        setCopied(true)
-        clearTimeout(timer.current)
-        timer.current = setTimeout(() => setCopied(false), 1600)
-      })
-      .catch(() => {})
-  }
-
   const lines = code.split("\n")
   const before = new Set(history.prev.split("\n"))
   const changed = (line: string) =>
@@ -78,14 +63,7 @@ export function CodePanel({
             {"// the call behind the preview"}
           </span>
         </p>
-        <Button variant="ghost" size="xs" onClick={copy}>
-          {copied ? (
-            <RiCheckLine data-icon="inline-start" />
-          ) : (
-            <RiFileCopyLine data-icon="inline-start" />
-          )}
-          {copied ? "Copied" : "Copy"}
-        </Button>
+        <CopyButton text={code} what="the code" variant="ghost" />
       </div>
       <pre
         dir="ltr"

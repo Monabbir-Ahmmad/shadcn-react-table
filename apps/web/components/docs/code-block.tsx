@@ -4,6 +4,9 @@ import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
+import { CopyStatus } from "@/components/copy-status"
+import { copyLabel, useCopy } from "@/hooks/use-copy"
+
 /** The MDX `pre`: language label and a copy button over the code. */
 export function CodeBlock({
   className,
@@ -11,7 +14,7 @@ export function CodeBlock({
   ...props
 }: React.ComponentProps<"pre">) {
   const ref = React.useRef<HTMLPreElement>(null)
-  const [copied, setCopied] = React.useState(false)
+  const { state, copy } = useCopy()
   const child = React.isValidElement<{ className?: string }>(children)
     ? children
     : null
@@ -22,18 +25,12 @@ export function CodeBlock({
         <span className="font-mono">{language ?? "text"}</span>
         <button
           type="button"
-          onClick={() =>
-            void navigator.clipboard
-              .writeText(ref.current?.textContent ?? "")
-              .then(() => {
-                setCopied(true)
-                setTimeout(() => setCopied(false), 1500)
-              })
-          }
+          onClick={() => void copy(ref.current?.textContent ?? "")}
           className="rounded px-2 py-0.5 font-medium hover:bg-muted hover:text-foreground"
         >
-          {copied ? "Copied" : "Copy"}
+          {copyLabel(state)}
         </button>
+        <CopyStatus state={state} />
       </div>
       <pre
         ref={ref}

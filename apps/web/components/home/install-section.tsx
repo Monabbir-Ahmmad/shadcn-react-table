@@ -1,11 +1,6 @@
-"use client"
-
-import * as React from "react"
 import Link from "next/link"
-import { RiCheckLine, RiFileCopyLine } from "@remixicon/react"
 
-import { Button } from "@workspace/ui/components/button"
-
+import { CopyButton } from "@/components/copy-button"
 import { Step, Steps } from "@/components/docs/steps"
 import { ProofSection, Wrappable } from "@/components/home/proof/proof-section"
 import { INSTALL_COMMAND } from "@/lib/site"
@@ -58,39 +53,15 @@ export function InstallSection() {
   )
 }
 
+/** The install command; only its copy button runs on the client. */
 function CommandBlock() {
-  const [copied, setCopied] = React.useState(false)
-
-  const copy = () => {
-    void navigator.clipboard
-      ?.writeText(INSTALL_COMMAND)
-      .then(() => {
-        setCopied(true)
-        setTimeout(() => setCopied(false), 1500)
-      })
-      .catch(() => {})
-  }
-
   return (
     <div className="flex items-start gap-4 border bg-background p-4 font-mono text-[13px] leading-relaxed">
       <code className="min-w-0 flex-1 break-words">
         <span className="text-muted-foreground select-none">$ </span>
         <Wrappable text={INSTALL_COMMAND} />
       </code>
-      <Button
-        variant="outline"
-        size="xs"
-        onClick={copy}
-        aria-label={copied ? "Copied" : "Copy the install command"}
-        className="shrink-0"
-      >
-        {copied ? (
-          <RiCheckLine data-icon="inline-start" className="text-primary" />
-        ) : (
-          <RiFileCopyLine data-icon="inline-start" />
-        )}
-        {copied ? "Copied" : "Copy"}
-      </Button>
+      <CopyButton text={INSTALL_COMMAND} what="the install command" />
     </div>
   )
 }

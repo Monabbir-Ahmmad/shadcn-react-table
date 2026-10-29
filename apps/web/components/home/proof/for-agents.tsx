@@ -1,11 +1,6 @@
-"use client"
-
-import * as React from "react"
 import Link from "next/link"
-import { RiCheckLine, RiFileCopyLine } from "@remixicon/react"
 
-import { Button } from "@workspace/ui/components/button"
-
+import { CopyButton } from "@/components/copy-button"
 import { ProofSection, Wrappable } from "@/components/home/proof/proof-section"
 import { SITE_URL } from "@/lib/site"
 
@@ -22,18 +17,6 @@ const LINES = [
 
 /** The one-line agent prompt, plus the skill, MCP and docs index. */
 export function ForAgents() {
-  const [copied, setCopied] = React.useState(false)
-
-  const copy = () => {
-    void navigator.clipboard
-      ?.writeText(PROMPT)
-      .then(() => {
-        setCopied(true)
-        setTimeout(() => setCopied(false), 1500)
-      })
-      .catch(() => {})
-  }
-
   return (
     <ProofSection
       id="agents"
@@ -49,20 +32,7 @@ export function ForAgents() {
         <p className="min-w-0 flex-1 break-words">
           <Wrappable text={PROMPT} />
         </p>
-        <Button
-          variant="outline"
-          size="xs"
-          onClick={copy}
-          aria-label={copied ? "Copied" : "Copy the agent prompt"}
-          className="shrink-0"
-        >
-          {copied ? (
-            <RiCheckLine data-icon="inline-start" className="text-primary" />
-          ) : (
-            <RiFileCopyLine data-icon="inline-start" />
-          )}
-          {copied ? "Copied" : "Copy"}
-        </Button>
+        <CopyButton text={PROMPT} what="the agent prompt" />
       </div>
       <dl className="mt-6 border-b">
         {LINES.map((line) => (

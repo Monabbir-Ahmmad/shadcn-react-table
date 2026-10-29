@@ -3,7 +3,9 @@
 import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
+import { CopyStatus } from "@/components/copy-status"
 import { EXAMPLES } from "@/components/examples/registry"
+import { copyLabel, useCopy } from "@/hooks/use-copy"
 import { pageMarkdownUrl } from "@/lib/docs-meta"
 import { EXAMPLE_SOURCE } from "@/lib/example-source.generated"
 
@@ -18,8 +20,8 @@ const GITHUB_SRC =
 export function Example({ slug }: { slug: string }) {
   const example = EXAMPLES.find((e) => e.slug === slug)
   const [tab, setTab] = React.useState<"preview" | "code">("preview")
-  const [copied, setCopied] = React.useState(false)
-  const [promptCopied, setPromptCopied] = React.useState(false)
+  const code = useCopy()
+  const prompt = useCopy()
 
   if (!example) {
     return (
@@ -33,11 +35,7 @@ export function Example({ slug }: { slug: string }) {
   const source = EXAMPLE_SOURCE[slug]
 
   const copy = () => {
-    if (!source) return
-    void navigator.clipboard.writeText(source).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    })
+    if (source) void code.copy(source)
   }
 
   // A prompt asking a coding agent to add this example, pointing it at the
@@ -46,11 +44,9 @@ export function Example({ slug }: { slug: string }) {
     const { origin, pathname } = window.location
     const base = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
     const page = `${origin}${pageMarkdownUrl(pathname.slice(base.length) || "/", base)}`
-    const prompt = `Add the "${example.title}" example (\`${slug}\`) from ${page} to my app. It uses shadcn-react-table: ${origin}${base}/SKILL.md`
-    void navigator.clipboard.writeText(prompt).then(() => {
-      setPromptCopied(true)
-      setTimeout(() => setPromptCopied(false), 1500)
-    })
+    void prompt.copy(
+      `Add the "${example.title}" example (\`${slug}\`) from ${page} to my app. It uses shadcn-react-table: ${origin}${base}/SKILL.md`
+    )
   }
 
   return (
@@ -88,7 +84,7 @@ export function Example({ slug }: { slug: string }) {
               onClick={copy}
               className="rounded-md border bg-background px-2 py-1 text-xs font-medium transition-colors hover:bg-muted"
             >
-              {copied ? "Copied" : "Copy"}
+              {copyLabel(code.state)}
             </button>
           )}
           <button
@@ -97,8 +93,10 @@ export function Example({ slug }: { slug: string }) {
             className="rounded-md border bg-background px-2 py-1 text-xs font-medium transition-colors hover:bg-muted"
             aria-label="Copy a prompt that asks your coding agent to add this example"
           >
-            {promptCopied ? "Copied" : "Copy prompt"}
+            {copyLabel(prompt.state, "Copy prompt")}
           </button>
+          <CopyStatus state={code.state} />
+          <CopyStatus state={prompt.state} />
           <a
             href={GITHUB_SRC}
             target="_blank"
