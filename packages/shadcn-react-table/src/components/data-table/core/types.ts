@@ -303,6 +303,7 @@ export interface DataTableConfig<TData extends RowData> {
   enableAdvancedFilter: boolean
   advancedFilter: AdvancedFilterGroup
   setAdvancedFilter: React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>
+  /** Whether the advanced filter dialog is open. */
   showAdvancedFilterPanel: boolean
   setShowAdvancedFilterPanel: React.Dispatch<React.SetStateAction<boolean>>
   isLoading: boolean
@@ -312,6 +313,7 @@ export interface DataTableConfig<TData extends RowData> {
   showLoadingOverlay: boolean
   enableFacetedValues: boolean
   enableColumnActions: boolean
+  /** Whether per-column filters are on. */
   enableColumnFilters: boolean
   enableColumnFilterModes: boolean
   enableFilterMatchHighlighting: boolean
@@ -343,9 +345,12 @@ export interface DataTableConfig<TData extends RowData> {
   enableEditing: boolean
   editDisplayMode: EditDisplayMode
   createDisplayMode: CreateDisplayMode
+  /** The cell being edited in cell mode (`{ rowId, columnId }`), or `null`. */
   editingCell: EditingCell | null
   setEditingCell: React.Dispatch<React.SetStateAction<EditingCell | null>>
+  /** Id of the row being edited in row or modal mode, or `null`. */
   editingRowId: string | null
+  /** Whether a new row is being created. */
   isCreating: boolean
   /** Draft values for the row/modal editor + create form, keyed by column id. */
   rowDraft: Record<string, unknown>
@@ -443,6 +448,7 @@ export interface DataTableConfig<TData extends RowData> {
   positionGlobalFilter: "left" | "right" | "none"
   positionToolbarAlertBanner: "top" | "bottom" | "none"
   positionToolbarDropZone: "top" | "bottom" | "both" | "none"
+  /** Whether rows can be selected. */
   enableRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
@@ -510,6 +516,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Called with an updater over the `left` / `right` pinning state when the
    *  user pins or unpins a column. */
   onColumnPinningChange?: OnChangeFn<DataTableColumnPinningState>
+  /** Text for every label, message and screen-reader string. Partial: missing
+   *  keys fall back to English (or to `DataTableConfigProvider`). Install a
+   *  locale item for a full language. */
   localization?: Partial<DataTableLocalization>
   /** Override any subset of the table's icons. */
   icons?: Partial<DataTableIcons>
@@ -532,6 +541,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Compute faceted unique values / min-max (auto select options + range
    *  bounds). Default true; disable to skip the faceted row models. */
   enableFacetedValues?: boolean
+  /** Shows the column-actions menu in each header (sort, filter, pin, hide,
+   *  group…). Default `true`. */
   enableColumnActions?: boolean
   /** Show the filter-mode menu adornment on filter fields. Default true. */
   enableColumnFilterModes?: boolean
@@ -628,27 +639,36 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   createRowDefaults?: Record<string, unknown>
   /** Show a click-to-copy affordance on all cells (per-column override via meta). */
   enableClickToCopy?: boolean
+  /** Called when a cell edit is committed (cell and table editing) with the
+   *  new `value`. Persist it; the table does not change `data` itself. */
   onEditCellSave?: (props: {
     row: DataTableRow<TData>
     column: DataTableColumn<TData, unknown>
     value: unknown
     table: DataTableInstance<TData>
   }) => void
+  /** Called when a row edit is saved (row and modal editing) with the edited
+   *  `values`. Call `exit()` to leave editing, e.g. after the save succeeds. */
   onSaveRow?: (props: {
     row: DataTableRow<TData>
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
+  /** Called when the new-row editor is saved with the row's `values`. Call
+   *  `exit()` to close it. */
   onCreateRow?: (props: {
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
+  /** Content of the row-actions column, replacing the default edit and menu
+   *  buttons. */
   renderRowActions?: (props: {
     row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
+  /** Items for a right-click menu on each cell. */
   renderCellActionMenuItems?: (props: {
     cell: DataTableCell<TData, unknown>
     row: DataTableRow<TData>
@@ -686,9 +706,13 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
 
   /** Fired when a body row is clicked / double-clicked. */
   onRowClick?: (props: RowEvent<TData>) => void
+  /** Called when a row is double-clicked. Double-clicks on controls inside
+   *  the row (edit, expand, pin…) are ignored. */
   onRowDoubleClick?: (props: RowEvent<TData>) => void
   /** Fired when a body cell is clicked / double-clicked. */
   onCellClick?: (props: CellEvent<TData>) => void
+  /** Called when a cell is double-clicked. Double-clicks on controls inside
+   *  the cell are ignored. */
   onCellDoubleClick?: (props: CellEvent<TData>) => void
 
   /** Virtualize body rows for large datasets (recommended past ~100 rows).
@@ -728,6 +752,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  200px, 9999px)`) so tall content scrolls internally; override the bound
    *  with `surfaceClassName`. Default true. */
   enableStickyHeader?: boolean
+  /** Splits rows into pages with pagination controls. Default `true`; turn it
+   *  off for virtualization or infinite scroll. */
   enablePagination?: boolean
   /** Load more rows as the user scrolls near the bottom (infinite append). When
    *  on, the pager is hidden and pagination is forced to a single growing page,
@@ -775,7 +801,11 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   selectAllMode?: "page" | "all"
   /** Show the select-all checkbox in the selection column header. Default true. */
   enableSelectAll?: boolean
+  /** Shows the toolbar above the table (title, search, filters, view
+   *  options). Default `true`. */
   enableTopToolbar?: boolean
+  /** Shows the toolbar below the table (pagination, custom actions). Default
+   *  `true`. */
   enableBottomToolbar?: boolean
   /** Show the density toggle in the toolbar. Default true. */
   enableDensityToggle?: boolean
@@ -785,7 +815,11 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  visibility, export, density, full screen). Default true. Hides the whole
    *  cluster at once; use the per-item flags for finer control. */
   enableToolbarInternalActions?: boolean
+  /** Cell keyboard navigation with a single Tab stop: arrow keys, Home/End,
+   *  PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also
+   *  makes the table an ARIA grid. Default `true`. */
   enableKeyboardNavigation?: boolean
+  /** Heading shown at the start of the top toolbar. */
   title?: React.ReactNode
   /** Custom content rendered in the top toolbar's left region (next to the
    *  title), e.g. bulk-action buttons. */
@@ -805,5 +839,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   ) => React.ReactNode
   /** Render a `<caption>` for the table (e.g. an accessible summary). */
   renderCaption?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Content shown when there are no rows. Defaults to
+   *  `localization.noRecordsToDisplay`. */
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }

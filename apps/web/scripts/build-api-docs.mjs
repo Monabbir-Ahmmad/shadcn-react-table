@@ -97,8 +97,22 @@ const colMetaModule = typesSf
   .find((m) => m.getName().includes("@tanstack/react-table"))
 const columnOptions = membersOf(colMetaModule.getInterfaceOrThrow("ColumnMeta"))
 
-// --- Table instance API (table.tableInstance = DataTableConfig)
-const tableInstance = membersOf(typesSf.getInterfaceOrThrow("DataTableConfig"))
+// --- Table instance API (table.tableInstance = DataTableConfig). Most members
+// are the resolved form of a same-named option, so an undocumented member
+// borrows that option's description; `setX` setters describe themselves.
+const optionDescriptions = Object.fromEntries(
+  useDataTableOptions.map((o) => [o.name, o.description])
+)
+const tableInstance = membersOf(
+  typesSf.getInterfaceOrThrow("DataTableConfig")
+).map((member) => {
+  if (member.description) return member
+  const setter = /^set([A-Z]\w*)$/.exec(member.name)
+  const description = setter
+    ? `Updates \`${setter[1][0].toLowerCase()}${setter[1].slice(1)}\`.`
+    : (optionDescriptions[member.name] ?? "")
+  return { ...member, description }
+})
 
 // --- <DataTable /> component props
 const dataTableProps = membersOf(
@@ -152,6 +166,11 @@ const SLOT_DESCRIPTIONS = {
   "data-table-surface": "The scroll container for the table (both axes).",
   "data-table-progress":
     "Indeterminate progress bar shown while loading or saving.",
+  "data-table-progress-bar": "The moving bar inside `data-table-progress`.",
+  "data-table-infinite-sentinel":
+    "Invisible marker after the last row; infinite scroll loads more when it nears the viewport.",
+  "data-table-infinite-loader":
+    "Loading-more indicator shown while infinite scroll fetches the next rows.",
   "data-table-toolbar": "Top toolbar root.",
   "data-table-toolbar-actions":
     "Internal actions cluster (search, filters, density, full screen, …).",
@@ -214,6 +233,29 @@ const body =
         `export const ${name}: ApiMember[] = ${JSON.stringify(rows, null, 2)}\n`
     )
     .join("\n")
+
+// Every documented member needs a description, so a new option cannot ship
+// without one. Localization keys are exempt: their table shows each key's
+// English text, which says what it is.
+const undocumented = [
+  ["useDataTable option", useDataTableOptions],
+  ["column option", columnOptions],
+  ["instance member", tableInstance],
+  ["DataTable prop", dataTableProps],
+  ["icon slot", iconSlots],
+  ["ref", tableRefs],
+  ["data-slot", slots],
+].flatMap(([kind, rows]) =>
+  rows.filter((row) => !row.description).map((row) => `${kind} ${row.name}`)
+)
+if (undocumented.length > 0) {
+  console.error(
+    `api reference: ${undocumented.length} without a description ` +
+      `(add a JSDoc comment, or a SLOT_DESCRIPTIONS entry):\n  ` +
+      undocumented.join("\n  ")
+  )
+  process.exit(1)
+}
 
 mkdirSync(dirname(OUT), { recursive: true })
 // Normalize CRLF that JSON.stringify escaped into the string literals when

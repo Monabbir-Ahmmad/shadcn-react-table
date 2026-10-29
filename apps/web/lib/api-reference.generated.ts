@@ -39,7 +39,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "Partial<DataTableLocalization>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Text for every label, message and screen-reader string. Partial: missing keys fall back to English (or to `DataTableConfigProvider`). Install a locale item for a full language.",
   },
   {
     name: "icons",
@@ -114,7 +115,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Shows the column-actions menu in each header (sort, filter, pin, hide, group…). Default `true`.",
   },
   {
     name: "enableColumnFilterModes",
@@ -394,35 +396,39 @@ export const useDataTableOptions: ApiMember[] = [
     type: "(props: { row: DataTableRow<TData> column: DataTableColumn<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell edit is committed (cell and table editing) with the new `value`. Persist it; the table does not change `data` itself.",
   },
   {
     name: "onSaveRow",
     type: "(props: { row: DataTableRow<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row edit is saved (row and modal editing) with the edited `values`. Call `exit()` to leave editing, e.g. after the save succeeds.",
   },
   {
     name: "onCreateRow",
     type: "(props: { values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when the new-row editor is saved with the row's `values`. Call `exit()` to close it.",
   },
   {
     name: "renderRowActions",
     type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content of the row-actions column, replacing the default edit and menu buttons.",
   },
   {
     name: "renderCellActionMenuItems",
     type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Items for a right-click menu on each cell.",
   },
   {
     name: "renderRowActionMenuItems",
@@ -468,7 +474,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "(props: RowEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row is double-clicked. Double-clicks on controls inside the row (edit, expand, pin…) are ignored.",
   },
   {
     name: "onCellClick",
@@ -482,7 +489,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "(props: CellEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored.",
   },
   {
     name: "enableRowVirtualization",
@@ -575,7 +583,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Splits rows into pages with pagination controls. Default `true`; turn it off for virtualization or infinite scroll.",
   },
   {
     name: "enableInfiniteScroll",
@@ -700,14 +709,16 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Shows the toolbar above the table (title, search, filters, view options). Default `true`.",
   },
   {
     name: "enableBottomToolbar",
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Shows the toolbar below the table (pagination, custom actions). Default `true`.",
   },
   {
     name: "enableDensityToggle",
@@ -736,14 +747,15 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`.",
   },
   {
     name: "title",
     type: "React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Heading shown at the start of the top toolbar.",
   },
   {
     name: "renderToolbarActions",
@@ -797,7 +809,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content shown when there are no rows. Defaults to `localization.noRecordsToDisplay`.",
   },
 ]
 
@@ -957,42 +970,45 @@ export const tableInstance: ApiMember[] = [
     type: "DataTableLocalization",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Text for every label, message and screen-reader string. Partial: missing keys fall back to English (or to `DataTableConfigProvider`). Install a locale item for a full language.",
   },
   {
     name: "icons",
     type: "DataTableIcons",
     required: true,
     default: null,
-    description: "",
+    description: "Override any subset of the table's icons.",
   },
   {
     name: "density",
     type: "Density",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Controlled density. Pair with `onDensityChange`; omit for uncontrolled (seed the initial value with `defaultDensity`).",
   },
   {
     name: "setDensity",
     type: "React.Dispatch<React.SetStateAction<Density>>",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `density`.",
   },
   {
     name: "isFullscreen",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Controlled full-screen state. Pair with `onIsFullscreenChange`.",
   },
   {
     name: "setIsFullscreen",
     type: "React.Dispatch<React.SetStateAction<boolean>>",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `isFullscreen`.",
   },
   {
     name: "direction",
@@ -1014,14 +1030,15 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`; omit for uncontrolled (seed with `defaultShowColumnFilters`).",
   },
   {
     name: "setShowColumnFilters",
     type: "React.Dispatch<React.SetStateAction<boolean>>",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `showColumnFilters`.",
   },
   {
     name: "columnFilterModes",
@@ -1043,28 +1060,31 @@ export const tableInstance: ApiMember[] = [
     type: "GlobalFilterMode",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Controlled global search mode. Pair with `onGlobalFilterModeChange`; omit for uncontrolled (seed with `defaultGlobalFilterMode`).",
   },
   {
     name: "setGlobalFilterMode",
     type: "(mode: GlobalFilterMode) => void",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `globalFilterMode`.",
   },
   {
     name: "enableGlobalFilter",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the expandable global search in the toolbar. Default true.",
   },
   {
     name: "enableGlobalFilterModes",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the global search mode menu (fuzzy/contains/…). Default true.",
   },
   {
     name: "enableAdvancedFilter",
@@ -1079,98 +1099,106 @@ export const tableInstance: ApiMember[] = [
     type: "AdvancedFilterGroup",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for uncontrolled (seed with `defaultAdvancedFilter`).",
   },
   {
     name: "setAdvancedFilter",
     type: "React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `advancedFilter`.",
   },
   {
     name: "showAdvancedFilterPanel",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Whether the advanced filter dialog is open.",
   },
   {
     name: "setShowAdvancedFilterPanel",
     type: "React.Dispatch<React.SetStateAction<boolean>>",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `showAdvancedFilterPanel`.",
   },
   {
     name: "isLoading",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the loading affordances (progress bar; skeletons when empty; a dimming overlay over existing rows). Toggle each independently below.",
   },
   {
     name: "isSaving",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the progress bar for an in-flight save/mutation. Defaults the progress bar on without replacing rows with skeletons.",
   },
   {
     name: "showProgressBars",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Show the top progress bar. Default: `isLoading || isSaving`.",
   },
   {
     name: "showSkeletons",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Replace the body with skeleton rows while empty. Default: `isLoading`.",
   },
   {
     name: "showLoadingOverlay",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Dim existing rows with an overlay while loading. Default: `isLoading`.",
   },
   {
     name: "enableFacetedValues",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Compute faceted unique values / min-max (auto select options + range bounds). Default true; disable to skip the faceted row models.",
   },
   {
     name: "enableColumnActions",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Shows the column-actions menu in each header (sort, filter, pin, hide, group…). Default `true`.",
   },
   {
     name: "enableColumnFilters",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Whether per-column filters are on.",
   },
   {
     name: "enableColumnFilterModes",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the filter-mode menu adornment on filter fields. Default true.",
   },
   {
     name: "enableFilterMatchHighlighting",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Highlight matched substrings in cells. Default true.",
   },
   {
     name: "columnsWithCustomCell",
@@ -1185,28 +1213,31 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Drag-and-drop column reordering (adds a grip to each header).",
   },
   {
     name: "enableColumnPinning",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Column pinning (left/right) via the column-actions menu + sticky columns.",
   },
   {
     name: "enableColumnResizing",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Column resizing via an edge drag handle.",
   },
   {
     name: "enableColumnAutosize",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead.",
   },
   {
     name: "autoSizeColumn",
@@ -1228,28 +1259,29 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Drag-and-drop row reordering (adds a drag-handle column).",
   },
   {
     name: "enableRowPinning",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Row pinning (top) via a pin toggle in the row-number column.",
   },
   {
     name: "enableRowNumbers",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Adds a leading row-number column.",
   },
   {
     name: "rowNumberMode",
     type: '"static" | "original"',
     required: true,
     default: null,
-    description: "",
+    description:
+      '"static" tracks the current view (page-aware); "original" uses source index.',
   },
   {
     name: "onRowOrderChange",
@@ -1264,77 +1296,82 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Row grouping (group-by menu + drop-to-group zone + aggregated group rows).",
   },
   {
     name: "enableExpanding",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided.",
   },
   {
     name: "enableStickyFooter",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
   },
   {
     name: "renderDetailPanel",
     type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Render an expanding detail panel for each row.",
   },
   {
     name: "enableEditing",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Enable inline editing.",
   },
   {
     name: "editDisplayMode",
     type: "EditDisplayMode",
     required: true,
     default: null,
-    description: "",
+    description: 'How edits are surfaced. Default "cell".',
   },
   {
     name: "createDisplayMode",
     type: "CreateDisplayMode",
     required: true,
     default: null,
-    description: "",
+    description:
+      'How the create form is surfaced, independent of `editDisplayMode`: `"modal"` (dialog, default), `"row"` (an inline editable row at the top of the table), or `"custom"` (you render it from `isCreating` + `rowDraft`).',
   },
   {
     name: "editingCell",
     type: "EditingCell | null",
     required: true,
     default: null,
-    description: "",
+    description:
+      "The cell being edited in cell mode (`{ rowId, columnId }`), or `null`.",
   },
   {
     name: "setEditingCell",
     type: "React.Dispatch<React.SetStateAction<EditingCell | null>>",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `editingCell`.",
   },
   {
     name: "editingRowId",
     type: "string | null",
     required: true,
     default: null,
-    description: "",
+    description: "Id of the row being edited in row or modal mode, or `null`.",
   },
   {
     name: "isCreating",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Whether a new row is being created.",
   },
   {
     name: "rowDraft",
@@ -1349,7 +1386,7 @@ export const tableInstance: ApiMember[] = [
     type: "(columnId: string, value: unknown) => void",
     required: true,
     default: null,
-    description: "",
+    description: "Updates `rowDraftValue`.",
   },
   {
     name: "beginRowEdit",
@@ -1379,98 +1416,109 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show a click-to-copy affordance on all cells (per-column override via meta).",
   },
   {
     name: "onEditCellSave",
     type: "(props: { row: DataTableRow<TData> column: DataTableColumn<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell edit is committed (cell and table editing) with the new `value`. Persist it; the table does not change `data` itself.",
   },
   {
     name: "onSaveRow",
     type: "(props: { row: DataTableRow<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row edit is saved (row and modal editing) with the edited `values`. Call `exit()` to leave editing, e.g. after the save succeeds.",
   },
   {
     name: "onCreateRow",
     type: "(props: { values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when the new-row editor is saved with the row's `values`. Call `exit()` to close it.",
   },
   {
     name: "renderRowActions",
     type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content of the row-actions column, replacing the default edit and menu buttons.",
   },
   {
     name: "renderCellActionMenuItems",
     type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Items for a right-click menu on each cell.",
   },
   {
     name: "renderRowActionMenuItems",
     type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically.",
   },
   {
     name: "renderColumnActionsMenuItems",
     type: "(props: { column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Append custom items to the bottom of every column-actions menu. Returns the items (e.g. `<DropdownMenuItem>`); a separator is added before them.",
   },
   {
     name: "renderColumnFilterModeMenuItems",
     type: "(props: { column: DataTableColumn<TData, unknown> modes: FilterMode[] currentMode: FilterMode onSelect: (mode: FilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the radio items in a column's filter-mode menu. Render your own items and call `onSelect(mode)` to switch; `modes` is the allowed set.",
   },
   {
     name: "renderGlobalFilterModeMenuItems",
     type: "(props: { modes: GlobalFilterMode[] currentMode: GlobalFilterMode onSelect: (mode: GlobalFilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the radio items in the global-search mode menu. Render your own items and call `onSelect(mode)` to switch; `modes` is the allowed set.",
   },
   {
     name: "onRowClick",
     type: "(props: RowEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description: "Fired when a body row is clicked / double-clicked.",
   },
   {
     name: "onRowDoubleClick",
     type: "(props: RowEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row is double-clicked. Double-clicks on controls inside the row (edit, expand, pin…) are ignored.",
   },
   {
     name: "onCellClick",
     type: "(props: CellEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description: "Fired when a body cell is clicked / double-clicked.",
   },
   {
     name: "onCellDoubleClick",
     type: "(props: CellEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored.",
   },
   {
     name: "refs",
@@ -1485,28 +1533,30 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD.",
   },
   {
     name: "enableColumnVirtualization",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers.",
   },
   {
     name: "estimateRowHeight",
     type: "number",
     required: true,
     default: null,
-    description: "",
+    description: "Estimated row height (px) for the virtualizer. Default 52.",
   },
   {
     name: "virtualOverscan",
     type: "number",
     required: true,
     default: null,
-    description: "",
+    description: "Extra rows rendered above/below the viewport. Default 8.",
   },
   {
     name: "rowHeight",
@@ -1528,42 +1578,48 @@ export const tableInstance: ApiMember[] = [
     type: "RowVirtualizerOptions<TData>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function.",
   },
   {
     name: "columnVirtualizerOptions",
     type: "ColumnVirtualizerOptions<TData>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function.",
   },
   {
     name: "rowVirtualizerInstanceRef",
     type: "React.RefObject<DataTableRowVirtualizer | null>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`.",
   },
   {
     name: "columnVirtualizerInstanceRef",
     type: "React.RefObject<DataTableColumnVirtualizer | null>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`.",
   },
   {
     name: "enableStickyHeader",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `surfaceClassName`. Default true.",
   },
   {
     name: "enablePagination",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Splits rows into pages with pagination controls. Default `true`; turn it off for virtualization or infinite scroll.",
   },
   {
     name: "enableInfiniteScroll",
@@ -1607,147 +1663,162 @@ export const tableInstance: ApiMember[] = [
     type: '"top" | "bottom" | "both" | "none"',
     required: true,
     default: null,
-    description: "",
+    description:
+      'Where the pagination controls render. Default "bottom". "none" keeps pagination active but hides the controls.',
   },
   {
     name: "paginationDisplayMode",
     type: "PaginationDisplayMode",
     required: true,
     default: null,
-    description: "",
+    description:
+      'Pagination control style: `"default"` (range label + first/prev/next/last buttons), `"pages"` (numbered page buttons), or `"custom"` (render your own via `renderBottomToolbarCustomActions`). Default "default".',
   },
   {
     name: "columnFilterDisplayMode",
     type: "ColumnFilterDisplayMode",
     required: true,
     default: null,
-    description: "",
+    description:
+      'Where column filter inputs live: `"subheader"` (a filter row under the header, default), `"popover"` (per-column popovers opened from the column header), or `"custom"` (you render them).',
   },
   {
     name: "positionGlobalFilter",
     type: '"left" | "right" | "none"',
     required: true,
     default: null,
-    description: "",
+    description:
+      'Which toolbar region the global search renders in. Default "right" (the internal-actions cluster). "left" places it next to the title/actions; "none" hides it (same as `enableGlobalFilter: false`).',
   },
   {
     name: "positionToolbarAlertBanner",
     type: '"top" | "bottom" | "none"',
     required: true,
     default: null,
-    description: "",
+    description: 'Where the row-selection alert banner renders. Default "top".',
   },
   {
     name: "positionToolbarDropZone",
     type: '"top" | "bottom" | "both" | "none"',
     required: true,
     default: null,
-    description: "",
+    description:
+      'Where the group-by drop zone renders (grouping only). Default "top".',
   },
   {
     name: "enableRowSelection",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Whether rows can be selected.",
   },
   {
     name: "enableTopToolbar",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Shows the toolbar above the table (title, search, filters, view options). Default `true`.",
   },
   {
     name: "enableBottomToolbar",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Shows the toolbar below the table (pagination, custom actions). Default `true`.",
   },
   {
     name: "enableDensityToggle",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Show the density toggle in the toolbar. Default true.",
   },
   {
     name: "enableFullscreenToggle",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Show the full-screen toggle in the toolbar. Default true.",
   },
   {
     name: "enableToolbarInternalActions",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control.",
   },
   {
     name: "enableKeyboardNavigation",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`.",
   },
   {
     name: "title",
     type: "React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Heading shown at the start of the top toolbar.",
   },
   {
     name: "renderToolbarActions",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Custom content rendered in the top toolbar's left region (next to the title), e.g. bulk-action buttons.",
   },
   {
     name: "renderTopToolbar",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Replace the entire top toolbar with custom content.",
   },
   {
     name: "renderBottomToolbar",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the entire bottom toolbar (pagination region) with custom content.",
   },
   {
     name: "renderToolbarInternalActions",
     type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the top toolbar's internal icon-action cluster with custom content.",
   },
   {
     name: "renderBottomToolbarCustomActions",
     type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Custom content rendered in the bottom toolbar's left region (next to pagination), e.g. summary text or actions.",
   },
   {
     name: "renderCaption",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Render a `<caption>` for the table (e.g. an accessible summary).",
   },
   {
     name: "renderEmpty",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content shown when there are no rows. Defaults to `localization.noRecordsToDisplay`.",
   },
 ]
 
@@ -1757,7 +1828,7 @@ export const dataTableProps: ApiMember[] = [
     type: "DataTableInstance<TData>",
     required: true,
     default: null,
-    description: "",
+    description: "The instance returned by `useDataTable`.",
   },
   {
     name: "pageSizeOptions",
@@ -2500,42 +2571,43 @@ export const iconSlots: ApiMember[] = [
     type: "IconComponent",
     required: true,
     default: "ArrowUp",
-    description: "",
+    description: "Header sort indicator: sorted ascending.",
   },
   {
     name: "sortDescending",
     type: "IconComponent",
     required: true,
     default: "ArrowDown",
-    description: "",
+    description: "Header sort indicator: sorted descending.",
   },
   {
     name: "sortUnsorted",
     type: "IconComponent",
     required: true,
     default: "ChevronsUpDown",
-    description: "",
+    description: "Header sort indicator: sortable but not sorted.",
   },
   {
     name: "columnActions",
     type: "IconComponent",
     required: true,
     default: "MoreVertical",
-    description: "",
+    description: "Column-actions menu trigger in each header.",
   },
   {
     name: "filter",
     type: "IconComponent",
     required: true,
     default: "Filter",
-    description: "",
+    description: "Filter toggle and filter menu items.",
   },
   {
     name: "filterOff",
     type: "IconComponent",
     required: true,
     default: "FilterX",
-    description: "",
+    description:
+      "Hide-filters state of the filter toggle and clear-filter items.",
   },
   {
     name: "advancedFilter",
@@ -2556,154 +2628,155 @@ export const iconSlots: ApiMember[] = [
     type: "IconComponent",
     required: true,
     default: "EyeOff",
-    description: "",
+    description: "Hide-column menu item.",
   },
   {
     name: "pin",
     type: "IconComponent",
     required: true,
     default: "Pin",
-    description: "",
+    description: "Pin column and pin row actions.",
   },
   {
     name: "pinnedRow",
     type: "IconComponent",
     required: true,
     default: "Pin",
-    description: "",
+    description: "Shown on a pinned row's pin button.",
   },
   {
     name: "unpin",
     type: "IconComponent",
     required: true,
     default: "PinOff",
-    description: "",
+    description: "Unpin column and unpin row actions.",
   },
   {
     name: "group",
     type: "IconComponent",
     required: true,
     default: "Group",
-    description: "",
+    description: "Group-by menu item and grouping chips.",
   },
   {
     name: "columnVisibility",
     type: "IconComponent",
     required: true,
     default: "Columns3",
-    description: "",
+    description: "Column-visibility (show/hide columns) toolbar button.",
   },
   {
     name: "density",
     type: "IconComponent",
     required: true,
     default: "Rows3",
-    description: "",
+    description: "Density toggle toolbar button.",
   },
   {
     name: "fullscreenEnter",
     type: "IconComponent",
     required: true,
     default: "Maximize2",
-    description: "",
+    description: "Full-screen toggle while not full screen.",
   },
   {
     name: "fullscreenExit",
     type: "IconComponent",
     required: true,
     default: "Minimize2",
-    description: "",
+    description: "Full-screen toggle while full screen.",
   },
   {
     name: "search",
     type: "IconComponent",
     required: true,
     default: "Search",
-    description: "",
+    description: "Global search button and search-mode menu.",
   },
   {
     name: "clear",
     type: "IconComponent",
     required: true,
     default: "X",
-    description: "",
+    description: "Clear buttons (search box, filter inputs, grouping chips).",
   },
   {
     name: "pageFirst",
     type: "IconComponent",
     required: true,
     default: "ChevronsLeft",
-    description: "",
+    description: "Pagination: first page. Mirrored in right-to-left tables.",
   },
   {
     name: "pagePrev",
     type: "IconComponent",
     required: true,
     default: "ChevronLeft",
-    description: "",
+    description: "Pagination: previous page. Mirrored in right-to-left tables.",
   },
   {
     name: "pageNext",
     type: "IconComponent",
     required: true,
     default: "ChevronRight",
-    description: "",
+    description: "Pagination: next page. Mirrored in right-to-left tables.",
   },
   {
     name: "pageLast",
     type: "IconComponent",
     required: true,
     default: "ChevronsRight",
-    description: "",
+    description: "Pagination: last page. Mirrored in right-to-left tables.",
   },
   {
     name: "expanded",
     type: "IconComponent",
     required: true,
     default: "ChevronDown",
-    description: "",
+    description: "Expand control of an expanded row or group.",
   },
   {
     name: "collapsed",
     type: "IconComponent",
     required: true,
     default: "ChevronRight",
-    description: "",
+    description:
+      "Expand control of a collapsed row or group. Mirrored in right-to-left tables.",
   },
   {
     name: "dragHandle",
     type: "IconComponent",
     required: true,
     default: "GripVertical",
-    description: "",
+    description: "Drag grip for column and row reordering.",
   },
   {
     name: "edit",
     type: "IconComponent",
     required: true,
     default: "Pencil",
-    description: "",
+    description: "Edit row / edit cell action.",
   },
   {
     name: "save",
     type: "IconComponent",
     required: true,
     default: "Check",
-    description: "",
+    description: "Save action while editing a row.",
   },
   {
     name: "cancel",
     type: "IconComponent",
     required: true,
     default: "X",
-    description: "",
+    description: "Cancel action while editing a row.",
   },
   {
     name: "calendar",
     type: "IconComponent",
     required: true,
     default: "Calendar",
-    description: "",
+    description: "Date filter field trigger.",
   },
 ]
 
@@ -2799,14 +2872,16 @@ export const slots: ApiMember[] = [
     type: "",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Loading-more indicator shown while infinite scroll fetches the next rows.",
   },
   {
     name: "data-table-infinite-sentinel",
     type: "",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Invisible marker after the last row; infinite scroll loads more when it nears the viewport.",
   },
   {
     name: "data-table-pagination",
@@ -2827,7 +2902,7 @@ export const slots: ApiMember[] = [
     type: "",
     required: true,
     default: null,
-    description: "",
+    description: "The moving bar inside `data-table-progress`.",
   },
   {
     name: "data-table-surface",

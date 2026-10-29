@@ -46,6 +46,7 @@ const MemoizedDataTableBody = React.memo(
 interface DataTableProps<
   TData extends RowData,
 > extends React.ComponentProps<"div"> {
+  /** The instance returned by `useDataTable`. */
   table: DataTableInstance<TData>
   /** Page-size options for the bottom pagination control. */
   pageSizeOptions?: number[]
