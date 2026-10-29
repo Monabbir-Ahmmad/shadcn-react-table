@@ -3,6 +3,7 @@
 The version applies to the registry block: `/r/data-table.json` carries it
 in `meta.version`. After installing, record the version you received —
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
+Changes waiting for a release are listed under `## Unreleased`.
 
 ## 1.0.0
 

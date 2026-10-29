@@ -40,6 +40,42 @@ pnpm install
    `pnpm --filter @monabbir/shadcn-react-table exec playwright install chromium`.
 4. Push your branch and open a pull request against `main`.
 
+## Changelog
+
+Every pull request that changes what users get — the data table's behavior,
+options, types, styles or docs they rely on — adds an entry to
+[`packages/shadcn-react-table/CHANGELOG.md`](packages/shadcn-react-table/CHANGELOG.md)
+under `## Unreleased` (create the heading if it isn't there). Start each entry
+with **New**, **Changed**, **Fixed** or **Removed**, and mark breaking changes
+**(breaking)** with what to do instead. CI checks that a PR touching the table's
+source also touches the changelog; for a change users can't see (tests,
+refactors), add the `no-changelog` label.
+
+A release renames `## Unreleased` to the new version and bumps `version` in
+`packages/shadcn-react-table/package.json`; merging that to `main` publishes the
+GitHub release with that section as its notes.
+
+## Generated files
+
+These are built from the source and committed. Never edit them by hand —
+change the source and regenerate (`pnpm build` does all of them):
+
+| File                                                        | Built by                                              |
+| ----------------------------------------------------------- | ----------------------------------------------------- |
+| `apps/web/public/r/*.json`                                  | `pnpm --filter shadcn-react-table-web registry:build` |
+| `apps/web/lib/api-reference.generated.ts`                   | `pnpm --filter shadcn-react-table-web api:build`      |
+| `apps/web/lib/example-source.generated.ts`                  | `pnpm --filter shadcn-react-table-web examples:build` |
+| `apps/web/public/llms*.txt`, `apps/web/public/docs/**/*.md` | `pnpm --filter shadcn-react-table-web llms:build`     |
+
+CI fails when one of them is out of date. Every documented option needs a
+JSDoc description; `api:build` fails on a missing one.
+
+## Commits
+
+One change per commit, with a subject line in the form `<type>: <summary>`
+(`feat`, `fix`, `perf`, `docs`, `test`, `refactor`, `build`, `ci`, `chore`;
+`feat!:` / `refactor!:` for breaking changes).
+
 ## Pull requests
 
 - CI runs automatically on every PR and must pass: lint, typecheck, test,

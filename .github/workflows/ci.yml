@@ -19,6 +19,27 @@ permissions:
   contents: read
 
 jobs:
+  # A PR that changes the table's source must say what changed for users.
+  changelog:
+    if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'no-changelog')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Changelog entry for source changes
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE"...HEAD)
+          source=$(echo "$changed" | grep '^packages/shadcn-react-table/src/' | grep -v '\.test\.' || true)
+          if [ -n "$source" ] && ! echo "$changed" | grep -q '^packages/shadcn-react-table/CHANGELOG.md$'; then
+            echo "::error::The table's source changed without a CHANGELOG.md entry. Add one under '## Unreleased', or the no-changelog label."
+            exit 1
+          fi
+
   verify:
     runs-on: ubuntu-latest
     steps:

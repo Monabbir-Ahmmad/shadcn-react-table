@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://monabbir-ahmmad.github.io/shadcn-react-table/docs
+    about: Guides, API reference and live examples.
+  - name: Security issue
+    url: https://github.com/Monabbir-Ahmmad/shadcn-react-table/security/advisories/new
+    about: Report a vulnerability privately.

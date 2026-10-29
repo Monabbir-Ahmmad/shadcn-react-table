@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in the data table doesn't work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! A small reproduction gets a bug fixed fastest.
+  - type: input
+    id: version
+    attributes:
+      label: Block version
+      description: The `meta.version` of the data-table you installed (see the updating guide), or the date you installed it.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: flavor
+    attributes:
+      label: shadcn component library
+      options:
+        - Radix UI
+        - Base UI
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: The `useDataTable` options and columns, or a link to a repository or sandbox.
+      render: tsx
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, React / Next.js version, anything else relevant.
