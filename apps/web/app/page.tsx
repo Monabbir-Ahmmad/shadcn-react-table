@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 
 import { SiteHeader } from "@/components/site-header"
-import { Hero } from "@/components/home/hero"
+import { AnatomyStage } from "@/components/home/anatomy/anatomy-stage"
+import { AnatomyStatic } from "@/components/home/anatomy/anatomy-static"
 import { FeatureGrid } from "@/components/home/feature-grid"
 import { TechStrip } from "@/components/home/tech-strip"
 import { StatsBand } from "@/components/home/stats-band"
@@ -22,7 +23,8 @@ export default function HomePage() {
     <div className="flex min-h-svh flex-col">
       <SiteHeader />
       <main className="flex-1">
-        <Hero />
+        <AnatomyStage />
+        <AnatomyStatic />
         <TechStrip />
         <StatsBand />
         <FeaturePlayground />
