@@ -44,8 +44,8 @@ const columns: DataTableColumnDef<Person>[] = [
     accessorKey: "dept",
     header: "Department",
     meta: {
-      variant: "select",
-      options: DEPTS.map((d) => ({ label: d, value: d })),
+      filterVariant: "select",
+      filterSelectOptions: DEPTS.map((d) => ({ label: d, value: d })),
       editVariant: "select",
       editSelectOptions: DEPTS.map((d) => ({ label: d, value: d })),
     },
@@ -53,17 +53,21 @@ const columns: DataTableColumnDef<Person>[] = [
   {
     accessorKey: "age",
     header: "Age",
-    meta: { variant: "range-slider", align: "right", editVariant: "number" },
+    meta: {
+      filterVariant: "range-slider",
+      align: "right",
+      editVariant: "number",
+    },
     aggregationFn: "mean",
   },
   {
     accessorKey: "salary",
     header: "Salary",
-    meta: { variant: "range", align: "right" },
+    meta: { filterVariant: "range", align: "right" },
     aggregationFn: "sum",
     footer: "Total",
   },
-  { accessorKey: "hired", header: "Hired", meta: { variant: "date" } },
+  { accessorKey: "hired", header: "Hired", meta: { filterVariant: "date" } },
 ]
 
 export default function Page() {

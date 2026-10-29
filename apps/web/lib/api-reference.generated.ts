@@ -448,7 +448,7 @@ export const useDataTableOptions: ApiMember[] = [
       "Show a click-to-copy affordance on all cells (per-column override via meta).",
   },
   {
-    name: "onEditCellSave",
+    name: "onEditingCellSave",
     type: "(props: { row: DataTableRow<TData> column: DataTableColumn<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
     required: false,
     default: null,
@@ -456,7 +456,7 @@ export const useDataTableOptions: ApiMember[] = [
       "Called when a cell edit is committed (cell and table editing) with the new `value`. Persist it; the table does not change `data` itself.",
   },
   {
-    name: "onSaveRow",
+    name: "onEditingRowSave",
     type: "(props: { row: DataTableRow<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
@@ -464,7 +464,7 @@ export const useDataTableOptions: ApiMember[] = [
       "Called when a row edit is saved (row and modal editing) with the edited `values`. Call `exit()` to leave editing, e.g. after the save succeeds.",
   },
   {
-    name: "onCreateRow",
+    name: "onCreatingRowSave",
     type: "(props: { values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
@@ -814,7 +814,7 @@ export const useDataTableOptions: ApiMember[] = [
     description: "Heading shown at the start of the top toolbar.",
   },
   {
-    name: "renderToolbarActions",
+    name: "renderTopToolbarCustomActions",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
@@ -872,7 +872,7 @@ export const useDataTableOptions: ApiMember[] = [
 
 export const columnOptions: ApiMember[] = [
   {
-    name: "variant",
+    name: "filterVariant",
     type: "FilterVariant",
     required: false,
     default: null,
@@ -880,7 +880,7 @@ export const columnOptions: ApiMember[] = [
       'Filter UI variant rendered in the filter row. Defaults to "text".',
   },
   {
-    name: "options",
+    name: "filterSelectOptions",
     type: "DataTableFilterOption[]",
     required: false,
     default: null,
@@ -947,7 +947,7 @@ export const columnOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; drive the value via `table.tableInstance` (`rowDraft`/`setRowDraftValue` or `onEditCellSave`).",
+      "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; drive the value via `table.tableInstance` (`rowDraft`/`setRowDraftValue` or `onEditingCellSave`).",
   },
   {
     name: "renderGroupedCell",
@@ -997,18 +997,19 @@ export const columnOptions: ApiMember[] = [
       "Horizontal alignment applied to the header label and body cells.",
   },
   {
-    name: "disableHighlight",
+    name: "enableFilterMatchHighlighting",
     type: "boolean",
     required: false,
     default: null,
-    description: "Opt this column out of match highlighting.",
+    description:
+      "`false` opts this column out of match highlighting (the table option of the same name turns it on or off for every column).",
   },
   {
-    name: "disableColumnActions",
+    name: "enableColumnActions",
     type: "boolean",
     required: false,
     default: null,
-    description: "Hide the column-actions menu for this column.",
+    description: "`false` hides the column-actions menu for this column.",
   },
   {
     name: "label",
@@ -1476,7 +1477,7 @@ export const tableInstance: ApiMember[] = [
       "Show a click-to-copy affordance on all cells (per-column override via meta).",
   },
   {
-    name: "onEditCellSave",
+    name: "onEditingCellSave",
     type: "(props: { row: DataTableRow<TData> column: DataTableColumn<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
     required: false,
     default: null,
@@ -1484,7 +1485,7 @@ export const tableInstance: ApiMember[] = [
       "Called when a cell edit is committed (cell and table editing) with the new `value`. Persist it; the table does not change `data` itself.",
   },
   {
-    name: "onSaveRow",
+    name: "onEditingRowSave",
     type: "(props: { row: DataTableRow<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
@@ -1492,7 +1493,7 @@ export const tableInstance: ApiMember[] = [
       "Called when a row edit is saved (row and modal editing) with the edited `values`. Call `exit()` to leave editing, e.g. after the save succeeds.",
   },
   {
-    name: "onCreateRow",
+    name: "onCreatingRowSave",
     type: "(props: { values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
@@ -1822,7 +1823,7 @@ export const tableInstance: ApiMember[] = [
     description: "Heading shown at the start of the top toolbar.",
   },
   {
-    name: "renderToolbarActions",
+    name: "renderTopToolbarCustomActions",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,

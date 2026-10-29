@@ -40,7 +40,7 @@ const columns: DataTableColumnDef<Person>[] = [
     header: "Status",
     meta: {
       editVariant: "select",
-      options: [
+      filterSelectOptions: [
         { label: "a", value: "a" },
         { label: "b", value: "b" },
       ],
@@ -142,7 +142,7 @@ describe("select cell editor", () => {
             header: "Priority",
             meta: {
               editVariant: "select",
-              options: [
+              filterSelectOptions: [
                 { label: "1", value: "1" },
                 { label: "2", value: "2" },
               ],

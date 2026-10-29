@@ -22,7 +22,7 @@ export function createExpandColumn<TData extends RowData>(
     enableResizing: false,
     size: 44,
     minSize: 44,
-    meta: { disableColumnActions: true },
+    meta: { enableColumnActions: false },
     header: ({ table }) =>
       table.getCanSomeRowsExpand() ? (
         <button

@@ -33,7 +33,7 @@ const columns: DataTableColumnDef<Person>[] = [
     header: "Status",
     meta: {
       editVariant: "select",
-      options: [
+      filterSelectOptions: [
         { label: "a", value: "a" },
         { label: "b", value: "b" },
       ],

@@ -8,27 +8,27 @@ Each column can expose its own filter control in a per-column filter row. Toggle
 
 ## Choosing a filter control
 
-The UI for each filter is chosen by the column's `meta.variant`. Supported variants are `"text"` (default), `"select"`, `"multi-select"`, `"checkbox"`, `"range"`, `"range-slider"`, `"date"`, and `"date-range"`.
+The UI for each filter is chosen by the column's `meta.filterVariant`. Supported variants are `"text"` (default), `"select"`, `"multi-select"`, `"checkbox"`, `"range"`, `"range-slider"`, `"date"`, and `"date-range"`.
 
-For `select` and `multi-select`, supply `meta.options` as an array of `{ label, value }`. If you omit them, the options are derived from the column's faceted unique values.
+For `select` and `multi-select`, supply `meta.filterSelectOptions` as an array of `{ label, value }`. If you omit them, the options are derived from the column's faceted unique values.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
 
 const columns = [
-  { accessorKey: "title", header: "Title", meta: { variant: "text" } },
+  { accessorKey: "title", header: "Title", meta: { filterVariant: "text" } },
   {
     accessorKey: "status",
     header: "Status",
     meta: {
-      variant: "select",
-      options: [
+      filterVariant: "select",
+      filterSelectOptions: [
         { label: "Active", value: "active" },
         { label: "Archived", value: "archived" },
       ],
     },
   },
-  { accessorKey: "score", header: "Score", meta: { variant: "range" } },
+  { accessorKey: "score", header: "Score", meta: { filterVariant: "range" } },
 ]
 
 const table = useDataTable({ data, columns, getRowId: (row) => row.id })
@@ -52,7 +52,7 @@ Use `meta.renderColumnFilter` as an escape hatch to render your own filter contr
 
 ## Match highlighting
 
-Matched substrings in cells are highlighted by default. Disable it for the whole table with `enableFilterMatchHighlighting: false`, or for a single column with `meta.disableHighlight: true`.
+Matched substrings in cells are highlighted by default. Disable it for the whole table with `enableFilterMatchHighlighting: false`, or for a single column with `meta.enableFilterMatchHighlighting: true`.
 
 ## Disabling a column's filter
 
@@ -60,17 +60,40 @@ Set `enableColumnFilter: false` on a column to remove its filter control entirel
 
 ## Faceted values
 
-Select / multi-select filters auto-derive their options, and range filters their min/max bounds, from the data's faceted values. This is on by default; set `enableFacetedValues: false` to skip computing the faceted row models (e.g. for very large client-side datasets) — then provide `meta.options` explicitly for select-style filters.
+Select / multi-select filters auto-derive their options, and range filters their min/max bounds, from the data's faceted values. This is on by default; set `enableFacetedValues: false` to skip computing the faceted row models (e.g. for very large client-side datasets) — then provide `meta.filterSelectOptions` explicitly for select-style filters.
 
 ## Relevant options
 
 `useDataTable` options that affect column filtering:
 
-<ApiTable of="useDataTableOptions" only={["defaultShowColumnFilters", "showColumnFilters", "onShowColumnFiltersChange", "enableColumnFilterModes", "enableFilterMatchHighlighting", "enableFacetedValues", "columnFilterDisplayMode"]} />
+<ApiTable
+  of="useDataTableOptions"
+  only={[
+    "defaultShowColumnFilters",
+    "showColumnFilters",
+    "onShowColumnFiltersChange",
+    "enableColumnFilterModes",
+    "enableFilterMatchHighlighting",
+    "enableFacetedValues",
+    "columnFilterDisplayMode",
+  ]}
+/>
 
 Per-column, via `columnDef.meta`:
 
-<ApiTable of="columnOptions" propLabel="meta key" only={["variant", "options", "filterMode", "enableColumnFilterModes", "renderColumnFilter", "columnFilterModeOptions", "disableHighlight"]} />
+<ApiTable
+  of="columnOptions"
+  propLabel="meta key"
+  only={[
+    "filterVariant",
+    "filterSelectOptions",
+    "filterMode",
+    "enableColumnFilterModes",
+    "renderColumnFilter",
+    "columnFilterModeOptions",
+    "enableFilterMatchHighlighting",
+  ]}
+/>
 
 ## Related
 

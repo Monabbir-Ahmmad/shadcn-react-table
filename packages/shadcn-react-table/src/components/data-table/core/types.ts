@@ -167,10 +167,10 @@ declare module "@tanstack/react-table" {
     TValue extends CellData = CellData,
   > {
     /** Filter UI variant rendered in the filter row. Defaults to "text". */
-    variant?: FilterVariant
+    filterVariant?: FilterVariant
     /** Options for `select` / `multi-select` filter variants. If omitted for a
      *  select-style variant, options are derived from faceted unique values. */
-    options?: DataTableFilterOption[]
+    filterSelectOptions?: DataTableFilterOption[]
     /** Default filter mode for this column (overrides the per-variant default). */
     filterMode?: FilterMode
     /** Per-column override for the filter-mode menu (defaults to the table). */
@@ -213,10 +213,11 @@ declare module "@tanstack/react-table" {
     enableClickToCopy?: boolean
     /** Horizontal alignment applied to the header label and body cells. */
     align?: "left" | "center" | "right"
-    /** Opt this column out of match highlighting. */
-    disableHighlight?: boolean
-    /** Hide the column-actions menu for this column. */
-    disableColumnActions?: boolean
+    /** `false` opts this column out of match highlighting (the table option of
+     *  the same name turns it on or off for every column). */
+    enableFilterMatchHighlighting?: boolean
+    /** `false` hides the column-actions menu for this column. */
+    enableColumnActions?: boolean
     /** Human-readable label for menus when the header is not a plain string. */
     label?: string
   }

@@ -111,7 +111,7 @@ export function DataTableEditModal<TData extends RowData>({
                 <DataTableEditField
                   value={value}
                   variant={meta?.editVariant}
-                  options={meta?.editSelectOptions ?? meta?.options}
+                  options={meta?.editSelectOptions ?? meta?.filterSelectOptions}
                   error={meta?.validate?.(value)}
                   ariaLabel={getColumnLabel(column)}
                   onChange={(next) => setRowDraftValue(column.id, next)}

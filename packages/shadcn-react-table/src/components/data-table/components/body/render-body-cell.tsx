@@ -127,7 +127,7 @@ function renderCellContent<TData extends RowData>(
   const value = cell.getValue()
   const canHighlight =
     enableHighlight &&
-    !column.columnDef.meta?.disableHighlight &&
+    column.columnDef.meta?.enableFilterMatchHighlighting !== false &&
     !columnsWithCustomCell.has(column.id) &&
     (typeof value === "string" || typeof value === "number")
 

@@ -23,7 +23,7 @@ interface DataTableColumnFilterProps<TData extends RowData, TValue> {
 }
 
 /**
- * One filter-row field. Reads `column.meta.variant` and renders the matching
+ * One filter-row field. Reads `column.meta.filterVariant` and renders the matching
  * control, preceded by the filter-mode menu (where the variant supports modes).
  * `meta.renderColumnFilter` is an escape hatch for fully custom UI. Returns an
  * empty placeholder for non-filterable columns so the grid stays aligned.
@@ -57,7 +57,7 @@ function FilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const variant = column.columnDef.meta?.variant ?? "text"
+  const variant = column.columnDef.meta?.filterVariant ?? "text"
   switch (variant) {
     case "select":
       return <SelectFilterField column={column} table={table} />

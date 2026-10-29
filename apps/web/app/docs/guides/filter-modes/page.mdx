@@ -2,7 +2,7 @@ export const metadata = { title: "Filter modes" }
 
 # Filter modes
 
-Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty. With `enableColumnFilterModes: true` (the default) each filter field shows a mode menu offering the modes appropriate to that column's `meta.variant`.
+Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty. With `enableColumnFilterModes: true` (the default) each filter field shows a mode menu offering the modes appropriate to that column's `meta.filterVariant`.
 
 <Example slug="filter-modes" />
 
@@ -17,12 +17,12 @@ const columns = [
   {
     accessorKey: "title",
     header: "Title",
-    meta: { variant: "text", filterMode: "startsWith" },
+    meta: { filterVariant: "text", filterMode: "startsWith" },
   },
   {
     accessorKey: "score",
     header: "Score",
-    meta: { variant: "range", filterMode: "between" },
+    meta: { filterVariant: "range", filterMode: "between" },
   },
 ]
 
@@ -60,7 +60,7 @@ const columns = [
     accessorKey: "title",
     header: "Title",
     meta: {
-      variant: "text",
+      filterVariant: "text",
       filterMode: "contains",
       columnFilterModeOptions: ["contains", "startsWith", "equals"],
     },

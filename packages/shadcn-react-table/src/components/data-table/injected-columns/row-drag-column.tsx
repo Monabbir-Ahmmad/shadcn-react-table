@@ -37,7 +37,7 @@ export function createRowDragHandleColumn<TData extends RowData>(
     enableResizing: false,
     size: 40,
     minSize: 40,
-    meta: { disableColumnActions: true, align: "center" },
+    meta: { enableColumnActions: false, align: "center" },
     header: () => null,
     cell: () => (
       <RowDragHandle label={localization.reorderRow} Icon={icons.dragHandle} />

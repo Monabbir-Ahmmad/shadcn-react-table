@@ -72,7 +72,7 @@ export function shouldShowColumnActions<TData extends RowData, TValue>(
 ): boolean {
   return (
     opts.enableColumnActions &&
-    !column.columnDef.meta?.disableColumnActions &&
+    column.columnDef.meta?.enableColumnActions !== false &&
     (column.getCanSort() ||
       column.getCanHide() ||
       column.getCanFilter() ||
@@ -161,7 +161,7 @@ function getColumnDefControlsWidth<TData extends RowData>(
     opts.enableColumnOrdering || (opts.enableGrouping && canGroup)
   const showActions =
     opts.enableColumnActions &&
-    !def.meta?.disableColumnActions &&
+    def.meta?.enableColumnActions !== false &&
     (canSort ||
       canHide ||
       canFilter ||

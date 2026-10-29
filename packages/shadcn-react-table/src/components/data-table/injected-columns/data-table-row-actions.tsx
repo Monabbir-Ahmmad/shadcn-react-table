@@ -31,7 +31,7 @@ export function createRowActionsColumn<TData extends RowData>(
     enableGrouping: false,
     size: 90,
     minSize: 80,
-    meta: { disableColumnActions: true, align },
+    meta: { enableColumnActions: false, align },
     header: () => null,
     cell: ({ row, table }) => (
       <RowActionsCell

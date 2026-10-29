@@ -19,14 +19,14 @@ return <DataTable table={table} />
 
 ## How it works
 
-Each rule is a `{ columnId, operator, value }`. The available operators adapt to the column's `meta.variant`:
+Each rule is a `{ columnId, operator, value }`. The available operators adapt to the column's `meta.filterVariant`:
 
 | Variant                   | Operators                                                                                      |
 | ------------------------- | ---------------------------------------------------------------------------------------------- |
 | `text` (default)          | contains, does not contain, starts with, ends with, equals, not equals, is empty, is not empty |
 | `select` / `multi-select` | equals, not equals, is empty, is not empty                                                     |
-| `range` / `range-slider`  | equals, not equals, `>`, `≥`, `<`, `≤`, between, is empty, is not empty                                |
-| `date` / `date-range`     | equals, not equals, `>`, `<`, between, is empty, is not empty                                      |
+| `range` / `range-slider`  | equals, not equals, `>`, `≥`, `<`, `≤`, between, is empty, is not empty                        |
+| `date` / `date-range`     | equals, not equals, `>`, `<`, between, is empty, is not empty                                  |
 | `checkbox`                | equals                                                                                         |
 
 Build your rules in the dialog, then click **Apply** to filter the table. Closing or cancelling the dialog discards unapplied edits.

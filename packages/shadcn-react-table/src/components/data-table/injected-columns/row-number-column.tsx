@@ -28,7 +28,7 @@ export function createRowNumberColumn<TData extends RowData>(
     enableResizing: false,
     size: 56,
     minSize: 48,
-    meta: { disableColumnActions: true, align: "center", label: "#" },
+    meta: { enableColumnActions: false, align: "center", label: "#" },
     header: () => <span className="text-muted-foreground">#</span>,
     cell: ({ row, table }) => {
       const number =

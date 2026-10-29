@@ -29,7 +29,7 @@ export function createSelectionColumn<TData extends RowData>(
     enableResizing: false,
     size: 44,
     minSize: 44,
-    meta: { disableColumnActions: true, align: "center" },
+    meta: { enableColumnActions: false, align: "center" },
     header: ({ table }) => {
       // No select-all affordance for single-select tables or when disabled.
       if (!enableSelectAll) return null

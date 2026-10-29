@@ -32,7 +32,7 @@ const columns: DataTableColumnDef<Person>[] = [
   {
     accessorKey: "active",
     header: "Active",
-    meta: { variant: "checkbox" },
+    meta: { filterVariant: "checkbox" },
   },
 ]
 
@@ -69,7 +69,7 @@ describe("localization language", () => {
           id: "born",
           header: "Born",
           accessorFn: () => born,
-          meta: { variant: "date" },
+          meta: { filterVariant: "date" },
         },
       ],
       defaultShowColumnFilters: true,
@@ -153,7 +153,7 @@ describe("localization language", () => {
           id: "born",
           header: "Born",
           accessorFn: () => born,
-          meta: { variant: "date" },
+          meta: { filterVariant: "date" },
         },
       ],
       defaultShowColumnFilters: true,

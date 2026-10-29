@@ -127,7 +127,7 @@ function RowDraftEditor<TData extends RowData>({
     <DataTableEditField
       value={value}
       variant={meta?.editVariant}
-      options={meta?.editSelectOptions ?? meta?.options}
+      options={meta?.editSelectOptions ?? meta?.filterSelectOptions}
       error={error}
       ariaLabel={getColumnLabel(column)}
       onChange={(next) => cn.setRowDraftValue(column.id, next)}
@@ -168,7 +168,7 @@ function LocalDraftEditor<TData extends RowData>({
     <DataTableEditField
       value={draft}
       variant={meta?.editVariant}
-      options={meta?.editSelectOptions ?? meta?.options}
+      options={meta?.editSelectOptions ?? meta?.filterSelectOptions}
       error={error}
       ariaLabel={getColumnLabel(column)}
       autoFocus={exitOnCommit}

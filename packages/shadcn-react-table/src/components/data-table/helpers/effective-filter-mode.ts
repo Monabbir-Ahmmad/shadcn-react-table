@@ -9,7 +9,7 @@ export function getEffectiveMode<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>,
   table: DataTableInstance<TData>
 ): FilterMode {
-  const variant = column.columnDef.meta?.variant ?? "text"
+  const variant = column.columnDef.meta?.filterVariant ?? "text"
   return (
     table.tableInstance.columnFilterModes[column.id] ??
     column.columnDef.meta?.filterMode ??

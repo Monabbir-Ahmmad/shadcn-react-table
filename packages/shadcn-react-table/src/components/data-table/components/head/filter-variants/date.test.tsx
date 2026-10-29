@@ -13,7 +13,7 @@ type Person = { id: string; born: Date }
 
 function Table({ variant, value }: { variant: FilterVariant; value: unknown }) {
   const columns: DataTableColumnDef<Person>[] = [
-    { accessorKey: "born", header: "Born", meta: { variant } },
+    { accessorKey: "born", header: "Born", meta: { filterVariant: variant } },
   ]
   const table = useDataTable<Person>({
     columns,

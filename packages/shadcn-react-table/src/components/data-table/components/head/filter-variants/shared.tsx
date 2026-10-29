@@ -113,7 +113,7 @@ export function ValuelessLabel({ label }: { label: string }) {
   )
 }
 
-/** Options for select-style variants: explicit `meta.options` or faceted values. */
+/** Options for select-style variants: explicit `meta.filterSelectOptions` or faceted values. */
 export function useSelectOptions<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>
 ): { options: DataTableFilterOption[]; counts: Map<string, number> } {
@@ -124,7 +124,7 @@ export function useSelectOptions<TData extends RowData, TValue>(
       if (value == null) continue
       counts.set(String(value), count)
     }
-    const explicit = column.columnDef.meta?.options
+    const explicit = column.columnDef.meta?.filterSelectOptions
     if (explicit && explicit.length > 0) {
       return { options: explicit, counts }
     }
@@ -132,7 +132,7 @@ export function useSelectOptions<TData extends RowData, TValue>(
       .sort((a, b) => a.localeCompare(b))
       .map((value) => ({ label: value, value }))
     return { options, counts }
-  }, [facets, column.columnDef.meta?.options])
+  }, [facets, column.columnDef.meta?.filterSelectOptions])
 }
 
 /** A text input with a trailing clear affordance. */

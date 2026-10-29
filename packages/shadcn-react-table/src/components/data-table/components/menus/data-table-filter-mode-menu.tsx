@@ -44,7 +44,7 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
     enableColumnFilterModes,
     renderColumnFilterModeMenuItems,
   } = table.tableInstance
-  const variant = column.columnDef.meta?.variant ?? "text"
+  const variant = column.columnDef.meta?.filterVariant ?? "text"
   const perColumn = column.columnDef.meta?.enableColumnFilterModes
   const enabled = perColumn ?? enableColumnFilterModes
   // Restrict (and order) to the column's allowed subset when provided.

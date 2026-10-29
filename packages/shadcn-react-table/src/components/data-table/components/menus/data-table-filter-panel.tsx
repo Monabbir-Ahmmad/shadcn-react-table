@@ -46,7 +46,7 @@ const nextRuleId = () => `cn-adv-rule-${++ruleSeq}`
 function columnVariant<TData extends RowData>(
   column: DataTableColumn<TData, unknown> | undefined
 ): FilterVariant {
-  return column?.columnDef.meta?.variant ?? "text"
+  return column?.columnDef.meta?.filterVariant ?? "text"
 }
 
 function valueInputType(variant: FilterVariant): "text" | "number" | "date" {
@@ -338,7 +338,7 @@ function RuleValueInput<TData extends RowData>({
 }) {
   if (isValuelessOperator(rule.operator)) return null
 
-  const options = column?.columnDef.meta?.options
+  const options = column?.columnDef.meta?.filterSelectOptions
   if ((variant === "select" || variant === "multi-select") && options?.length) {
     return (
       <Select

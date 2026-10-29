@@ -22,7 +22,7 @@ export interface ColumnFilterModes<TData extends RowData> {
 /**
  * The dynamic filter function behind per-column filter modes. The chosen modes
  * are table state (`columnFilterModes`, read through `getModes` at filter
- * time); defaults come from each column's `meta.filterMode` / `meta.variant`.
+ * time); defaults come from each column's `meta.filterMode` / `meta.filterVariant`.
  * The filter fn keeps a stable identity (changing it would thrash the filtered
  * row model every render).
  *
@@ -34,7 +34,7 @@ export function useColumnFilterModes<TData extends RowData>(
   columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>,
   getModes: () => Record<string, FilterMode>
 ): ColumnFilterModes<TData> {
-  // Per-column default mode derived from `meta.filterMode` / `meta.variant`.
+  // Per-column default mode derived from `meta.filterMode` / `meta.filterVariant`.
   const defaultModes = React.useMemo(() => {
     const map: Record<string, FilterMode> = {}
     for (const def of flattenLeafColumns(columns)) {
@@ -42,7 +42,7 @@ export function useColumnFilterModes<TData extends RowData>(
       if (!key) continue
       const meta = def.meta
       map[key] =
-        meta?.filterMode ?? defaultModeForVariant(meta?.variant ?? "text")
+        meta?.filterMode ?? defaultModeForVariant(meta?.filterVariant ?? "text")
     }
     return map
   }, [columns])
