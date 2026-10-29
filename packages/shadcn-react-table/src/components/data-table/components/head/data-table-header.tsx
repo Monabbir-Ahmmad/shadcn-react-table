@@ -144,20 +144,24 @@ export function DataTableHeader<TData extends RowData>({
       ))}
 
       {filterRowVisible &&
-        table.getHeaderGroups().map((headerGroup) => (
-          <TableRow
-            key={`${headerGroup.id}-filters`}
-            className="hover:bg-transparent"
-          >
-            {enableColumnVirtualization
-              ? withHeaderSpacers(
-                  headerGroup.headers,
-                  renderFilterCell,
-                  `filter-${headerGroup.id}`
-                )
-              : headerGroup.headers.map((header) => renderFilterCell(header))}
-          </TableRow>
-        ))}
+        // Only leaf columns filter; group header rows would render empty.
+        table
+          .getHeaderGroups()
+          .slice(-1)
+          .map((headerGroup) => (
+            <TableRow
+              key={`${headerGroup.id}-filters`}
+              className="hover:bg-transparent"
+            >
+              {enableColumnVirtualization
+                ? withHeaderSpacers(
+                    headerGroup.headers,
+                    renderFilterCell,
+                    `filter-${headerGroup.id}`
+                  )
+                : headerGroup.headers.map((header) => renderFilterCell(header))}
+            </TableRow>
+          ))}
     </TableHeader>
   )
 }
