@@ -52,7 +52,6 @@ const SWITCHES: Choice[] = [
 function PlaygroundTable({ config }: { config: PlaygroundConfig }) {
   const columns = React.useMemo(() => userColumns(), [])
   const [data, setData] = React.useState(DATA)
-  const options = playgroundOptions(config)
   const table = useDataTable({
     data,
     columns,
@@ -71,12 +70,7 @@ function PlaygroundTable({ config }: { config: PlaygroundConfig }) {
       )
       exit()
     },
-    ...options,
-    // Keep the small page size alongside any state the switches set.
-    initialState: {
-      pagination: { pageIndex: 0, pageSize: 8 },
-      ...options.initialState,
-    },
+    ...playgroundOptions(config),
   })
   return <DataTable table={table} />
 }
@@ -88,8 +82,9 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={() => {
-        navigator.clipboard
-          .writeText(text)
+        // clipboard is undefined on insecure origins.
+        void navigator.clipboard
+          ?.writeText(text)
           .then(() => {
             setCopied(true)
             window.setTimeout(() => setCopied(false), 1500)
@@ -177,13 +172,16 @@ export function FeaturePlayground() {
               {view === "code" ? <CopyButton text={code} /> : null}
             </div>
             <div className="p-3">
-              {view === "preview" ? (
+              {/* Both views stay mounted so edits survive a switch. */}
+              <div hidden={view !== "preview"}>
                 <PlaygroundTable key={JSON.stringify(config)} config={config} />
-              ) : (
-                <pre className="overflow-x-auto p-2 font-mono text-sm">
-                  {code}
-                </pre>
-              )}
+              </div>
+              <pre
+                hidden={view !== "code"}
+                className="overflow-x-auto p-2 font-mono text-sm"
+              >
+                {code}
+              </pre>
             </div>
           </div>
         </div>

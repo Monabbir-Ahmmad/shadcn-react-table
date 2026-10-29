@@ -54,11 +54,27 @@ describe("playground", () => {
         "  enableRowSelection: true,",
         "  enableEditing: true,",
         '  editDisplayMode: "cell",',
+        "  onEditingCellSave: ({ row, column, value }) => save(row.id, { [column.id]: value }),",
         "})",
         "",
         "return <DataTable table={table} />",
       ].join("\n")
     )
+  })
+
+  it("prints the row save handler for row and modal editing", () => {
+    for (const editing of ["row", "modal"] as const) {
+      const code = playgroundCode({ ...DEFAULT_PLAYGROUND, editing })
+      expect(code).toContain(
+        [
+          "  onEditingRowSave: ({ row, values, exit }) => {",
+          "    save(row.id, values)",
+          "    exit()",
+          "  },",
+          "})",
+        ].join("\n")
+      )
+    }
   })
 
   it("prints nested objects", () => {

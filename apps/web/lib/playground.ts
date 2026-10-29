@@ -62,6 +62,24 @@ function print(value: unknown): string {
   return String(value)
 }
 
+/** The save handlers the editing mode needs, as source lines. */
+function saveHandlerLines(editing: PlaygroundConfig["editing"]): string[] {
+  if (editing === "cell") {
+    return [
+      "  onEditingCellSave: ({ row, column, value }) => save(row.id, { [column.id]: value }),",
+    ]
+  }
+  if (editing === "row" || editing === "modal") {
+    return [
+      "  onEditingRowSave: ({ row, values, exit }) => {",
+      "    save(row.id, values)",
+      "    exit()",
+      "  },",
+    ]
+  }
+  return []
+}
+
 /** The code for the current switches. */
 export function playgroundCode(config: PlaygroundConfig): string {
   const lines = Object.entries(playgroundOptions(config)).map(
@@ -73,6 +91,7 @@ export function playgroundCode(config: PlaygroundConfig): string {
     "  columns,",
     "  getRowId: (row) => row.id,",
     ...lines,
+    ...saveHandlerLines(config.editing),
     "})",
     "",
     "return <DataTable table={table} />",
