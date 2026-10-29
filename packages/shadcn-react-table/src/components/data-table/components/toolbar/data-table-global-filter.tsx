@@ -62,16 +62,27 @@ export function DataTableGlobalFilter<TData extends RowData>({
   const [expanded, setExpanded] = React.useState(external.length > 0)
   const [value, setValue] = React.useState(external)
 
+  // Values this box committed that the table state has not reflected yet.
+  // Controlled state that stores them late (router / async state) echoes them
+  // back while the user types on; an echo must not replace the newer draft.
+  const [inFlight, setInFlight] = React.useState<string[]>([])
+
   // Outside changes (`setGlobalFilter`, `resetGlobalFilter`, controlled state)
   // win over the local draft. Adjusted during render (React's "derive state
   // from a prop change" pattern) rather than in an effect, which lint forbids.
   // While typing with a debounce, `external` is unchanged, so the draft is kept:
-  // `value` only resets when `external` itself changes.
+  // `value` only resets when `external` itself changes to something new.
   const [prevExternal, setPrevExternal] = React.useState(external)
   if (external !== prevExternal) {
     setPrevExternal(external)
-    setValue(external)
-    if (external.length > 0) setExpanded(true)
+    const echo = inFlight.indexOf(external)
+    if (echo >= 0) {
+      setInFlight(inFlight.slice(echo + 1))
+    } else {
+      setInFlight([])
+      setValue(external)
+      if (external.length > 0) setExpanded(true)
+    }
   }
   // Drive focus-on-expand and let consumers focus the box. Use the forwarded
   // ref when provided (so `DataTable` shares its `searchInputRef`), else a
@@ -83,10 +94,10 @@ export function DataTableGlobalFilter<TData extends RowData>({
 
   React.useEffect(() => {
     if (value === (table.getState().globalFilter ?? "")) return
-    const id = setTimeout(
-      () => table.setGlobalFilter(value || undefined),
-      debounceMs
-    )
+    const id = setTimeout(() => {
+      setInFlight((prev) => [...prev.slice(-19), value])
+      table.setGlobalFilter(value || undefined)
+    }, debounceMs)
     return () => clearTimeout(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, debounceMs])
