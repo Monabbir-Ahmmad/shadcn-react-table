@@ -134,6 +134,7 @@ Set the MRT value explicitly to keep the old behavior.
 - `layoutMode` and column `grow`, and the `"head-overlay"` alert banner position.
 - `rowPinningDisplayMode` values `"sticky"` and `"select-sticky"` (rows that stick in place); use `"top-and-bottom"` or `"select-top"`.
 - `enableColumnDragging` as a separate switch.
+- MRT's `enableRowDragging` works through `DataTableDndProvider` and `onRowDragEnd` here; see [Row dragging](/docs/guides/row-dragging).
 - MUI theming: the table uses your shadcn/ui components and theme instead.
 
 ## Related

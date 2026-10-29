@@ -24,6 +24,7 @@ import type {
   DataTableHeader,
 } from "../../../core/table-types"
 import { setColumnDragVars } from "../../../utils/column-styles"
+import { DndKeyContext, useDndId } from "../../../core/dnd-scope"
 
 /** dnd-kit activator props for the current column's drag handle. */
 export interface ColumnDragHandleProps {
@@ -65,6 +66,8 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
   children: React.ReactNode
 }) {
   const column = header.column
+  const tableKey = React.useContext(DndKeyContext)
+  const dndId = useDndId()
   const {
     attributes,
     listeners,
@@ -74,9 +77,9 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
     transition: sortTransition,
     isDragging,
   } = useSortable({
-    id: column.id,
+    id: dndId(column.id),
     disabled: !draggable,
-    data: { type: "column" },
+    data: { type: "column", tableKey, columnId: column.id },
   })
 
   // While a column is dragged, its header follows the pointer and the others

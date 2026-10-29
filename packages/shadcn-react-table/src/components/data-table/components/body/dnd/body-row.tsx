@@ -13,6 +13,7 @@ import { mergeProps } from "../../../helpers/slot-props"
 import { BODY_ROW_CLASS } from "../../../core/constants"
 import { RowDragContext } from "../../../injected-columns/injected-columns"
 import type { DataTableRow } from "../../../core/table-types"
+import { DndKeyContext, useDndId } from "../../../core/dnd-scope"
 
 /**
  * Body row. `useSortable` is always called (disabled when row ordering is off).
@@ -35,6 +36,8 @@ export function DataTableBodyRow<TData extends RowData>({
   onClick?: React.MouseEventHandler<HTMLTableRowElement>
   onDoubleClick?: React.MouseEventHandler<HTMLTableRowElement>
 }) {
+  const tableKey = React.useContext(DndKeyContext)
+  const dndId = useDndId()
   const {
     attributes,
     listeners,
@@ -43,13 +46,21 @@ export function DataTableBodyRow<TData extends RowData>({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: row.id, disabled: !draggable, data: { type: "row" } })
+  } = useSortable({
+    id: dndId(row.id),
+    disabled: !draggable,
+    data: { type: "row", tableKey, rowId: row.id },
+  })
 
+  // Inside a DataTableDndProvider a floating preview follows the pointer, so
+  // the dragged row stays in place, dimmed.
+  const previewed = isDragging && tableKey != null
   const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+    transform: previewed ? undefined : CSS.Transform.toString(transform),
     transition,
     position: isDragging ? "relative" : undefined,
     zIndex: isDragging ? 1 : undefined,
+    opacity: previewed ? 0.5 : undefined,
   }
 
   const dragProps = React.useMemo(

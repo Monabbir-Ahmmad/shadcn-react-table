@@ -37,6 +37,7 @@ Then `import { DataTable, useDataTable } from "@/components/ui/data-table"`: bui
 
 - [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection.md): Set `enableRowSelection: true` to add a leading checkbox column.
 - [Row ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-ordering.md): Set `enableRowOrdering: true` to add a drag-handle column for drag-and-drop row reordering.
+- [Row dragging](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-dragging.md): Rows can be dragged out of a table — onto another table, or onto a drop zone of your own — with the pointer, touch or the keyboard.
 - [Row pinning](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-pinning.md): Set `enableRowPinning: true` to add a pin toggle inside the row-number column.
 - [Row numbers](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-numbers.md): Set `enableRowNumbers: true` to add a leading row-number column to the table.
 

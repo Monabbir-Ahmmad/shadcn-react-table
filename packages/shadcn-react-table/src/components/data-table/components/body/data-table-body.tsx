@@ -39,6 +39,7 @@ import { getCellRenderState, renderBodyCell } from "./render-body-cell"
 import { SkeletonBar, SkeletonRows } from "./skeleton-rows"
 import type { DataTableCell, DataTableRow } from "../../core/table-types"
 import { dt } from "../../core/internal"
+import { useDndId } from "../../core/dnd-scope"
 
 // Table-instance members scoped to single rows (handled by `rowDeps`), event
 // handlers (read through a ref), and the refs object (new every render).
@@ -110,6 +111,7 @@ export function DataTableBody<TData extends RowData>({
     enableColumnVirtualization,
     enableRowVirtualization,
     enableRowOrdering,
+    enableRowDragging,
     renderDetailPanel,
     onRowClick,
     onRowDoubleClick,
@@ -202,6 +204,8 @@ export function DataTableBody<TData extends RowData>({
         getColumnDragStyle(column.id, pinning.zIndex as number | undefined)),
     }
   }
+
+  const dndId = useDndId()
 
   const renderCell = (
     cell: DataTableCell<TData, unknown>,
@@ -406,7 +410,7 @@ export function DataTableBody<TData extends RowData>({
           {...bodyRowProps(row, rowIndex)}
           row={row}
           draggable={
-            enableRowOrdering &&
+            (enableRowOrdering || enableRowDragging) &&
             !enableRowVirtualization &&
             !row.getIsPinned() &&
             !isGrouped
@@ -574,7 +578,7 @@ export function DataTableBody<TData extends RowData>({
           <>
             {!stickyPins && topRows.map((row, i) => renderRow(row, i))}
             <SortableContext
-              items={centerRowIds}
+              items={centerRowIds.map(dndId)}
               strategy={verticalListSortingStrategy}
             >
               {centerNodes}

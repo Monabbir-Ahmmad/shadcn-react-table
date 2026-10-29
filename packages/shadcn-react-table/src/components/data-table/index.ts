@@ -8,6 +8,11 @@
 export { DataTable } from "./core/data-table"
 export { useDataTable } from "./core/use-data-table"
 export { DataTableProvider, useDataTableInstance } from "./core/table-context"
+export {
+  DataTableDndProvider,
+  useDataTableDropZone,
+  type RowDropTarget,
+} from "./core/dnd-scope"
 
 // The table's parts, for your own layouts (each takes `table`; render them
 // inside a `DataTableProvider`).

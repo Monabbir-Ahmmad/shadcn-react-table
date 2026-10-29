@@ -634,6 +634,7 @@ Set the MRT value explicitly to keep the old behavior.
 - `layoutMode` and column `grow`, and the `"head-overlay"` alert banner position.
 - `rowPinningDisplayMode` values `"sticky"` and `"select-sticky"` (rows that stick in place); use `"top-and-bottom"` or `"select-top"`.
 - `enableColumnDragging` as a separate switch.
+- MRT's `enableRowDragging` works through `DataTableDndProvider` and `onRowDragEnd` here; see [Row dragging](/docs/guides/row-dragging).
 - MUI theming: the table uses your shadcn/ui components and theme instead.
 
 ## Related
@@ -1756,6 +1757,89 @@ return <DataTable table={table} />
 - [useDataTable options](/docs/api/use-data-table)
 - [Table instance](/docs/api/table-instance)
 - [Row selection](/docs/guides/row-selection)
+
+---
+
+<!-- https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-dragging/ -->
+
+# Row dragging
+
+Rows can be dragged out of a table — onto another table, or onto a drop zone of your own — with the pointer, touch or the keyboard. (To reorder rows inside one table, see [Row ordering](/docs/guides/row-ordering).)
+
+## Between tables
+
+Wrap the tables in `DataTableDndProvider`, turn on `enableRowDragging` on the table rows leave from, and move the row in `onRowDragEnd`:
+
+```tsx
+import { DataTable, DataTableDndProvider, useDataTable } from "@/components/ui/data-table"
+
+function Lists() {
+  const [todo, setTodo] = React.useState(initialTodo)
+  const [done, setDone] = React.useState(initialDone)
+
+  const todoTable = useDataTable({
+    data: todo,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowDragging: true,
+    onRowDragEnd: ({ row, over }) => {
+      if (over.type === "table" && over.table === doneTable) {
+        setTodo((rows) => rows.filter((r) => r.id !== row.id))
+        setDone((rows) => [...rows, row.original])
+      }
+    },
+  })
+  const doneTable = useDataTable({ data: done, columns, getRowId: (row) => row.id })
+
+  return (
+    <DataTableDndProvider>
+      <DataTable table={todoTable} className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary" />
+      <DataTable table={doneTable} className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary" />
+    </DataTableDndProvider>
+  )
+}
+```
+
+`over` says where the row landed: `{ type: "table", table, rowId? }` (the table, and the row it was dropped on, if any) or `{ type: "zone", id }`. While a row from another table is over a table, the table's root has a `data-drop-target` attribute, so you can highlight it with `data-[drop-target]:…` classes. A floating preview follows the pointer.
+
+Each table inside the provider keeps its own column and row reordering and drag-to-group, and the tables may share row and column ids.
+
+## Drop zones
+
+Make any element a drop target with `useDataTableDropZone(id)` inside the provider:
+
+```tsx
+import { useDataTableDropZone } from "@/components/ui/data-table"
+
+function Trash() {
+  const { setNodeRef, isOver } = useDataTableDropZone("trash")
+  return (
+    <div ref={setNodeRef} className={isOver ? "bg-destructive/10" : undefined}>
+      Drop here to delete
+    </div>
+  )
+}
+```
+
+A row dropped there calls `onRowDragEnd` with `over: { type: "zone", id: "trash" }`.
+
+## Reordering too
+
+`enableRowDragging` only adds the drag handle; combine it with `enableRowOrdering` (and `onRowOrderChange`) to reorder inside the table as well.
+
+## Relevant options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enableRowDragging` | `boolean` | `false` | Adds a drag handle to each row for moving rows out of the table — to another table or a drop zone in the same `DataTableDndProvider` — without reordering inside it (combine with `enableRowOrdering` for both). Default false. |
+| `onRowDragEnd` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void` |  | Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data. |
+| `enableRowOrdering` | `boolean` | `false` | Drag-and-drop row reordering (adds a drag-handle column). |
+| `onRowOrderChange` | `(activeRowId: string, overRowId: string) => void` |  | Called on a row drag-and-drop reorder; the consumer reorders its data. |
+
+## Related
+
+- [Row ordering](/docs/guides/row-ordering)
+- [Composition](/docs/guides/composition)
 
 ---
 
@@ -5430,6 +5514,8 @@ The table is styled with Tailwind, not per-component style props. Structural slo
 | `enableRowPinning` | `boolean` | `false` | Row pinning (top) via a pin toggle in the row-number column. |
 | `enableRowNumbers` | `boolean` | `false` | Adds a leading row-number column. |
 | `rowNumberMode` | `"static" \| "original"` | `"static"` | "static" tracks the current view (page-aware); "original" uses source index. |
+| `enableRowDragging` | `boolean` | `false` | Adds a drag handle to each row for moving rows out of the table — to another table or a drop zone in the same `DataTableDndProvider` — without reordering inside it (combine with `enableRowOrdering` for both). Default false. |
+| `onRowDragEnd` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void` |  | Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data. |
 | `onRowOrderChange` | `(activeRowId: string, overRowId: string) => void` |  | Called on a row drag-and-drop reorder; the consumer reorders its data. |
 | `enableGrouping` | `boolean` | `false` | Row grouping (group-by menu + drop-to-group zone + aggregated group rows). |
 | `enableExpanding` | `boolean` |  | Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided. |
@@ -5648,6 +5734,8 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `enableExpanding` | `boolean` |  | Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided. |
 | `enableStickyFooter` | `boolean` |  | Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false. |
 | `rowPinningDisplayMode` | `RowPinningDisplayMode` |  | Where pinned rows show and how rows get pinned. |
+| `enableRowDragging` | `boolean` |  | Whether rows have a drag handle for moving them out of the table. |
+| `onRowDragEnd` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void` |  | Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data. |
 | `enableTableHead` | `boolean` |  | Whether the header rows render. |
 | `enableTableFooter` | `boolean` |  | Whether the footer rows render (when columns define footers). |
 | `enableExpandAll` | `boolean` |  | Whether the expand column's header toggles every row. |

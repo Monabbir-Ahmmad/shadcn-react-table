@@ -130,7 +130,7 @@ describe("useDragAnnouncements", () => {
   it("names the group drop zone by the grouping it would make", () => {
     const { result } = setup([a, b])
     const { announcements: ann } = result.current
-    const zone = item(GROUP_DROPZONE_ID)
+    const zone = item(GROUP_DROPZONE_ID, "group-zone")
     expect(ann.onDragOver!(args(item("name", "column"), zone))).toBe(
       defaultLocalization.dragOver(
         "Name",

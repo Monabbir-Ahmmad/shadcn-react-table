@@ -20,6 +20,7 @@ import type { DataTableFeatures } from "./features"
 import type { DataTableIcons } from "./icons"
 import type { DataTableLocalization } from "./localization"
 import type { DataTableUiState } from "./ui-state"
+import type { RowDropTarget } from "./dnd-scope"
 import type {
   DataTableAggregationFn,
   DataTableCell,
@@ -625,6 +626,13 @@ export interface DataTableConfig<TData extends RowData> {
   enableStickyFooter: boolean
   /** Where pinned rows show and how rows get pinned. */
   rowPinningDisplayMode: RowPinningDisplayMode
+  /** Whether rows have a drag handle for moving them out of the table. */
+  enableRowDragging: boolean
+  onRowDragEnd?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+    over: RowDropTarget
+  }) => void
   /** Whether the header rows render. */
   enableTableHead: boolean
   /** Whether the footer rows render (when columns define footers). */
@@ -1010,6 +1018,18 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableRowNumbers?: boolean
   /** "static" tracks the current view (page-aware); "original" uses source index. */
   rowNumberMode?: "static" | "original"
+  /** Adds a drag handle to each row for moving rows out of the table — to
+   *  another table or a drop zone in the same `DataTableDndProvider` —
+   *  without reordering inside it (combine with `enableRowOrdering` for
+   *  both). Default false. */
+  enableRowDragging?: boolean
+  /** Called when a row is dropped on another table or a drop zone in the same
+   *  `DataTableDndProvider`. Move the row in your data. */
+  onRowDragEnd?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+    over: RowDropTarget
+  }) => void
   /** Called on a row drag-and-drop reorder; the consumer reorders its data. */
   onRowOrderChange?: (activeRowId: string, overRowId: string) => void
   /** Row grouping (group-by menu + drop-to-group zone + aggregated group rows). */

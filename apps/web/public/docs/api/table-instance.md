@@ -66,6 +66,8 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `enableExpanding` | `boolean` |  | Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided. |
 | `enableStickyFooter` | `boolean` |  | Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false. |
 | `rowPinningDisplayMode` | `RowPinningDisplayMode` |  | Where pinned rows show and how rows get pinned. |
+| `enableRowDragging` | `boolean` |  | Whether rows have a drag handle for moving them out of the table. |
+| `onRowDragEnd` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void` |  | Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data. |
 | `enableTableHead` | `boolean` |  | Whether the header rows render. |
 | `enableTableFooter` | `boolean` |  | Whether the footer rows render (when columns define footers). |
 | `enableExpandAll` | `boolean` |  | Whether the expand column's header toggles every row. |

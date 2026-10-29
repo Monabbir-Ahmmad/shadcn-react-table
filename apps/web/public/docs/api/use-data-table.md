@@ -53,6 +53,8 @@
 | `enableRowPinning` | `boolean` | `false` | Row pinning (top) via a pin toggle in the row-number column. |
 | `enableRowNumbers` | `boolean` | `false` | Adds a leading row-number column. |
 | `rowNumberMode` | `"static" \| "original"` | `"static"` | "static" tracks the current view (page-aware); "original" uses source index. |
+| `enableRowDragging` | `boolean` | `false` | Adds a drag handle to each row for moving rows out of the table — to another table or a drop zone in the same `DataTableDndProvider` — without reordering inside it (combine with `enableRowOrdering` for both). Default false. |
+| `onRowDragEnd` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void` |  | Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data. |
 | `onRowOrderChange` | `(activeRowId: string, overRowId: string) => void` |  | Called on a row drag-and-drop reorder; the consumer reorders its data. |
 | `enableGrouping` | `boolean` | `false` | Row grouping (group-by menu + drop-to-group zone + aggregated group rows). |
 | `enableExpanding` | `boolean` |  | Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided. |

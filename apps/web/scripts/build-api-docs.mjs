@@ -219,6 +219,8 @@ const SLOT_DESCRIPTIONS = {
     "Bottom toolbar (custom actions and/or pagination).",
   "data-table-pagination": "Pagination controls.",
   "data-table-create-row": 'Inline create row (createDisplayMode: "row").',
+  "data-table-drag-preview":
+    "Floating preview of a row dragged inside a DataTableDndProvider.",
 }
 const slotValues = new Set()
 // data-slot markers live in .tsx files spread across the feature subfolders, so

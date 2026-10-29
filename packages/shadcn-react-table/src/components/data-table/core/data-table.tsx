@@ -29,6 +29,12 @@ import {
 import { useDragAnnouncements } from "../hooks/use-drag-announcements"
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll"
 import { useTableDnd } from "../hooks/use-table-dnd"
+import {
+  DndKeyContext,
+  TableDropTarget,
+  useDndScope,
+  useIsDropTarget,
+} from "./dnd-scope"
 import { useTableVirtualizers } from "../hooks/use-table-virtualizers"
 import { useTableState } from "../hooks/use-table-state"
 import { useFullscreenModal } from "../hooks/use-fullscreen-modal"
@@ -194,6 +200,40 @@ export function DataTable<TData extends RowData>({
   })
   const { sensors, collisionDetection, handleDragEnd } = useTableDnd(table)
   const accessibility = useDragAnnouncements(table)
+  // Inside a DataTableDndProvider the table joins the provider's drag
+  // context (rows can then move between tables) instead of having its own.
+  const dndScope = useDndScope()
+  const dndKey = React.useId()
+  const isDropTarget = useIsDropTarget(dndScope ? dndKey : null)
+  const dndEntry = {
+    table: table as unknown as DataTableInstance<never>,
+    collisionDetection,
+    handleDragEnd,
+    announcements: accessibility.announcements,
+    screenReaderInstructions: accessibility.screenReaderInstructions,
+  }
+  const dndEntryRef = React.useRef(dndEntry)
+  React.useLayoutEffect(() => {
+    dndEntryRef.current = dndEntry
+  })
+  React.useEffect(() => {
+    if (!dndScope) return
+    // The provider reads the latest handlers through this proxy.
+    const latest = dndEntryRef
+    return dndScope.register(dndKey, {
+      get table() {
+        return latest.current.table
+      },
+      collisionDetection: (args) => latest.current.collisionDetection(args),
+      handleDragEnd: (event) => latest.current.handleDragEnd(event),
+      get announcements() {
+        return latest.current.announcements
+      },
+      get screenReaderInstructions() {
+        return latest.current.screenReaderInstructions
+      },
+    })
+  }, [dndScope, dndKey])
   const {
     rowVirtualizer,
     columnVirtualizer,
@@ -279,6 +319,175 @@ export function DataTable<TData extends RowData>({
     [enableColumnResizing, table, columnSizing, columnSizingInfo]
   )
 
+  const dndContent = (
+    <>
+      {enableGrouping &&
+        (positionToolbarDropZone === "top" ||
+          positionToolbarDropZone === "both") && (
+          <DropToGroupZoneRegion table={table} config={dt(table)} />
+        )}
+
+      <div
+        {...mergeProps(
+          // The callback ref runs after render, not during it.
+          // eslint-disable-next-line react-hooks/refs
+          {
+            ref: setSurfaceRef,
+            onKeyDown,
+            onFocus,
+            onBlur,
+            // Focusable (not a Tab stop) so keyboard navigation can park
+            // focus here when the focused cell scrolls out of a virtual
+            // window.
+            tabIndex: enableKeyboardNavigation ? -1 : undefined,
+            "data-slot": "data-table-surface",
+            className: cn(
+              // This surface is the single scroll container for both axes, so
+              // the sticky header/footer engage and the horizontal scrollbar
+              // stays pinned to the visible bottom. Neutralize the shadcn
+              // <Table> wrapper's own overflow so it doesn't become a second
+              // (unbounded) scroll container that breaks sticky positioning.
+              "relative overflow-auto rounded-md border bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
+              "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
+              // MRT-parity default bound: with a sticky header the surface
+              // caps near the viewport height, so tall content (long groups,
+              // trees, detail panels) scrolls internally under the pinned
+              // header instead of stretching the page. A `slotProps.surface`
+              // class (via tailwind-merge) or `enableStickyHeader: false` opts
+              // out.
+              enableStickyHeader &&
+                "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
+              enableRowVirtualization && "max-h-150"
+            ),
+          } as React.ComponentProps<"div">,
+          getSlotProps(table, "surface", {})
+        )}
+      >
+        {showProgressBars && (
+          <div
+            data-slot="data-table-progress"
+            className="absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden bg-primary/20"
+            role="presentation"
+          >
+            {/* @keyframes can't go in an inline style attribute, so the rule
+                    lives in this co-located <style> — keeping the table
+                    self-contained (no globals.css / registry CSS needed). The
+                    animation itself is applied inline; reduced motion stops it. */}
+            <style>
+              {
+                "@keyframes data-table-progress{from{transform:translateX(-100%)}to{transform:translateX(400%)}}@media (prefers-reduced-motion:reduce){[data-slot=data-table-progress-bar]{animation:none!important}}"
+              }
+            </style>
+            <div
+              data-slot="data-table-progress-bar"
+              className="h-full w-1/3 bg-primary"
+              style={{
+                animation: "data-table-progress 1.1s ease-in-out infinite",
+              }}
+            />
+          </div>
+        )}
+
+        <Table
+          {...mergeProps(
+            {
+              role: isGrid ? "grid" : undefined,
+              "aria-rowcount": isGrid ? ariaRowCount : undefined,
+              "aria-colcount": isGrid
+                ? table.getVisibleLeafColumns().length
+                : undefined,
+              "aria-busy": isBusy || undefined,
+              style: {
+                ...columnSizeVars,
+                // Fixed layout makes per-column widths authoritative (auto
+                // layout would stretch/redistribute them and ignore a resize).
+                // `max(100%, totalSize)` keeps the table at least as wide as the
+                // surface: when the columns are narrower than the surface, fixed
+                // layout distributes the slack proportionally so they fill it
+                // (no trailing empty space); when they outgrow the surface, the
+                // table exceeds 100% and scrolls horizontally.
+                ...(enableColumnResizing
+                  ? { width: `max(100%, ${table.getTotalSize()}px)` }
+                  : null),
+              },
+              className: cn(enableColumnResizing && "table-fixed"),
+            } as React.ComponentProps<"table">,
+            getSlotProps(table, "table", {})
+          )}
+        >
+          {renderCaption && (
+            <TableCaption>{renderCaption({ table })}</TableCaption>
+          )}
+          {enableTableHead && (
+            <HeaderRegion
+              table={table}
+              config={dt(table)}
+              withHeaderSpacers={withHeaderSpacers}
+            />
+          )}
+          <GridSyncContext.Provider value={scheduleSync}>
+            <MemoizedDataTableBody
+              table={table}
+              rowVirtualizer={rowVirtualizer}
+              virtualItems={virtualItems}
+              virtualColumns={virtualColumns}
+              withColumnSpacers={withColumnSpacers}
+            />
+          </GridSyncContext.Provider>
+          {showFooter && (
+            <FooterRegion
+              table={table}
+              config={dt(table)}
+              withHeaderSpacers={withHeaderSpacers}
+            />
+          )}
+        </Table>
+
+        {enableInfiniteScroll && hasRows && (
+          <>
+            {/* Bottom sentinel: when it scrolls near the viewport (within
+                    `infiniteScrollThreshold`px) the table asks for the next
+                    chunk. Sits after the rendered window, so it works with or
+                    without row virtualization. `sticky start-0` keeps it within
+                    the horizontal viewport so a wide (horizontally scrolled)
+                    table still triggers — the IntersectionObserver checks both
+                    axes, and a start-anchored sentinel would otherwise scroll
+                    out of the root rect. */}
+            <div
+              ref={sentinelRef}
+              data-slot="data-table-infinite-sentinel"
+              aria-hidden
+              className="sticky start-0 h-px w-full"
+            />
+            {isFetchingNextPage && (
+              <div
+                data-slot="data-table-infinite-loader"
+                role="status"
+                className="sticky start-0 flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground"
+              >
+                <span
+                  aria-hidden
+                  className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                />
+                {localization.loadingMore}
+              </div>
+            )}
+          </>
+        )}
+
+        {showLoadingOverlay && hasRows && (
+          <div className="absolute inset-0 z-10 bg-card/40" aria-hidden />
+        )}
+      </div>
+
+      {enableGrouping &&
+        (positionToolbarDropZone === "bottom" ||
+          positionToolbarDropZone === "both") && (
+          <DropToGroupZoneRegion table={table} config={dt(table)} />
+        )}
+    </>
+  )
+
   return (
     <DataTableProvider table={table}>
       <div
@@ -289,12 +498,15 @@ export function DataTable<TData extends RowData>({
             ref: paperRef,
             "data-slot": "data-table",
             className: cn(
-              "flex w-full flex-col gap-2",
+              "relative flex w-full flex-col gap-2",
               DENSITY_PADDING_VARS,
               isFullscreen &&
                 "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4"
             ),
             "data-density": density,
+            // A row from another table is over this one (see
+            // DataTableDndProvider); style it with `data-[drop-target]:…`.
+            "data-drop-target": isDropTarget || undefined,
             // Full screen covers the page, so it is a modal dialog meanwhile.
             role: isFullscreen ? "dialog" : undefined,
             "aria-modal": isFullscreen || undefined,
@@ -328,177 +540,23 @@ export function DataTable<TData extends RowData>({
             <PaginationRegion table={table} config={dt(table)} />
           )}
 
-        <DndContext
-          sensors={sensors}
-          accessibility={accessibility}
-          collisionDetection={collisionDetection}
-          onDragEnd={handleDragEnd}
-        >
-          {enableGrouping &&
-            (positionToolbarDropZone === "top" ||
-              positionToolbarDropZone === "both") && (
-              <DropToGroupZoneRegion table={table} config={dt(table)} />
-            )}
-
-          <div
-            {...mergeProps(
-              // The callback ref runs after render, not during it.
-              // eslint-disable-next-line react-hooks/refs
-              {
-                ref: setSurfaceRef,
-                onKeyDown,
-                onFocus,
-                onBlur,
-                // Focusable (not a Tab stop) so keyboard navigation can park
-                // focus here when the focused cell scrolls out of a virtual
-                // window.
-                tabIndex: enableKeyboardNavigation ? -1 : undefined,
-                "data-slot": "data-table-surface",
-                className: cn(
-                  // This surface is the single scroll container for both axes, so
-                  // the sticky header/footer engage and the horizontal scrollbar
-                  // stays pinned to the visible bottom. Neutralize the shadcn
-                  // <Table> wrapper's own overflow so it doesn't become a second
-                  // (unbounded) scroll container that breaks sticky positioning.
-                  "relative overflow-auto rounded-md border bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
-                  "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
-                  // MRT-parity default bound: with a sticky header the surface
-                  // caps near the viewport height, so tall content (long groups,
-                  // trees, detail panels) scrolls internally under the pinned
-                  // header instead of stretching the page. A `slotProps.surface`
-                  // class (via tailwind-merge) or `enableStickyHeader: false` opts
-                  // out.
-                  enableStickyHeader &&
-                    "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
-                  enableRowVirtualization && "max-h-150"
-                ),
-              } as React.ComponentProps<"div">,
-              getSlotProps(table, "surface", {})
-            )}
-          >
-            {showProgressBars && (
-              <div
-                data-slot="data-table-progress"
-                className="absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden bg-primary/20"
-                role="presentation"
-              >
-                {/* @keyframes can't go in an inline style attribute, so the rule
-                    lives in this co-located <style> — keeping the table
-                    self-contained (no globals.css / registry CSS needed). The
-                    animation itself is applied inline; reduced motion stops it. */}
-                <style>
-                  {
-                    "@keyframes data-table-progress{from{transform:translateX(-100%)}to{transform:translateX(400%)}}@media (prefers-reduced-motion:reduce){[data-slot=data-table-progress-bar]{animation:none!important}}"
-                  }
-                </style>
-                <div
-                  data-slot="data-table-progress-bar"
-                  className="h-full w-1/3 bg-primary"
-                  style={{
-                    animation: "data-table-progress 1.1s ease-in-out infinite",
-                  }}
-                />
-              </div>
-            )}
-
-            <Table
-              {...mergeProps(
-                {
-                  role: isGrid ? "grid" : undefined,
-                  "aria-rowcount": isGrid ? ariaRowCount : undefined,
-                  "aria-colcount": isGrid
-                    ? table.getVisibleLeafColumns().length
-                    : undefined,
-                  "aria-busy": isBusy || undefined,
-                  style: {
-                    ...columnSizeVars,
-                    // Fixed layout makes per-column widths authoritative (auto
-                    // layout would stretch/redistribute them and ignore a resize).
-                    // `max(100%, totalSize)` keeps the table at least as wide as the
-                    // surface: when the columns are narrower than the surface, fixed
-                    // layout distributes the slack proportionally so they fill it
-                    // (no trailing empty space); when they outgrow the surface, the
-                    // table exceeds 100% and scrolls horizontally.
-                    ...(enableColumnResizing
-                      ? { width: `max(100%, ${table.getTotalSize()}px)` }
-                      : null),
-                  },
-                  className: cn(enableColumnResizing && "table-fixed"),
-                } as React.ComponentProps<"table">,
-                getSlotProps(table, "table", {})
-              )}
+        <DndKeyContext.Provider value={dndScope ? dndKey : null}>
+          {dndScope ? (
+            <>
+              <TableDropTarget tableKey={dndKey} />
+              {dndContent}
+            </>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              accessibility={accessibility}
+              collisionDetection={collisionDetection}
+              onDragEnd={handleDragEnd}
             >
-              {renderCaption && (
-                <TableCaption>{renderCaption({ table })}</TableCaption>
-              )}
-              {enableTableHead && (
-                <HeaderRegion
-                  table={table}
-                  config={dt(table)}
-                  withHeaderSpacers={withHeaderSpacers}
-                />
-              )}
-              <GridSyncContext.Provider value={scheduleSync}>
-                <MemoizedDataTableBody
-                  table={table}
-                  rowVirtualizer={rowVirtualizer}
-                  virtualItems={virtualItems}
-                  virtualColumns={virtualColumns}
-                  withColumnSpacers={withColumnSpacers}
-                />
-              </GridSyncContext.Provider>
-              {showFooter && (
-                <FooterRegion
-                  table={table}
-                  config={dt(table)}
-                  withHeaderSpacers={withHeaderSpacers}
-                />
-              )}
-            </Table>
-
-            {enableInfiniteScroll && hasRows && (
-              <>
-                {/* Bottom sentinel: when it scrolls near the viewport (within
-                    `infiniteScrollThreshold`px) the table asks for the next
-                    chunk. Sits after the rendered window, so it works with or
-                    without row virtualization. `sticky start-0` keeps it within
-                    the horizontal viewport so a wide (horizontally scrolled)
-                    table still triggers — the IntersectionObserver checks both
-                    axes, and a start-anchored sentinel would otherwise scroll
-                    out of the root rect. */}
-                <div
-                  ref={sentinelRef}
-                  data-slot="data-table-infinite-sentinel"
-                  aria-hidden
-                  className="sticky start-0 h-px w-full"
-                />
-                {isFetchingNextPage && (
-                  <div
-                    data-slot="data-table-infinite-loader"
-                    role="status"
-                    className="sticky start-0 flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground"
-                  >
-                    <span
-                      aria-hidden
-                      className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-                    />
-                    {localization.loadingMore}
-                  </div>
-                )}
-              </>
-            )}
-
-            {showLoadingOverlay && hasRows && (
-              <div className="absolute inset-0 z-10 bg-card/40" aria-hidden />
-            )}
-          </div>
-
-          {enableGrouping &&
-            (positionToolbarDropZone === "bottom" ||
-              positionToolbarDropZone === "both") && (
-              <DropToGroupZoneRegion table={table} config={dt(table)} />
-            )}
-        </DndContext>
+              {dndContent}
+            </DndContext>
+          )}
+        </DndKeyContext.Provider>
 
         {positionToolbarAlertBanner === "bottom" && (
           <AlertBannerRegion table={table} config={dt(table)} />

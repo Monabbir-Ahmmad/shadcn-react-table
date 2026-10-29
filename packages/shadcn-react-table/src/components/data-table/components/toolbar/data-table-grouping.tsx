@@ -1,5 +1,7 @@
 "use client"
 
+import * as React from "react"
+
 import { useDroppable } from "@dnd-kit/core"
 import type { RowData } from "@tanstack/react-table"
 
@@ -9,6 +11,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import { dt } from "../../core/internal"
+import { DndKeyContext, useDndId } from "../../core/dnd-scope"
 
 export const GROUP_DROPZONE_ID = "cn-group-dropzone"
 
@@ -24,7 +27,12 @@ export function DataTableDropToGroupZone<TData extends RowData>({
 }) {
   const { localization, icons } = dt(table)
   const grouping = table.getState().grouping
-  const { setNodeRef, isOver } = useDroppable({ id: GROUP_DROPZONE_ID })
+  const tableKey = React.useContext(DndKeyContext)
+  const dndId = useDndId()
+  const { setNodeRef, isOver } = useDroppable({
+    id: dndId(GROUP_DROPZONE_ID),
+    data: { type: "group-zone", tableKey },
+  })
 
   return (
     <div

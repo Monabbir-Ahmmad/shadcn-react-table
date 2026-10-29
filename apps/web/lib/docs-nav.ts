@@ -50,6 +50,7 @@ export const docsNav: DocsNavGroup[] = [
     items: [
       { title: "Row selection", href: "/docs/guides/row-selection" },
       { title: "Row ordering", href: "/docs/guides/row-ordering" },
+      { title: "Row dragging", href: "/docs/guides/row-dragging" },
       { title: "Row pinning", href: "/docs/guides/row-pinning" },
       { title: "Row numbers", href: "/docs/guides/row-numbers" },
     ],

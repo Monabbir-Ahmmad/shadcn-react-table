@@ -37,6 +37,7 @@ import { isFilterRowVisible } from "../../helpers/grid-rows"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import type { DataTableHeader } from "../../core/table-types"
 import { dt } from "../../core/internal"
+import { useDndId } from "../../core/dnd-scope"
 
 interface DataTableHeaderProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -62,7 +63,8 @@ export function DataTableHeader<TData extends RowData>({
 
   const controls = headerControlsOptionsFromTable(table)
   const padding = CELL_PADDING_Y
-  const leafColumnIds = table.getVisibleLeafColumns().map((c) => c.id)
+  const dndId = useDndId()
+  const leafColumnIds = table.getVisibleLeafColumns().map((c) => dndId(c.id))
 
   const filterRowVisible = isFilterRowVisible(table)
   const headerGroups = table.getHeaderGroups()

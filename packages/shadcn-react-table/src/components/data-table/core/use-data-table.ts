@@ -169,6 +169,8 @@ export function useDataTable<TData extends RowData>(
     enableStickyFooter = false,
     enableTableHead = true,
     rowPinningDisplayMode = "top-and-bottom",
+    enableRowDragging = false,
+    onRowDragEnd,
     enableTableFooter = true,
     enableExpandAll = true,
     renderDetailPanel,
@@ -498,7 +500,7 @@ export function useDataTable<TData extends RowData>(
 
   const resolvedColumns = useResolvedColumns<TData>({
     columns,
-    enableRowOrdering,
+    enableRowOrdering: enableRowOrdering || enableRowDragging,
     enableRowSelection,
     selectAllMode,
     enableSelectAll,
@@ -853,6 +855,8 @@ export function useDataTable<TData extends RowData>(
     enableStickyFooter,
     enableTableHead,
     rowPinningDisplayMode,
+    enableRowDragging,
+    onRowDragEnd,
     enableTableFooter,
     enableExpandAll,
     renderDetailPanel,

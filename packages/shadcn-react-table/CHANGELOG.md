@@ -86,6 +86,10 @@ for every rename.
 
 ### New
 
+- **New:** drag rows between tables and onto drop zones:
+  `DataTableDndProvider`, `enableRowDragging`, `onRowDragEnd({ row, table,
+  over })` and `useDataTableDropZone(id)`, with keyboard support, a floating
+  preview and a `data-drop-target` attribute on the hovered table.
 - **New:** columns resize from the keyboard: the resize handle is a focusable
   separator (arrow keys ±10px, Shift ±50px, Home/End to the limits, Enter to
   fit) that reports its width to screen readers.

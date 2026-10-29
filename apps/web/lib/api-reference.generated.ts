@@ -396,6 +396,22 @@ export const useDataTableOptions: ApiMember[] = [
       '"static" tracks the current view (page-aware); "original" uses source index.',
   },
   {
+    name: "enableRowDragging",
+    type: "boolean",
+    required: false,
+    default: "false",
+    description:
+      "Adds a drag handle to each row for moving rows out of the table — to another table or a drop zone in the same `DataTableDndProvider` — without reordering inside it (combine with `enableRowOrdering` for both). Default false.",
+  },
+  {
+    name: "onRowDragEnd",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data.",
+  },
+  {
     name: "onRowOrderChange",
     type: "(activeRowId: string, overRowId: string) => void",
     required: false,
@@ -1388,6 +1404,22 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description: "Where pinned rows show and how rows get pinned.",
+  },
+  {
+    name: "enableRowDragging",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether rows have a drag handle for moving them out of the table.",
+  },
+  {
+    name: "onRowDragEnd",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data.",
   },
   {
     name: "enableTableHead",
@@ -3089,6 +3121,14 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: 'Inline create row (createDisplayMode: "row").',
+  },
+  {
+    name: "data-table-drag-preview",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Floating preview of a row dragged inside a DataTableDndProvider.",
   },
   {
     name: "data-table-infinite-loader",

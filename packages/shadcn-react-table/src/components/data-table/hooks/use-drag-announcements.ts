@@ -4,7 +4,6 @@ import type { Announcements, ScreenReaderInstructions } from "@dnd-kit/core"
 import type { RowData } from "@tanstack/react-table"
 import * as React from "react"
 
-import { GROUP_DROPZONE_ID } from "../components/toolbar/data-table-grouping"
 import type { DataTableInstance } from "../core/types"
 import { getColumnLabel } from "../helpers/column-label"
 import { dt } from "../core/internal"
@@ -24,7 +23,13 @@ export function useDragAnnouncements<TData extends RowData>(
       id: string | number,
       data: Record<string, unknown> | undefined
     ): string => {
-      const key = String(id)
+      const key = String(
+        data?.type === "column"
+          ? (data.columnId ?? id)
+          : data?.type === "row"
+            ? (data.rowId ?? id)
+            : id
+      )
       if (data?.type === "column") {
         const column = table.getColumn(key)
         if (column) return getColumnLabel(column)
@@ -44,7 +49,8 @@ export function useDragAnnouncements<TData extends RowData>(
       label(item.id, item.data.current as Record<string, unknown> | undefined)
     // The drop target, phrased for the item being dragged.
     const target = (active: Item, over: Item) =>
-      over.id === GROUP_DROPZONE_ID
+      (over.data.current as { type?: string } | undefined)?.type ===
+      "group-zone"
         ? localization.groupByColumn(name(active))
         : name(over)
     return {
