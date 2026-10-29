@@ -45,7 +45,7 @@ export default function FrameTable({ icons }: { icons: "lucide" | "remix" }) {
     columns: COLUMNS,
     getRowId: (row) => row.id,
     enableRowSelection: true,
-    initialState: { pagination: { pageIndex: 0, pageSize: 6 } },
+    initialState: { pagination: { pageIndex: 0, pageSize: 5 } },
   })
   return (
     <DataTableConfigProvider icons={icons === "remix" ? remixIcons : undefined}>

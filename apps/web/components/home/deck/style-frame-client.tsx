@@ -51,7 +51,11 @@ export function StyleFrameClient({ style }: { style: string }) {
 
   React.useEffect(() => {
     const onMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin || !isToFrame(event.data))
+      if (
+        event.source !== window.parent ||
+        event.origin !== window.location.origin ||
+        !isToFrame(event.data)
+      )
         return
       const { theme } = event.data
       const root = document.documentElement
@@ -80,7 +84,11 @@ export function StyleFrameClient({ style }: { style: string }) {
 
   if (!Table) return null
   return (
-    <div ref={rootRef} className="bg-background p-3 font-sans text-foreground">
+    <div
+      ref={rootRef}
+      data-pagefind-ignore
+      className="bg-background p-3 font-sans text-foreground"
+    >
       <Table icons={icons === "remix" ? "remix" : "lucide"} />
     </div>
   )

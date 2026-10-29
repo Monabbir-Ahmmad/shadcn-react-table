@@ -34,7 +34,8 @@ function copy(dir, dest, style) {
     const from = join(dir, entry.name)
     const to = join(dest, entry.name)
     if (entry.isDirectory()) {
-      if (entry.name === "locales") continue
+      // Core files do not import locales; consumers add them as separate registry items.
+      if (entry.name === "locales" || entry.name === "__screenshots__") continue
       copy(from, to, style)
     } else if (/\.tsx?$/.test(entry.name) && !/\.test\./.test(entry.name)) {
       const src = readFileSync(from, "utf8")
