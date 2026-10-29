@@ -45,6 +45,7 @@ export type {
   RowVirtualizerOptions,
   ColumnVirtualizerOptions,
   ClickToCopyOption,
+  DisplayColumnId,
 } from "./core/types"
 
 export type {

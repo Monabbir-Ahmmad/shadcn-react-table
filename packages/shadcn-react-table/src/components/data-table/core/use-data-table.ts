@@ -110,6 +110,8 @@ export function useDataTable<TData extends RowData>(
     paginationDisplayMode = "default",
     pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
     slotProps,
+    displayColumnDefOptions,
+    defaultDisplayColumn,
     columnFilterDisplayMode = "subheader",
     positionGlobalFilter = "right",
     positionToolbarAlertBanner = "top",
@@ -465,6 +467,7 @@ export function useDataTable<TData extends RowData>(
     editDisplayMode,
     localization,
     icons,
+    displayColumnOptions: { defaultDisplayColumn, displayColumnDefOptions },
   })
 
   // Which header affordances render — shared by the column sizing below, the

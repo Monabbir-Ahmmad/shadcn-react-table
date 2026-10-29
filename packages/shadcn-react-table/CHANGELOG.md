@@ -34,6 +34,9 @@ for every rename.
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **New:** `displayColumnDefOptions` (by column id, e.g. `"cn-select"`) and
+  `defaultDisplayColumn` override the columns the table adds itself. New
+  `DisplayColumnId` type.
 - **Changed (breaking):** `renderColumnActionsMenuItems`,
   `renderRowActionMenuItems` and `renderCellActionMenuItems` receive
   `internalMenuItems` and `closeMenu`, and their return value is the whole

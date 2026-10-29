@@ -15,6 +15,11 @@ import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { EditDisplayMode, UseDataTableOptions } from "../core/types"
 import type { DataTableColumnDef } from "../core/table-types"
+import {
+  applyDisplayColumnOptions,
+  displayColumnOptionsKey,
+  type DisplayColumnOptions,
+} from "../helpers/display-column-options"
 
 interface UseResolvedColumnsParams<TData extends RowData> {
   columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>
@@ -34,6 +39,8 @@ interface UseResolvedColumnsParams<TData extends RowData> {
   editDisplayMode: EditDisplayMode
   localization: DataTableLocalization
   icons: DataTableIcons
+  /** `defaultDisplayColumn` / `displayColumnDefOptions`. */
+  displayColumnOptions: DisplayColumnOptions<TData>
 }
 
 /**
@@ -61,9 +68,19 @@ export function useResolvedColumns<TData extends RowData>({
   editDisplayMode,
   localization,
   icons,
+  displayColumnOptions,
 }: UseResolvedColumnsParams<TData>): ReadonlyArray<
   DataTableColumnDef<TData, unknown>
 > {
+  // The overrides' functions are read through this ref, so the columns are
+  // rebuilt only when their plain values change (see `optionsKey`).
+  const optionsRef = React.useRef(displayColumnOptions)
+  // eslint-disable-next-line react-hooks/refs
+  optionsRef.current = displayColumnOptions
+  const optionsKey = displayColumnOptionsKey(displayColumnOptions)
+
+  // The column functions read the ref when they run, not during this render.
+  /* eslint-disable react-hooks/refs */
   return React.useMemo(() => {
     const leading = []
     const trailing = []
@@ -106,9 +123,13 @@ export function useResolvedColumns<TData extends RowData>({
       if (positionActionsColumn === "first") leading.unshift(actions)
       else trailing.push(actions)
     }
+    const withOptions = (column: DataTableColumnDef<TData, unknown>) =>
+      applyDisplayColumnOptions(column, () => optionsRef.current)
     return leading.length > 0 || trailing.length > 0
-      ? [...leading, ...columns, ...trailing]
+      ? [...leading.map(withOptions), ...columns, ...trailing.map(withOptions)]
       : columns
+    // `optionsKey` stands in for the options themselves (read via the ref).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     columns,
     enableRowOrdering,
@@ -127,5 +148,7 @@ export function useResolvedColumns<TData extends RowData>({
     editDisplayMode,
     localization,
     icons,
+    optionsKey,
   ])
+  /* eslint-enable react-hooks/refs */
 }

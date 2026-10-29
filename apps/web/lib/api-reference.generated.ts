@@ -192,6 +192,22 @@ export const useDataTableOptions: ApiMember[] = [
       "While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering.",
   },
   {
+    name: "displayColumnDefOptions",
+    type: "Partial< Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>> >",
+    required: false,
+    default: null,
+    description:
+      'Column options for the columns the table adds itself (selection, expand, row actions, row number, row pin, drag handle), by id — e.g. `{ "cn-select": { size: 48 } }`. `meta` merges with the column\'s own.',
+  },
+  {
+    name: "defaultDisplayColumn",
+    type: "Partial<DataTableColumnDef<TData, unknown>>",
+    required: false,
+    default: null,
+    description:
+      "Column options applied to every column the table adds itself, under `displayColumnDefOptions`.",
+  },
+  {
     name: "slotProps",
     type: "DataTableSlots<TData>",
     required: false,

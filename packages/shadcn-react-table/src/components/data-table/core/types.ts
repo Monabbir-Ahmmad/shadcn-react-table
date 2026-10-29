@@ -23,6 +23,7 @@ import type { DataTableUiState } from "./ui-state"
 import type {
   DataTableAggregationFn,
   DataTableCell,
+  DataTableColumnDef,
   DataTableColumn,
   DataTableFilterFn,
   DataTableHeader,
@@ -269,6 +270,16 @@ declare module "@tanstack/react-table" {
     } & DataTableMethods<TData>
   }
 }
+
+/** The ids of the columns the table adds itself, for
+ *  `displayColumnDefOptions`. */
+export type DisplayColumnId =
+  | "cn-select"
+  | "cn-expand"
+  | "cn-row-actions"
+  | "cn-row-number"
+  | "cn-row-pin"
+  | "cn-row-drag"
 
 /** How cells copy their value: on click (`true`), from the cell menu
  *  (`"context-menu"`), not at all (`false`), or per cell. */
@@ -816,6 +827,15 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping
    *  or expanded, or under manual sorting/filtering. */
   enableGlobalFilterRankedResults?: boolean
+  /** Column options for the columns the table adds itself (selection,
+   *  expand, row actions, row number, row pin, drag handle), by id — e.g.
+   *  `{ "cn-select": { size: 48 } }`. `meta` merges with the column's own. */
+  displayColumnDefOptions?: Partial<
+    Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>>
+  >
+  /** Column options applied to every column the table adds itself, under
+   *  `displayColumnDefOptions`. */
+  defaultDisplayColumn?: Partial<DataTableColumnDef<TData, unknown>>
   /** Props for the table's parts (cells, rows, toolbars, …), as an object or
    *  a function of the part's context. `className` is combined with the
    *  table's, `style` merged, event handlers both run; other props replace
