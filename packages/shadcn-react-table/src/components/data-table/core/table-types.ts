@@ -1,4 +1,5 @@
 import type {
+  AggregationFnDef,
   Cell,
   CellData,
   Column,
@@ -9,6 +10,7 @@ import type {
   Row,
   RowData,
   RowModel,
+  SortFn,
   Table,
 } from "@tanstack/react-table"
 
@@ -61,6 +63,22 @@ export type DataTableRowModel<TData extends RowData> = RowModel<
 export type DataTableFilterFn<TData extends RowData> = FilterFn<
   DataTableFeatures,
   TData
+>
+
+export type DataTableSortFn<TData extends RowData> = SortFn<
+  DataTableFeatures,
+  TData
+>
+
+/** An aggregation function: `aggregate` the rows (and optionally `merge`
+ *  sub-group results). The result type is up to you. */
+export type DataTableAggregationFn<TData extends RowData> = AggregationFnDef<
+  DataTableFeatures,
+  TData,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any
 >
 
 /** A row-model factory: called once per table, returns the memoized getter. */

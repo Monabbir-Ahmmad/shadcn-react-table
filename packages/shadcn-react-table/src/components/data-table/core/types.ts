@@ -21,11 +21,14 @@ import type { DataTableIcons } from "./icons"
 import type { DataTableLocalization } from "./localization"
 import type { DataTableUiState } from "./ui-state"
 import type {
+  DataTableAggregationFn,
   DataTableCell,
   DataTableColumn,
+  DataTableFilterFn,
   DataTableHeader,
   DataTableHeaderGroup,
   DataTableRow,
+  DataTableSortFn,
 } from "./table-types"
 
 // Re-exported as part of the public type surface: these describe column-`meta`
@@ -183,7 +186,8 @@ declare module "@tanstack/react-table" {
       table: DataTableInstance<TData>
     }) => React.ReactNode
     /** Restrict (and order) the filter-mode menu for this column to this subset
-     *  of modes. Include the column's default mode. */
+     *  of modes (built-in ones and custom `filterFns` names). Include the
+     *  column's default mode. */
     columnFilterModeOptions?: FilterMode[]
     /** Allow editing this column (defaults to true when table editing is on). */
     enableEditing?: boolean
@@ -489,6 +493,12 @@ export interface DataTableConfig<TData extends RowData> {
   /** Current global search mode (table state). */
   globalFilterMode: GlobalFilterMode
   setGlobalFilterMode: (mode: GlobalFilterMode) => void
+  /** The consumer's own filter functions, by name. */
+  filterFns: Record<string, DataTableFilterFn<TData>>
+  /** Table-wide filter-mode menu modes, if restricted. */
+  columnFilterModeOptions: FilterMode[] | undefined
+  /** The global search mode menu's modes. */
+  globalFilterModeOptions: GlobalFilterMode[]
   enableGlobalFilter: boolean
   enableGlobalFilterModes: boolean
   /** Compound AND/OR filter panel (independent of, and additive to, the
@@ -756,6 +766,26 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableGlobalFilter?: boolean
   /** Show the global search mode menu (fuzzy/contains/…). Default true. */
   enableGlobalFilterModes?: boolean
+  /** Your own filter functions, by name (TanStack's filter function
+   *  signature). Name one on a column's `filterFn`, as a column's
+   *  `meta.filterMode`, or in `columnFilterModeOptions` /
+   *  `globalFilterModeOptions` to offer it in the mode menus (labelled by
+   *  `localization.filterModes[name]`, else the name). Names are read when the
+   *  table is created. */
+  filterFns?: Record<string, DataTableFilterFn<TData>>
+  /** Your own sort functions, by name; a column uses one with
+   *  `sortFn: "name"`. Names are read when the table is created. */
+  sortFns?: Record<string, DataTableSortFn<TData>>
+  /** Your own aggregation functions, by name; a column uses one with
+   *  `aggregationFn: "name"`. Names are read when the table is created. */
+  aggregationFns?: Record<string, DataTableAggregationFn<TData>>
+  /** Restrict (and order) every column's filter-mode menu to these modes —
+   *  built-in ones (kept where the column's variant supports them) and custom
+   *  `filterFns` names. A column's `meta.columnFilterModeOptions` wins. */
+  columnFilterModeOptions?: FilterMode[]
+  /** Restrict (and order) the global search mode menu: built-in modes and
+   *  custom `filterFns` names. */
+  globalFilterModeOptions?: GlobalFilterMode[]
   /** While the global search is in fuzzy mode, order rows by best match (most
    *  relevant first) until the user applies their own sort. Default false —
    *  MRT defaults this on, but the data table keeps it off so searching never silently

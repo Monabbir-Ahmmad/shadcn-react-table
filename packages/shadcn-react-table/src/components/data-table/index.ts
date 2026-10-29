@@ -54,6 +54,8 @@ export type {
   DataTableHeader,
   DataTableFeatures,
   DataTableFilterFn,
+  DataTableSortFn,
+  DataTableAggregationFn,
 } from "./core/table-types"
 
 export type { DataTableColumnPinningState } from "./helpers/column-pinning"

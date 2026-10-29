@@ -24,6 +24,23 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+## Custom search modes
+
+Limit or reorder the search mode menu with `globalFilterModeOptions`. It can also list your own [custom filter functions](/docs/guides/filter-modes#custom-filter-functions) by name; the search runs them on each searchable column, and a row matches when any column passes.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  filterFns: {
+    exact: (row, columnId, value) => String(row.getValue(columnId)) === value,
+  },
+  globalFilterModeOptions: ["contains", "fuzzy", "exact"],
+  initialState: { globalFilterMode: "contains" },
+  localization: { filterModes: { exact: "Exact match" } },
+})
+```
+
 ## Disabling global search
 
 Set `enableGlobalFilter: false` to remove the search box from the toolbar.
@@ -86,7 +103,7 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` â
 
 ## Relevant options
 
-<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "enableGlobalFilterRankedResults", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
+<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "globalFilterModeOptions", "enableGlobalFilterRankedResults", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
 
 ## Related
 

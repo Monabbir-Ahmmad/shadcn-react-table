@@ -9,7 +9,12 @@ import {
 } from "@tanstack/react-table"
 import * as React from "react"
 
-import { VALUELESS_MODES, type FilterMode } from "../fns/filter-fns"
+import {
+  GLOBAL_FILTER_MODES,
+  VALUELESS_MODES,
+  type FilterMode,
+  type GlobalFilterMode,
+} from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
 import { flattenLeafColumns } from "../helpers/flatten-leaf-columns"
 import { mapPinningUpdater, toCorePinning } from "../helpers/column-pinning"
@@ -64,6 +69,7 @@ type CoreStoreState = TableState<DataTableFeatures>
 const selectNothing = () => null
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [5, 10, 25, 50, 100]
+const NO_FILTER_FNS = {}
 
 /**
  * Core hook. Wraps `useTable` with MRT-flavoured defaults (row models,
@@ -121,6 +127,11 @@ export function useDataTable<TData extends RowData>(
     enableGlobalFilter = true,
     enableGlobalFilterModes = true,
     enableGlobalFilterRankedResults = false,
+    filterFns: customFilterFns = NO_FILTER_FNS,
+    sortFns: customSortFns,
+    aggregationFns: customAggregationFns,
+    columnFilterModeOptions,
+    globalFilterModeOptions = GLOBAL_FILTER_MODES as GlobalFilterMode[],
     onDensityChange,
     onIsFullscreenChange,
     onShowColumnFiltersChange,
@@ -200,6 +211,13 @@ export function useDataTable<TData extends RowData>(
       ...defaultLocalization,
       ...configCtx.localization,
       ...localizationProp,
+      // Merged by key, so labelling a custom filter function keeps the
+      // built-in labels.
+      filterModes: {
+        ...defaultLocalization.filterModes,
+        ...configCtx.localization?.filterModes,
+        ...localizationProp?.filterModes,
+      },
     }),
     [configCtx.localization, localizationProp]
   )
@@ -281,7 +299,8 @@ export function useDataTable<TData extends RowData>(
 
   const { dynamicFilterFn } = useColumnFilterModes<TData>(
     columns,
-    () => getUi().columnFilterModes
+    () => getUi().columnFilterModes,
+    () => customFilterFns
   )
 
   // `enableFilters: false` forces manual filtering into TanStack below; the
@@ -292,6 +311,7 @@ export function useDataTable<TData extends RowData>(
   const { dynamicGlobalFilterFn, rankedSortedRowModel } =
     useGlobalFilterMode<TData>({
       getMode: () => getUi().globalFilterMode,
+      getCustomFns: () => customFilterFns,
       enableGlobalFilterRankedResults,
       manualSorting: !!tableOptions.manualSorting,
       manualFiltering: isManualFiltering,
@@ -326,6 +346,11 @@ export function useDataTable<TData extends RowData>(
       filteredRowModel: advancedFilteredRowModel,
       sortedRowModel: rankedSortedRowModel,
       uiDefaults: () => uiDefaults,
+      customFns: {
+        filterFns: customFilterFns,
+        sortFns: customSortFns,
+        aggregationFns: customAggregationFns,
+      },
     })
   )
 
@@ -710,6 +735,9 @@ export function useDataTable<TData extends RowData>(
     setColumnFilterMode,
     globalFilterMode: ui.globalFilterMode,
     setGlobalFilterMode: uiActions.setGlobalFilterMode,
+    filterFns: customFilterFns,
+    columnFilterModeOptions,
+    globalFilterModeOptions,
     enableGlobalFilter,
     enableGlobalFilterModes,
     enableAdvancedFilter,

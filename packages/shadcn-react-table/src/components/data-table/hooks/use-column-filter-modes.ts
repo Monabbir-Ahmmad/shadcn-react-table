@@ -6,6 +6,7 @@ import type { RowData } from "@tanstack/react-table"
 import {
   createDynamicFilterFn,
   defaultModeForVariant,
+  type CustomFilterFns,
   type FilterMode,
 } from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
@@ -32,7 +33,9 @@ export interface ColumnFilterModes<TData extends RowData> {
  */
 export function useColumnFilterModes<TData extends RowData>(
   columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>,
-  getModes: () => Record<string, FilterMode>
+  getModes: () => Record<string, FilterMode>,
+  /** The consumer's `filterFns`, read when filtering. */
+  getCustomFns: () => CustomFilterFns<TData>
 ): ColumnFilterModes<TData> {
   // Per-column default mode derived from `meta.filterMode` / `meta.filterVariant`.
   const defaultModes = React.useMemo(() => {
@@ -58,6 +61,9 @@ export function useColumnFilterModes<TData extends RowData>(
   const defaultModesRef = React.useRef(defaultModes)
   // eslint-disable-next-line react-hooks/refs
   defaultModesRef.current = defaultModes
+  const getCustomFnsRef = React.useRef(getCustomFns)
+  // eslint-disable-next-line react-hooks/refs
+  getCustomFnsRef.current = getCustomFns
 
   const getColumnMode = React.useCallback(
     (columnId: string): FilterMode =>
@@ -67,13 +73,17 @@ export function useColumnFilterModes<TData extends RowData>(
     []
   )
 
+  // The getters read refs inside TanStack's filtering pass, not during this
+  // hook's render.
+  /* eslint-disable react-hooks/refs */
   const dynamicFilterFn = React.useMemo(
-    // getColumnMode reads refs inside TanStack's filtering pass, not during
-    // this hook's render.
-    // eslint-disable-next-line react-hooks/refs
-    () => createDynamicFilterFn<TData>(getColumnMode),
+    () =>
+      createDynamicFilterFn<TData>(getColumnMode, () =>
+        getCustomFnsRef.current()
+      ),
     [getColumnMode]
   )
+  /* eslint-enable react-hooks/refs */
 
   return {
     getColumnMode,

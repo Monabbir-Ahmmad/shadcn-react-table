@@ -1,9 +1,26 @@
-/** Global-search modes offered in the global filter-mode menu. */
-export type GlobalFilterMode =
+/** Built-in global-search modes offered in the global filter-mode menu. */
+export type BuiltInGlobalFilterMode =
   "fuzzy" | "contains" | "startsWith" | "endsWith" | "equals"
 
-/** All supported filter modes across variants. */
-export type FilterMode =
+/** The global search mode menu's default modes. */
+export const GLOBAL_FILTER_MODES: readonly BuiltInGlobalFilterMode[] = [
+  "fuzzy",
+  "contains",
+  "startsWith",
+  "endsWith",
+  "equals",
+]
+
+/** A global-search mode: a built-in one, or the name of a custom function in
+ *  the `filterFns` option. */
+export type GlobalFilterMode = BuiltInGlobalFilterMode | (string & {})
+
+/** A filter mode: a built-in one, or the name of a custom function in the
+ *  `filterFns` option. */
+export type FilterMode = BuiltInFilterMode | (string & {})
+
+/** The built-in filter modes across variants. */
+export type BuiltInFilterMode =
   // text
   | "contains"
   | "equals"
@@ -47,7 +64,7 @@ const toDate = parseDate
 // `filterFn` resolves `row.getValue(columnId)` and dispatches by mode.
 type ModeFn = (cellValue: unknown, filterValue: unknown) => boolean
 
-export const MODE_FNS: Record<FilterMode, ModeFn> = {
+export const MODE_FNS: Record<BuiltInFilterMode, ModeFn> = {
   contains: (cell, val) => lower(cell).includes(lower(val)),
   equals: (cell, val) => lower(cell) === lower(val),
   notEquals: (cell, val) => lower(cell) !== lower(val),
@@ -104,6 +121,13 @@ function betweenNum(cell: unknown, val: unknown, inclusive: boolean): boolean {
   if (min != null && (inclusive ? n < min : n <= min)) return false
   if (max != null && (inclusive ? n > max : n >= max)) return false
   return min != null || max != null
+}
+
+/** The built-in function for a mode, if it is one. */
+export function getModeFn(mode: string): ModeFn | undefined {
+  return Object.hasOwn(MODE_FNS, mode)
+    ? MODE_FNS[mode as BuiltInFilterMode]
+    : undefined
 }
 
 /** Modes that activate without a typed value (they test the cell only). */

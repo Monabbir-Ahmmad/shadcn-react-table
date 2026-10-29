@@ -32,13 +32,29 @@ Sorting is standard TanStack, so the usual column knobs apply:
 
 - `enableSorting: false` — disable sorting for a column.
 - `sortDescFirst: true` — start from descending (handy for numeric columns).
-- `sortFn` — a custom comparator.
+- `sortFn` — a built-in sort function's name, a comparator, or the name of one of your own from the `sortFns` option.
 
 ```tsx
 const columns: DataTableColumnDef<Person>[] = [
   { accessorKey: "id", header: "ID", enableSorting: false },
   { accessorKey: "salary", header: "Salary", sortDescFirst: true },
 ]
+```
+
+To reuse a comparator across columns, register it by name with `sortFns`:
+
+```tsx
+const PRIORITY = ["low", "medium", "high"]
+
+const table = useDataTable({
+  data,
+  columns: [{ accessorKey: "priority", header: "Priority", sortFn: "byPriority" }],
+  sortFns: {
+    byPriority: (rowA, rowB, columnId) =>
+      PRIORITY.indexOf(rowA.getValue(columnId)) -
+      PRIORITY.indexOf(rowB.getValue(columnId)),
+  },
+})
 ```
 
 ## Controlled sorting

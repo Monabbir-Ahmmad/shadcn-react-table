@@ -144,6 +144,46 @@ export const useDataTableOptions: ApiMember[] = [
       "Show the global search mode menu (fuzzy/contains/…). Default true.",
   },
   {
+    name: "filterFns",
+    type: "Record<string, DataTableFilterFn<TData>>",
+    required: false,
+    default: "NO_FILTER_FNS",
+    description:
+      "Your own filter functions, by name (TanStack's filter function signature). Name one on a column's `filterFn`, as a column's `meta.filterMode`, or in `columnFilterModeOptions` / `globalFilterModeOptions` to offer it in the mode menus (labelled by `localization.filterModes[name]`, else the name). Names are read when the table is created.",
+  },
+  {
+    name: "sortFns",
+    type: "Record<string, DataTableSortFn<TData>>",
+    required: false,
+    default: null,
+    description:
+      'Your own sort functions, by name; a column uses one with `sortFn: "name"`. Names are read when the table is created.',
+  },
+  {
+    name: "aggregationFns",
+    type: "Record<string, DataTableAggregationFn<TData>>",
+    required: false,
+    default: null,
+    description:
+      'Your own aggregation functions, by name; a column uses one with `aggregationFn: "name"`. Names are read when the table is created.',
+  },
+  {
+    name: "columnFilterModeOptions",
+    type: "FilterMode[]",
+    required: false,
+    default: null,
+    description:
+      "Restrict (and order) every column's filter-mode menu to these modes — built-in ones (kept where the column's variant supports them) and custom `filterFns` names. A column's `meta.columnFilterModeOptions` wins.",
+  },
+  {
+    name: "globalFilterModeOptions",
+    type: "GlobalFilterMode[]",
+    required: false,
+    default: "GLOBAL_FILTER_MODES as GlobalFilterMode[]",
+    description:
+      "Restrict (and order) the global search mode menu: built-in modes and custom `filterFns` names.",
+  },
+  {
     name: "enableGlobalFilterRankedResults",
     type: "boolean",
     required: false,
@@ -869,7 +909,7 @@ export const columnOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Restrict (and order) the filter-mode menu for this column to this subset of modes. Include the column's default mode.",
+      "Restrict (and order) the filter-mode menu for this column to this subset of modes (built-in ones and custom `filterFns` names). Include the column's default mode.",
   },
   {
     name: "enableEditing",
@@ -996,6 +1036,27 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description: "Override any subset of the table's icons.",
+  },
+  {
+    name: "filterFns",
+    type: "Record<string, DataTableFilterFn<TData>>",
+    required: true,
+    default: null,
+    description: "The consumer's own filter functions, by name.",
+  },
+  {
+    name: "columnFilterModeOptions",
+    type: "FilterMode[] | undefined",
+    required: true,
+    default: null,
+    description: "Table-wide filter-mode menu modes, if restricted.",
+  },
+  {
+    name: "globalFilterModeOptions",
+    type: "GlobalFilterMode[]",
+    required: true,
+    default: null,
+    description: "The global search mode menu's modes.",
   },
   {
     name: "enableGlobalFilter",

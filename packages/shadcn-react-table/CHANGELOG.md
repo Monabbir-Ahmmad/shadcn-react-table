@@ -34,6 +34,14 @@ for every rename.
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **New custom functions:** `filterFns`, `sortFns` and `aggregationFns`
+  options register your own functions by name. Columns use them with
+  `filterFn` / `sortFn` / `aggregationFn: "name"`; custom filter functions can
+  also be a column's `meta.filterMode` and appear in the mode menus when listed
+  in `columnFilterModeOptions` (column or new table-wide option) or the new
+  `globalFilterModeOptions`. `FilterMode` / `GlobalFilterMode` accept any name.
+- **Changed:** `localization.filterModes` is merged with the built-in labels
+  key by key, so adding a label no longer drops the others.
 - **Changed (breaking):** `<DataTable surfaceClassName>` is replaced by
   `slotProps: { surface: { className } }`.
 - **Removed:** the deprecated localization keys `advancedFiltersMatchLabel`

@@ -25,14 +25,6 @@ import type { GlobalFilterMode } from "../../fns/filter-fns"
 import { dt } from "../../core/internal"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
-const GLOBAL_MODES: GlobalFilterMode[] = [
-  "fuzzy",
-  "contains",
-  "startsWith",
-  "endsWith",
-  "equals",
-]
-
 /**
  * Expandable global search (MRT order: first in the toolbar icon cluster). The
  * search button expands into an input with a leading icon, an optional
@@ -56,6 +48,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
     globalFilterMode,
     setGlobalFilterMode,
     renderGlobalFilterModeMenuItems,
+    globalFilterModeOptions: modes,
   } = dt(table)
 
   const external = (table.getState().globalFilter ?? "") as string
@@ -194,7 +187,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
             <DropdownMenuSeparator />
             {renderGlobalFilterModeMenuItems ? (
               renderGlobalFilterModeMenuItems({
-                modes: GLOBAL_MODES,
+                modes,
                 currentMode: globalFilterMode,
                 onSelect: setGlobalFilterMode,
                 table,
@@ -206,7 +199,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
                   setGlobalFilterMode(mode as GlobalFilterMode)
                 }
               >
-                {GLOBAL_MODES.map((mode) => (
+                {modes.map((mode) => (
                   <DropdownMenuRadioItem key={mode} value={mode}>
                     {localization.filterModes[mode] ?? mode}
                   </DropdownMenuRadioItem>

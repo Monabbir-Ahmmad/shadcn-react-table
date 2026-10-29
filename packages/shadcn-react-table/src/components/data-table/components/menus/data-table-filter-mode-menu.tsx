@@ -44,15 +44,23 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
     setColumnFilterMode,
     enableColumnFilterModes,
     renderColumnFilterModeMenuItems,
+    filterFns,
+    columnFilterModeOptions,
   } = dt(table)
   const variant = column.columnDef.meta?.filterVariant ?? "text"
   const perColumn = column.columnDef.meta?.enableColumnFilterModes
   const enabled = perColumn ?? enableColumnFilterModes
-  // Restrict (and order) to the column's allowed subset when provided.
-  const allowed = column.columnDef.meta?.columnFilterModeOptions
   const variantModes = modeOptionsForVariant(variant)
+  // Restrict (and order) to the column's allowed subset, else the table's
+  // (which leaves single-mode variants alone). Custom functions are kept
+  // whatever the variant.
+  const allowed =
+    column.columnDef.meta?.columnFilterModeOptions ??
+    (variantModes.length > 0 ? columnFilterModeOptions : undefined)
   const modes = allowed
-    ? allowed.filter((mode) => variantModes.includes(mode))
+    ? allowed.filter(
+        (mode) => variantModes.includes(mode) || Object.hasOwn(filterFns, mode)
+      )
     : variantModes
 
   if (!enabled || modes.length === 0) return null

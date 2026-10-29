@@ -14,8 +14,13 @@ import {
   sortFns,
   stockFeatures,
   tableFeatures,
+  type AggregationFnDef,
   type BuiltInAggregationFn,
+  type BuiltInFilterFn,
+  type BuiltInSortFn,
+  type FilterFn,
   type RowData,
+  type SortFn,
   type TableFeature,
   type TableFeatures,
 } from "@tanstack/react-table"
@@ -28,12 +33,25 @@ import { createUiStateFeature, type DataTableUiState } from "./ui-state"
 // TanStack types `aggregationFns` with a type alias it doesn't export, which
 // declaration emit can't name. A named interface over the same type gives the
 // emitted `DataTableFeatures` something it can reference.
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// The index signatures let columns name the consumer's own functions
+// (`sortFn: "byPriority"`), registered per table from the hook's options.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface BuiltInAggregationFns extends Pick<
   typeof aggregationFns,
   BuiltInAggregationFn
-> {}
+> {
+  [name: string]: AggregationFnDef<any, any, any, any>
+}
+interface FilterFnRegistry extends Pick<typeof filterFns, BuiltInFilterFn> {
+  [name: string]: FilterFn<any, any>
+}
+interface SortFnRegistry extends Pick<typeof sortFns, BuiltInSortFn> {
+  [name: string]: SortFn<any, any>
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
 const builtInAggregationFns: BuiltInAggregationFns = aggregationFns
+const filterFnRegistry: FilterFnRegistry = filterFns
+const sortFnRegistry: SortFnRegistry = sortFns
 
 // Our instance members (`getState()` in our state shape, `dataTable`, the methods) as a
 // TanStack feature, so TanStack's own types for tables built with this feature
@@ -72,8 +90,8 @@ const baseFeatures = tableFeatures({
   facetedRowModel: createFacetedRowModel(),
   facetedUniqueValues: createFacetedUniqueValues(),
   facetedMinMaxValues: createFacetedMinMaxValues(),
-  filterFns,
-  sortFns,
+  filterFns: filterFnRegistry,
+  sortFns: sortFnRegistry,
   aggregationFns: builtInAggregationFns,
   filterMeta: metaHelper<RankingInfo>(),
 })
@@ -122,7 +140,15 @@ export function createDataTableFeatures({
   filteredRowModel,
   sortedRowModel,
   uiDefaults,
+  customFns,
 }: {
+  /** The consumer's `filterFns` / `sortFns` / `aggregationFns`, added to the
+   *  built-in registries so columns can name them. */
+  customFns: {
+    filterFns?: Record<string, FilterFnRegistry[string]>
+    sortFns?: Record<string, SortFnRegistry[string]>
+    aggregationFns?: Record<string, BuiltInAggregationFns[string]>
+  }
   gates: () => RowModelGates
   /** Starting values of the UI state slices (see `ui-state.ts`). */
   uiDefaults: () => DataTableUiState
@@ -160,6 +186,12 @@ export function createDataTableFeatures({
       },
     },
     dataTableUiFeature: createUiStateFeature(uiDefaults),
+    filterFns: { ...baseFeatures.filterFns, ...customFns.filterFns },
+    sortFns: { ...baseFeatures.sortFns, ...customFns.sortFns },
+    aggregationFns: {
+      ...baseFeatures.aggregationFns,
+      ...customFns.aggregationFns,
+    },
     filteredRowModel,
     sortedRowModel,
     groupedRowModel: (table) => {

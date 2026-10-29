@@ -6,6 +6,7 @@ import type { RowData } from "@tanstack/react-table"
 import {
   createGlobalFilterFn,
   createRankedSortedRowModel,
+  type CustomFilterFns,
   type GlobalFilterMode,
 } from "../fns/filter-fns"
 import type {
@@ -13,9 +14,11 @@ import type {
   DataTableRowModelFactory,
 } from "../core/table-types"
 
-interface UseGlobalFilterModeParams {
+interface UseGlobalFilterModeParams<TData extends RowData> {
   /** The current mode (table state), read when filtering and ranking. */
   getMode: () => GlobalFilterMode
+  /** The consumer's `filterFns`, read when filtering. */
+  getCustomFns: () => CustomFilterFns<TData>
   enableGlobalFilterRankedResults: boolean
   manualSorting: boolean
   manualFiltering: boolean
@@ -39,22 +42,31 @@ export interface GlobalFilterModeState<TData extends RowData> {
  */
 export function useGlobalFilterMode<TData extends RowData>({
   getMode,
+  getCustomFns,
   enableGlobalFilterRankedResults,
   manualSorting,
   manualFiltering,
   enableGrouping,
-}: UseGlobalFilterModeParams): GlobalFilterModeState<TData> {
+}: UseGlobalFilterModeParams<TData>): GlobalFilterModeState<TData> {
   const getModeRef = React.useRef(getMode)
   // eslint-disable-next-line react-hooks/refs
   getModeRef.current = getMode
+  const getCustomFnsRef = React.useRef(getCustomFns)
+  // eslint-disable-next-line react-hooks/refs
+  getCustomFnsRef.current = getCustomFns
   // Stable; the filtered row model (fns/advanced-filter.ts) re-filters when
   // the mode changes, since TanStack's own memo ignores filter functions.
+  // Read inside TanStack's filtering pass, not during this render.
+  /* eslint-disable react-hooks/refs */
   const dynamicGlobalFilterFn = React.useMemo(
-    // Read inside TanStack's filtering pass, not during this render.
-    // eslint-disable-next-line react-hooks/refs
-    () => createGlobalFilterFn<TData>(() => getModeRef.current()),
+    () =>
+      createGlobalFilterFn<TData>(
+        () => getModeRef.current(),
+        () => getCustomFnsRef.current()
+      ),
     []
   )
+  /* eslint-enable react-hooks/refs */
 
   const rankingRef = React.useRef<{
     enabled: boolean
