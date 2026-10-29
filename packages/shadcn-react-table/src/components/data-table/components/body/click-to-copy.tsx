@@ -65,7 +65,8 @@ export function ClickToCopy({
   )
 }
 
-async function copyText(text: string): Promise<boolean> {
+/** Copies text to the clipboard; resolves whether it worked. */
+export async function copyText(text: string): Promise<boolean> {
   if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
     try {
       await navigator.clipboard.writeText(text)

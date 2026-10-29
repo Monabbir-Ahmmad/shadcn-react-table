@@ -434,11 +434,19 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "enableClickToCopy",
-    type: "boolean",
+    type: "ClickToCopyOption<TData>",
     required: false,
     default: "false",
     description:
-      "Show a click-to-copy affordance on all cells (per-column override via meta).",
+      'Copy cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function. Per-column override via meta.',
+  },
+  {
+    name: "enableCellActions",
+    type: "boolean | ((cell: DataTableCell<TData, unknown>) => boolean)",
+    required: false,
+    default: "false",
+    description:
+      "A right-click menu on each cell with built-in Copy (when click-to-copy is on) and Edit (when the cell is editable) items, or a function deciding per cell. `renderCellActionMenuItems` customizes it. Default false.",
   },
   {
     name: "onEditingCellSave",
@@ -474,26 +482,27 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "renderCellActionMenuItems",
-    type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Copy, Edit) the menu shows for this cell. */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
-    description: "Items for a right-click menu on each cell.",
+    description:
+      "The contents of the right-click menu on each cell (turns the menu on). Include `internalMenuItems` to keep the built-in Copy / Edit items.",
   },
   {
     name: "renderRowActionMenuItems",
-    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Edit, when the row can be edited). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
     description:
-      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically.",
+      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically. While editing is on, the Edit action moves into this menu: include `internalMenuItems` to keep it.",
   },
   {
     name: "renderColumnActionsMenuItems",
-    type: "(props: { column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> /** The built-in items (sort, filter, hide, group, pin). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
     description:
-      "Append custom items to the bottom of every column-actions menu. Returns the items (e.g. `<DropdownMenuItem>`); a separator is added before them.",
+      "The contents of every column-actions menu. Return your items (e.g. `<DropdownMenuItem>`) with `internalMenuItems` where the built-in ones should go, or leave it out to replace them.",
   },
   {
     name: "renderColumnFilterModeMenuItems",
@@ -976,10 +985,11 @@ export const columnOptions: ApiMember[] = [
   },
   {
     name: "enableClickToCopy",
-    type: "boolean",
+    type: "ClickToCopyOption<TData>",
     required: false,
     default: null,
-    description: "Show a click-to-copy affordance on this column's cells.",
+    description:
+      'Copy this column\'s cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function.',
   },
   {
     name: "align",
@@ -1292,11 +1302,19 @@ export const dataTableOptions: ApiMember[] = [
   },
   {
     name: "enableClickToCopy",
-    type: "boolean",
+    type: "ClickToCopyOption<TData>",
     required: true,
     default: null,
     description:
-      "Show a click-to-copy affordance on all cells (per-column override via meta).",
+      'Copy cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function. Per-column override via meta.',
+  },
+  {
+    name: "enableCellActions",
+    type: "boolean | ((cell: DataTableCell<TData, unknown>) => boolean)",
+    required: true,
+    default: null,
+    description:
+      "A right-click menu on each cell with built-in Copy (when click-to-copy is on) and Edit (when the cell is editable) items, or a function deciding per cell. `renderCellActionMenuItems` customizes it. Default false.",
   },
   {
     name: "onEditingCellSave",
@@ -1332,26 +1350,27 @@ export const dataTableOptions: ApiMember[] = [
   },
   {
     name: "renderCellActionMenuItems",
-    type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Copy, Edit) the menu shows for this cell. */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
-    description: "Items for a right-click menu on each cell.",
+    description:
+      "The contents of the right-click menu on each cell (turns the menu on). Include `internalMenuItems` to keep the built-in Copy / Edit items.",
   },
   {
     name: "renderRowActionMenuItems",
-    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Edit, when the row can be edited). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
     description:
-      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically.",
+      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically. While editing is on, the Edit action moves into this menu: include `internalMenuItems` to keep it.",
   },
   {
     name: "renderColumnActionsMenuItems",
-    type: "(props: { column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> /** The built-in items (sort, filter, hide, group, pin). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
     description:
-      "Append custom items to the bottom of every column-actions menu. Returns the items (e.g. `<DropdownMenuItem>`); a separator is added before them.",
+      "The contents of every column-actions menu. Return your items (e.g. `<DropdownMenuItem>`) with `internalMenuItems` where the built-in ones should go, or leave it out to replace them.",
   },
   {
     name: "renderColumnFilterModeMenuItems",
@@ -2725,6 +2744,13 @@ export const iconSlots: ApiMember[] = [
     required: true,
     default: "Pencil",
     description: "Edit row / edit cell action.",
+  },
+  {
+    name: "copy",
+    type: "IconComponent",
+    required: true,
+    default: "Copy",
+    description: "Copy action in the cell menu.",
   },
   {
     name: "save",

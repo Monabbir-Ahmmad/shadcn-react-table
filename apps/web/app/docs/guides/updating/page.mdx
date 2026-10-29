@@ -131,6 +131,7 @@ file.
 | `meta.disableColumnActions: true`                                                          | `meta.enableColumnActions: false`                              |
 | `<DataTable pageSizeOptions={…} />`                                                        | `useDataTable({ pageSizeOptions: … })`                         |
 | `<DataTable surfaceClassName="…" />`                                                       | `useDataTable({ slotProps: { surface: { className: "…" } } })` |
+| `renderColumnActionsMenuItems` appended after a separator                                   | return `<>{internalMenuItems}<DropdownMenuSeparator />{yours}</>` |
 
 ## Related
 

@@ -27,6 +27,7 @@ import {
   RiPushpinLine,
   RiSearchLine,
   RiUnpinLine,
+  RiFileCopyLine,
 } from "@remixicon/react"
 
 import type { DataTableIcons } from "@monabbir/shadcn-react-table/components/data-table"
@@ -65,6 +66,7 @@ export const remixIcons: DataTableIcons = {
   collapsed: RiArrowRightSLine,
   dragHandle: RiDraggable,
   edit: RiPencilLine,
+  copy: RiFileCopyLine,
   save: RiCheckLine,
   cancel: RiCloseLine,
   calendar: RiCalendarLine,

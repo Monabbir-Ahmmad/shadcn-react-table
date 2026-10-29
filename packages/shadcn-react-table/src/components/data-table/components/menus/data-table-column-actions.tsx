@@ -1,6 +1,7 @@
 "use client"
 
 import type { RowData } from "@tanstack/react-table"
+import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -58,9 +59,114 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
   const sorted = column.getIsSorted()
   const pinned = getPinSide(column)
   const hasFilter = column.getFilterValue() != null
+  const [open, setOpen] = React.useState(false)
+
+  const internalMenuItems = (
+    <>
+      {canSort && (
+        <>
+          <DropdownMenuItem
+            onClick={() => column.toggleSorting(false)}
+            disabled={sorted === "asc"}
+          >
+            <icons.sortAscending />
+            {localization.sortAscending}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => column.toggleSorting(true)}
+            disabled={sorted === "desc"}
+          >
+            <icons.sortDescending />
+            {localization.sortDescending}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => column.clearSorting()}
+            disabled={!sorted}
+          >
+            <icons.clearAll />
+            {localization.clearSort}
+          </DropdownMenuItem>
+        </>
+      )}
+
+      {canFilter && (
+        <>
+          {canSort && <DropdownMenuSeparator />}
+          {columnFilterDisplayMode === "subheader" && (
+            <DropdownMenuItem onClick={() => setShowColumnFilters(true)}>
+              <icons.filter />
+              {localization.filterByColumn(getColumnLabel(column))}
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            onClick={() => column.setFilterValue(undefined)}
+            disabled={!hasFilter}
+          >
+            <icons.filterOff />
+            {localization.clearFilter}
+          </DropdownMenuItem>
+        </>
+      )}
+
+      {canHide && (
+        <>
+          {(canSort || canFilter) && <DropdownMenuSeparator />}
+          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+            <icons.hide />
+            {localization.hideColumn}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => table.toggleAllColumnsVisible(true)}>
+            <icons.clearAll />
+            {localization.showAllColumns}
+          </DropdownMenuItem>
+        </>
+      )}
+
+      {canGroup && (
+        <>
+          {(canSort || canFilter || canHide) && <DropdownMenuSeparator />}
+          <DropdownMenuItem onClick={() => column.toggleGrouping()}>
+            <icons.group />
+            {isGrouped
+              ? localization.ungroupByColumn(getColumnLabel(column))
+              : localization.groupByColumn(getColumnLabel(column))}
+          </DropdownMenuItem>
+        </>
+      )}
+
+      {canPin && (
+        <>
+          {(canSort || canFilter || canHide || canGroup) && (
+            <DropdownMenuSeparator />
+          )}
+          <DropdownMenuItem
+            onClick={() => pinColumn(column, "left")}
+            disabled={pinned === "left"}
+          >
+            <icons.pin />
+            {localization.pinToLeft}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => pinColumn(column, "right")}
+            disabled={pinned === "right"}
+          >
+            <icons.pin />
+            {localization.pinToRight}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => pinColumn(column, false)}
+            disabled={!pinned}
+          >
+            <icons.unpin />
+            {localization.unpin}
+          </DropdownMenuItem>
+        </>
+      )}
+    </>
+  )
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <Tooltip>
         <TooltipTrigger asChild>
           <DropdownMenuTrigger asChild>
@@ -80,119 +186,14 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
         <TooltipContent>{localization.columnActions}</TooltipContent>
       </Tooltip>
       <DropdownMenuContent align="start" className="w-48">
-        {canSort && (
-          <>
-            <DropdownMenuItem
-              onClick={() => column.toggleSorting(false)}
-              disabled={sorted === "asc"}
-            >
-              <icons.sortAscending />
-              {localization.sortAscending}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => column.toggleSorting(true)}
-              disabled={sorted === "desc"}
-            >
-              <icons.sortDescending />
-              {localization.sortDescending}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => column.clearSorting()}
-              disabled={!sorted}
-            >
-              <icons.clearAll />
-              {localization.clearSort}
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {canFilter && (
-          <>
-            {canSort && <DropdownMenuSeparator />}
-            {columnFilterDisplayMode === "subheader" && (
-              <DropdownMenuItem onClick={() => setShowColumnFilters(true)}>
-                <icons.filter />
-                {localization.filterByColumn(getColumnLabel(column))}
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              onClick={() => column.setFilterValue(undefined)}
-              disabled={!hasFilter}
-            >
-              <icons.filterOff />
-              {localization.clearFilter}
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {canHide && (
-          <>
-            {(canSort || canFilter) && <DropdownMenuSeparator />}
-            <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-              <icons.hide />
-              {localization.hideColumn}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => table.toggleAllColumnsVisible(true)}
-            >
-              <icons.clearAll />
-              {localization.showAllColumns}
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {canGroup && (
-          <>
-            {(canSort || canFilter || canHide) && <DropdownMenuSeparator />}
-            <DropdownMenuItem onClick={() => column.toggleGrouping()}>
-              <icons.group />
-              {isGrouped
-                ? localization.ungroupByColumn(getColumnLabel(column))
-                : localization.groupByColumn(getColumnLabel(column))}
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {canPin && (
-          <>
-            {(canSort || canFilter || canHide || canGroup) && (
-              <DropdownMenuSeparator />
-            )}
-            <DropdownMenuItem
-              onClick={() => pinColumn(column, "left")}
-              disabled={pinned === "left"}
-            >
-              <icons.pin />
-              {localization.pinToLeft}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => pinColumn(column, "right")}
-              disabled={pinned === "right"}
-            >
-              <icons.pin />
-              {localization.pinToRight}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => pinColumn(column, false)}
-              disabled={!pinned}
-            >
-              <icons.unpin />
-              {localization.unpin}
-            </DropdownMenuItem>
-          </>
-        )}
-
-        {renderColumnActionsMenuItems && (
-          <>
-            {(canSort || canFilter || canHide || canGroup || canPin) && (
-              <DropdownMenuSeparator />
-            )}
-            {renderColumnActionsMenuItems({
+        {renderColumnActionsMenuItems
+          ? renderColumnActionsMenuItems({
               column: column as DataTableColumn<TData, unknown>,
               table,
-            })}
-          </>
-        )}
+              internalMenuItems,
+              closeMenu: () => setOpen(false),
+            })
+          : internalMenuItems}
       </DropdownMenuContent>
     </DropdownMenu>
   )

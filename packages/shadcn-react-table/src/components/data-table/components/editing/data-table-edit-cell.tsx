@@ -6,6 +6,7 @@ import * as React from "react"
 import {
   ContextMenu,
   ContextMenuContent,
+  ContextMenuItem,
   ContextMenuTrigger,
 } from "@workspace/ui/components/context-menu"
 
@@ -13,7 +14,7 @@ import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { stopPropagation } from "../../helpers/stop-propagation"
-import { ClickToCopy } from "../body/click-to-copy"
+import { ClickToCopy, copyText } from "../body/click-to-copy"
 import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableCell } from "../../core/table-types"
 import { dt } from "../../core/internal"
@@ -64,9 +65,11 @@ export function DataTableBodyCellContent<TData extends RowData>({
 
   let node: React.ReactNode = fallback
 
-  const copyEnabled =
+  const copyOption =
     column.columnDef.meta?.enableClickToCopy ?? cn.enableClickToCopy
-  if (copyEnabled) {
+  const copyMode =
+    typeof copyOption === "function" ? copyOption(cell) : copyOption
+  if (copyMode === true) {
     node = (
       <ClickToCopy
         value={String(cell.getValue() ?? "")}
@@ -92,23 +95,97 @@ export function DataTableBodyCellContent<TData extends RowData>({
     )
   }
 
-  if (cn.renderCellActionMenuItems) {
+  const cellActions =
+    typeof cn.enableCellActions === "function"
+      ? cn.enableCellActions(cell)
+      : cn.enableCellActions
+  // Copy shows in the menu when copying is on; Edit when the cell can start
+  // editing (table mode is always editing).
+  const menuCopy = copyMode === "context-menu" || (cellActions && !!copyMode)
+  const menuEdit = cellActions && editable && mode !== "table"
+  if (cn.renderCellActionMenuItems || menuCopy || menuEdit) {
     node = (
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <span className="block">{node}</span>
-        </ContextMenuTrigger>
-        <ContextMenuContent
-          onClick={stopPropagation}
-          onDoubleClick={stopPropagation}
-        >
-          {cn.renderCellActionMenuItems({ cell, row, table })}
-        </ContextMenuContent>
-      </ContextMenu>
+      <CellActionsMenu
+        cell={cell}
+        table={table}
+        copy={menuCopy}
+        edit={menuEdit}
+      >
+        {node}
+      </CellActionsMenu>
     )
   }
 
   return node
+}
+
+/** The right-click menu on a cell: built-in Copy / Edit items, or the
+ *  consumer's `renderCellActionMenuItems`. */
+function CellActionsMenu<TData extends RowData>({
+  cell,
+  table,
+  copy,
+  edit,
+  children,
+}: {
+  cell: DataTableCell<TData, unknown>
+  table: DataTableInstance<TData>
+  copy: boolean
+  edit: boolean
+  children: React.ReactNode
+}) {
+  const cn = dt(table)
+  const { row, column } = cell
+  // The context menu has no controlled `open`; remounting closes it.
+  const [instance, setInstance] = React.useState(0)
+  const closeMenu = () => setInstance((n) => n + 1)
+
+  const internalMenuItems = (
+    <>
+      {copy && (
+        <ContextMenuItem
+          onClick={() => void copyText(String(cell.getValue() ?? ""))}
+        >
+          <cn.icons.copy />
+          {cn.localization.copy}
+        </ContextMenuItem>
+      )}
+      {edit && (
+        <ContextMenuItem
+          onClick={() =>
+            cn.editDisplayMode === "cell"
+              ? cn.setEditingCell({ rowId: row.id, columnId: column.id })
+              : cn.beginRowEdit(row)
+          }
+        >
+          <cn.icons.edit />
+          {cn.localization.edit}
+        </ContextMenuItem>
+      )}
+    </>
+  )
+
+  return (
+    <ContextMenu key={instance}>
+      <ContextMenuTrigger asChild>
+        <span className="block">{children}</span>
+      </ContextMenuTrigger>
+      <ContextMenuContent
+        onClick={stopPropagation}
+        onDoubleClick={stopPropagation}
+      >
+        {cn.renderCellActionMenuItems
+          ? cn.renderCellActionMenuItems({
+              cell,
+              row,
+              table,
+              internalMenuItems,
+              closeMenu,
+            })
+          : internalMenuItems}
+      </ContextMenuContent>
+    </ContextMenu>
+  )
 }
 
 /** Editor bound to the shared row draft (row/modal editing). */

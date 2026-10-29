@@ -486,17 +486,14 @@ function CellActionsExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    enableClickToCopy: true,
+    // Copy from the right-click menu; it also gets the built-in Edit item.
+    enableClickToCopy: "context-menu",
+    enableCellActions: true,
+    enableEditing: true,
     initialState: { pagination: { pageSize: 10 } },
-    renderCellActionMenuItems: ({ cell }) => (
+    renderCellActionMenuItems: ({ cell, internalMenuItems }) => (
       <>
-        <ContextMenuItem
-          onClick={() =>
-            navigator.clipboard?.writeText(String(cell.getValue() ?? ""))
-          }
-        >
-          Copy value
-        </ContextMenuItem>
+        {internalMenuItems}
         <ContextMenuItem
           onClick={() =>
             navigator.clipboard?.writeText(JSON.stringify(cell.row.original))

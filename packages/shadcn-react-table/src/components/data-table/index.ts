@@ -44,6 +44,7 @@ export type {
   DataTableColumnVirtualizer,
   RowVirtualizerOptions,
   ColumnVirtualizerOptions,
+  ClickToCopyOption,
 } from "./core/types"
 
 export type {

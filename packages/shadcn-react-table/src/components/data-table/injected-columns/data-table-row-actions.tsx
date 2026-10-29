@@ -1,11 +1,13 @@
 "use client"
 
 import type { RowData } from "@tanstack/react-table"
+import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 
@@ -70,6 +72,7 @@ function RowActionsCell<TData extends RowData>({
   } = dt(table)
 
   const isEditingThisRow = editDisplayMode === "row" && editingRowId === row.id
+  const [menuOpen, setMenuOpen] = React.useState(false)
 
   if (isEditingThisRow) {
     return (
@@ -118,7 +121,7 @@ function RowActionsCell<TData extends RowData>({
       onClick={stopPropagation}
       onDoubleClick={stopPropagation}
     >
-      {canInlineEdit && (
+      {canInlineEdit && !renderRowActionMenuItems && (
         <Button
           variant="ghost"
           size="icon"
@@ -131,7 +134,7 @@ function RowActionsCell<TData extends RowData>({
       )}
       {renderRowActions?.({ row, table })}
       {renderRowActionMenuItems && (
-        <DropdownMenu>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
@@ -143,7 +146,18 @@ function RowActionsCell<TData extends RowData>({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {renderRowActionMenuItems({ row, table })}
+            {renderRowActionMenuItems({
+              row,
+              table,
+              // The edit action lives in the menu when there is one.
+              internalMenuItems: canInlineEdit ? (
+                <DropdownMenuItem onClick={() => beginRowEdit(row)}>
+                  <icons.edit />
+                  {localization.edit}
+                </DropdownMenuItem>
+              ) : null,
+              closeMenu: () => setMenuOpen(false),
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

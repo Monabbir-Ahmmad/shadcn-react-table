@@ -10,6 +10,7 @@ import {
   ChevronsRight,
   ChevronsUpDown,
   Columns3,
+  Copy,
   EyeOff,
   Filter,
   FilterX,
@@ -93,6 +94,8 @@ export interface DataTableIcons {
   dragHandle: IconComponent
   /** Edit row / edit cell action. */
   edit: IconComponent
+  /** Copy action in the cell menu. */
+  copy: IconComponent
   /** Save action while editing a row. */
   save: IconComponent
   /** Cancel action while editing a row. */
@@ -129,6 +132,7 @@ export const defaultIcons: DataTableIcons = {
   collapsed: ChevronRight,
   dragHandle: GripVertical,
   edit: Pencil,
+  copy: Copy,
   save: Check,
   cancel: X,
   calendar: Calendar,

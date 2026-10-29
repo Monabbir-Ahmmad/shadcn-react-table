@@ -39,6 +39,8 @@ return <DataTable table={table} />
 
 For a compact kebab menu instead of inline buttons, use `renderRowActionMenuItems`. It returns the menu items (e.g. `DropdownMenuItem`s) rendered inside an auto-injected dropdown in the actions column. Both slots can be combined — inline controls plus a menu.
 
+While editing is on (`"row"` or `"modal"` display), the Edit action moves into this menu: it arrives as `internalMenuItems`. The callback also gets `closeMenu()`.
+
 ```tsx
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
@@ -46,11 +48,11 @@ const table = useDataTable({
   data,
   columns,
   getRowId: (row) => row.id,
-  renderRowActionMenuItems: ({ row, table }) => (
+  enableEditing: true,
+  editDisplayMode: "modal",
+  renderRowActionMenuItems: ({ row, internalMenuItems }) => (
     <>
-      <DropdownMenuItem onClick={() => table.beginRowEdit(row)}>
-        Edit
-      </DropdownMenuItem>
+      {internalMenuItems}
       <DropdownMenuItem variant="destructive" onClick={() => remove(row.id)}>
         Delete
       </DropdownMenuItem>

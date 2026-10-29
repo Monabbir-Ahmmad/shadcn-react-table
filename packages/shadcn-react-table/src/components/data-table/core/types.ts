@@ -217,8 +217,9 @@ declare module "@tanstack/react-table" {
     ) => React.ReactNode
     /** Validate an edited value; return an error message or undefined if valid. */
     validate?: (value: unknown) => string | undefined
-    /** Show a click-to-copy affordance on this column's cells. */
-    enableClickToCopy?: boolean
+    /** Copy this column's cells on click (`true`), from the cell menu
+     *  (`"context-menu"`), or decide per cell with a function. */
+    enableClickToCopy?: ClickToCopyOption<TData>
     /** Horizontal alignment applied to the header label and body cells. */
     align?: "left" | "center" | "right"
     /** `false` opts this column out of match highlighting (the table option of
@@ -268,6 +269,13 @@ declare module "@tanstack/react-table" {
     } & DataTableMethods<TData>
   }
 }
+
+/** How cells copy their value: on click (`true`), from the cell menu
+ *  (`"context-menu"`), not at all (`false`), or per cell. */
+export type ClickToCopyOption<TData extends RowData> =
+  | boolean
+  | "context-menu"
+  | ((cell: DataTableCell<TData, unknown>) => boolean | "context-menu")
 
 /** Props for one part of the table (`data-*` attributes included), or a
  *  function of its context. */
@@ -570,7 +578,9 @@ export interface DataTableConfig<TData extends RowData> {
   beginCreate: () => void
   /** Exit any editing/creating state, discarding the draft. */
   cancelEdit: () => void
-  enableClickToCopy: boolean
+  enableClickToCopy: ClickToCopyOption<TData>
+  enableCellActions:
+    boolean | ((cell: DataTableCell<TData, unknown>) => boolean)
   onEditingCellSave?: (props: {
     row: DataTableRow<TData>
     column: DataTableColumn<TData, unknown>
@@ -596,14 +606,23 @@ export interface DataTableConfig<TData extends RowData> {
     cell: DataTableCell<TData, unknown>
     row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Copy, Edit) the menu shows for this cell. */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   renderRowActionMenuItems?: (props: {
     row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Edit, when the row can be edited). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   renderColumnActionsMenuItems?: (props: {
     column: DataTableColumn<TData, unknown>
     table: DataTableInstance<TData>
+    /** The built-in items (sort, filter, hide, group, pin). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   renderColumnFilterModeMenuItems?: (props: {
     column: DataTableColumn<TData, unknown>
@@ -890,8 +909,14 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   createDisplayMode?: CreateDisplayMode
   /** Default values for the create form, keyed by column id. */
   createRowDefaults?: Record<string, unknown>
-  /** Show a click-to-copy affordance on all cells (per-column override via meta). */
-  enableClickToCopy?: boolean
+  /** Copy cells on click (`true`), from the cell menu (`"context-menu"`), or
+   *  decide per cell with a function. Per-column override via meta. */
+  enableClickToCopy?: ClickToCopyOption<TData>
+  /** A right-click menu on each cell with built-in Copy (when click-to-copy
+   *  is on) and Edit (when the cell is editable) items, or a function deciding
+   *  per cell. `renderCellActionMenuItems` customizes it. Default false. */
+  enableCellActions?:
+    boolean | ((cell: DataTableCell<TData, unknown>) => boolean)
   /** Called when a cell edit is committed (cell and table editing) with the
    *  new `value`. Persist it; the table does not change `data` itself. */
   onEditingCellSave?: (props: {
@@ -921,23 +946,36 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
     row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
-  /** Items for a right-click menu on each cell. */
+  /** The contents of the right-click menu on each cell (turns the menu on).
+   *  Include `internalMenuItems` to keep the built-in Copy / Edit items. */
   renderCellActionMenuItems?: (props: {
     cell: DataTableCell<TData, unknown>
     row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Copy, Edit) the menu shows for this cell. */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   /** Render a kebab menu in the row-actions column. Returns the menu items
-   *  (e.g. `<DropdownMenuItem>`); injects the actions column automatically. */
+   *  (e.g. `<DropdownMenuItem>`); injects the actions column automatically.
+   *  While editing is on, the Edit action moves into this menu: include
+   *  `internalMenuItems` to keep it. */
   renderRowActionMenuItems?: (props: {
     row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Edit, when the row can be edited). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
-  /** Append custom items to the bottom of every column-actions menu. Returns the
-   *  items (e.g. `<DropdownMenuItem>`); a separator is added before them. */
+  /** The contents of every column-actions menu. Return your items (e.g.
+   *  `<DropdownMenuItem>`) with `internalMenuItems` where the built-in ones
+   *  should go, or leave it out to replace them. */
   renderColumnActionsMenuItems?: (props: {
     column: DataTableColumn<TData, unknown>
     table: DataTableInstance<TData>
+    /** The built-in items (sort, filter, hide, group, pin). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   /** Replace the radio items in a column's filter-mode menu. Render your own
    *  items and call `onSelect(mode)` to switch; `modes` is the allowed set. */
