@@ -143,6 +143,21 @@ describe("keyboard navigation", () => {
     await poll(activeText).toBe("r1c39")
   })
 
+  it("keeps navigating after the focused cell scrolls out of view", async () => {
+    render(<Table rowCount={1000} colCount={2} enableRowVirtualization />)
+    await settle()
+    focusCell("r2c0")
+
+    // Scroll away (as with the mouse wheel): the focused row unmounts.
+    surface().scrollTop = surface().scrollHeight
+    await poll(() => screen.queryByText("r2c0")).toBeNull()
+    await settle()
+    expect(surface().contains(document.activeElement)).toBe(true)
+
+    await userEvent.keyboard("[ArrowDown]")
+    await poll(activeText).toBe("r3c0")
+  })
+
   it("moves from a pinned top row into the virtualized rows", async () => {
     render(
       <Table

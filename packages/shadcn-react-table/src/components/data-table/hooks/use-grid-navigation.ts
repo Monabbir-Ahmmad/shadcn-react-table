@@ -56,12 +56,24 @@ export function useGridNavigation<T extends HTMLElement>({
 }: UseGridNavigationOptions<T>) {
   const activeCellRef = React.useRef<GridCell>({ row: 0, col: 0 })
   const pendingFrameRef = React.useRef<number | null>(null)
+  const focusedCellRef = React.useRef<HTMLElement | null>(null)
 
   // After every render, exactly one rendered cell is the tab stop: the active
   // cell when it is rendered, otherwise the first rendered cell.
   React.useLayoutEffect(() => {
     const root = ref.current
     if (!enabled || !root) return
+    // The focused cell was scrolled out of the virtual window and unmounted:
+    // park focus on the grid so the keys keep working from the active cell.
+    const focused = focusedCellRef.current
+    if (
+      focused &&
+      !focused.isConnected &&
+      (document.activeElement === document.body || !document.activeElement)
+    ) {
+      focusedCellRef.current = null
+      root.focus({ preventScroll: true })
+    }
     const cells = root.querySelectorAll<HTMLElement>("[data-cell-row]")
     if (cells.length === 0) return
     const stop = findCell(root, activeCellRef.current) ?? cells[0]!
@@ -118,16 +130,23 @@ export function useGridNavigation<T extends HTMLElement>({
     const active = document.activeElement as HTMLElement | null
     if (active && EDITABLE.has(active.tagName)) return
 
+    // Focus is on a cell, or parked on the grid itself (see above).
     const current = active?.closest<HTMLElement>("[data-cell-row]")
-    if (!current || !root.contains(current)) return
+    let from: GridCell
+    if (current && root.contains(current)) {
+      from = {
+        row: Number(current.dataset.cellRow),
+        col: Number(current.dataset.cellCol),
+      }
+    } else if (active === root) {
+      from = activeCellRef.current
+    } else return
 
     const maxRow = rowCount() - 1
     const maxCol = colCount() - 1
     if (maxRow < 0 || maxCol < 0) return
 
-    let row = Number(current.dataset.cellRow)
-    let col = Number(current.dataset.cellCol)
-    const from = { row, col }
+    let { row, col } = from
 
     switch (event.key) {
       case "ArrowUp":
@@ -152,7 +171,7 @@ export function useGridNavigation<T extends HTMLElement>({
         break
     }
 
-    if (row === from.row && col === from.col) return
+    if (row === from.row && col === from.col && current) return
     event.preventDefault()
     moveTo(root, { row, col })
   }
@@ -164,6 +183,7 @@ export function useGridNavigation<T extends HTMLElement>({
       "[data-cell-row]"
     )
     if (!cell) return
+    focusedCellRef.current = cell
     activeCellRef.current = {
       row: Number(cell.dataset.cellRow),
       col: Number(cell.dataset.cellCol),
