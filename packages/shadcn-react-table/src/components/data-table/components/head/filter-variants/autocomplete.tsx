@@ -41,7 +41,11 @@ export function AutocompleteFilterField<TData extends RowData, TValue>({
       />
       <datalist id={listId}>
         {options.map((option) => (
-          <option key={option.value} value={option.label} />
+          <option
+            key={option.value}
+            value={option.value}
+            label={option.label}
+          />
         ))}
       </datalist>
     </>

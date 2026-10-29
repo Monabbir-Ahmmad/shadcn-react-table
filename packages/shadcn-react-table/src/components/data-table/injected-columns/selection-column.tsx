@@ -36,7 +36,12 @@ function toggleRow<TData extends RowData>(
     row.toggleSelected(value)
     return
   }
-  const rows = table.getRowModel().rows
+  // Display order: top-pinned, then the rest, then bottom-pinned.
+  const rows = [
+    ...table.getTopRows(),
+    ...table.getCenterRows(),
+    ...table.getBottomRows(),
+  ]
   const from = rows.findIndex((r) => r.id === anchorId)
   const to = rows.findIndex((r) => r.id === row.id)
   if (from === -1 || to === -1) {

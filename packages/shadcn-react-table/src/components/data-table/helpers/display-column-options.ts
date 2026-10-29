@@ -22,9 +22,21 @@ export interface DisplayColumnOptions<TData extends RowData> {
 export function displayColumnOptionsKey<TData extends RowData>(
   options: DisplayColumnOptions<TData>
 ): string {
-  return JSON.stringify(options, (_key, value: unknown) =>
-    typeof value === "function" ? "ƒ" : value
-  )
+  // Only plain objects and arrays are walked: React elements, DOM nodes and
+  // class instances (which can be circular) count as equal, like functions.
+  return JSON.stringify(options, (_key, value: unknown) => {
+    if (typeof value === "function") return "ƒ"
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      const proto = Object.getPrototypeOf(value)
+      if (
+        (proto !== Object.prototype && proto !== null) ||
+        "$$typeof" in value
+      ) {
+        return "◇"
+      }
+    }
+    return value
+  })
 }
 
 /**

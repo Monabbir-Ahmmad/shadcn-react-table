@@ -109,6 +109,53 @@ export interface RowModelGates {
 
 const EMPTY_FACETS = new Map<unknown, number>()
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+interface CustomFns {
+  filterFns?: Record<string, FilterFn<any, any>>
+  sortFns?: Record<string, SortFn<any, any>>
+  aggregationFns?: Record<string, AggregationFnDef<any, any, any, any>>
+}
+
+/**
+ * The consumer's filter or sort functions as registry entries that call the
+ * latest version by name (the registry is built once per table). Each keeps
+ * the original's own properties (`autoRemove`, …).
+ */
+function liveFns<K extends "filterFns" | "sortFns">(
+  getCustomFns: () => CustomFns,
+  key: K
+): NonNullable<CustomFns[K]> {
+  const out: Record<string, (...args: any[]) => any> = {}
+  for (const [name, fn] of Object.entries(getCustomFns()[key] ?? {})) {
+    out[name] = Object.assign(
+      (...args: any[]) =>
+        ((getCustomFns()[key]?.[name] ?? fn) as (...a: any[]) => any)(...args),
+      fn
+    )
+  }
+  return out as NonNullable<CustomFns[K]>
+}
+
+/** The consumer's aggregation functions, calling the latest version. */
+function liveAggregationFns(
+  getCustomFns: () => CustomFns
+): NonNullable<CustomFns["aggregationFns"]> {
+  const out: NonNullable<CustomFns["aggregationFns"]> = {}
+  for (const [name, def] of Object.entries(
+    getCustomFns().aggregationFns ?? {}
+  )) {
+    const latest = () => getCustomFns().aggregationFns?.[name] ?? def
+    out[name] = {
+      aggregate: (context) => latest().aggregate(context),
+      ...(def.merge && {
+        merge: (context: any) => (latest().merge ?? def.merge!)(context),
+      }),
+    }
+  }
+  return out
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 /** Every method the table adds to the TanStack instance. */
 export const DATA_TABLE_METHODS = [
   "setDensity",
@@ -140,15 +187,12 @@ export function createDataTableFeatures({
   filteredRowModel,
   sortedRowModel,
   uiDefaults,
-  customFns,
+  getCustomFns,
 }: {
   /** The consumer's `filterFns` / `sortFns` / `aggregationFns`, added to the
-   *  built-in registries so columns can name them. */
-  customFns: {
-    filterFns?: Record<string, FilterFnRegistry[string]>
-    sortFns?: Record<string, SortFnRegistry[string]>
-    aggregationFns?: Record<string, BuiltInAggregationFns[string]>
-  }
+   *  built-in registries so columns can name them. Read once for the names;
+   *  each registered function calls the latest version. */
+  getCustomFns: () => CustomFns
   gates: () => RowModelGates
   /** Starting values of the UI state slices (see `ui-state.ts`). */
   uiDefaults: () => DataTableUiState
@@ -186,11 +230,14 @@ export function createDataTableFeatures({
       },
     },
     dataTableUiFeature: createUiStateFeature(uiDefaults),
-    filterFns: { ...baseFeatures.filterFns, ...customFns.filterFns },
-    sortFns: { ...baseFeatures.sortFns, ...customFns.sortFns },
+    filterFns: {
+      ...baseFeatures.filterFns,
+      ...liveFns(getCustomFns, "filterFns"),
+    },
+    sortFns: { ...baseFeatures.sortFns, ...liveFns(getCustomFns, "sortFns") },
     aggregationFns: {
       ...baseFeatures.aggregationFns,
-      ...customFns.aggregationFns,
+      ...liveAggregationFns(getCustomFns),
     },
     filteredRowModel,
     sortedRowModel,

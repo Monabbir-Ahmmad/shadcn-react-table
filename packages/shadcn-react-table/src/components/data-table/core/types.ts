@@ -604,6 +604,15 @@ export interface DataTableConfig<TData extends RowData> {
   // Editing / actions
   /** Whether editing is on (a per-row `enableEditing` function counts). */
   enableEditing: boolean
+  /** Overrides for the columns the table adds itself, by id. A new object
+   *  re-renders the rows, so memoize it when you pass functions. */
+  displayColumnDefOptions:
+    | Partial<
+        Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>>
+      >
+    | undefined
+  /** Overrides for every column the table adds itself. */
+  defaultDisplayColumn: Partial<DataTableColumnDef<TData, unknown>> | undefined
   /** Whether a row can be edited: the `enableEditing` function's answer, or
    *  `enableEditing` itself. */
   getCanEditRow: (row: DataTableRow<TData>) => boolean
@@ -859,14 +868,16 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  signature). Name one on a column's `filterFn`, as a column's
    *  `meta.filterMode`, or in `columnFilterModeOptions` /
    *  `globalFilterModeOptions` to offer it in the mode menus (labelled by
-   *  `localization.filterModes[name]`, else the name). Names are read when the
-   *  table is created. */
+   *  `localization.filterModes[name]`, else the name). The names are read
+   *  when the table is created; the functions stay current. */
   filterFns?: Record<string, DataTableFilterFn<TData>>
   /** Your own sort functions, by name; a column uses one with
-   *  `sortFn: "name"`. Names are read when the table is created. */
+   *  `sortFn: "name"`. The names are read when the table is created; the
+   *  functions stay current. */
   sortFns?: Record<string, DataTableSortFn<TData>>
   /** Your own aggregation functions, by name; a column uses one with
-   *  `aggregationFn: "name"`. Names are read when the table is created. */
+   *  `aggregationFn: "name"`. The names are read when the table is created;
+   *  the functions stay current. */
   aggregationFns?: Record<string, DataTableAggregationFn<TData>>
   /** Restrict (and order) every column's filter-mode menu to these modes —
    *  built-in ones (kept where the column's variant supports them) and custom

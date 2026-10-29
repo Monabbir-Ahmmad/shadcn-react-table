@@ -46,6 +46,7 @@ export function DataTableEditModal<TData extends RowData>({
     onCreatingRowSave,
     renderEditRowDialogContent,
     renderCreateRowDialogContent,
+    getCanEditRow,
   } = dt(table)
   // The table around this dialog does not re-render for the edit draft.
   useTableState(table, (state) => [
@@ -67,7 +68,9 @@ export function DataTableEditModal<TData extends RowData>({
 
   const open =
     (isCreating && createDisplayMode === "modal") ||
-    (editDisplayMode === "modal" && editingRowId != null && !editingRowMissing)
+    (editDisplayMode === "modal" &&
+      editingRow != null &&
+      getCanEditRow(editingRow))
   if (!open) return null
 
   const editableColumns = table

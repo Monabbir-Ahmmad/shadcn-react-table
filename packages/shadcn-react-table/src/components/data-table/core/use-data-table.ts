@@ -214,10 +214,23 @@ export function useDataTable<TData extends RowData>(
 
   // A per-row function turns editing on; it then decides row by row.
   const enableEditing = enableEditingProp !== false
-  const getCanEditRow = (row: DataTableRow<TData>) =>
-    typeof enableEditingProp === "function"
-      ? enableEditingProp(row)
-      : enableEditingProp
+  // Stable identities (rows re-render when a config member changes); they
+  // read the latest options through this ref.
+  const editingOptionsRef = React.useRef({
+    enableEditingProp,
+    onEditingRowCancel,
+    onCreatingRowCancel,
+  })
+  // eslint-disable-next-line react-hooks/refs
+  editingOptionsRef.current = {
+    enableEditingProp,
+    onEditingRowCancel,
+    onCreatingRowCancel,
+  }
+  const getCanEditRow = React.useCallback((row: DataTableRow<TData>) => {
+    const enabled = editingOptionsRef.current.enableEditingProp
+    return typeof enabled === "function" ? enabled(row) : enabled
+  }, [])
 
   // Infinite scroll implies a single growing page: hide the pager and drop the
   // pagination row model so every appended row renders.
@@ -344,6 +357,20 @@ export function useDataTable<TData extends RowData>(
     getGlobalFilterMode: () => getUi().globalFilterMode,
   })
 
+  // Custom functions are registered once by name; the registered entries
+  // call the latest versions through this ref.
+  const customFnsRef = React.useRef({
+    filterFns: customFilterFns,
+    sortFns: customSortFns,
+    aggregationFns: customAggregationFns,
+  })
+  // eslint-disable-next-line react-hooks/refs
+  customFnsRef.current = {
+    filterFns: customFilterFns,
+    sortFns: customSortFns,
+    aggregationFns: customAggregationFns,
+  }
+
   // Row-model stages our options can switch off. Read through a ref inside the
   // (cached-once) factories so toggling an option takes effect immediately.
   const gatesRef = React.useRef<RowModelGates>(null!)
@@ -366,11 +393,7 @@ export function useDataTable<TData extends RowData>(
       filteredRowModel: advancedFilteredRowModel,
       sortedRowModel: rankedSortedRowModel,
       uiDefaults: () => uiDefaults,
-      customFns: {
-        filterFns: customFilterFns,
-        sortFns: customSortFns,
-        aggregationFns: customAggregationFns,
-      },
+      getCustomFns: () => customFnsRef.current,
     })
   )
 
@@ -531,6 +554,7 @@ export function useDataTable<TData extends RowData>(
       }),
     [resolvedColumns, headerControlsOptions, baseColumnSize]
   )
+
   /* eslint-enable react-hooks/preserve-manual-memoization */
 
   // Subscribes the calling component to nothing by default (DataTable
@@ -730,6 +754,19 @@ export function useDataTable<TData extends RowData>(
     }
   }, [table, autoSizeColumn])
 
+  const cancelEditing = React.useCallback(() => {
+    const { onCreatingRowCancel, onEditingRowCancel } =
+      editingOptionsRef.current
+    const { isCreating, editingRowId } = table.getState()
+    if (isCreating) {
+      onCreatingRowCancel?.({ table })
+    } else if (editingRowId != null) {
+      const row = table.getCoreRowModel().rowsById[editingRowId]
+      if (row) onEditingRowCancel?.({ row, table })
+    }
+    uiActions.cancelEdit()
+  }, [table, uiActions])
+
   /* eslint-enable react-hooks/preserve-manual-memoization */
 
   const config: DataTableConfig<TData> = {
@@ -799,6 +836,8 @@ export function useDataTable<TData extends RowData>(
     renderDetailPanel,
     enableEditing,
     getCanEditRow,
+    displayColumnDefOptions,
+    defaultDisplayColumn,
     editDisplayMode,
     createDisplayMode,
     editingCell: ui.editingCell,
@@ -810,16 +849,7 @@ export function useDataTable<TData extends RowData>(
     beginRowEdit: uiActions.beginRowEdit,
     beginCreate: uiActions.beginCreate,
     cancelEdit: uiActions.cancelEdit,
-    cancelEditing: () => {
-      const { isCreating, editingRowId } = table.getState()
-      if (isCreating) {
-        onCreatingRowCancel?.({ table })
-      } else if (editingRowId != null) {
-        const row = table.getCoreRowModel().rowsById[editingRowId]
-        if (row) onEditingRowCancel?.({ row, table })
-      }
-      uiActions.cancelEdit()
-    },
+    cancelEditing,
     onEditingRowCancel,
     onCreatingRowCancel,
     renderEditRowDialogContent,

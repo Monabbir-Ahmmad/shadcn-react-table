@@ -149,7 +149,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "NO_FILTER_FNS",
     description:
-      "Your own filter functions, by name (TanStack's filter function signature). Name one on a column's `filterFn`, as a column's `meta.filterMode`, or in `columnFilterModeOptions` / `globalFilterModeOptions` to offer it in the mode menus (labelled by `localization.filterModes[name]`, else the name). Names are read when the table is created.",
+      "Your own filter functions, by name (TanStack's filter function signature). Name one on a column's `filterFn`, as a column's `meta.filterMode`, or in `columnFilterModeOptions` / `globalFilterModeOptions` to offer it in the mode menus (labelled by `localization.filterModes[name]`, else the name). The names are read when the table is created; the functions stay current.",
   },
   {
     name: "sortFns",
@@ -157,7 +157,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      'Your own sort functions, by name; a column uses one with `sortFn: "name"`. Names are read when the table is created.',
+      'Your own sort functions, by name; a column uses one with `sortFn: "name"`. The names are read when the table is created; the functions stay current.',
   },
   {
     name: "aggregationFns",
@@ -165,7 +165,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      'Your own aggregation functions, by name; a column uses one with `aggregationFn: "name"`. Names are read when the table is created.',
+      'Your own aggregation functions, by name; a column uses one with `aggregationFn: "name"`. The names are read when the table is created; the functions stay current.',
   },
   {
     name: "columnFilterModeOptions",
@@ -1394,6 +1394,21 @@ export const dataTableOptions: ApiMember[] = [
     default: null,
     description:
       "Whether editing is on (a per-row `enableEditing` function counts).",
+  },
+  {
+    name: "displayColumnDefOptions",
+    type: "| Partial< Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>> > | undefined",
+    required: true,
+    default: null,
+    description:
+      "Overrides for the columns the table adds itself, by id. A new object re-renders the rows, so memoize it when you pass functions.",
+  },
+  {
+    name: "defaultDisplayColumn",
+    type: "Partial<DataTableColumnDef<TData, unknown>> | undefined",
+    required: true,
+    default: null,
+    description: "Overrides for every column the table adds itself.",
   },
   {
     name: "getCanEditRow",

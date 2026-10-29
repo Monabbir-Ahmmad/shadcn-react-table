@@ -68,6 +68,8 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `enableExpandAll` | `boolean` |  | Whether the expand column's header toggles every row. |
 | `renderDetailPanel` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode` |  | Render an expanding detail panel for each row. |
 | `enableEditing` | `boolean` |  | Whether editing is on (a per-row `enableEditing` function counts). |
+| `displayColumnDefOptions` | `\| Partial< Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>> > \| undefined` |  | Overrides for the columns the table adds itself, by id. A new object re-renders the rows, so memoize it when you pass functions. |
+| `defaultDisplayColumn` | `Partial<DataTableColumnDef<TData, unknown>> \| undefined` |  | Overrides for every column the table adds itself. |
 | `getCanEditRow` | `(row: DataTableRow<TData>) => boolean` |  | Whether a row can be edited: the `enableEditing` function's answer, or `enableEditing` itself. |
 | `editDisplayMode` | `EditDisplayMode` |  | How edits are surfaced. Default "cell". |
 | `createDisplayMode` | `CreateDisplayMode` |  | How the create form is surfaced, independent of `editDisplayMode`: `"modal"` (dialog, default), `"row"` (an inline editable row at the top of the table), or `"custom"` (you render it from `isCreating` + `rowDraft`). |

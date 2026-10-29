@@ -40,7 +40,7 @@ useDataTable({
 
 `meta` is merged with the column's own, so you only list what you change. The column ids are fixed; use them in `initialState.columnPinning` or `columnOrder` too.
 
-> **Inline is fine:** The table rebuilds these columns only when a plain value changes; functions such as `cell` or `header` are read when they run. You can write the options inline without memoizing them.
+> **Memoize for speed:** Inline options work, but a new object on every render also re-renders every row. Define them outside your component, or wrap them in `useMemo`, to skip that.
 
 Example (`display-columns`):
 

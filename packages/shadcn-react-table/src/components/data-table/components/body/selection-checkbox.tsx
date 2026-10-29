@@ -52,8 +52,9 @@ function SelectionCheckbox({
           role: radio ? "radio" : "checkbox",
           "data-slot": radio ? "radio" : "checkbox",
           "aria-checked": indeterminate ? "mixed" : checked,
+          // A radio only ever selects; another row's radio moves it.
           onClick: (event: React.MouseEvent<HTMLButtonElement>) =>
-            onCheckedChange?.(!checked, event),
+            onCheckedChange?.(radio ? true : !checked, event),
           className: cn(
             "peer relative flex size-4.5 shrink-0 items-center justify-center border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
             radio ? "rounded-full" : "rounded-none",
