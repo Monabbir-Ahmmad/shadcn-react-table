@@ -36,7 +36,7 @@ function Table() {
 // header and cells read their width from.
 const sizeOf = (columnId: string) =>
   Number(
-    screen.getByRole("table").style.getPropertyValue(`--col-${columnId}-size`)
+    screen.getByRole("grid").style.getPropertyValue(`--col-${columnId}-size`)
   )
 
 const resizeHandle = () =>

@@ -72,7 +72,7 @@ function mount(options: Options = {}) {
 }
 
 async function pickOption(name: string) {
-  const trigger = within(screen.getByRole("table")).getAllByRole("combobox")[0]!
+  const trigger = within(screen.getByRole("grid")).getAllByRole("combobox")[0]!
   trigger.focus()
   fireEvent.keyDown(trigger, { key: "Enter" })
   const option = await screen.findByRole("option", { name })

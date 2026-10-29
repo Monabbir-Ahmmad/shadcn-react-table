@@ -9,7 +9,13 @@ const NAV_KEYS = new Set([
   "ArrowRight",
   "Home",
   "End",
+  "PageUp",
+  "PageDown",
 ])
+
+/** Controls a cell can hold (edit trigger, expand, copy, checkbox…). */
+const FOCUSABLE =
+  'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 const EDITABLE = new Set(["INPUT", "TEXTAREA", "SELECT"])
 
@@ -59,23 +65,35 @@ export function useGridNavigation<T extends HTMLElement>({
 }: UseGridNavigationOptions<T>) {
   const activeCellRef = React.useRef<GridCell>({ row: 0, col: 0 })
   const pendingFrameRef = React.useRef<number | null>(null)
-  const focusedCellRef = React.useRef<HTMLElement | null>(null)
+  // The last element focused inside the grid (a cell or a control in one).
+  const focusedRef = React.useRef<HTMLElement | null>(null)
 
   // After every render, exactly one rendered cell is the tab stop: the active
   // cell when it is rendered, otherwise the first rendered cell.
   React.useLayoutEffect(() => {
     const root = ref.current
     if (!enabled || !root) return
-    // The focused cell was scrolled out of the virtual window and unmounted:
-    // park focus on the grid so the keys keep working from the active cell.
-    const focused = focusedCellRef.current
+    // The focused element unmounted and focus fell to the page: an inline
+    // editor closed, save/cancel buttons went away, the row was deleted, or it
+    // scrolled out of a virtual window. Put focus back at the same cell
+    // position (on its control when a control had it), or park it on the grid
+    // so the keys keep working from the active cell.
+    const focused = focusedRef.current
     if (
       focused &&
       !focused.isConnected &&
       (document.activeElement === document.body || !document.activeElement)
     ) {
-      focusedCellRef.current = null
-      root.focus({ preventScroll: true })
+      focusedRef.current = null
+      const cell = findCell(root, activeCellRef.current)
+      if (cell) {
+        const inner = focused.matches("[data-cell-row]")
+          ? null
+          : cell.querySelector<HTMLElement>(FOCUSABLE)
+        ;(inner ?? cell).focus({ preventScroll: true })
+      } else {
+        root.focus({ preventScroll: true })
+      }
     }
     const cells = root.querySelectorAll<HTMLElement>("[data-cell-row]")
     if (cells.length === 0) return
@@ -125,13 +143,39 @@ export function useGridNavigation<T extends HTMLElement>({
     pendingFrameRef.current = requestAnimationFrame(tryFocus)
   }
 
+  /** Enter / F2 / Ctrl+C on a focused cell (not on a control inside it). */
+  const onCellCommand = (event: React.KeyboardEvent<T>, cell: HTMLElement) => {
+    if (event.key === "Enter" || event.key === "F2") {
+      // Activate the cell's control: open its editor, toggle, follow a link.
+      const control = cell.querySelector<HTMLElement>(FOCUSABLE)
+      if (!control) return
+      event.preventDefault()
+      if (EDITABLE.has(control.tagName)) control.focus()
+      else control.click()
+      return
+    }
+    const isCopy =
+      (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c"
+    if (isCopy && !window.getSelection()?.toString()) {
+      event.preventDefault()
+      void navigator.clipboard?.writeText(cell.textContent?.trim() ?? "")
+    }
+  }
+
   const onKeyDown = (event: React.KeyboardEvent<T>) => {
-    if (!enabled || !NAV_KEYS.has(event.key)) return
+    if (!enabled) return
     const root = ref.current
     if (!root) return
 
     const active = document.activeElement as HTMLElement | null
     if (active && EDITABLE.has(active.tagName)) return
+
+    if (!NAV_KEYS.has(event.key)) {
+      if (active?.matches("[data-cell-row]") && root.contains(active)) {
+        onCellCommand(event, active)
+      }
+      return
+    }
 
     // Focus is on a cell, or parked on the grid itself (see above).
     const current = active?.closest<HTMLElement>("[data-cell-row]")
@@ -158,6 +202,17 @@ export function useGridNavigation<T extends HTMLElement>({
       case "ArrowDown":
         row = Math.min(maxRow, row + 1)
         break
+      case "PageUp":
+      case "PageDown": {
+        // About one screen of rows: the visible height over a row's height.
+        const rowHeight = current?.offsetHeight || 40
+        const step = Math.max(1, Math.floor(root.clientHeight / rowHeight) - 1)
+        row =
+          event.key === "PageDown"
+            ? Math.min(maxRow, row + step)
+            : Math.max(0, row - step)
+        break
+      }
       case "ArrowLeft":
       case "ArrowRight":
         // Columns run right to left in RTL, so the arrows swap meaning.
@@ -189,12 +244,23 @@ export function useGridNavigation<T extends HTMLElement>({
       "[data-cell-row]"
     )
     if (!cell) return
-    focusedCellRef.current = cell
+    focusedRef.current = event.target as HTMLElement
     activeCellRef.current = {
       row: Number(cell.dataset.cellRow),
       col: Number(cell.dataset.cellCol),
     }
   }
 
-  return { onKeyDown, onFocus, activeCellRef }
+  /** Forgets the focused element once focus moves out of the grid, so a
+   *  later unmount there does not pull focus back in. */
+  const onBlur = (event: React.FocusEvent<T>) => {
+    const root = ref.current
+    const next = event.relatedTarget as Node | null
+    const target = event.target as Node
+    if (target.isConnected && root && (!next || !root.contains(next))) {
+      focusedRef.current = null
+    }
+  }
+
+  return { onKeyDown, onFocus, onBlur, activeCellRef }
 }

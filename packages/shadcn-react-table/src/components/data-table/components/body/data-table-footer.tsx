@@ -15,6 +15,7 @@ import {
   FOOTER_CELL_CLASS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
+import { getDataRowCount, getHeaderRowCount } from "../../helpers/grid-rows"
 import type {
   VirtualHeaderLayout,
   WithHeaderSpacers,
@@ -46,8 +47,13 @@ export function DataTableFooter<TData extends RowData>({
   table,
   withHeaderSpacers,
 }: DataTableFooterProps<TData>) {
-  const { density, enableColumnVirtualization, enableStickyFooter, refs } =
-    table.tableInstance
+  const {
+    density,
+    enableColumnVirtualization,
+    enableStickyFooter,
+    enableKeyboardNavigation,
+    refs,
+  } = table.tableInstance
   const padding = DENSITY_CELL_PADDING[density]
 
   return (
@@ -58,8 +64,17 @@ export function DataTableFooter<TData extends RowData>({
       ref={refs.tableFooterRef}
       className={cn(enableStickyFooter && "sticky bottom-0 z-20")}
     >
-      {table.getFooterGroups().map((footerGroup) => (
-        <TableRow key={footerGroup.id} className="hover:bg-transparent">
+      {table.getFooterGroups().map((footerGroup, index) => (
+        <TableRow
+          key={footerGroup.id}
+          // Grid row position, after the header and data rows.
+          aria-rowindex={
+            enableKeyboardNavigation
+              ? getHeaderRowCount(table) + getDataRowCount(table) + index + 1
+              : undefined
+          }
+          className="hover:bg-transparent"
+        >
           {enableColumnVirtualization
             ? withHeaderSpacers(
                 footerGroup.headers,

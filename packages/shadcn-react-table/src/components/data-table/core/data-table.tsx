@@ -25,6 +25,8 @@ import { useDragAnnouncements } from "../hooks/use-drag-announcements"
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll"
 import { useTableDnd } from "../hooks/use-table-dnd"
 import { useTableVirtualizers } from "../hooks/use-table-virtualizers"
+import { useFullscreenModal } from "../hooks/use-fullscreen-modal"
+import { getDataRowCount, getHeaderRowCount } from "../helpers/grid-rows"
 import { getColumnSizeVars } from "../utils/column-styles"
 import { type DataTableInstance } from "./types"
 
@@ -74,11 +76,15 @@ export function DataTable<TData extends RowData>({
   surfaceClassName,
   className,
   ref: refProp,
+  onKeyDown: onKeyDownProp,
   ...props
 }: DataTableProps<TData>) {
   const {
     density,
     isFullscreen,
+    setIsFullscreen,
+    isLoading,
+    isSaving,
     showProgressBars,
     showLoadingOverlay,
     enableColumnResizing,
@@ -108,15 +114,18 @@ export function DataTable<TData extends RowData>({
   // The paper div feeds `refs.tablePaperRef` and, when given, the consumer's
   // own ref; a plain `ref={refs.tablePaperRef}` would be overwritten by the
   // `{...props}` spread.
+  const paperElRef = React.useRef<HTMLDivElement | null>(null)
   const paperRef = React.useCallback(
     (el: HTMLDivElement | null) => {
       assignRef(refs.tablePaperRef, el)
+      paperElRef.current = el
       const consumerCleanup = assignRef(refProp, el)
       // Returning a cleanup makes React 19 call it on detach instead of
       // calling this ref with `null`, so a consumer callback ref that returned
       // its own cleanup is honored and never sees `null`.
       return () => {
         assignRef(refs.tablePaperRef, null)
+        paperElRef.current = null
         if (typeof consumerCleanup === "function") consumerCleanup()
         else assignRef(refProp, null)
       }
@@ -149,7 +158,7 @@ export function DataTable<TData extends RowData>({
   // Keyboard navigation works on display indexes (top, center, bottom rows;
   // visible leaf columns), which it maps back to the virtualizers' indexes to
   // scroll a cell that is not rendered into view.
-  const { onKeyDown, onFocus } = useGridNavigation<HTMLDivElement>({
+  const { onKeyDown, onFocus, onBlur } = useGridNavigation<HTMLDivElement>({
     enabled: enableKeyboardNavigation,
     rtl: direction === "rtl",
     ref: gridRef,
@@ -192,6 +201,19 @@ export function DataTable<TData extends RowData>({
     0
   const showFooter = hasFooter(table)
 
+  // Grid semantics (keyboard navigation makes the table a grid): the full row
+  // and column counts, since virtualization and pinning render a subset.
+  const isGrid = enableKeyboardNavigation
+  const ariaRowCount =
+    getHeaderRowCount(table) +
+    getDataRowCount(table) +
+    (showFooter ? table.getFooterGroups().length : 0)
+  const isBusy = isLoading || isSaving
+
+  const fullscreen = useFullscreenModal(paperElRef, isFullscreen, () =>
+    setIsFullscreen(false)
+  )
+
   const columnSizing = table.getState().columnSizing
   const columnSizingInfo = table.getState().columnSizingInfo
   const columnSizeVars = React.useMemo(
@@ -222,8 +244,18 @@ export function DataTable<TData extends RowData>({
           className
         )}
         data-density={density}
+        // Full screen covers the page, so it is a modal dialog meanwhile.
+        role={isFullscreen ? "dialog" : undefined}
+        aria-modal={isFullscreen || undefined}
         {...props}
+        onKeyDown={(event) => {
+          onKeyDownProp?.(event)
+          fullscreen.onKeyDown(event)
+        }}
       >
+        <div role="status" aria-live="polite" className="sr-only">
+          {isLoading ? localization.loading : ""}
+        </div>
         {renderTopToolbar
           ? renderTopToolbar({ table })
           : enableTopToolbar && (
@@ -271,6 +303,7 @@ export function DataTable<TData extends RowData>({
             }}
             onKeyDown={onKeyDown}
             onFocus={onFocus}
+            onBlur={onBlur}
             // Focusable (not a Tab stop) so keyboard navigation can park focus
             // here when the focused cell scrolls out of a virtual window.
             tabIndex={enableKeyboardNavigation ? -1 : undefined}
@@ -320,6 +353,12 @@ export function DataTable<TData extends RowData>({
             )}
 
             <Table
+              role={isGrid ? "grid" : undefined}
+              aria-rowcount={isGrid ? ariaRowCount : undefined}
+              aria-colcount={
+                isGrid ? table.getVisibleLeafColumns().length : undefined
+              }
+              aria-busy={isBusy || undefined}
               style={{
                 ...columnSizeVars,
                 // Fixed layout makes per-column widths authoritative (auto

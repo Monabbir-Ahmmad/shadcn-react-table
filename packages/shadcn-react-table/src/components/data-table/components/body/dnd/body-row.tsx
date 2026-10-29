@@ -24,7 +24,8 @@ export function DataTableBodyRow<TData extends RowData>({
   className,
   onClick,
   onDoubleClick,
-}: {
+  ...rest
+}: Omit<React.ComponentProps<"tr">, "children"> & {
   row: DataTableRow<TData>
   draggable: boolean
   children: React.ReactNode
@@ -61,6 +62,7 @@ export function DataTableBodyRow<TData extends RowData>({
   return (
     <RowDragContext.Provider value={dragProps}>
       <TableRow
+        {...rest}
         ref={setNodeRef}
         style={style}
         data-state={row.getIsSelected() ? "selected" : undefined}

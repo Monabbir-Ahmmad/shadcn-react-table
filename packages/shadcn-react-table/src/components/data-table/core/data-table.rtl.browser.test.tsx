@@ -89,7 +89,7 @@ describe("right-to-left tables", () => {
     render(<RtlTable colCount={3} enableColumnResizing />)
     await settle()
     const size = () =>
-      Number(screen.getByRole("table").style.getPropertyValue("--col-c0-size"))
+      Number(screen.getByRole("grid").style.getPropertyValue("--col-c0-size"))
     expect(size()).toBe(120)
     const handle = screen.getAllByRole("separator", {
       name: /resize column/i,

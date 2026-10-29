@@ -32,6 +32,7 @@ import {
 import { DataTableHeadCell } from "../body/dnd"
 import { DataTableColumnFilter } from "./data-table-column-filter"
 import { DataTableColumnHeader } from "./data-table-column-header"
+import { isFilterRowVisible } from "../../helpers/grid-rows"
 import type { DataTableHeader } from "../../core/table-types"
 
 interface DataTableHeaderProps<TData extends RowData> {
@@ -52,10 +53,8 @@ export function DataTableHeader<TData extends RowData>({
     density,
     enableColumnResizing,
     enableColumnVirtualization,
-    enableColumnFilters,
-    showColumnFilters,
-    columnFilterDisplayMode,
     enableStickyHeader,
+    enableKeyboardNavigation,
     refs,
   } = table.tableInstance
 
@@ -63,14 +62,11 @@ export function DataTableHeader<TData extends RowData>({
   const padding = DENSITY_CELL_PADDING[density]
   const leafColumnIds = table.getVisibleLeafColumns().map((c) => c.id)
 
-  const anyFilterable = table
-    .getAllColumns()
-    .some((column) => column.getCanFilter())
-  const filterRowVisible =
-    enableColumnFilters &&
-    showColumnFilters &&
-    anyFilterable &&
-    columnFilterDisplayMode === "subheader"
+  const filterRowVisible = isFilterRowVisible(table)
+  const headerGroups = table.getHeaderGroups()
+  // Grid row positions (keyboard navigation makes the table a grid).
+  const rowIndex = (index: number) =>
+    enableKeyboardNavigation ? index + 1 : undefined
 
   const renderHeadCell = (
     header: DataTableHeader<TData, unknown>,
@@ -121,9 +117,10 @@ export function DataTableHeader<TData extends RowData>({
       ref={refs.tableHeadRef}
       className={cn(enableStickyHeader && "sticky top-0 z-20 bg-card")}
     >
-      {table.getHeaderGroups().map((headerGroup) => (
+      {headerGroups.map((headerGroup, index) => (
         <TableRow
           key={headerGroup.id}
+          aria-rowindex={rowIndex(index)}
           className="group/th hover:bg-transparent"
         >
           <SortableContext
@@ -143,23 +140,21 @@ export function DataTableHeader<TData extends RowData>({
 
       {filterRowVisible &&
         // Only leaf columns filter; group header rows would render empty.
-        table
-          .getHeaderGroups()
-          .slice(-1)
-          .map((headerGroup) => (
-            <TableRow
-              key={`${headerGroup.id}-filters`}
-              className="hover:bg-transparent"
-            >
-              {enableColumnVirtualization
-                ? withHeaderSpacers(
-                    headerGroup.headers,
-                    renderFilterCell,
-                    `filter-${headerGroup.id}`
-                  )
-                : headerGroup.headers.map((header) => renderFilterCell(header))}
-            </TableRow>
-          ))}
+        headerGroups.slice(-1).map((headerGroup) => (
+          <TableRow
+            key={`${headerGroup.id}-filters`}
+            aria-rowindex={rowIndex(headerGroups.length)}
+            className="hover:bg-transparent"
+          >
+            {enableColumnVirtualization
+              ? withHeaderSpacers(
+                  headerGroup.headers,
+                  renderFilterCell,
+                  `filter-${headerGroup.id}`
+                )
+              : headerGroup.headers.map((header) => renderFilterCell(header))}
+          </TableRow>
+        ))}
     </TableHeader>
   )
 }

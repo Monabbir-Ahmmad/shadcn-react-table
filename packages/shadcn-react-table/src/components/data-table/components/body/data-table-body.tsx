@@ -17,6 +17,7 @@ import {
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
 import { getPinSide } from "../../helpers/column-pinning"
+import { getHeaderRowCount } from "../../helpers/grid-rows"
 import { resolveRowHeight } from "../../helpers/resolve-row-height"
 import type {
   VirtualRowItem,
@@ -74,7 +75,10 @@ export function DataTableBody<TData extends RowData>({
     localization,
     rowHeight,
     getRowHeight,
+    enableRowSelection,
   } = table.tableInstance
+  const isGrid = enableKeyboardNavigation
+  const headerRowCount = getHeaderRowCount(table)
 
   const padding = DENSITY_CELL_PADDING[density]
   const visibleColumnCount = table.getVisibleLeafColumns().length
@@ -131,6 +135,7 @@ export function DataTableBody<TData extends RowData>({
         key={cell.id}
         data-cell-row={rowIndex}
         data-cell-col={colIndex}
+        aria-colindex={isGrid ? colIndex + 1 : undefined}
         data-pinned={getPinSide(cell.column) || undefined}
         // The grid navigation hook makes one rendered cell the tab stop.
         tabIndex={enableKeyboardNavigation ? -1 : undefined}
@@ -220,6 +225,15 @@ export function DataTableBody<TData extends RowData>({
   const bottomOffset = centerOffset + centerRows.length
   const centerIndexById = new Map(centerRows.map((r, i) => [r.id, i]))
 
+  /** Grid semantics for a data row (keyboard navigation makes it a grid). */
+  const gridRowProps = (row: DataTableRow<TData>, rowIndex: number) =>
+    isGrid
+      ? {
+          "aria-rowindex": headerRowCount + rowIndex + 1,
+          "aria-selected": enableRowSelection ? row.getIsSelected() : undefined,
+        }
+      : {}
+
   const renderRow = (row: DataTableRow<TData>, rowIndex: number) => {
     const isGrouped = row.getIsGrouped()
     const showDetail = !!renderDetailPanel && row.getIsExpanded() && !isGrouped
@@ -227,6 +241,7 @@ export function DataTableBody<TData extends RowData>({
     return (
       <React.Fragment key={row.id}>
         <DataTableBodyRow
+          {...gridRowProps(row, rowIndex)}
           row={row}
           draggable={
             enableRowOrdering &&
@@ -310,6 +325,10 @@ export function DataTableBody<TData extends RowData>({
                   return (
                     <TableRow
                       key={item.row.id}
+                      {...gridRowProps(
+                        item.row,
+                        centerOffset + (centerIndexById.get(item.row.id) ?? 0)
+                      )}
                       data-index={vRow.index}
                       ref={rowVirtualizer.measureElement}
                       data-state={
