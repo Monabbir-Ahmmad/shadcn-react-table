@@ -59,34 +59,15 @@ export function DataTableFooter<TData extends RowData>({
       className={cn(enableStickyFooter && "sticky bottom-0 z-20")}
     >
       {table.getFooterGroups().map((footerGroup) => {
-        const headers = enableColumnVirtualization
-          ? (virtualColumns
-              .map((vc) => footerGroup.headers[vc.index])
-              .filter(Boolean) as DataTableHeader<TData, unknown>[])
-          : footerGroup.headers
-        const cells = headers.map((header) => (
-          <TableCell
-            key={header.id}
-            colSpan={header.colSpan}
-            style={{
-              ...getWidthStyle(header.column, table),
-              ...getColumnPinningStyle(header.column),
-            }}
-            className={cn(
-              FOOTER_CELL_CLASS,
-              padding,
-              ALIGN_CELL[header.column.columnDef.meta?.align ?? "left"],
-              getColumnPinningClass(header.column)
-            )}
-          >
-            {header.isPlaceholder
-              ? null
-              : flexRender(header.column.columnDef.footer, {
-                  ...header.getContext(),
-                  table,
-                })}
-          </TableCell>
-        ))
+        // Under column virtualization, one entry per virtual column (aligned
+        // for the spacer layout).
+        const headers: (DataTableHeader<TData, unknown> | undefined)[] =
+          enableColumnVirtualization
+            ? virtualColumns.map((vc) => footerGroup.headers[vc.index])
+            : footerGroup.headers
+        const cells = headers.map((header) =>
+          header ? renderFooterCell(header) : null
+        )
         return (
           <TableRow key={footerGroup.id} className="hover:bg-transparent">
             {withColumnSpacers(cells, `footer-${footerGroup.id}`)}
@@ -95,4 +76,30 @@ export function DataTableFooter<TData extends RowData>({
       })}
     </TableFooter>
   )
+
+  function renderFooterCell(header: DataTableHeader<TData, unknown>) {
+    return (
+      <TableCell
+        key={header.id}
+        colSpan={header.colSpan}
+        style={{
+          ...getWidthStyle(header.column, table),
+          ...getColumnPinningStyle(header.column),
+        }}
+        className={cn(
+          FOOTER_CELL_CLASS,
+          padding,
+          ALIGN_CELL[header.column.columnDef.meta?.align ?? "left"],
+          getColumnPinningClass(header.column)
+        )}
+      >
+        {header.isPlaceholder
+          ? null
+          : flexRender(header.column.columnDef.footer, {
+              ...header.getContext(),
+              table,
+            })}
+      </TableCell>
+    )
+  }
 }

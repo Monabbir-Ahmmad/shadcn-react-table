@@ -121,12 +121,10 @@ export function DataTableHeader<TData extends RowData>({
         >
           {enableColumnVirtualization ? (
             withColumnSpacers(
-              virtualColumns
-                .map((vc) => {
-                  const header = headerGroup.headers[vc.index]
-                  return header ? renderHeadCell(header) : null
-                })
-                .filter(Boolean) as React.ReactNode[],
+              virtualColumns.map((vc) => {
+                const header = headerGroup.headers[vc.index]
+                return header ? renderHeadCell(header) : null
+              }),
               `head-${headerGroup.id}`
             )
           ) : (
@@ -148,12 +146,10 @@ export function DataTableHeader<TData extends RowData>({
           >
             {enableColumnVirtualization
               ? withColumnSpacers(
-                  virtualColumns
-                    .map((vc) => {
-                      const header = headerGroup.headers[vc.index]
-                      return header ? renderFilterCell(header) : null
-                    })
-                    .filter(Boolean) as React.ReactNode[],
+                  virtualColumns.map((vc) => {
+                    const header = headerGroup.headers[vc.index]
+                    return header ? renderFilterCell(header) : null
+                  }),
                   `filter-${headerGroup.id}`
                 )
               : headerGroup.headers.map(renderFilterCell)}

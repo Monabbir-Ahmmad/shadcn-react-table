@@ -5,6 +5,8 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import * as React from "react"
 
 import type { DataTableInstance } from "../core/types"
+import { getPinSide } from "../helpers/column-pinning"
+import { pinnedRangeExtractor } from "../helpers/pinned-range-extractor"
 import { resolveRowHeight } from "../helpers/resolve-row-height"
 import type { DataTableRow } from "../core/table-types"
 
@@ -13,7 +15,7 @@ export interface VirtualRowItem<TData extends RowData> {
   detail: boolean
 }
 
-/** Wraps a window of cells with left/right spacers when virtualizing columns. */
+/** Lays out one cell per virtual column with spacers for the skipped columns. */
 export type WithColumnSpacers = (
   cells: React.ReactNode[],
   keyPrefix: string
@@ -88,16 +90,35 @@ export function useTableVirtualizers<TData extends RowData>(
   })
 
   // Horizontal virtualizer for wide tables. When off, count is 0 and the
-  // helpers below fall through to rendering all columns.
-  const leafColumns = table.getVisibleLeafColumns()
+  // helpers below fall through to rendering all columns. Leaf columns are taken
+  // in render order (pinned columns moved to the edges, as cells and headers
+  // are); `getVisibleLeafColumns` ignores pinning.
+  const leafColumns = (table.getHeaderGroups().at(-1)?.headers ?? []).map(
+    (header) => header.column
+  )
+  const pinnedIndexes = leafColumns.flatMap((column, index) =>
+    getPinSide(column) ? [index] : []
+  )
   const columnVirtualizer = useVirtualizer({
     horizontal: true,
     count: enableColumnVirtualization ? leafColumns.length : 0,
     getScrollElement: () => gridRef.current,
     estimateSize: (index) => leafColumns[index]?.getSize() ?? 150,
+    getItemKey: (index) => leafColumns[index]?.id ?? index,
+    // Pinned columns are sticky, so they must render even when scrolled out.
+    rangeExtractor: (range) => pinnedRangeExtractor(range, pinnedIndexes),
     overscan: virtualOverscan,
     ...columnVOptions,
   })
+
+  // Sizes are estimates, which the virtualizer caches; re-measure when a
+  // column is resized, reordered, hidden or pinned.
+  const columnLayoutKey = leafColumns
+    .map((column) => `${column.id}:${column.getSize()}`)
+    .join()
+  React.useEffect(() => {
+    if (enableColumnVirtualization) columnVirtualizer.measure()
+  }, [columnLayoutKey, enableColumnVirtualization, columnVirtualizer])
 
   // Expose the virtualizer instances for imperative control (e.g. scrollToIndex).
   React.useEffect(() => {
@@ -112,39 +133,36 @@ export function useTableVirtualizers<TData extends RowData>(
   const virtualColumns = enableColumnVirtualization
     ? columnVirtualizer.getVirtualItems()
     : []
-  const colSpacerLeft = virtualColumns.length
-    ? (virtualColumns[0]?.start ?? 0)
-    : 0
-  const colSpacerRight = virtualColumns.length
-    ? columnVirtualizer.getTotalSize() -
-      (virtualColumns[virtualColumns.length - 1]?.end ?? 0)
-    : 0
+  const totalColumnWidth = columnVirtualizer.getTotalSize()
 
-  /** Wraps a row of cells with left/right spacers when virtualizing columns. */
+  /**
+   * Lays out a row's cells (one per virtual column, in the same order) with a
+   * spacer wherever columns are skipped: before the window, after it, and
+   * between the window and any pinned columns rendered outside it.
+   */
   const withColumnSpacers = (
     cells: React.ReactNode[],
     keyPrefix: string
   ): React.ReactNode => {
     if (!enableColumnVirtualization) return cells
-    return (
-      <>
-        {colSpacerLeft > 0 && (
-          <td
-            key={`${keyPrefix}-spacer-l`}
-            aria-hidden
-            style={{ width: colSpacerLeft }}
-          />
-        )}
-        {cells}
-        {colSpacerRight > 0 && (
-          <td
-            key={`${keyPrefix}-spacer-r`}
-            aria-hidden
-            style={{ width: colSpacerRight }}
-          />
-        )}
-      </>
+    // An empty cell collapses under auto table layout unless it has a min width.
+    const spacer = (key: string, width: number) => (
+      <td
+        key={`${keyPrefix}-${key}`}
+        aria-hidden
+        style={{ width, minWidth: width, padding: 0 }}
+      />
     )
+    const out: React.ReactNode[] = []
+    let end = 0
+    virtualColumns.forEach((vc, i) => {
+      if (vc.start > end) out.push(spacer(`gap-${vc.index}`, vc.start - end))
+      out.push(cells[i])
+      end = vc.end
+    })
+    if (totalColumnWidth > end)
+      out.push(spacer("gap-end", totalColumnWidth - end))
+    return out
   }
 
   return {

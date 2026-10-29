@@ -201,14 +201,12 @@ export function DataTableBody<TData extends RowData>({
       )
     }
     return withColumnSpacers(
-      virtualColumns
-        .map((vc) => {
-          const cell = cells[vc.index]
-          return cell
-            ? renderCell(cell, row, rowIndex, vc.index, rowHeightValue)
-            : null
-        })
-        .filter(Boolean) as React.ReactNode[],
+      virtualColumns.map((vc) => {
+        const cell = cells[vc.index]
+        return cell
+          ? renderCell(cell, row, rowIndex, vc.index, rowHeightValue)
+          : null
+      }),
       `row-${row.id}`
     )
   }

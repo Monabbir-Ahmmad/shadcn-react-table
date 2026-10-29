@@ -689,8 +689,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  The table surface becomes the scroll container — give it a bounded height
    *  via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. */
   enableRowVirtualization?: boolean
-  /** Virtualize columns for very wide tables. Applies fixed column widths and
-   *  is not combined with column pinning/ordering. */
+  /** Virtualize columns for very wide tables. Applies fixed column widths;
+   *  pinned columns stay rendered. Column drag-ordering is not available. */
   enableColumnVirtualization?: boolean
   /** Estimated row height (px) for the virtualizer. Default 52. */
   estimateRowHeight?: number
