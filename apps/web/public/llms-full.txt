@@ -103,19 +103,14 @@ Coding agents can install and use the table from one prompt, a skill file, the s
 
 # Installation
 
-The data table is distributed as a **shadcn registry** item. The CLI installs the table source into your project, pulls the shadcn primitives it depends on (in _your_ configured style), and installs the npm packages it needs.
+The data table is distributed as a **shadcn registry** item. The CLI installs the table source into your project, pulls the shadcn primitives it depends on (in *your* configured style), and installs the npm packages it needs.
 
 ## Prerequisites
 
 - A project already set up with **shadcn/ui** (a `components.json` with your style, base color, and `@/components/ui` aliases). If you don't have one, run `pnpm dlx shadcn@latest init` first.
 - **Tailwind CSS v4** and React 19 / Next.js (or any bundler that compiles your `components/`).
 
-> **Any shadcn style works — Radix UI or Base UI:** It only uses standard primitive APIs, so it adapts to any shadcn style (Sera,
->   Vega, Nova, Luma, …), base color, **and component library flavor**. The same
->   URL works in Radix-flavored and Base-UI-flavored projects: a current shadcn
->   CLI (4.x — the one with `init -b radix|base`) adapts the source to your flavor
->   at install time and pulls the primitives in *your* style. Nothing is
->   overwritten unless you opt in.
+> **Any shadcn style works — Radix UI or Base UI:** It only uses standard primitive APIs, so it adapts to any shadcn style (Sera, Vega, Nova, Luma, …), base color, **and component library flavor**. The same URL works in Radix-flavored and Base-UI-flavored projects: a current shadcn CLI (4.x — the one with `init -b radix|base`) adapts the source to your flavor at install time and pulls the primitives in *your* style. Nothing is overwritten unless you opt in.
 
 ## Add the component
 
@@ -158,12 +153,7 @@ Import the public API from your `@/components/ui/data-table` alias:
 import { DataTable, useDataTable } from "@/components/ui/data-table"
 ```
 
-> **react-day-picker v9+:** If your shadcn `calendar.tsx` predates react-day-picker v9, its `classNames`
->   may use the old `table` key (renamed to `month_grid`). Re-run `shadcn add
->   calendar` or rename the key — this only affects the date filter variant. The
->   calendar itself comes from your own shadcn setup via `registryDependencies` —
->   the table isn't tied to react-day-picker, and any calendar with a compatible
->   props surface drops in.
+> **react-day-picker v9+:** If your shadcn `calendar.tsx` predates react-day-picker v9, its `classNames` may use the old `table` key (renamed to `month_grid`). Re-run `shadcn add calendar` or rename the key — this only affects the date filter variant. The calendar itself comes from your own shadcn setup via `registryDependencies` — the table isn't tied to react-day-picker, and any calendar with a compatible props surface drops in.
 
 ## Next
 
@@ -231,7 +221,6 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 ```markdown
 ## Data table
-
 - components/ui/data-table is shadcn-react-table (installed from its shadcn registry; edit freely).
 - Before changing table options read https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table.md;
   column options: https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options.md.
@@ -245,10 +234,7 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 <Cards>
   <Card href="/docs/installation" title="Installation" />
-  <Card
-    href="/docs/guides/migrating-from-mrt"
-    title="Migrating from Material React Table"
-  />
+  <Card href="/docs/guides/migrating-from-mrt" title="Migrating from Material React Table" />
 </Cards>
 
 ---
@@ -294,26 +280,22 @@ const columns: DataTableColumnDef<Person>[] = [
 
 <Step title="Create the table">
 
-Pass `data` and `columns` to `useDataTable`. Everything else is optional.
-
-```tsx
-const table = useDataTable({
-  data,
-  columns,
-  getRowId: (row) => row.id,
-  initialState: { pagination: { pageSize: 10 } },
-})
-```
+Inside your component, pass `data` and `columns` to `useDataTable`. Everything else is optional; `getRowId` gives rows a stable identity and `initialState` seeds the page size.
 
 </Step>
 
 <Step title="Render it">
 
-Hand the instance to `<DataTable />`. Put the hook call inside a component:
+Hand the instance to `<DataTable />`.
 
 ```tsx
 export function PeopleTable() {
-  const table = useDataTable({ data, columns, getRowId: (row) => row.id })
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+  })
 
   return <DataTable table={table} />
 }
@@ -611,25 +593,25 @@ file.
 
 ### API renames in 1.0.0
 
-| 0.x                                                                                        | 1.0.0                                                             |
-| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| `table.tableInstance.setDensity(…)` (and every setter or action)                           | `table.setDensity(…)`                                             |
-| `table.tableInstance.density` (and other UI state)                                         | `table.getState().density`                                        |
-| `table.tableInstance.isLoading` (and other options, `refs`)                                | `table.dataTable.isLoading`                                       |
-| `DataTableConfig` type                                                                     | `DataTableOptionsResolved` (+ `DataTableMethods`)                 |
-| `defaultDensity: "compact"`                                                                | `initialState: { density: "compact" }`                            |
-| `density`, `isFullscreen`, `showColumnFilters`, `advancedFilter`, `globalFilterMode` props | `state: { … }`                                                    |
-| `defaultShowColumnFilters`, `defaultGlobalFilterMode`, `defaultAdvancedFilter`             | `initialState: { … }`                                             |
-| `onEditCellSave` / `onSaveRow` / `onCreateRow`                                             | `onEditingCellSave` / `onEditingRowSave` / `onCreatingRowSave`    |
-| `renderToolbarActions`                                                                     | `renderTopToolbarCustomActions`                                   |
-| `meta.variant` / `meta.options`                                                            | `meta.filterVariant` / `meta.filterSelectOptions`                 |
-| `meta.disableHighlight: true`                                                              | `meta.enableFilterMatchHighlighting: false`                       |
-| `meta.disableColumnActions: true`                                                          | `meta.enableColumnActions: false`                                 |
-| `<DataTable pageSizeOptions={…} />`                                                        | `useDataTable({ pageSizeOptions: … })`                            |
-| `<DataTable surfaceClassName="…" />`                                                       | `useDataTable({ slotProps: { surface: { className: "…" } } })`    |
-| `renderColumnActionsMenuItems` appended after a separator                                  | return `<>{internalMenuItems}<DropdownMenuSeparator />{yours}</>` |
-| Edit button next to the `renderRowActionMenuItems` menu                                    | Edit is in the menu: render `internalMenuItems` in your items     |
-| `sortingFns` option                                                                        | `sortFns`                                                         |
+| 0.x                                                                                        | 1.0.0                                                          |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `table.tableInstance.setDensity(…)` (and every setter or action)                           | `table.setDensity(…)`                                          |
+| `table.tableInstance.density` (and other UI state)                                         | `table.getState().density`                                     |
+| `table.tableInstance.isLoading` (and other options, `refs`)                                | `table.dataTable.isLoading`                                    |
+| `DataTableConfig` type                                                                     | `DataTableOptionsResolved` (+ `DataTableMethods`)              |
+| `defaultDensity: "compact"`                                                                | `initialState: { density: "compact" }`                         |
+| `density`, `isFullscreen`, `showColumnFilters`, `advancedFilter`, `globalFilterMode` props | `state: { … }`                                                 |
+| `defaultShowColumnFilters`, `defaultGlobalFilterMode`, `defaultAdvancedFilter`             | `initialState: { … }`                                          |
+| `onEditCellSave` / `onSaveRow` / `onCreateRow`                                             | `onEditingCellSave` / `onEditingRowSave` / `onCreatingRowSave` |
+| `renderToolbarActions`                                                                     | `renderTopToolbarCustomActions`                                |
+| `meta.variant` / `meta.options`                                                            | `meta.filterVariant` / `meta.filterSelectOptions`              |
+| `meta.disableHighlight: true`                                                              | `meta.enableFilterMatchHighlighting: false`                    |
+| `meta.disableColumnActions: true`                                                          | `meta.enableColumnActions: false`                              |
+| `<DataTable pageSizeOptions={…} />`                                                        | `useDataTable({ pageSizeOptions: … })`                         |
+| `<DataTable surfaceClassName="…" />`                                                       | `useDataTable({ slotProps: { surface: { className: "…" } } })` |
+| `renderColumnActionsMenuItems` appended after a separator                                   | return `<>{internalMenuItems}<DropdownMenuSeparator />{yours}</>` |
+| Edit button next to the `renderRowActionMenuItems` menu                                   | Edit is in the menu: render `internalMenuItems` in your items     |
+| `sortingFns` option                                                                         | `sortFns`                                                          |
 
 ## Related
 
@@ -665,59 +647,59 @@ return <DataTable table={table} />
 
 MRT puts its own column options on the column definition. Here they live under `meta`.
 
-| MRT column option                                                             | Here                                                                                  |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `Cell` / `Header` / `Footer`                                                  | `cell` / `header` / `footer` (TanStack's)                                             |
-| `filterVariant`                                                               | `meta.filterVariant`                                                                  |
-| `filterSelectOptions`                                                         | `meta.filterSelectOptions`                                                            |
-| `filterFn` (a mode name)                                                      | `meta.filterMode`                                                                     |
-| `columnFilterModeOptions`                                                     | `meta.columnFilterModeOptions`                                                        |
-| `enableColumnFilterModes`                                                     | `meta.enableColumnFilterModes`                                                        |
-| `Filter`                                                                      | `meta.renderColumnFilter`                                                             |
-| `editVariant` / `editSelectOptions`                                           | `meta.editVariant` / `meta.editSelectOptions`                                         |
-| `enableEditing`                                                               | `meta.enableEditing`                                                                  |
-| `Edit`                                                                        | `meta.renderEditCell`                                                                 |
-| `muiEditTextFieldProps` validation                                            | `meta.validate` (return a message to block the save)                                  |
-| `GroupedCell` / `AggregatedCell` / `PlaceholderCell`                          | `meta.renderGroupedCell` / `meta.renderAggregatedCell` / `meta.renderPlaceholderCell` |
-| `enableClickToCopy`                                                           | `meta.enableClickToCopy`                                                              |
-| `enableColumnActions`                                                         | `meta.enableColumnActions`                                                            |
-| `visibleInShowHideMenu`                                                       | `meta.visibleInShowHideMenu`                                                          |
-| `muiTableHeadCellProps` / `muiTableBodyCellProps` / `muiTableFooterCellProps` | `meta.slotProps.headCell` / `.bodyCell` / `.footerCell`                               |
+| MRT column option | Here |
+| --- | --- |
+| `Cell` / `Header` / `Footer` | `cell` / `header` / `footer` (TanStack's) |
+| `filterVariant` | `meta.filterVariant` |
+| `filterSelectOptions` | `meta.filterSelectOptions` |
+| `filterFn` (a mode name) | `meta.filterMode` |
+| `columnFilterModeOptions` | `meta.columnFilterModeOptions` |
+| `enableColumnFilterModes` | `meta.enableColumnFilterModes` |
+| `Filter` | `meta.renderColumnFilter` |
+| `editVariant` / `editSelectOptions` | `meta.editVariant` / `meta.editSelectOptions` |
+| `enableEditing` | `meta.enableEditing` |
+| `Edit` | `meta.renderEditCell` |
+| `muiEditTextFieldProps` validation | `meta.validate` (return a message to block the save) |
+| `GroupedCell` / `AggregatedCell` / `PlaceholderCell` | `meta.renderGroupedCell` / `meta.renderAggregatedCell` / `meta.renderPlaceholderCell` |
+| `enableClickToCopy` | `meta.enableClickToCopy` |
+| `enableColumnActions` | `meta.enableColumnActions` |
+| `visibleInShowHideMenu` | `meta.visibleInShowHideMenu` |
+| `muiTableHeadCellProps` / `muiTableBodyCellProps` / `muiTableFooterCellProps` | `meta.slotProps.headCell` / `.bodyCell` / `.footerCell` |
 
 ## Component props (`mui*Props`)
 
 MRT's `mui*Props` become one `slotProps` option. Each part takes props or a function of its context, and merges them with the table's own. See [Part props](/docs/guides/slot-props).
 
-| MRT                                                                          | `slotProps` part                             |
-| ---------------------------------------------------------------------------- | -------------------------------------------- |
-| `muiTablePaperProps`                                                         | `root`                                       |
-| `muiTableContainerProps`                                                     | `surface`                                    |
-| `muiTableProps`                                                              | `table`                                      |
-| `muiTableHeadProps` / `muiTableHeadRowProps` / `muiTableHeadCellProps`       | `head` / `headRow` / `headCell`              |
-| `muiFilterTextFieldProps` (cell)                                             | `filterCell`                                 |
-| `muiTableBodyProps` / `muiTableBodyRowProps` / `muiTableBodyCellProps`       | `body` / `bodyRow` / `bodyCell`              |
-| `muiDetailPanelProps`                                                        | `detailPanel`                                |
-| `muiTableFooterProps` / `muiTableFooterRowProps` / `muiTableFooterCellProps` | `footer` / `footerRow` / `footerCell`        |
-| `muiTopToolbarProps` / `muiBottomToolbarProps`                               | `topToolbar` / `bottomToolbar`               |
-| `muiPaginationProps`                                                         | `pagination`                                 |
-| `muiToolbarAlertBannerProps`                                                 | `alertBanner`                                |
-| `muiSearchTextFieldProps`                                                    | `searchInput`                                |
-| `muiEditTextFieldProps`                                                      | `editField`                                  |
-| `muiEditRowDialogProps` / `muiCreateRowModalProps`                           | `editDialog` (`isCreating` tells them apart) |
-| `muiSelectCheckboxProps`                                                     | `selectCheckbox`                             |
+| MRT | `slotProps` part |
+| --- | --- |
+| `muiTablePaperProps` | `root` |
+| `muiTableContainerProps` | `surface` |
+| `muiTableProps` | `table` |
+| `muiTableHeadProps` / `muiTableHeadRowProps` / `muiTableHeadCellProps` | `head` / `headRow` / `headCell` |
+| `muiFilterTextFieldProps` (cell) | `filterCell` |
+| `muiTableBodyProps` / `muiTableBodyRowProps` / `muiTableBodyCellProps` | `body` / `bodyRow` / `bodyCell` |
+| `muiDetailPanelProps` | `detailPanel` |
+| `muiTableFooterProps` / `muiTableFooterRowProps` / `muiTableFooterCellProps` | `footer` / `footerRow` / `footerCell` |
+| `muiTopToolbarProps` / `muiBottomToolbarProps` | `topToolbar` / `bottomToolbar` |
+| `muiPaginationProps` | `pagination` |
+| `muiToolbarAlertBannerProps` | `alertBanner` |
+| `muiSearchTextFieldProps` | `searchInput` |
+| `muiEditTextFieldProps` | `editField` |
+| `muiEditRowDialogProps` / `muiCreateRowModalProps` | `editDialog` (`isCreating` tells them apart) |
+| `muiSelectCheckboxProps` | `selectCheckbox` |
 
 ## State
 
-| MRT state                                                                              | Here                                        |
-| -------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `isFullScreen`                                                                         | `isFullscreen`                              |
-| `columnFilterFns`                                                                      | `columnFilterModes`                         |
-| `globalFilterFn`                                                                       | `globalFilterMode`                          |
-| `editingRow`                                                                           | `editingRowId` (the draft is in `rowDraft`) |
-| `editingCell`                                                                          | `editingCell` (`{ rowId, columnId }`)       |
-| `creatingRow`                                                                          | `isCreating` (the draft is in `rowDraft`)   |
-| `isLoading` / `isSaving` / `showProgressBars` / `showSkeletons` / `showLoadingOverlay` | options of the same names, not state        |
-| `density`, `showColumnFilters`, and TanStack's own state                               | unchanged                                   |
+| MRT state | Here |
+| --- | --- |
+| `isFullScreen` | `isFullscreen` |
+| `columnFilterFns` | `columnFilterModes` |
+| `globalFilterFn` | `globalFilterMode` |
+| `editingRow` | `editingRowId` (the draft is in `rowDraft`) |
+| `editingCell` | `editingCell` (`{ rowId, columnId }`) |
+| `creatingRow` | `isCreating` (the draft is in `rowDraft`) |
+| `isLoading` / `isSaving` / `showProgressBars` / `showSkeletons` / `showLoadingOverlay` | options of the same names, not state |
+| `density`, `showColumnFilters`, and TanStack's own state | unchanged |
 
 Set and control state the same way: `initialState`, `state`, and the matching `on…Change` callback (`onIsFullScreenChange` → `onIsFullscreenChange`, `onColumnFilterFnsChange` → `onColumnFilterModesChange`, `onGlobalFilterFnChange` → `onGlobalFilterModeChange`). See [State management](/docs/guides/state).
 
@@ -727,48 +709,48 @@ Most options keep their MRT names: `enableRowSelection`, `enableMultiRowSelectio
 
 Renamed or reshaped:
 
-| MRT                                                                         | Here                                                                                                                                   |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `sortingFns`                                                                | `sortFns` (TanStack v9's name)                                                                                                         |
-| `rowNumberDisplayMode`                                                      | `rowNumberMode`                                                                                                                        |
-| `renderEmptyRowsFallback`                                                   | `renderEmpty`                                                                                                                          |
-| `muiPaginationProps.rowsPerPageOptions`                                     | `pageSizeOptions`                                                                                                                      |
-| `state.isLoading` and friends                                               | the `isLoading`, `isSaving`, `showProgressBars`, `showSkeletons`, `showLoadingOverlay` options                                         |
-| `onEditingRowSave({ values, table })`, then `table.setEditingRow(null)`     | `onEditingRowSave({ row, values, table, exit })`, then `exit()`                                                                        |
-| `onCreatingRowSave({ values, table })`, then `table.setCreatingRow(null)`   | `onCreatingRowSave({ values, table, exit })`, then `exit()`                                                                            |
-| cell edits saved from `muiEditTextFieldProps.onBlur`                        | `onEditingCellSave({ row, column, value, table })`                                                                                     |
+| MRT | Here |
+| --- | --- |
+| `sortingFns` | `sortFns` (TanStack v9's name) |
+| `rowNumberDisplayMode` | `rowNumberMode` |
+| `renderEmptyRowsFallback` | `renderEmpty` |
+| `muiPaginationProps.rowsPerPageOptions` | `pageSizeOptions` |
+| `state.isLoading` and friends | the `isLoading`, `isSaving`, `showProgressBars`, `showSkeletons`, `showLoadingOverlay` options |
+| `onEditingRowSave({ values, table })`, then `table.setEditingRow(null)` | `onEditingRowSave({ row, values, table, exit })`, then `exit()` |
+| `onCreatingRowSave({ values, table })`, then `table.setCreatingRow(null)` | `onCreatingRowSave({ values, table, exit })`, then `exit()` |
+| cell edits saved from `muiEditTextFieldProps.onBlur` | `onEditingCellSave({ row, column, value, table })` |
 | `displayColumnDefOptions["mrt-row-select"]` (and the other `mrt-row-*` ids) | `displayColumnDefOptions["cn-select"]` — ids: `cn-select`, `cn-expand`, `cn-row-actions`, `cn-row-number`, `cn-row-pin`, `cn-row-drag` |
 
 Callbacks and render options with the same name and arguments: `onEditingRowCancel`, `onCreatingRowCancel`, `renderTopToolbarCustomActions`, `renderBottomToolbarCustomActions`, `renderToolbarInternalActions`, `renderTopToolbar`, `renderBottomToolbar`, `renderRowActions`, `renderDetailPanel`, `renderCaption`, `renderEditRowDialogContent`, `renderCreateRowDialogContent`, `renderColumnFilterModeMenuItems`, `renderGlobalFilterModeMenuItems`, and the menu callbacks `renderColumnActionsMenuItems`, `renderRowActionMenuItems`, `renderCellActionMenuItems` (each receives `internalMenuItems` and `closeMenu`).
 
 ## The table instance
 
-| MRT                                                        | Here                                        |
-| ---------------------------------------------------------- | ------------------------------------------- |
-| `table.setEditingRow(row)`                                 | `table.beginRowEdit(row)`                   |
-| `table.setEditingRow(null)` / `table.setCreatingRow(null)` | `table.cancelEdit()`                        |
-| `table.setCreatingRow(true)`                               | `table.beginCreate()`                       |
-| `table.setEditingCell(cell)`                               | `table.setEditingCell({ rowId, columnId })` |
-| `table.setIsFullScreen(…)`                                 | `table.setIsFullscreen(…)`                  |
-| `table.setColumnFilterFns(…)`                              | `table.setColumnFilterMode(columnId, mode)` |
-| `table.setGlobalFilterFn(…)`                               | `table.setGlobalFilterMode(mode)`           |
-| `table.refs.tableContainerRef` (and the other refs)        | `table.dataTable.refs.tableContainerRef`    |
-| `table.options.enableEditing` (and MRT's other options)    | `table.dataTable.enableEditing`             |
-| `table.getState()`                                         | unchanged, including the UI state above     |
+| MRT | Here |
+| --- | --- |
+| `table.setEditingRow(row)` | `table.beginRowEdit(row)` |
+| `table.setEditingRow(null)` / `table.setCreatingRow(null)` | `table.cancelEdit()` |
+| `table.setCreatingRow(true)` | `table.beginCreate()` |
+| `table.setEditingCell(cell)` | `table.setEditingCell({ rowId, columnId })` |
+| `table.setIsFullScreen(…)` | `table.setIsFullscreen(…)` |
+| `table.setColumnFilterFns(…)` | `table.setColumnFilterMode(columnId, mode)` |
+| `table.setGlobalFilterFn(…)` | `table.setGlobalFilterMode(mode)` |
+| `table.refs.tableContainerRef` (and the other refs) | `table.dataTable.refs.tableContainerRef` |
+| `table.options.enableEditing` (and MRT's other options) | `table.dataTable.enableEditing` |
+| `table.getState()` | unchanged, including the UI state above |
 
 The instance is stable and the component that calls `useDataTable` does not re-render on state changes. Read state where you render it with `table.Subscribe`, or pass `stateSelector`. See [State management](/docs/guides/state).
 
 ## Defaults that differ
 
-| Option                            | MRT          | Here         | Why                                                      |
-| --------------------------------- | ------------ | ------------ | -------------------------------------------------------- |
-| `editDisplayMode`                 | `"modal"`    | `"cell"`     | Inline editing is the quickest edit for most tables      |
-| `positionActionsColumn`           | `"first"`    | `"last"`     | Actions read best after the data they act on             |
-| `enableStickyHeader`              | `false`      | `true`       | Headers stay useful on long tables                       |
-| `enableFacetedValues`             | `false`      | `true`       | Select filters fill their options from the data          |
-| `enableGlobalFilterRankedResults` | `true`       | `false`      | Searching never reorders rows unless you opt in          |
-| Text filter mode                  | `"fuzzy"`    | `"contains"` | Predictable matches; fuzzy is one menu click away        |
-| Cell editing starts on            | double-click | single click | One click to edit, matching the click-to-edit affordance |
+| Option | MRT | Here | Why |
+| --- | --- | --- | --- |
+| `editDisplayMode` | `"modal"` | `"cell"` | Inline editing is the quickest edit for most tables |
+| `positionActionsColumn` | `"first"` | `"last"` | Actions read best after the data they act on |
+| `enableStickyHeader` | `false` | `true` | Headers stay useful on long tables |
+| `enableFacetedValues` | `false` | `true` | Select filters fill their options from the data |
+| `enableGlobalFilterRankedResults` | `true` | `false` | Searching never reorders rows unless you opt in |
+| Text filter mode | `"fuzzy"` | `"contains"` | Predictable matches; fuzzy is one menu click away |
+| Cell editing starts on | double-click | single click | One click to edit, matching the click-to-edit affordance |
 
 Set the MRT value explicitly to keep the old behavior.
 
@@ -816,16 +798,16 @@ function ColumnFiltersExample() {
 
 The UI for each filter is chosen by the column's `meta.filterVariant`:
 
-| Variant                           | Control                                 | Values                                              |
-| --------------------------------- | --------------------------------------- | --------------------------------------------------- |
-| `"text"` (default)                | Text box                                | Any                                                 |
-| `"autocomplete"`                  | Text box suggesting the column's values | Any                                                 |
-| `"select"` / `"multi-select"`     | Dropdown / checklist                    | Strings                                             |
-| `"checkbox"`                      | Checkbox                                | Booleans                                            |
-| `"range"` / `"range-slider"`      | Number boxes / slider                   | Numbers                                             |
-| `"date"` / `"date-range"`         | Calendar                                | Dates, compared by day                              |
-| `"datetime"` / `"datetime-range"` | Date-time box                           | Dates, compared to the minute                       |
-| `"time"` / `"time-range"`         | Time box                                | `"HH:mm"` strings or Dates, compared by time of day |
+| Variant | Control | Values |
+| --- | --- | --- |
+| `"text"` (default) | Text box | Any |
+| `"autocomplete"` | Text box suggesting the column's values | Any |
+| `"select"` / `"multi-select"` | Dropdown / checklist | Strings |
+| `"checkbox"` | Checkbox | Booleans |
+| `"range"` / `"range-slider"` | Number boxes / slider | Numbers |
+| `"date"` / `"date-range"` | Calendar | Dates, compared by day |
+| `"datetime"` / `"datetime-range"` | Date-time box | Dates, compared to the minute |
+| `"time"` / `"time-range"` | Time box | `"HH:mm"` strings or Dates, compared by time of day |
 
 The date, date-time and time variants share the same modes (equals, before, after, between, empty…); the `-range` variants start in "between".
 
@@ -1038,12 +1020,7 @@ To restrict every column at once, pass `columnFilterModeOptions` to `useDataTabl
 const table = useDataTable({
   data,
   columns,
-  columnFilterModeOptions: [
-    "contains",
-    "equals",
-    "between",
-    "betweenInclusive",
-  ],
+  columnFilterModeOptions: ["contains", "equals", "between", "betweenInclusive"],
 })
 ```
 
@@ -1259,9 +1236,9 @@ const table = useDataTable({
 
 The ranking yields to the user: the moment they click a column to sort, their sort takes over, and clearing the search restores the original order. It applies only in `"fuzzy"` mode and is skipped while grouping or row expansion is active, or under `manualSorting` / `manualFiltering` (the server owns ordering there).
 
-> **Off by default:** Material React Table enables this by default; the data table keeps it off so
->   adding a search box never silently reorders your rows. Opt in when relevance
->   ordering is what you want.
+> **Off by default:** Material React Table enables this by default; the data table keeps it off so adding a
+>   search box never silently reorders your rows. Opt in when relevance ordering
+>   is what you want.
 
 ## Placement
 
@@ -1405,7 +1382,6 @@ return <DataTable table={table} />
 ```
 
 ## Initial hidden columns
-
 Hide columns from the start with `initialState.columnVisibility`, mapping a column id to `false`.
 
 ```tsx
@@ -1419,15 +1395,15 @@ const table = useDataTable({
 ```
 
 ## Prevent hiding a column
-
 Use TanStack's `enableHiding: false` on a column definition to keep it always visible. It will not appear in the toggle or expose a Hide item.
 
 ```tsx
-const columns = [{ accessorKey: "firstName", enableHiding: false }]
+const columns = [
+  { accessorKey: "firstName", enableHiding: false },
+]
 ```
 
-> **Always-on columns:** Columns with `enableHiding: false` stay rendered regardless of toolbar or menu
->   actions.
+> **Always-on columns:** Columns with `enableHiding: false` stay rendered regardless of toolbar or menu actions.
 
 ## Leaving a column out of the menu
 
@@ -1501,7 +1477,6 @@ function ColumnDragExample() {
 ```
 
 ## Initial order
-
 Provide the starting order with `initialState.columnOrder`, an array of column ids.
 
 ```tsx
@@ -1515,8 +1490,7 @@ const table = useDataTable({
 })
 ```
 
-> **Pair with pinning:** Pinned columns stay anchored while the rest reorder. Combine ordering with
->   pinning to keep key columns in view.
+> **Pair with pinning:** Pinned columns stay anchored while the rest reorder. Combine ordering with pinning to keep key columns in view.
 
 ## Related
 
@@ -1566,7 +1540,6 @@ return <DataTable table={table} />
 ```
 
 ## Initial pins
-
 Pin columns from the start with `initialState.columnPinning`, grouping ids into `left` and `right`.
 
 ```tsx
@@ -1585,8 +1558,7 @@ const table = useDataTable({
 
 Table options and `table.getState()` use `left` / `right`, while instance methods such as `column.pin` and `column.getIsPinned` use TanStack v9's `start` / `end`.
 
-> **Sticky positioning:** Pinned columns rely on the same sticky behavior used elsewhere in the table.
->   See the sticky guide for how that interacts with headers and footers.
+> **Sticky positioning:** Pinned columns rely on the same sticky behavior used elsewhere in the table. See the sticky guide for how that interacts with headers and footers.
 
 ## Related
 
@@ -1963,8 +1935,7 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-> **Not compatible with virtualization:** Row drag-and-drop is incompatible with row virtualization. Disable
->   virtualization when you enable row ordering.
+> **Not compatible with virtualization:** Row drag-and-drop is incompatible with row virtualization. Disable virtualization when you enable row ordering.
 
 ## Related
 
@@ -1987,11 +1958,7 @@ Rows can be dragged out of a table — onto another table, or onto a drop zone o
 Wrap the tables in `DataTableDndProvider`, turn on `enableRowDragging` on the table rows leave from, and move the row in `onRowDragEnd`:
 
 ```tsx
-import {
-  DataTable,
-  DataTableDndProvider,
-  useDataTable,
-} from "@/components/ui/data-table"
+import { DataTable, DataTableDndProvider, useDataTable } from "@/components/ui/data-table"
 
 function Lists() {
   const [todo, setTodo] = React.useState(initialTodo)
@@ -2009,22 +1976,12 @@ function Lists() {
       }
     },
   })
-  const doneTable = useDataTable({
-    data: done,
-    columns,
-    getRowId: (row) => row.id,
-  })
+  const doneTable = useDataTable({ data: done, columns, getRowId: (row) => row.id })
 
   return (
     <DataTableDndProvider>
-      <DataTable
-        table={todoTable}
-        className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary"
-      />
-      <DataTable
-        table={doneTable}
-        className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary"
-      />
+      <DataTable table={todoTable} className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary" />
+      <DataTable table={doneTable} className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary" />
     </DataTableDndProvider>
   )
 }
@@ -2152,12 +2109,12 @@ return <DataTable table={table} />
 
 `rowPinningDisplayMode` sets where pinned rows show and how rows get pinned:
 
-| Mode                               | Pinned rows                                                  | Pinned by                                                |
-| ---------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
-| `"top-and-bottom"` (default)       | Stay in view above (or below) the other rows while scrolling | The pin button (to the top), or `row.pin("bottom")`      |
-| `"top"` / `"bottom"`               | The same                                                     | The pin button, to that side                             |
-| `"static"`                         | Listed first (or last), and scroll away with the rest        | The pin button                                           |
-| `"select-top"` / `"select-bottom"` | Stay in view on that side                                    | Selecting the row; deselecting unpins it. No pin buttons |
+| Mode | Pinned rows | Pinned by |
+| --- | --- | --- |
+| `"top-and-bottom"` (default) | Stay in view above (or below) the other rows while scrolling | The pin button (to the top), or `row.pin("bottom")` |
+| `"top"` / `"bottom"` | The same | The pin button, to that side |
+| `"static"` | Listed first (or last), and scroll away with the rest | The pin button |
+| `"select-top"` / `"select-bottom"` | Stay in view on that side | Selecting the row; deselecting unpins it. No pin buttons |
 
 ```tsx
 useDataTable({
@@ -2266,8 +2223,7 @@ const table = useDataTable({
 })
 ```
 
-> **Pairs with row pinning:** The row-number column is also where the pin toggle lives, so it works well
->   alongside row pinning.
+> **Pairs with row pinning:** The row-number column is also where the pin toggle lives, so it works well alongside row pinning.
 
 ## Related
 
@@ -2364,9 +2320,7 @@ const PRIORITY = ["low", "medium", "high"]
 
 const table = useDataTable({
   data,
-  columns: [
-    { accessorKey: "priority", header: "Priority", sortFn: "byPriority" },
-  ],
+  columns: [{ accessorKey: "priority", header: "Priority", sortFn: "byPriority" }],
   sortFns: {
     byPriority: (rowA, rowB, columnId) =>
       PRIORITY.indexOf(rowA.getValue(columnId)) -
@@ -2914,8 +2868,7 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-> **Indentation:** Use `row.depth` inside a cell renderer to indent child rows so the hierarchy
->   reads clearly.
+> **Indentation:** Use `row.depth` inside a cell renderer to indent child rows so the hierarchy reads clearly.
 
 ## From a flat list
 
@@ -3404,25 +3357,15 @@ useDataTable({
   columns,
   enableEditing: true,
   editDisplayMode: "modal",
-  renderEditRowDialogContent: ({
-    row,
-    internalEditComponents,
-    save,
-    cancel,
-    hasErrors,
-  }) => (
+  renderEditRowDialogContent: ({ row, internalEditComponents, save, cancel, hasErrors }) => (
     <>
       <DialogHeader>
         <DialogTitle>Edit {row.original.name}</DialogTitle>
       </DialogHeader>
       <div className="grid grid-cols-2 gap-3">{internalEditComponents}</div>
       <DialogFooter>
-        <Button variant="outline" onClick={cancel}>
-          Discard
-        </Button>
-        <Button onClick={save} disabled={hasErrors}>
-          Save changes
-        </Button>
+        <Button variant="outline" onClick={cancel}>Discard</Button>
+        <Button onClick={save} disabled={hasErrors}>Save changes</Button>
       </DialogFooter>
     </>
   ),
@@ -3846,10 +3789,7 @@ function CellActionsExample() {
 `renderCellActionMenuItems` sets the menu's contents (and turns the menu on). It receives `{ cell, row, table, internalMenuItems, closeMenu }`: place `internalMenuItems` where the built-in items should go, or leave it out to replace them, and call `closeMenu()` from anything that isn't a menu item.
 
 ```tsx
-import {
-  ContextMenuItem,
-  ContextMenuSeparator,
-} from "@/components/ui/context-menu"
+import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu"
 
 const table = useDataTable({
   data,
@@ -4137,19 +4077,13 @@ return <DataTable table={table} />
 
 Once the content overflows the bound, the header pins to the top and the footer pins to the bottom while the rows scroll between them. Setting `enableStickyHeader: false` removes both the pinning and the default bound, letting the table grow to its full height.
 
-> **MRT parity note:** Material React Table defaults `enableStickyHeader` and `enableStickyFooter` to
->   `false`. This table deliberately defaults `enableStickyHeader` to `true` so
->   headers stay useful out of the box, but leaves `enableStickyFooter` at `false`
->   (opt in when you have an aggregation/footer row). The
->   sticky-implies-bounded-surface behavior itself matches MRT.
+> **MRT parity note:** Material React Table defaults `enableStickyHeader` and `enableStickyFooter` to `false`. This table deliberately defaults `enableStickyHeader` to `true` so headers stay useful out of the box, but leaves `enableStickyFooter` at `false` (opt in when you have an aggregation/footer row). The sticky-implies-bounded-surface behavior itself matches MRT.
 
 ## Footer cells
 
 Footer cells are populated from each column's `footer` definition or from aggregation values. See [Grouping](/docs/guides/grouping) for how aggregation rows are produced.
 
-> **Nothing to stick to?:** If the header or footer is not sticking, the surface is probably not bounded —
->   check that `slotProps.surface` isn't removing the default max-height (e.g.
->   `max-h-none`) and that the data actually overflows the bound.
+> **Nothing to stick to?:** If the header or footer is not sticking, the surface is probably not bounded — check that `slotProps.surface` isn't removing the default max-height (e.g. `max-h-none`) and that the data actually overflows the bound.
 
 ## Related
 
@@ -4419,9 +4353,7 @@ const columns: DataTableColumnDef<Person>[] = [
 | `skeleton` | `<div> props · { column, rowIndex, table }` |  | Each loading skeleton (bar or square) in a body cell. |
 | `selectCheckbox` | `<button> props · { row?, table }` |  | Each row selection checkbox (and the select-all one, without `row`). |
 
-> **The root:** `<DataTable />
->   `'s own props also land on the root, after `slotProps.root` — so `
->   <DataTable table={table} className="…" />` works too.
+> **The root:** `<DataTable />`'s own props also land on the root, after `slotProps.root` — so `<DataTable table={table} className="…" />` works too.
 
 ## Related
 
@@ -4439,14 +4371,14 @@ const columns: DataTableColumnDef<Person>[] = [
 
 Some features add columns of their own: row selection, the expand toggle, row actions, row numbers, row pinning and the row drag handle. Change any of them with `displayColumnDefOptions`, keyed by the column's id — it takes the same options as your own columns.
 
-| Column               | Id               | Added by                                                            |
-| -------------------- | ---------------- | ------------------------------------------------------------------- |
-| Selection checkboxes | `cn-select`      | `enableRowSelection`                                                |
-| Expand toggle        | `cn-expand`      | `renderDetailPanel`, `getSubRows`                                   |
-| Row actions          | `cn-row-actions` | `renderRowActions`, `renderRowActionMenuItems`, row / modal editing |
-| Row numbers          | `cn-row-number`  | `enableRowNumbers`                                                  |
-| Row pin button       | `cn-row-pin`     | `enableRowPinning` (without row numbers)                            |
-| Drag handle          | `cn-row-drag`    | `enableRowOrdering`                                                 |
+| Column | Id | Added by |
+| --- | --- | --- |
+| Selection checkboxes | `cn-select` | `enableRowSelection` |
+| Expand toggle | `cn-expand` | `renderDetailPanel`, `getSubRows` |
+| Row actions | `cn-row-actions` | `renderRowActions`, `renderRowActionMenuItems`, row / modal editing |
+| Row numbers | `cn-row-number` | `enableRowNumbers` |
+| Row pin button | `cn-row-pin` | `enableRowPinning` (without row numbers) |
+| Drag handle | `cn-row-drag` | `enableRowOrdering` |
 
 ```tsx
 const table = useDataTable({
@@ -4458,9 +4390,7 @@ const table = useDataTable({
     "cn-row-number": {
       header: "#",
       size: 56,
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">{row.index + 1}</span>
-      ),
+      cell: ({ row }) => <span className="text-muted-foreground">{row.index + 1}</span>,
     },
     "cn-select": { size: 44 },
   },
@@ -4479,9 +4409,7 @@ useDataTable({
 
 `meta` is merged with the column's own, so you only list what you change. The column ids are fixed; use them in `initialState.columnPinning` or `columnOrder` too.
 
-> **Memoize for speed:** Inline options work, but a new object on every render also re-renders every
->   row. Define them outside your component, or wrap them in `useMemo`, to skip
->   that.
+> **Memoize for speed:** Inline options work, but a new object on every render also re-renders every row. Define them outside your component, or wrap them in `useMemo`, to skip that.
 
 Example (`display-columns`):
 
@@ -4694,24 +4622,24 @@ function HeadlessExample() {
 
 ## The parts
 
-| Part                            | What it is                                   |
-| ------------------------------- | -------------------------------------------- |
-| `DataTableToolbar`              | The whole top toolbar                        |
-| `DataTableBottomToolbar`        | The whole bottom toolbar                     |
-| `DataTableGlobalFilter`         | Search box with its mode menu                |
-| `DataTablePagination`           | Page size, range and page buttons            |
-| `DataTableAlertBanner`          | The selection banner                         |
-| `DataTableViewOptions`          | Show / hide / reorder columns menu           |
-| `DataTableDensityToggle`        | Density menu                                 |
-| `DataTableFullscreenToggle`     | Full screen button                           |
-| `DataTableFilterToggle`         | Show / hide the filter row                   |
-| `DataTableAdvancedFilterToggle` | Opens the advanced filter panel              |
-| `DataTableFilterPanel`          | The advanced filter panel                    |
-| `DataTableDropToGroupZone`      | Drop zone for grouping by drag               |
-| `DataTableColumnActions`        | A column's actions menu (takes `column`)     |
-| `DataTableColumnFilter`         | A column's filter field (takes `column`)     |
-| `DataTableFilterModeMenu`       | A column's filter-mode menu (takes `column`) |
-| `DataTableEditModal`            | The edit / create dialog                     |
+| Part | What it is |
+| --- | --- |
+| `DataTableToolbar` | The whole top toolbar |
+| `DataTableBottomToolbar` | The whole bottom toolbar |
+| `DataTableGlobalFilter` | Search box with its mode menu |
+| `DataTablePagination` | Page size, range and page buttons |
+| `DataTableAlertBanner` | The selection banner |
+| `DataTableViewOptions` | Show / hide / reorder columns menu |
+| `DataTableDensityToggle` | Density menu |
+| `DataTableFullscreenToggle` | Full screen button |
+| `DataTableFilterToggle` | Show / hide the filter row |
+| `DataTableAdvancedFilterToggle` | Opens the advanced filter panel |
+| `DataTableFilterPanel` | The advanced filter panel |
+| `DataTableDropToGroupZone` | Drop zone for grouping by drag |
+| `DataTableColumnActions` | A column's actions menu (takes `column`) |
+| `DataTableColumnFilter` | A column's filter field (takes `column`) |
+| `DataTableFilterModeMenu` | A column's filter-mode menu (takes `column`) |
+| `DataTableEditModal` | The edit / create dialog |
 
 The header, body and footer stay inside `<DataTable />`, which manages their scrolling, virtualization and keyboard navigation. To change how they look, use [`slotProps`](/docs/guides/slot-props).
 
@@ -4943,10 +4871,9 @@ return <DataTable table={table} />
 
 # Theming
 
-The data table is **style-agnostic**. It is built entirely on standard shadcn/ui primitive APIs, and those primitives are declared as registry dependencies. When you run `shadcn add`, the CLI installs those primitives in _your_ configured style (Sera, Vega, Nova, Luma, …) and base color — so the table simply inherits your existing look with nothing to override.
+The data table is **style-agnostic**. It is built entirely on standard shadcn/ui primitive APIs, and those primitives are declared as registry dependencies. When you run `shadcn add`, the CLI installs those primitives in *your* configured style (Sera, Vega, Nova, Luma, …) and base color — so the table simply inherits your existing look with nothing to override.
 
-> **No table-specific theme:** There is no separate table-specific theme. Whatever your shadcn style and base
->   color are, the table already matches them.
+> **No table-specific theme:** There is no separate table-specific theme. Whatever your shadcn style and base color are, the table already matches them.
 
 ## Design tokens
 
@@ -5044,7 +4971,7 @@ For icon (and localization) defaults shared across many tables, wrap a subtree i
 import { DataTableConfigProvider } from "@/components/ui/data-table"
 import { RiSearchLine } from "@remixicon/react"
 
-;<DataTableConfigProvider icons={{ search: RiSearchLine }}>
+<DataTableConfigProvider icons={{ search: RiSearchLine }}>
   {children}
 </DataTableConfigProvider>
 ```
@@ -5937,7 +5864,7 @@ When infinite scroll is on, the pager is hidden and pagination is forced to a si
 
 ## Controlled fetch state
 
-You own the data and the loading flags; the table only decides _when_ to ask for more. Append the next chunk to `data` in your `onLoadMore` handler.
+You own the data and the loading flags; the table only decides *when* to ask for more. Append the next chunk to `data` in your `onLoadMore` handler.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
@@ -6112,8 +6039,8 @@ rowVirtualizerRef.current?.scrollToIndex(100)
 ```
 
 > **Row drag-ordering is disabled:** Row virtualization is incompatible with row drag-ordering. If you need to
->   reorder rows by dragging, leave virtualization off. See [Row
->   ordering](/docs/guides/row-ordering).
+>   reorder rows by dragging, leave virtualization off. See
+>   [Row ordering](/docs/guides/row-ordering).
 
 ## Column virtualization
 
@@ -6373,7 +6300,9 @@ function toCsv(rows: unknown[][]) {
   const escape = (value: unknown) => {
     const text = value == null ? "" : String(value)
     const guarded = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text
-    return /[",\n]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded
+    return /[",\n]/.test(guarded)
+      ? `"${guarded.replace(/"/g, '""')}"`
+      : guarded
   }
   return rows.map((row) => row.map(escape).join(",")).join("\n")
 }
@@ -6725,15 +6654,15 @@ The table is built to be used without a mouse and with a screen reader. Its part
 
 With `enableKeyboardNavigation` (on by default) the table is an ARIA grid: one Tab stop for the whole body, `aria-rowcount` / `aria-colcount` for the full data (also when rows or columns are virtualized), and `aria-rowindex` / `aria-colindex` on every row and cell. Turn it off and the table is a plain `<table>`.
 
-| Keys                     | What they do                                                             |
-| ------------------------ | ------------------------------------------------------------------------ |
-| Arrow keys               | Move between cells (left and right are mirrored in right-to-left tables) |
-| Home / End               | First / last cell in the row                                             |
-| Ctrl + Home / Ctrl + End | First / last cell in the table                                           |
-| Page Up / Page Down      | Up / down a screenful of rows                                            |
-| Enter or F2              | Activate the cell: open its editor, toggle its checkbox, follow its link |
-| Ctrl + C (Cmd + C)       | Copy the focused cell's text                                             |
-| Escape                   | Cancel an edit; leave full screen                                        |
+| Keys | What they do |
+| --- | --- |
+| Arrow keys | Move between cells (left and right are mirrored in right-to-left tables) |
+| Home / End | First / last cell in the row |
+| Ctrl + Home / Ctrl + End | First / last cell in the table |
+| Page Up / Page Down | Up / down a screenful of rows |
+| Enter or F2 | Activate the cell: open its editor, toggle its checkbox, follow its link |
+| Ctrl + C (Cmd + C) | Copy the focused cell's text |
+| Escape | Cancel an edit; leave full screen |
 
 Rows and columns that aren't rendered (virtualization) are scrolled into view as you reach them. Focus comes back to the same cell after an edit is saved or cancelled, and to the nearest cell when its row is deleted.
 

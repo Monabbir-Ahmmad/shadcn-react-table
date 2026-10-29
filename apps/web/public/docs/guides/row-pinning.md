@@ -40,12 +40,12 @@ return <DataTable table={table} />
 
 `rowPinningDisplayMode` sets where pinned rows show and how rows get pinned:
 
-| Mode                               | Pinned rows                                                  | Pinned by                                                |
-| ---------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
-| `"top-and-bottom"` (default)       | Stay in view above (or below) the other rows while scrolling | The pin button (to the top), or `row.pin("bottom")`      |
-| `"top"` / `"bottom"`               | The same                                                     | The pin button, to that side                             |
-| `"static"`                         | Listed first (or last), and scroll away with the rest        | The pin button                                           |
-| `"select-top"` / `"select-bottom"` | Stay in view on that side                                    | Selecting the row; deselecting unpins it. No pin buttons |
+| Mode | Pinned rows | Pinned by |
+| --- | --- | --- |
+| `"top-and-bottom"` (default) | Stay in view above (or below) the other rows while scrolling | The pin button (to the top), or `row.pin("bottom")` |
+| `"top"` / `"bottom"` | The same | The pin button, to that side |
+| `"static"` | Listed first (or last), and scroll away with the rest | The pin button |
+| `"select-top"` / `"select-bottom"` | Stay in view on that side | Selecting the row; deselecting unpins it. No pin buttons |
 
 ```tsx
 useDataTable({

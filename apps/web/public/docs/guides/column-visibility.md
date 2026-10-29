@@ -32,7 +32,6 @@ return <DataTable table={table} />
 ```
 
 ## Initial hidden columns
-
 Hide columns from the start with `initialState.columnVisibility`, mapping a column id to `false`.
 
 ```tsx
@@ -46,15 +45,15 @@ const table = useDataTable({
 ```
 
 ## Prevent hiding a column
-
 Use TanStack's `enableHiding: false` on a column definition to keep it always visible. It will not appear in the toggle or expose a Hide item.
 
 ```tsx
-const columns = [{ accessorKey: "firstName", enableHiding: false }]
+const columns = [
+  { accessorKey: "firstName", enableHiding: false },
+]
 ```
 
-> **Always-on columns:** Columns with `enableHiding: false` stay rendered regardless of toolbar or menu
->   actions.
+> **Always-on columns:** Columns with `enableHiding: false` stay rendered regardless of toolbar or menu actions.
 
 ## Leaving a column out of the menu
 

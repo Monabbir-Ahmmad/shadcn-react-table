@@ -350,25 +350,15 @@ useDataTable({
   columns,
   enableEditing: true,
   editDisplayMode: "modal",
-  renderEditRowDialogContent: ({
-    row,
-    internalEditComponents,
-    save,
-    cancel,
-    hasErrors,
-  }) => (
+  renderEditRowDialogContent: ({ row, internalEditComponents, save, cancel, hasErrors }) => (
     <>
       <DialogHeader>
         <DialogTitle>Edit {row.original.name}</DialogTitle>
       </DialogHeader>
       <div className="grid grid-cols-2 gap-3">{internalEditComponents}</div>
       <DialogFooter>
-        <Button variant="outline" onClick={cancel}>
-          Discard
-        </Button>
-        <Button onClick={save} disabled={hasErrors}>
-          Save changes
-        </Button>
+        <Button variant="outline" onClick={cancel}>Discard</Button>
+        <Button onClick={save} disabled={hasErrors}>Save changes</Button>
       </DialogFooter>
     </>
   ),

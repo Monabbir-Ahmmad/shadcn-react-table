@@ -22,59 +22,59 @@ return <DataTable table={table} />
 
 MRT puts its own column options on the column definition. Here they live under `meta`.
 
-| MRT column option                                                             | Here                                                                                  |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `Cell` / `Header` / `Footer`                                                  | `cell` / `header` / `footer` (TanStack's)                                             |
-| `filterVariant`                                                               | `meta.filterVariant`                                                                  |
-| `filterSelectOptions`                                                         | `meta.filterSelectOptions`                                                            |
-| `filterFn` (a mode name)                                                      | `meta.filterMode`                                                                     |
-| `columnFilterModeOptions`                                                     | `meta.columnFilterModeOptions`                                                        |
-| `enableColumnFilterModes`                                                     | `meta.enableColumnFilterModes`                                                        |
-| `Filter`                                                                      | `meta.renderColumnFilter`                                                             |
-| `editVariant` / `editSelectOptions`                                           | `meta.editVariant` / `meta.editSelectOptions`                                         |
-| `enableEditing`                                                               | `meta.enableEditing`                                                                  |
-| `Edit`                                                                        | `meta.renderEditCell`                                                                 |
-| `muiEditTextFieldProps` validation                                            | `meta.validate` (return a message to block the save)                                  |
-| `GroupedCell` / `AggregatedCell` / `PlaceholderCell`                          | `meta.renderGroupedCell` / `meta.renderAggregatedCell` / `meta.renderPlaceholderCell` |
-| `enableClickToCopy`                                                           | `meta.enableClickToCopy`                                                              |
-| `enableColumnActions`                                                         | `meta.enableColumnActions`                                                            |
-| `visibleInShowHideMenu`                                                       | `meta.visibleInShowHideMenu`                                                          |
-| `muiTableHeadCellProps` / `muiTableBodyCellProps` / `muiTableFooterCellProps` | `meta.slotProps.headCell` / `.bodyCell` / `.footerCell`                               |
+| MRT column option | Here |
+| --- | --- |
+| `Cell` / `Header` / `Footer` | `cell` / `header` / `footer` (TanStack's) |
+| `filterVariant` | `meta.filterVariant` |
+| `filterSelectOptions` | `meta.filterSelectOptions` |
+| `filterFn` (a mode name) | `meta.filterMode` |
+| `columnFilterModeOptions` | `meta.columnFilterModeOptions` |
+| `enableColumnFilterModes` | `meta.enableColumnFilterModes` |
+| `Filter` | `meta.renderColumnFilter` |
+| `editVariant` / `editSelectOptions` | `meta.editVariant` / `meta.editSelectOptions` |
+| `enableEditing` | `meta.enableEditing` |
+| `Edit` | `meta.renderEditCell` |
+| `muiEditTextFieldProps` validation | `meta.validate` (return a message to block the save) |
+| `GroupedCell` / `AggregatedCell` / `PlaceholderCell` | `meta.renderGroupedCell` / `meta.renderAggregatedCell` / `meta.renderPlaceholderCell` |
+| `enableClickToCopy` | `meta.enableClickToCopy` |
+| `enableColumnActions` | `meta.enableColumnActions` |
+| `visibleInShowHideMenu` | `meta.visibleInShowHideMenu` |
+| `muiTableHeadCellProps` / `muiTableBodyCellProps` / `muiTableFooterCellProps` | `meta.slotProps.headCell` / `.bodyCell` / `.footerCell` |
 
 ## Component props (`mui*Props`)
 
 MRT's `mui*Props` become one `slotProps` option. Each part takes props or a function of its context, and merges them with the table's own. See [Part props](/docs/guides/slot-props).
 
-| MRT                                                                          | `slotProps` part                             |
-| ---------------------------------------------------------------------------- | -------------------------------------------- |
-| `muiTablePaperProps`                                                         | `root`                                       |
-| `muiTableContainerProps`                                                     | `surface`                                    |
-| `muiTableProps`                                                              | `table`                                      |
-| `muiTableHeadProps` / `muiTableHeadRowProps` / `muiTableHeadCellProps`       | `head` / `headRow` / `headCell`              |
-| `muiFilterTextFieldProps` (cell)                                             | `filterCell`                                 |
-| `muiTableBodyProps` / `muiTableBodyRowProps` / `muiTableBodyCellProps`       | `body` / `bodyRow` / `bodyCell`              |
-| `muiDetailPanelProps`                                                        | `detailPanel`                                |
-| `muiTableFooterProps` / `muiTableFooterRowProps` / `muiTableFooterCellProps` | `footer` / `footerRow` / `footerCell`        |
-| `muiTopToolbarProps` / `muiBottomToolbarProps`                               | `topToolbar` / `bottomToolbar`               |
-| `muiPaginationProps`                                                         | `pagination`                                 |
-| `muiToolbarAlertBannerProps`                                                 | `alertBanner`                                |
-| `muiSearchTextFieldProps`                                                    | `searchInput`                                |
-| `muiEditTextFieldProps`                                                      | `editField`                                  |
-| `muiEditRowDialogProps` / `muiCreateRowModalProps`                           | `editDialog` (`isCreating` tells them apart) |
-| `muiSelectCheckboxProps`                                                     | `selectCheckbox`                             |
+| MRT | `slotProps` part |
+| --- | --- |
+| `muiTablePaperProps` | `root` |
+| `muiTableContainerProps` | `surface` |
+| `muiTableProps` | `table` |
+| `muiTableHeadProps` / `muiTableHeadRowProps` / `muiTableHeadCellProps` | `head` / `headRow` / `headCell` |
+| `muiFilterTextFieldProps` (cell) | `filterCell` |
+| `muiTableBodyProps` / `muiTableBodyRowProps` / `muiTableBodyCellProps` | `body` / `bodyRow` / `bodyCell` |
+| `muiDetailPanelProps` | `detailPanel` |
+| `muiTableFooterProps` / `muiTableFooterRowProps` / `muiTableFooterCellProps` | `footer` / `footerRow` / `footerCell` |
+| `muiTopToolbarProps` / `muiBottomToolbarProps` | `topToolbar` / `bottomToolbar` |
+| `muiPaginationProps` | `pagination` |
+| `muiToolbarAlertBannerProps` | `alertBanner` |
+| `muiSearchTextFieldProps` | `searchInput` |
+| `muiEditTextFieldProps` | `editField` |
+| `muiEditRowDialogProps` / `muiCreateRowModalProps` | `editDialog` (`isCreating` tells them apart) |
+| `muiSelectCheckboxProps` | `selectCheckbox` |
 
 ## State
 
-| MRT state                                                                              | Here                                        |
-| -------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `isFullScreen`                                                                         | `isFullscreen`                              |
-| `columnFilterFns`                                                                      | `columnFilterModes`                         |
-| `globalFilterFn`                                                                       | `globalFilterMode`                          |
-| `editingRow`                                                                           | `editingRowId` (the draft is in `rowDraft`) |
-| `editingCell`                                                                          | `editingCell` (`{ rowId, columnId }`)       |
-| `creatingRow`                                                                          | `isCreating` (the draft is in `rowDraft`)   |
-| `isLoading` / `isSaving` / `showProgressBars` / `showSkeletons` / `showLoadingOverlay` | options of the same names, not state        |
-| `density`, `showColumnFilters`, and TanStack's own state                               | unchanged                                   |
+| MRT state | Here |
+| --- | --- |
+| `isFullScreen` | `isFullscreen` |
+| `columnFilterFns` | `columnFilterModes` |
+| `globalFilterFn` | `globalFilterMode` |
+| `editingRow` | `editingRowId` (the draft is in `rowDraft`) |
+| `editingCell` | `editingCell` (`{ rowId, columnId }`) |
+| `creatingRow` | `isCreating` (the draft is in `rowDraft`) |
+| `isLoading` / `isSaving` / `showProgressBars` / `showSkeletons` / `showLoadingOverlay` | options of the same names, not state |
+| `density`, `showColumnFilters`, and TanStack's own state | unchanged |
 
 Set and control state the same way: `initialState`, `state`, and the matching `on…Change` callback (`onIsFullScreenChange` → `onIsFullscreenChange`, `onColumnFilterFnsChange` → `onColumnFilterModesChange`, `onGlobalFilterFnChange` → `onGlobalFilterModeChange`). See [State management](/docs/guides/state).
 
@@ -84,48 +84,48 @@ Most options keep their MRT names: `enableRowSelection`, `enableMultiRowSelectio
 
 Renamed or reshaped:
 
-| MRT                                                                         | Here                                                                                                                                   |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `sortingFns`                                                                | `sortFns` (TanStack v9's name)                                                                                                         |
-| `rowNumberDisplayMode`                                                      | `rowNumberMode`                                                                                                                        |
-| `renderEmptyRowsFallback`                                                   | `renderEmpty`                                                                                                                          |
-| `muiPaginationProps.rowsPerPageOptions`                                     | `pageSizeOptions`                                                                                                                      |
-| `state.isLoading` and friends                                               | the `isLoading`, `isSaving`, `showProgressBars`, `showSkeletons`, `showLoadingOverlay` options                                         |
-| `onEditingRowSave({ values, table })`, then `table.setEditingRow(null)`     | `onEditingRowSave({ row, values, table, exit })`, then `exit()`                                                                        |
-| `onCreatingRowSave({ values, table })`, then `table.setCreatingRow(null)`   | `onCreatingRowSave({ values, table, exit })`, then `exit()`                                                                            |
-| cell edits saved from `muiEditTextFieldProps.onBlur`                        | `onEditingCellSave({ row, column, value, table })`                                                                                     |
+| MRT | Here |
+| --- | --- |
+| `sortingFns` | `sortFns` (TanStack v9's name) |
+| `rowNumberDisplayMode` | `rowNumberMode` |
+| `renderEmptyRowsFallback` | `renderEmpty` |
+| `muiPaginationProps.rowsPerPageOptions` | `pageSizeOptions` |
+| `state.isLoading` and friends | the `isLoading`, `isSaving`, `showProgressBars`, `showSkeletons`, `showLoadingOverlay` options |
+| `onEditingRowSave({ values, table })`, then `table.setEditingRow(null)` | `onEditingRowSave({ row, values, table, exit })`, then `exit()` |
+| `onCreatingRowSave({ values, table })`, then `table.setCreatingRow(null)` | `onCreatingRowSave({ values, table, exit })`, then `exit()` |
+| cell edits saved from `muiEditTextFieldProps.onBlur` | `onEditingCellSave({ row, column, value, table })` |
 | `displayColumnDefOptions["mrt-row-select"]` (and the other `mrt-row-*` ids) | `displayColumnDefOptions["cn-select"]` — ids: `cn-select`, `cn-expand`, `cn-row-actions`, `cn-row-number`, `cn-row-pin`, `cn-row-drag` |
 
 Callbacks and render options with the same name and arguments: `onEditingRowCancel`, `onCreatingRowCancel`, `renderTopToolbarCustomActions`, `renderBottomToolbarCustomActions`, `renderToolbarInternalActions`, `renderTopToolbar`, `renderBottomToolbar`, `renderRowActions`, `renderDetailPanel`, `renderCaption`, `renderEditRowDialogContent`, `renderCreateRowDialogContent`, `renderColumnFilterModeMenuItems`, `renderGlobalFilterModeMenuItems`, and the menu callbacks `renderColumnActionsMenuItems`, `renderRowActionMenuItems`, `renderCellActionMenuItems` (each receives `internalMenuItems` and `closeMenu`).
 
 ## The table instance
 
-| MRT                                                        | Here                                        |
-| ---------------------------------------------------------- | ------------------------------------------- |
-| `table.setEditingRow(row)`                                 | `table.beginRowEdit(row)`                   |
-| `table.setEditingRow(null)` / `table.setCreatingRow(null)` | `table.cancelEdit()`                        |
-| `table.setCreatingRow(true)`                               | `table.beginCreate()`                       |
-| `table.setEditingCell(cell)`                               | `table.setEditingCell({ rowId, columnId })` |
-| `table.setIsFullScreen(…)`                                 | `table.setIsFullscreen(…)`                  |
-| `table.setColumnFilterFns(…)`                              | `table.setColumnFilterMode(columnId, mode)` |
-| `table.setGlobalFilterFn(…)`                               | `table.setGlobalFilterMode(mode)`           |
-| `table.refs.tableContainerRef` (and the other refs)        | `table.dataTable.refs.tableContainerRef`    |
-| `table.options.enableEditing` (and MRT's other options)    | `table.dataTable.enableEditing`             |
-| `table.getState()`                                         | unchanged, including the UI state above     |
+| MRT | Here |
+| --- | --- |
+| `table.setEditingRow(row)` | `table.beginRowEdit(row)` |
+| `table.setEditingRow(null)` / `table.setCreatingRow(null)` | `table.cancelEdit()` |
+| `table.setCreatingRow(true)` | `table.beginCreate()` |
+| `table.setEditingCell(cell)` | `table.setEditingCell({ rowId, columnId })` |
+| `table.setIsFullScreen(…)` | `table.setIsFullscreen(…)` |
+| `table.setColumnFilterFns(…)` | `table.setColumnFilterMode(columnId, mode)` |
+| `table.setGlobalFilterFn(…)` | `table.setGlobalFilterMode(mode)` |
+| `table.refs.tableContainerRef` (and the other refs) | `table.dataTable.refs.tableContainerRef` |
+| `table.options.enableEditing` (and MRT's other options) | `table.dataTable.enableEditing` |
+| `table.getState()` | unchanged, including the UI state above |
 
 The instance is stable and the component that calls `useDataTable` does not re-render on state changes. Read state where you render it with `table.Subscribe`, or pass `stateSelector`. See [State management](/docs/guides/state).
 
 ## Defaults that differ
 
-| Option                            | MRT          | Here         | Why                                                      |
-| --------------------------------- | ------------ | ------------ | -------------------------------------------------------- |
-| `editDisplayMode`                 | `"modal"`    | `"cell"`     | Inline editing is the quickest edit for most tables      |
-| `positionActionsColumn`           | `"first"`    | `"last"`     | Actions read best after the data they act on             |
-| `enableStickyHeader`              | `false`      | `true`       | Headers stay useful on long tables                       |
-| `enableFacetedValues`             | `false`      | `true`       | Select filters fill their options from the data          |
-| `enableGlobalFilterRankedResults` | `true`       | `false`      | Searching never reorders rows unless you opt in          |
-| Text filter mode                  | `"fuzzy"`    | `"contains"` | Predictable matches; fuzzy is one menu click away        |
-| Cell editing starts on            | double-click | single click | One click to edit, matching the click-to-edit affordance |
+| Option | MRT | Here | Why |
+| --- | --- | --- | --- |
+| `editDisplayMode` | `"modal"` | `"cell"` | Inline editing is the quickest edit for most tables |
+| `positionActionsColumn` | `"first"` | `"last"` | Actions read best after the data they act on |
+| `enableStickyHeader` | `false` | `true` | Headers stay useful on long tables |
+| `enableFacetedValues` | `false` | `true` | Select filters fill their options from the data |
+| `enableGlobalFilterRankedResults` | `true` | `false` | Searching never reorders rows unless you opt in |
+| Text filter mode | `"fuzzy"` | `"contains"` | Predictable matches; fuzzy is one menu click away |
+| Cell editing starts on | double-click | single click | One click to edit, matching the click-to-edit affordance |
 
 Set the MRT value explicitly to keep the old behavior.
 

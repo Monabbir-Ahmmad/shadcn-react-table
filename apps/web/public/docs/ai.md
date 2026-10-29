@@ -56,7 +56,6 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 ```markdown
 ## Data table
-
 - components/ui/data-table is shadcn-react-table (installed from its shadcn registry; edit freely).
 - Before changing table options read https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table.md;
   column options: https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options.md.
@@ -70,8 +69,5 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 <Cards>
   <Card href="/docs/installation" title="Installation" />
-  <Card
-    href="/docs/guides/migrating-from-mrt"
-    title="Migrating from Material React Table"
-  />
+  <Card href="/docs/guides/migrating-from-mrt" title="Migrating from Material React Table" />
 </Cards>

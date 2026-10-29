@@ -37,26 +37,22 @@ const columns: DataTableColumnDef<Person>[] = [
 
 <Step title="Create the table">
 
-Pass `data` and `columns` to `useDataTable`. Everything else is optional.
-
-```tsx
-const table = useDataTable({
-  data,
-  columns,
-  getRowId: (row) => row.id,
-  initialState: { pagination: { pageSize: 10 } },
-})
-```
+Inside your component, pass `data` and `columns` to `useDataTable`. Everything else is optional; `getRowId` gives rows a stable identity and `initialState` seeds the page size.
 
 </Step>
 
 <Step title="Render it">
 
-Hand the instance to `<DataTable />`. Put the hook call inside a component:
+Hand the instance to `<DataTable />`.
 
 ```tsx
 export function PeopleTable() {
-  const table = useDataTable({ data, columns, getRowId: (row) => row.id })
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+  })
 
   return <DataTable table={table} />
 }

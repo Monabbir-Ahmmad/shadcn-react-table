@@ -22,16 +22,16 @@ function ColumnFiltersExample() {
 
 The UI for each filter is chosen by the column's `meta.filterVariant`:
 
-| Variant                           | Control                                 | Values                                              |
-| --------------------------------- | --------------------------------------- | --------------------------------------------------- |
-| `"text"` (default)                | Text box                                | Any                                                 |
-| `"autocomplete"`                  | Text box suggesting the column's values | Any                                                 |
-| `"select"` / `"multi-select"`     | Dropdown / checklist                    | Strings                                             |
-| `"checkbox"`                      | Checkbox                                | Booleans                                            |
-| `"range"` / `"range-slider"`      | Number boxes / slider                   | Numbers                                             |
-| `"date"` / `"date-range"`         | Calendar                                | Dates, compared by day                              |
-| `"datetime"` / `"datetime-range"` | Date-time box                           | Dates, compared to the minute                       |
-| `"time"` / `"time-range"`         | Time box                                | `"HH:mm"` strings or Dates, compared by time of day |
+| Variant | Control | Values |
+| --- | --- | --- |
+| `"text"` (default) | Text box | Any |
+| `"autocomplete"` | Text box suggesting the column's values | Any |
+| `"select"` / `"multi-select"` | Dropdown / checklist | Strings |
+| `"checkbox"` | Checkbox | Booleans |
+| `"range"` / `"range-slider"` | Number boxes / slider | Numbers |
+| `"date"` / `"date-range"` | Calendar | Dates, compared by day |
+| `"datetime"` / `"datetime-range"` | Date-time box | Dates, compared to the minute |
+| `"time"` / `"time-range"` | Time box | `"HH:mm"` strings or Dates, compared by time of day |
 
 The date, date-time and time variants share the same modes (equals, before, after, between, empty…); the `-range` variants start in "between".
 

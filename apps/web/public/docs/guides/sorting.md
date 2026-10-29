@@ -81,9 +81,7 @@ const PRIORITY = ["low", "medium", "high"]
 
 const table = useDataTable({
   data,
-  columns: [
-    { accessorKey: "priority", header: "Priority", sortFn: "byPriority" },
-  ],
+  columns: [{ accessorKey: "priority", header: "Priority", sortFn: "byPriority" }],
   sortFns: {
     byPriority: (rowA, rowB, columnId) =>
       PRIORITY.indexOf(rowA.getValue(columnId)) -

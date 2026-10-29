@@ -1,9 +1,8 @@
 # Theming
 
-The data table is **style-agnostic**. It is built entirely on standard shadcn/ui primitive APIs, and those primitives are declared as registry dependencies. When you run `shadcn add`, the CLI installs those primitives in _your_ configured style (Sera, Vega, Nova, Luma, …) and base color — so the table simply inherits your existing look with nothing to override.
+The data table is **style-agnostic**. It is built entirely on standard shadcn/ui primitive APIs, and those primitives are declared as registry dependencies. When you run `shadcn add`, the CLI installs those primitives in *your* configured style (Sera, Vega, Nova, Luma, …) and base color — so the table simply inherits your existing look with nothing to override.
 
-> **No table-specific theme:** There is no separate table-specific theme. Whatever your shadcn style and base
->   color are, the table already matches them.
+> **No table-specific theme:** There is no separate table-specific theme. Whatever your shadcn style and base color are, the table already matches them.
 
 ## Design tokens
 

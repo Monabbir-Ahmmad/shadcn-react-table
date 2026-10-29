@@ -39,8 +39,7 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-> **Indentation:** Use `row.depth` inside a cell renderer to indent child rows so the hierarchy
->   reads clearly.
+> **Indentation:** Use `row.depth` inside a cell renderer to indent child rows so the hierarchy reads clearly.
 
 ## From a flat list
 

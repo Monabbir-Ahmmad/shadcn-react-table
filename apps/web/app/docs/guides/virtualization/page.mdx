@@ -66,8 +66,8 @@ rowVirtualizerRef.current?.scrollToIndex(100)
 
 <Callout variant="warning" title="Row drag-ordering is disabled">
   Row virtualization is incompatible with row drag-ordering. If you need to
-  reorder rows by dragging, leave virtualization off. See [Row
-  ordering](/docs/guides/row-ordering).
+  reorder rows by dragging, leave virtualization off. See
+  [Row ordering](/docs/guides/row-ordering).
 </Callout>
 
 ## Column virtualization
@@ -97,19 +97,7 @@ return <DataTable table={table} />
 
 ## Relevant options
 
-<ApiTable
-  of="useDataTableOptions"
-  only={[
-    "enableRowVirtualization",
-    "enableColumnVirtualization",
-    "estimateRowHeight",
-    "virtualOverscan",
-    "rowVirtualizerOptions",
-    "columnVirtualizerOptions",
-    "rowVirtualizerInstanceRef",
-    "columnVirtualizerInstanceRef",
-  ]}
-/>
+<ApiTable of="useDataTableOptions" only={["enableRowVirtualization", "enableColumnVirtualization", "estimateRowHeight", "virtualOverscan", "rowVirtualizerOptions", "columnVirtualizerOptions", "rowVirtualizerInstanceRef", "columnVirtualizerInstanceRef"]} />
 
 ## Related
 

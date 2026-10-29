@@ -7,11 +7,7 @@ Rows can be dragged out of a table — onto another table, or onto a drop zone o
 Wrap the tables in `DataTableDndProvider`, turn on `enableRowDragging` on the table rows leave from, and move the row in `onRowDragEnd`:
 
 ```tsx
-import {
-  DataTable,
-  DataTableDndProvider,
-  useDataTable,
-} from "@/components/ui/data-table"
+import { DataTable, DataTableDndProvider, useDataTable } from "@/components/ui/data-table"
 
 function Lists() {
   const [todo, setTodo] = React.useState(initialTodo)
@@ -29,22 +25,12 @@ function Lists() {
       }
     },
   })
-  const doneTable = useDataTable({
-    data: done,
-    columns,
-    getRowId: (row) => row.id,
-  })
+  const doneTable = useDataTable({ data: done, columns, getRowId: (row) => row.id })
 
   return (
     <DataTableDndProvider>
-      <DataTable
-        table={todoTable}
-        className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary"
-      />
-      <DataTable
-        table={doneTable}
-        className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary"
-      />
+      <DataTable table={todoTable} className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary" />
+      <DataTable table={doneTable} className="data-[drop-target]:ring-2 data-[drop-target]:ring-primary" />
     </DataTableDndProvider>
   )
 }

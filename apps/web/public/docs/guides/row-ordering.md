@@ -55,8 +55,7 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-> **Not compatible with virtualization:** Row drag-and-drop is incompatible with row virtualization. Disable
->   virtualization when you enable row ordering.
+> **Not compatible with virtualization:** Row drag-and-drop is incompatible with row virtualization. Disable virtualization when you enable row ordering.
 
 ## Related
 

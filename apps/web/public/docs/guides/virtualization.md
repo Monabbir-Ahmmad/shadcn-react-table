@@ -78,8 +78,8 @@ rowVirtualizerRef.current?.scrollToIndex(100)
 ```
 
 > **Row drag-ordering is disabled:** Row virtualization is incompatible with row drag-ordering. If you need to
->   reorder rows by dragging, leave virtualization off. See [Row
->   ordering](/docs/guides/row-ordering).
+>   reorder rows by dragging, leave virtualization off. See
+>   [Row ordering](/docs/guides/row-ordering).
 
 ## Column virtualization
 

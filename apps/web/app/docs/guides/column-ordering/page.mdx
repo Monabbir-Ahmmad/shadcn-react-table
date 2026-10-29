@@ -17,6 +17,7 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+
 ## While you drag
 
 The whole column moves with its header — body, filter and footer cells included — and the other columns slide aside to show where it will land. The movement comes from CSS variables on the scroll surface, so dragging doesn't re-render any rows. With "reduce motion" turned on in the operating system, the columns move without the slide animation.
@@ -24,7 +25,6 @@ The whole column moves with its header — body, filter and footer cells include
 <Example slug="column-drag" />
 
 ## Initial order
-
 Provide the starting order with `initialState.columnOrder`, an array of column ids.
 
 ```tsx
@@ -39,8 +39,7 @@ const table = useDataTable({
 ```
 
 <Callout variant="tip" title="Pair with pinning">
-  Pinned columns stay anchored while the rest reorder. Combine ordering with
-  pinning to keep key columns in view.
+Pinned columns stay anchored while the rest reorder. Combine ordering with pinning to keep key columns in view.
 </Callout>
 
 ## Related

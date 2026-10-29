@@ -34,7 +34,6 @@ return <DataTable table={table} />
 ```
 
 ## Initial pins
-
 Pin columns from the start with `initialState.columnPinning`, grouping ids into `left` and `right`.
 
 ```tsx
@@ -53,8 +52,7 @@ const table = useDataTable({
 
 Table options and `table.getState()` use `left` / `right`, while instance methods such as `column.pin` and `column.getIsPinned` use TanStack v9's `start` / `end`.
 
-> **Sticky positioning:** Pinned columns rely on the same sticky behavior used elsewhere in the table.
->   See the sticky guide for how that interacts with headers and footers.
+> **Sticky positioning:** Pinned columns rely on the same sticky behavior used elsewhere in the table. See the sticky guide for how that interacts with headers and footers.
 
 ## Related
 

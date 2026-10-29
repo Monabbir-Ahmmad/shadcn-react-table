@@ -48,8 +48,7 @@ const table = useDataTable({
 })
 ```
 
-> **Pairs with row pinning:** The row-number column is also where the pin toggle lives, so it works well
->   alongside row pinning.
+> **Pairs with row pinning:** The row-number column is also where the pin toggle lives, so it works well alongside row pinning.
 
 ## Related
 

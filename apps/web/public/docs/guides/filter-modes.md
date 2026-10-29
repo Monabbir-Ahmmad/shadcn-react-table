@@ -87,12 +87,7 @@ To restrict every column at once, pass `columnFilterModeOptions` to `useDataTabl
 const table = useDataTable({
   data,
   columns,
-  columnFilterModeOptions: [
-    "contains",
-    "equals",
-    "between",
-    "betweenInclusive",
-  ],
+  columnFilterModeOptions: ["contains", "equals", "between", "betweenInclusive"],
 })
 ```
 
