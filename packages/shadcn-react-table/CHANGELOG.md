@@ -34,6 +34,8 @@ for every rename.
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **Faster:** changing the density no longer re-renders every row; cells
+  read their padding from a CSS variable the table root sets.
 - **New:** `enableTableHead` / `enableTableFooter` hide the header or footer
   rows, `enableExpandAll` hides the expand-all toggle, and column
   `meta.visibleInShowHideMenu: false` leaves a column out of the show / hide

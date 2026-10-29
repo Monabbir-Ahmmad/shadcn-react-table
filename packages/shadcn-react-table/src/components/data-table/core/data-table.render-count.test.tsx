@@ -55,6 +55,21 @@ function Table({
 }
 
 describe("body re-renders", () => {
+  it("re-renders no row when the density changes", () => {
+    const renders = { count: 0 }
+    let table!: DataTableInstance<Row>
+    render(<Table renders={renders} onTable={(t) => (table = t)} />)
+    renders.count = 0
+    act(() => table.setDensity("compact"))
+    expect(renders.count).toBe(0)
+    // The new padding comes from the root's CSS variable.
+    expect(
+      document
+        .querySelector('[data-slot="data-table"]')!
+        .getAttribute("data-density")
+    ).toBe("compact")
+  })
+
   it("re-renders only the toggled row when selecting one row", () => {
     const renders = { count: 0 }
     render(<Table renders={renders} enableRowSelection />)
@@ -86,10 +101,9 @@ describe("body re-renders", () => {
 
   it("re-renders every row when something table-wide changes", () => {
     const renders = { count: 0 }
-    let table!: DataTableInstance<Row>
-    render(<Table renders={renders} onTable={(t) => (table = t)} />)
+    const { rerender } = render(<Table renders={renders} />)
     renders.count = 0
-    act(() => table.setDensity("compact"))
+    rerender(<Table renders={renders} enableClickToCopy />)
     expect(renders.count).toBeGreaterThanOrEqual(ROWS * 2)
   })
 

@@ -37,6 +37,7 @@ import { getColumnSizeVars } from "../utils/column-styles"
 import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
+import { DENSITY_PADDING_VARS } from "./constants"
 
 /**
  * Body wrapper that freezes during an active column resize. With
@@ -266,6 +267,7 @@ export function DataTable<TData extends RowData>({
             "data-slot": "data-table",
             className: cn(
               "flex w-full flex-col gap-2",
+              DENSITY_PADDING_VARS,
               isFullscreen &&
                 "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4"
             ),

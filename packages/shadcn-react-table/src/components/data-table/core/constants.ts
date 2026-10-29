@@ -10,12 +10,15 @@ import type { Density } from "./types"
 
 export const DENSITY_ORDER: Density[] = ["comfortable", "compact", "spacious"]
 
-/** Vertical padding utility per density level, applied to header + body cells. */
-export const DENSITY_CELL_PADDING: Record<Density, string> = {
-  compact: "py-1",
-  comfortable: "py-2.5",
-  spacious: "py-4",
-}
+/** Vertical padding for header, body and footer cells: the density's
+ *  `--dt-cell-py`, which the table root sets. Cells don't depend on the
+ *  density, so changing it re-renders no row. */
+export const CELL_PADDING_Y = "py-(--dt-cell-py)"
+
+/** Sets `--dt-cell-py` on the table root from its `data-density`
+ *  (comfortable, compact, spacious). */
+export const DENSITY_PADDING_VARS =
+  "[--dt-cell-py:calc(var(--spacing)*2.5)] data-[density=compact]:[--dt-cell-py:calc(var(--spacing)*1)] data-[density=spacious]:[--dt-cell-py:calc(var(--spacing)*4)]"
 
 /** Horizontal alignment → text-align utility, applied to body cells. */
 export const ALIGN_CELL = {

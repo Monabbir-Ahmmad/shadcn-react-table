@@ -14,7 +14,7 @@ import {
 } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { DENSITY_CELL_PADDING } from "../../core/constants"
+import { CELL_PADDING_Y } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
 import {
   headerControlsOptionsFromTable,
@@ -52,7 +52,6 @@ export function DataTableHeader<TData extends RowData>({
   withHeaderSpacers,
 }: DataTableHeaderProps<TData>) {
   const {
-    density,
     enableColumnResizing,
     enableColumnVirtualization,
     enableStickyHeader,
@@ -61,7 +60,7 @@ export function DataTableHeader<TData extends RowData>({
   } = dt(table)
 
   const controls = headerControlsOptionsFromTable(table)
-  const padding = DENSITY_CELL_PADDING[density]
+  const padding = CELL_PADDING_Y
   const leafColumnIds = table.getVisibleLeafColumns().map((c) => c.id)
 
   const filterRowVisible = isFilterRowVisible(table)

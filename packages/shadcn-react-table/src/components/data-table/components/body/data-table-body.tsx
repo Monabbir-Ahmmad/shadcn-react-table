@@ -12,7 +12,7 @@ import {
   ALIGN_CELL,
   BODY_CELL_CLASS,
   BODY_ROW_CLASS,
-  DENSITY_CELL_PADDING,
+  CELL_PADDING_Y,
   NON_DATA_COLUMN_IDS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
@@ -51,11 +51,15 @@ const ROW_SCOPED_KEYS = new Set([
   "onCellClick",
   "onCellDoubleClick",
   "refs",
+  // Rows take their padding from a CSS variable on the table root.
+  "density",
+  "setDensity",
 ])
 
 // State scoped to single rows (selection) or not rendered by rows at all
 // (the in-progress resize, during which the body is frozen anyway).
 const ROW_SCOPED_STATE = new Set([
+  "density",
   "rowSelection",
   "columnSizingInfo",
   "editingCell",
@@ -86,7 +90,6 @@ export function DataTableBody<TData extends RowData>({
   withColumnSpacers,
 }: DataTableBodyProps<TData>) {
   const {
-    density,
     enableKeyboardNavigation,
     enableFilterMatchHighlighting,
     columnsWithCustomCell,
@@ -157,7 +160,7 @@ export function DataTableBody<TData extends RowData>({
     ]
   }
 
-  const padding = DENSITY_CELL_PADDING[density]
+  const padding = CELL_PADDING_Y
   // Changes to it re-render the body, so rows always see the current value.
   const cellRenderState = getCellRenderState(table)
   const visibleColumnCount = table.getVisibleLeafColumns().length

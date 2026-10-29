@@ -1,9 +1,10 @@
-import { cleanup, render, screen } from "@testing-library/react"
+import { act, cleanup, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it } from "vitest"
 
 import { nextFrame } from "../../../../test/browser/pointer"
 import { DataTable } from "./data-table"
 import type { DataTableColumnDef } from "./table-types"
+import type { DataTableInstance } from "./types"
 import { useDataTable } from "./use-data-table"
 
 afterEach(cleanup)
@@ -74,5 +75,36 @@ describe("sticky header and pinned column", () => {
     expect(unpinned.getBoundingClientRect().left).toBeLessThan(
       unpinnedLeft - 200
     )
+  })
+})
+
+describe("density", () => {
+  it("sets the cells' vertical padding from the table root", async () => {
+    let table!: DataTableInstance<Row>
+    function Dense({
+      onTable,
+    }: {
+      onTable: (t: DataTableInstance<Row>) => void
+    }) {
+      const instance = useDataTable<Row>({
+        columns: columns.slice(0, 2),
+        data: data.slice(0, 3),
+        getRowId: (row) => row.id,
+        enablePagination: false,
+      })
+      onTable(instance)
+      return <DataTable table={instance} />
+    }
+    render(<Dense onTable={(t) => (table = t)} />)
+    const cell = screen.getByText("name-0").closest("td")!
+    const paddingTop = () => getComputedStyle(cell).paddingTop
+    // comfortable → compact → spacious: 2.5, 1 and 4 spacing units.
+    expect(paddingTop()).toBe("10px")
+    act(() => table.setDensity("compact"))
+    await nextFrame()
+    expect(paddingTop()).toBe("4px")
+    act(() => table.setDensity("spacious"))
+    await nextFrame()
+    expect(paddingTop()).toBe("16px")
   })
 })

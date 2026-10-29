@@ -13,7 +13,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import {
   ALIGN_CELL,
-  DENSITY_CELL_PADDING,
+  CELL_PADDING_Y,
   FOOTER_CELL_CLASS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
@@ -52,13 +52,12 @@ export function DataTableFooter<TData extends RowData>({
   withHeaderSpacers,
 }: DataTableFooterProps<TData>) {
   const {
-    density,
     enableColumnVirtualization,
     enableStickyFooter,
     enableKeyboardNavigation,
     refs,
   } = dt(table)
-  const padding = DENSITY_CELL_PADDING[density]
+  const padding = CELL_PADDING_Y
 
   return (
     <TableFooter
