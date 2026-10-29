@@ -18,6 +18,7 @@ import {
 } from "@workspace/ui/components/tooltip"
 
 import type { DataTableInstance } from "../../core/types"
+import { formatInteger } from "../../helpers/format-integer"
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -59,12 +60,14 @@ export function DataTablePagination<TData extends RowData>({
             className="h-8 w-18"
             aria-label={localization.rowsPerPage}
           >
-            <SelectValue placeholder={`${pageSize}`} />
+            <SelectValue
+              placeholder={formatInteger(pageSize, localization.language)}
+            />
           </SelectTrigger>
           <SelectContent>
             {pageSizeOptions.map((size) => (
               <SelectItem key={size} value={`${size}`}>
-                {size}
+                {formatInteger(size, localization.language)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -99,7 +102,7 @@ export function DataTablePagination<TData extends RowData>({
                 onClick={() => table.setPageIndex(item - 1)}
                 className="size-8 text-xs tabular-nums"
               >
-                {item}
+                {formatInteger(item, localization.language)}
               </Button>
             )
           )}

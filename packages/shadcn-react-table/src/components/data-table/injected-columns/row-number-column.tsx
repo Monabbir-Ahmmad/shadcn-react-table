@@ -7,6 +7,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
+import { formatInteger } from "../helpers/format-integer"
 import { RowPinButton } from "./row-pin-button"
 
 export const ROW_NUMBER_COLUMN_ID = "cn-row-number"
@@ -37,11 +38,12 @@ export function createRowNumberColumn<TData extends RowData>(
             1 +
             table.getState().pagination.pageIndex *
               table.getState().pagination.pageSize
+      const label = formatInteger(number, localization.language)
 
       if (!enableRowPinning) {
         return (
           <span className="text-xs text-muted-foreground tabular-nums">
-            {number}
+            {label}
           </span>
         )
       }
@@ -55,7 +57,7 @@ export function createRowNumberColumn<TData extends RowData>(
               "group-hover/rownum:opacity-0"
             )}
           >
-            {number}
+            {label}
           </span>
           <RowPinButton
             row={row}
