@@ -126,6 +126,4 @@ useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/tree" title="Tree data" />
-</Cards>
+- [Tree data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/tree): For hierarchical data, provide TanStack Table's getSubRows to tell the table where each row's children live.

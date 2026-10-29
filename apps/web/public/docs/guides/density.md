@@ -69,6 +69,4 @@ The other toolbar options have their own flags too: `enableGlobalFilter`, `enabl
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/table-instance" title="Table instance" />
-</Cards>
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.

@@ -107,7 +107,5 @@ function RowDraggingExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-ordering" title="Row ordering" />
-  <Card href="/docs/guides/composition" title="Composition" />
-</Cards>
+- [Row ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-ordering): Set enableRowOrdering: true to add a drag-handle column for drag-and-drop row reordering.
+- [Composition](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/composition): <DataTable /> lays out the whole table for you.

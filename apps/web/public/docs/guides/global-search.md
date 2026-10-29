@@ -130,7 +130,5 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` â
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/filter-modes" title="Filter modes" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Filter modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/filter-modes): Filter modes let users change how a column's filter is applied â€” for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty.

@@ -158,8 +158,6 @@ The table is styled with Tailwind, not per-component style props. Structural slo
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-</Cards>
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.

@@ -68,8 +68,6 @@ Add classes and attributes with [`slotProps`](/docs/guides/slot-props) instead o
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/state" title="State management" />
-  <Card href="/docs/guides/production-ready" title="Production-ready tables" />
-  <Card href="/docs/guides/updating" title="Updating" />
-</Cards>
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+- [Production-ready tables](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/production-ready): A table over a real API: data fetched with React Query, paging, sorting and search done on the server, the table's state kept in one hook, and edits saved through a mutation.
+- [Updating](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating): shadcn add copies this block's source into your project — after that, the code is yours, and upstream releases don't reach it automatically.

@@ -133,8 +133,6 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/virtualization" title="Virtualization" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.

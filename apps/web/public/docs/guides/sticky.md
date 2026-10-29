@@ -49,7 +49,5 @@ Footer cells are populated from each column's `footer` definition or from aggreg
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/grouping" title="Grouping" />
-  <Card href="/docs/api/data-table-props" title="DataTable props" />
-</Cards>
+- [Grouping](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/grouping): Set enableGrouping: true to let users group rows by a column.
+- [DataTable props](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/data-table-props): <DataTable /> is mostly driven by the instance from useDataTable.

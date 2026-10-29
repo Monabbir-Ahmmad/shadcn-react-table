@@ -163,8 +163,6 @@ To fix one, edit the file in your project (it is your copy) and delete the comme
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/localization" title="Localization key reference" />
-  <Card href="/docs/guides/custom-icons" title="Custom icons" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Localization key reference](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/localization): Every user-facing string flows through a localization table.
+- [Custom icons](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/custom-icons): Every glyph is a named slot.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.

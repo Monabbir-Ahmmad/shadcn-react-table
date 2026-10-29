@@ -155,9 +155,7 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/editing" title="Editing" />
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Editing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing): Set enableEditing: true to make rows editable, then choose how editing is presented with editDisplayMode.
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.

@@ -190,8 +190,6 @@ The header, body and footer stay inside `<DataTable />`, which manages their scr
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
-  <Card href="/docs/guides/state" title="State management" />
-</Cards>
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the slotProps option.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).

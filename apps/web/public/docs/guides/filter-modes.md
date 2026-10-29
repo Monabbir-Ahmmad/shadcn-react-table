@@ -184,7 +184,5 @@ Mode menu labels are localizable via `localization.filterModes`. Labels you pass
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/api/localization" title="Localization" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Localization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/localization): Every user-facing string flows through a localization table.

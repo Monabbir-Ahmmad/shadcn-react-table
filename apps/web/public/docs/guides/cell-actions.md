@@ -138,6 +138,4 @@ function ColumnActionsMenuExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-actions" title="Row actions" />
-</Cards>
+- [Row actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-actions): Provide renderRowActions to add a trailing actions column.

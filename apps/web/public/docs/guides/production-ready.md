@@ -110,8 +110,6 @@ useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/state" title="State management" />
-  <Card href="/docs/guides/best-practices" title="Best practices" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+- [Best practices](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/best-practices): A few habits keep tables fast, typed and easy to change.

@@ -37,7 +37,5 @@ To retheme, change your shadcn base color or CSS variables. Because the table co
 
 ## Related
 
-<Cards>
-  <Card href="/docs/installation" title="Installation" />
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-</Cards>
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.

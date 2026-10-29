@@ -74,8 +74,6 @@ function DisplayColumnsExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-  <Card href="/docs/guides/row-actions" title="Row actions" />
-  <Card href="/docs/guides/row-numbers" title="Row numbers" />
-</Cards>
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
+- [Row actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-actions): Provide renderRowActions to add a trailing actions column.
+- [Row numbers](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-numbers): Set enableRowNumbers: true to add a leading row-number column to the table.

@@ -145,8 +145,6 @@ Per-column, via `columnDef.meta`:
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/filter-modes" title="Filter modes" />
-  <Card href="/docs/guides/display-modes" title="Display modes" />
-  <Card href="/docs/api/column-options" title="Column options" />
-</Cards>
+- [Filter modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/filter-modes): Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty.
+- [Display modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-modes): Several features expose a *DisplayMode option that changes _how_ the UI is presented without changing the underlying behavior.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).

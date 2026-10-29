@@ -69,8 +69,6 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/filter-modes" title="Filter modes" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Filter modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/filter-modes): Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.

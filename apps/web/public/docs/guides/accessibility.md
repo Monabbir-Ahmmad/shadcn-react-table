@@ -44,8 +44,6 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-  <Card href="/docs/guides/column-resizing" title="Column resizing" />
-  <Card href="/docs/guides/column-ordering" title="Column ordering" />
-</Cards>
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
+- [Column resizing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-resizing): Set enableColumnResizing: true to add a drag handle on each column's edge.
+- [Column ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-ordering): Set enableColumnOrdering: true to add a drag grip to each header.

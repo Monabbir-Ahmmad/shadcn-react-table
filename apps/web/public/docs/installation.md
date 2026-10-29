@@ -13,7 +13,10 @@ The data table is distributed as a **shadcn registry** item. The CLI installs th
 
 Run the shadcn CLI against the registry URL:
 
-<PmTabs command="shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json" />
+```bash
+pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+# or: npx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · yarn dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · bunx --bun shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+```
 
 This single command:
 

@@ -167,7 +167,5 @@ The expand column's header toggles every row. Hide it with `enableExpandAll: fal
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/detail-panel" title="Detail panel" />
-  <Card href="/docs/guides/grouping" title="Grouping & aggregation" />
-</Cards>
+- [Detail panel](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/detail-panel): Provide renderDetailPanel to render an expandable panel beneath each row.
+- [Grouping & aggregation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/grouping): Set enableGrouping: true to let users group rows by a column.

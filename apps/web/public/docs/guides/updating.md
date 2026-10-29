@@ -133,6 +133,4 @@ file.
 
 ## Related
 
-<Cards>
-  <Card href="/docs/installation" title="Installation" />
-</Cards>
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.

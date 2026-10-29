@@ -66,8 +66,6 @@ Set `manualPagination: true`, pass the total `rowCount`, and control `state.pagi
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/infinite-scroll" title="Infinite scroll" />
-  <Card href="/docs/guides/display-modes" title="Display modes" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Infinite scroll](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/infinite-scroll): Infinite scroll loads more rows as the user scrolls toward the bottom, instead of paging through the data.
+- [Display modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-modes): Several features expose a *DisplayMode option that changes _how_ the UI is presented without changing the underlying behavior.

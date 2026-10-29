@@ -156,7 +156,5 @@ function ExportPdfExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-</Cards>
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).

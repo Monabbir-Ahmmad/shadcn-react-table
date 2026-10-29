@@ -585,9 +585,7 @@ Per-column, via `columnDef.meta`:
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/display-modes" title="Display modes" />
-  <Card href="/docs/api/column-options" title="Column options" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-  <Card href="/docs/guides/row-actions" title="Row actions" />
-</Cards>
+- [Display modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-modes): Several features expose a *DisplayMode option that changes _how_ the UI is presented without changing the underlying behavior.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Row actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-actions): Provide renderRowActions to add a trailing actions column.

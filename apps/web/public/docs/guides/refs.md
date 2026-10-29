@@ -34,8 +34,6 @@ return <DataTable table={table} />
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/virtualization" title="Virtualization" />
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-</Cards>
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.

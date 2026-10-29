@@ -136,8 +136,6 @@ return <DataTable table={table} />
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-ordering" title="Row ordering" />
-  <Card href="/docs/api/data-table-props" title="DataTable props" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Row ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-ordering): Set enableRowOrdering: true to add a drag-handle column for drag-and-drop row reordering.
+- [DataTable props](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/data-table-props): <DataTable /> is mostly driven by the instance from useDataTable.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.

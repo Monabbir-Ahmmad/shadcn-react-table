@@ -2,65 +2,55 @@
 
 A minimal table is two pieces: **columns** (TanStack column defs, typed with `DataTableColumnDef`) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
 
-<Steps>
+1. **Define columns**
 
-<Step title="Define columns">
+   Columns are TanStack column defs, typed with `DataTableColumnDef`. Give rows a stable `id` so selection and state survive re-renders.
 
-Columns are TanStack column defs, typed with `DataTableColumnDef`. Give rows a stable `id` so selection and state survive re-renders.
+   ```tsx
+   "use client"
 
-```tsx
-"use client"
+   import * as React from "react"
+   import {
+     DataTable,
+     useDataTable,
+     type DataTableColumnDef,
+   } from "@/components/ui/data-table"
 
-import * as React from "react"
-import {
-  DataTable,
-  useDataTable,
-  type DataTableColumnDef,
-} from "@/components/ui/data-table"
+   type Person = { id: string; name: string; email: string; age: number }
 
-type Person = { id: string; name: string; email: string; age: number }
+   const data: Person[] = [
+     { id: "1", name: "Ada Lovelace", email: "ada@example.com", age: 36 },
+     { id: "2", name: "Alan Turing", email: "alan@example.com", age: 41 },
+     { id: "3", name: "Grace Hopper", email: "grace@example.com", age: 85 },
+   ]
 
-const data: Person[] = [
-  { id: "1", name: "Ada Lovelace", email: "ada@example.com", age: 36 },
-  { id: "2", name: "Alan Turing", email: "alan@example.com", age: 41 },
-  { id: "3", name: "Grace Hopper", email: "grace@example.com", age: 85 },
-]
+   const columns: DataTableColumnDef<Person>[] = [
+     { accessorKey: "name", header: "Name" },
+     { accessorKey: "email", header: "Email" },
+     { accessorKey: "age", header: "Age", meta: { align: "right" } },
+   ]
+   ```
 
-const columns: DataTableColumnDef<Person>[] = [
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "email", header: "Email" },
-  { accessorKey: "age", header: "Age", meta: { align: "right" } },
-]
-```
+2. **Create the table**
 
-</Step>
+   Inside your component, pass `data` and `columns` to `useDataTable`. Everything else is optional; `getRowId` gives rows a stable identity and `initialState` seeds the page size.
 
-<Step title="Create the table">
+3. **Render it**
 
-Inside your component, pass `data` and `columns` to `useDataTable`. Everything else is optional; `getRowId` gives rows a stable identity and `initialState` seeds the page size.
+   Hand the instance to `<DataTable />`.
 
-</Step>
+   ```tsx
+   export function PeopleTable() {
+     const table = useDataTable({
+       data,
+       columns,
+       getRowId: (row) => row.id,
+       initialState: { pagination: { pageSize: 10 } },
+     })
 
-<Step title="Render it">
-
-Hand the instance to `<DataTable />`.
-
-```tsx
-export function PeopleTable() {
-  const table = useDataTable({
-    data,
-    columns,
-    getRowId: (row) => row.id,
-    initialState: { pagination: { pageSize: 10 } },
-  })
-
-  return <DataTable table={table} />
-}
-```
-
-</Step>
-
-</Steps>
+     return <DataTable table={table} />
+   }
+   ```
 
 That already gives you sorting, client pagination, a toolbar with global search, column visibility, and density controls:
 

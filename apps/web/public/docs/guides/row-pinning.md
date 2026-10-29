@@ -94,8 +94,6 @@ function RowPinningModesExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-  <Card href="/docs/guides/row-numbers" title="Row numbers" />
-</Cards>
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Row numbers](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-numbers): Set enableRowNumbers: true to add a leading row-number column to the table.

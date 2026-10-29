@@ -112,8 +112,6 @@ const columns: DataTableColumnDef<Person>[] = [
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/theming" title="Theming" />
-  <Card href="/docs/guides/sticky" title="Sticky header & footer" />
-  <Card href="/docs/api/data-table-props" title="DataTable props" />
-</Cards>
+- [Theming](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/theming): The data table is style-agnostic.
+- [Sticky header & footer](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky): The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.
+- [DataTable props](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/data-table-props): <DataTable /> is mostly driven by the instance from useDataTable.

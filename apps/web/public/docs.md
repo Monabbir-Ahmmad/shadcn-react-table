@@ -63,22 +63,18 @@ Coding agents can install and use the table from one prompt, a skill file, the s
 
 ## Start here
 
-<Cards>
-  <Card href="/docs/installation" title="Installation" />
-  <Card href="/docs/quick-start" title="Quick start" />
-  <Card href="/docs/ai" title="AI agent setup" />
-  <Card href="/docs/guides/migrating-from-mrt" title="Migrating from MRT" />
-</Cards>
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.
+- [Quick start](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/quick-start): A minimal table is two pieces: columns (TanStack column defs, typed with DataTableColumnDef) and a call to useDataTable, whose result you hand to <DataTable />.
+- [AI agent setup](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/ai): Set up the data table with a coding agent — Claude Code, Cursor, Codex, Copilot and the like.
+- [Migrating from MRT](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/migrating-from-mrt): The data table follows Material React Table (MRT) closely: the same hook-then-component shape, most of the same options, and the same TanStack Table underneath.
 
 ## Popular guides
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/editing" title="Editing" />
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
-  <Card href="/docs/guides/virtualization" title="Virtualization" />
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Editing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing): Set enableEditing: true to make rows editable, then choose how editing is presented with editDisplayMode.
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the slotProps option.
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
 
 [Browse all guides →](/docs/guides)

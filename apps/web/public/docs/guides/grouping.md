@@ -291,7 +291,5 @@ function CustomizedGroupingExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/sticky" title="Sticky header & footer" />
-  <Card href="/docs/api/column-options" title="Column options" />
-</Cards>
+- [Sticky header & footer](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky): The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).

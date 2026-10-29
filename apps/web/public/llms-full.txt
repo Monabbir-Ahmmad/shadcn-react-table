@@ -77,23 +77,19 @@ Coding agents can install and use the table from one prompt, a skill file, the s
 
 ## Start here
 
-<Cards>
-  <Card href="/docs/installation" title="Installation" />
-  <Card href="/docs/quick-start" title="Quick start" />
-  <Card href="/docs/ai" title="AI agent setup" />
-  <Card href="/docs/guides/migrating-from-mrt" title="Migrating from MRT" />
-</Cards>
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.
+- [Quick start](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/quick-start): A minimal table is two pieces: columns (TanStack column defs, typed with DataTableColumnDef) and a call to useDataTable, whose result you hand to <DataTable />.
+- [AI agent setup](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/ai): Set up the data table with a coding agent — Claude Code, Cursor, Codex, Copilot and the like.
+- [Migrating from MRT](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/migrating-from-mrt): The data table follows Material React Table (MRT) closely: the same hook-then-component shape, most of the same options, and the same TanStack Table underneath.
 
 ## Popular guides
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/editing" title="Editing" />
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
-  <Card href="/docs/guides/virtualization" title="Virtualization" />
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Editing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing): Set enableEditing: true to make rows editable, then choose how editing is presented with editDisplayMode.
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the slotProps option.
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
 
 [Browse all guides →](/docs/guides)
 
@@ -116,7 +112,10 @@ The data table is distributed as a **shadcn registry** item. The CLI installs th
 
 Run the shadcn CLI against the registry URL:
 
-<PmTabs command="shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json" />
+```bash
+pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+# or: npx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · yarn dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · bunx --bun shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+```
 
 This single command:
 
@@ -187,7 +186,10 @@ npx skills add Monabbir-Ahmmad/shadcn-react-table
 
 ## Registry address
 
-<PmTabs command="shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json" />
+```bash
+pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+# or: npx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · yarn dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · bunx --bun shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+```
 
 The same address works in Radix UI and Base UI projects; the shadcn CLI adapts the source. Languages are separate items: `…/r/data-table-locale-de.json`. To install by name, register the namespace once in `components.json` (see [Installation](/docs/installation#use-a-namespace-optional)):
 
@@ -232,10 +234,8 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 ## Related
 
-<Cards>
-  <Card href="/docs/installation" title="Installation" />
-  <Card href="/docs/guides/migrating-from-mrt" title="Migrating from Material React Table" />
-</Cards>
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.
+- [Migrating from Material React Table](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/migrating-from-mrt): The data table follows Material React Table (MRT) closely: the same hook-then-component shape, most of the same options, and the same TanStack Table underneath.
 
 ---
 
@@ -245,65 +245,55 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 A minimal table is two pieces: **columns** (TanStack column defs, typed with `DataTableColumnDef`) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
 
-<Steps>
+1. **Define columns**
 
-<Step title="Define columns">
+   Columns are TanStack column defs, typed with `DataTableColumnDef`. Give rows a stable `id` so selection and state survive re-renders.
 
-Columns are TanStack column defs, typed with `DataTableColumnDef`. Give rows a stable `id` so selection and state survive re-renders.
+   ```tsx
+   "use client"
 
-```tsx
-"use client"
+   import * as React from "react"
+   import {
+     DataTable,
+     useDataTable,
+     type DataTableColumnDef,
+   } from "@/components/ui/data-table"
 
-import * as React from "react"
-import {
-  DataTable,
-  useDataTable,
-  type DataTableColumnDef,
-} from "@/components/ui/data-table"
+   type Person = { id: string; name: string; email: string; age: number }
 
-type Person = { id: string; name: string; email: string; age: number }
+   const data: Person[] = [
+     { id: "1", name: "Ada Lovelace", email: "ada@example.com", age: 36 },
+     { id: "2", name: "Alan Turing", email: "alan@example.com", age: 41 },
+     { id: "3", name: "Grace Hopper", email: "grace@example.com", age: 85 },
+   ]
 
-const data: Person[] = [
-  { id: "1", name: "Ada Lovelace", email: "ada@example.com", age: 36 },
-  { id: "2", name: "Alan Turing", email: "alan@example.com", age: 41 },
-  { id: "3", name: "Grace Hopper", email: "grace@example.com", age: 85 },
-]
+   const columns: DataTableColumnDef<Person>[] = [
+     { accessorKey: "name", header: "Name" },
+     { accessorKey: "email", header: "Email" },
+     { accessorKey: "age", header: "Age", meta: { align: "right" } },
+   ]
+   ```
 
-const columns: DataTableColumnDef<Person>[] = [
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "email", header: "Email" },
-  { accessorKey: "age", header: "Age", meta: { align: "right" } },
-]
-```
+2. **Create the table**
 
-</Step>
+   Inside your component, pass `data` and `columns` to `useDataTable`. Everything else is optional; `getRowId` gives rows a stable identity and `initialState` seeds the page size.
 
-<Step title="Create the table">
+3. **Render it**
 
-Inside your component, pass `data` and `columns` to `useDataTable`. Everything else is optional; `getRowId` gives rows a stable identity and `initialState` seeds the page size.
+   Hand the instance to `<DataTable />`.
 
-</Step>
+   ```tsx
+   export function PeopleTable() {
+     const table = useDataTable({
+       data,
+       columns,
+       getRowId: (row) => row.id,
+       initialState: { pagination: { pageSize: 10 } },
+     })
 
-<Step title="Render it">
-
-Hand the instance to `<DataTable />`.
-
-```tsx
-export function PeopleTable() {
-  const table = useDataTable({
-    data,
-    columns,
-    getRowId: (row) => row.id,
-    initialState: { pagination: { pageSize: 10 } },
-  })
-
-  return <DataTable table={table} />
-}
-```
-
-</Step>
-
-</Steps>
+     return <DataTable table={table} />
+   }
+   ```
 
 That already gives you sorting, client pagination, a toolbar with global search, column visibility, and density controls:
 
@@ -615,9 +605,7 @@ file.
 
 ## Related
 
-<Cards>
-  <Card href="/docs/installation" title="Installation" />
-</Cards>
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.
 
 ---
 
@@ -764,11 +752,9 @@ Set the MRT value explicitly to keep the old behavior.
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/updating" title="Updating" />
-  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
-  <Card href="/docs/guides/state" title="State management" />
-</Cards>
+- [Updating](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating): shadcn add copies this block's source into your project — after that, the code is yours, and upstream releases don't reach it automatically.
+- [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the slotProps option.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
 
 ---
 
@@ -921,11 +907,9 @@ Per-column, via `columnDef.meta`:
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/filter-modes" title="Filter modes" />
-  <Card href="/docs/guides/display-modes" title="Display modes" />
-  <Card href="/docs/api/column-options" title="Column options" />
-</Cards>
+- [Filter modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/filter-modes): Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty.
+- [Display modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-modes): Several features expose a *DisplayMode option that changes _how_ the UI is presented without changing the underlying behavior.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
 
 ---
 
@@ -1117,10 +1101,8 @@ Mode menu labels are localizable via `localization.filterModes`. Labels you pass
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/api/localization" title="Localization" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Localization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/localization): Every user-facing string flows through a localization table.
 
 ---
 
@@ -1258,10 +1240,8 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` �
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/filter-modes" title="Filter modes" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Filter modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/filter-modes): Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty.
 
 ---
 
@@ -1338,11 +1318,9 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/filter-modes" title="Filter modes" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Filter modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/filter-modes): Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -1411,11 +1389,9 @@ Set `meta.visibleInShowHideMenu: false` to keep a column out of the show / hide 
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/density" title="Density" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-  <Card href="/docs/api/column-options" title="Column options" />
-</Cards>
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
 
 ---
 
@@ -1494,11 +1470,9 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-pinning" title="Column pinning" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-  <Card href="/docs/api/column-options" title="Column options" />
-</Cards>
+- [Column pinning](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-pinning): Set enableColumnPinning: true to let users pin columns left or right from the column-actions menu.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
 
 ---
 
@@ -1562,11 +1536,9 @@ Table options and `table.getState()` use `left` / `right`, while instance method
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-ordering" title="Column ordering" />
-  <Card href="/docs/guides/sticky" title="Sticky" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Column ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-ordering): Set enableColumnOrdering: true to add a drag grip to each header.
+- [Sticky](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky): The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -1685,10 +1657,8 @@ function ColumnAutosizeExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/column-options" title="Column options" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -1868,11 +1838,9 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-  <Card href="/docs/guides/export" title="Export" />
-</Cards>
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Export](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/export): The table ships no built-in export — the same stance as Material React Table — so the block carries no CSV or spreadsheet dependencies.
 
 ---
 
@@ -1939,11 +1907,9 @@ return <DataTable table={table} />
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-</Cards>
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
 
 ---
 
@@ -2058,10 +2024,8 @@ function RowDraggingExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-ordering" title="Row ordering" />
-  <Card href="/docs/guides/composition" title="Composition" />
-</Cards>
+- [Row ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-ordering): Set enableRowOrdering: true to add a drag-handle column for drag-and-drop row reordering.
+- [Composition](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/composition): <DataTable /> lays out the whole table for you.
 
 ---
 
@@ -2163,11 +2127,9 @@ function RowPinningModesExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-  <Card href="/docs/guides/row-numbers" title="Row numbers" />
-</Cards>
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Row numbers](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-numbers): Set enableRowNumbers: true to add a leading row-number column to the table.
 
 ---
 
@@ -2227,11 +2189,9 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-  <Card href="/docs/guides/row-pinning" title="Row pinning" />
-</Cards>
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Row pinning](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-pinning): Set enableRowPinning: true to add a pin toggle inside the row-number column.
 
 ---
 
@@ -2379,9 +2339,7 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 - TanStack Table [sorting guide](https://tanstack.com/table/latest).
 
@@ -2682,10 +2640,8 @@ function CustomizedGroupingExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/sticky" title="Sticky header & footer" />
-  <Card href="/docs/api/column-options" title="Column options" />
-</Cards>
+- [Sticky header & footer](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky): The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
 
 ---
 
@@ -2819,9 +2775,7 @@ useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/tree" title="Tree data" />
-</Cards>
+- [Tree data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/tree): For hierarchical data, provide TanStack Table's getSubRows to tell the table where each row's children live.
 
 ---
 
@@ -2996,10 +2950,8 @@ The expand column's header toggles every row. Hide it with `enableExpandAll: fal
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/detail-panel" title="Detail panel" />
-  <Card href="/docs/guides/grouping" title="Grouping & aggregation" />
-</Cards>
+- [Detail panel](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/detail-panel): Provide renderDetailPanel to render an expandable panel beneath each row.
+- [Grouping & aggregation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/grouping): Set enableGrouping: true to let users group rows by a column.
 
 ---
 
@@ -3592,12 +3544,10 @@ Per-column, via `columnDef.meta`:
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/display-modes" title="Display modes" />
-  <Card href="/docs/api/column-options" title="Column options" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-  <Card href="/docs/guides/row-actions" title="Row actions" />
-</Cards>
+- [Display modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-modes): Several features expose a *DisplayMode option that changes _how_ the UI is presented without changing the underlying behavior.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Row actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-actions): Provide renderRowActions to add a trailing actions column.
 
 ---
 
@@ -3739,10 +3689,8 @@ useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/cell-actions" title="Cell actions" />
-  <Card href="/docs/guides/editing" title="Editing" />
-</Cards>
+- [Cell actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/cell-actions): Cells can have a right-click menu.
+- [Editing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing): Set enableEditing: true to make rows editable, then choose how editing is presented with editDisplayMode.
 
 ---
 
@@ -3888,9 +3836,7 @@ function ColumnActionsMenuExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-actions" title="Row actions" />
-</Cards>
+- [Row actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-actions): Provide renderRowActions to add a trailing actions column.
 
 ---
 
@@ -3949,9 +3895,7 @@ return <DataTable table={table} />
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -4028,9 +3972,7 @@ The other toolbar options have their own flags too: `enableGlobalFilter`, `enabl
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/table-instance" title="Table instance" />
-</Cards>
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
 
 ---
 
@@ -4087,10 +4029,8 @@ Footer cells are populated from each column's `footer` definition or from aggreg
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/grouping" title="Grouping" />
-  <Card href="/docs/api/data-table-props" title="DataTable props" />
-</Cards>
+- [Grouping](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/grouping): Set enableGrouping: true to let users group rows by a column.
+- [DataTable props](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/data-table-props): <DataTable /> is mostly driven by the instance from useDataTable.
 
 ---
 
@@ -4232,12 +4172,10 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/state" title="State management" />
-  <Card href="/docs/guides/density" title="Density" />
-  <Card href="/docs/guides/global-search" title="Global search" />
-  <Card href="/docs/guides/export" title="Export" />
-</Cards>
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [Global search](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/global-search): An expandable global search box appears in the toolbar by default (enableGlobalFilter: true).
+- [Export](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/export): The table ships no built-in export — the same stance as Material React Table — so the block carries no CSV or spreadsheet dependencies.
 
 ---
 
@@ -4357,11 +4295,9 @@ const columns: DataTableColumnDef<Person>[] = [
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/theming" title="Theming" />
-  <Card href="/docs/guides/sticky" title="Sticky header & footer" />
-  <Card href="/docs/api/data-table-props" title="DataTable props" />
-</Cards>
+- [Theming](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/theming): The data table is style-agnostic.
+- [Sticky header & footer](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky): The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.
+- [DataTable props](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/data-table-props): <DataTable /> is mostly driven by the instance from useDataTable.
 
 ---
 
@@ -4443,11 +4379,9 @@ function DisplayColumnsExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-  <Card href="/docs/guides/row-actions" title="Row actions" />
-  <Card href="/docs/guides/row-numbers" title="Row numbers" />
-</Cards>
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
+- [Row actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-actions): Provide renderRowActions to add a trailing actions column.
+- [Row numbers](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-numbers): Set enableRowNumbers: true to add a leading row-number column to the table.
 
 ---
 
@@ -4645,11 +4579,9 @@ The header, body and footer stay inside `<DataTable />`, which manages their scr
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
-  <Card href="/docs/guides/state" title="State management" />
-</Cards>
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the slotProps option.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
 
 ---
 
@@ -4812,12 +4744,10 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/editing" title="Editing" />
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Editing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing): Set enableEditing: true to make rows editable, then choose how editing is presented with editDisplayMode.
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -4859,11 +4789,9 @@ return <DataTable table={table} />
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/virtualization" title="Virtualization" />
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-</Cards>
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
 
 ---
 
@@ -4908,10 +4836,8 @@ To retheme, change your shadcn base color or CSS variables. Because the table co
 
 ## Related
 
-<Cards>
-  <Card href="/docs/installation" title="Installation" />
-  <Card href="/docs/guides/column-filtering" title="Column filtering" />
-</Cards>
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering): Each column can expose its own filter control in a per-column filter row.
 
 ---
 
@@ -4981,11 +4907,9 @@ import { RiSearchLine } from "@remixicon/react"
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/icons" title="Icon slot reference" />
-  <Card href="/docs/guides/localization" title="Localization" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Icon slot reference](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/icons): Every glyph the table renders is a named slot.
+- [Localization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/localization): The table ships in 38 languages.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -5156,11 +5080,9 @@ To fix one, edit the file in your project (it is your copy) and delete the comme
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/localization" title="Localization key reference" />
-  <Card href="/docs/guides/custom-icons" title="Custom icons" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Localization key reference](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/localization): Every user-facing string flows through a localization table.
+- [Custom icons](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/custom-icons): Every glyph is a named slot.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -5436,9 +5358,7 @@ function SkeletonsExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
 
 ---
 
@@ -5605,10 +5525,8 @@ function DynamicColumnsExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/loading" title="Loading state" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Loading state](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/loading): Pass isLoading: true to render skeleton rows and a progress bar in place of the data.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -5726,11 +5644,9 @@ useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/state" title="State management" />
-  <Card href="/docs/guides/best-practices" title="Best practices" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+- [Best practices](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/best-practices): A few habits keep tables fast, typed and easy to change.
 
 ---
 
@@ -5804,11 +5720,9 @@ Set `manualPagination: true`, pass the total `rowCount`, and control `state.pagi
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/infinite-scroll" title="Infinite scroll" />
-  <Card href="/docs/guides/display-modes" title="Display modes" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Infinite scroll](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/infinite-scroll): Infinite scroll loads more rows as the user scrolls toward the bottom, instead of paging through the data.
+- [Display modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-modes): Several features expose a *DisplayMode option that changes _how_ the UI is presented without changing the underlying behavior.
 
 ---
 
@@ -5949,11 +5863,9 @@ const table = useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/guides/virtualization" title="Virtualization" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -6097,11 +6009,9 @@ return <DataTable table={table} />
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-ordering" title="Row ordering" />
-  <Card href="/docs/api/data-table-props" title="DataTable props" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Row ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-ordering): Set enableRowOrdering: true to add a drag-handle column for drag-and-drop row reordering.
+- [DataTable props](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/data-table-props): <DataTable /> is mostly driven by the instance from useDataTable.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -6219,11 +6129,9 @@ For each row: `getRowHeight(row)` wins unless it returns `null`/`undefined`, the
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/virtualization" title="Virtualization" />
-  <Card href="/docs/guides/density" title="Density" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---
 
@@ -6387,10 +6295,8 @@ function ExportPdfExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-</Cards>
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
 
 ---
 
@@ -6556,11 +6462,9 @@ The table is styled with Tailwind, not per-component style props. Structural slo
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-  <Card href="/docs/api/table-instance" title="Table instance" />
-</Cards>
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
 
 ---
 
@@ -6636,11 +6540,9 @@ Add classes and attributes with [`slotProps`](/docs/guides/slot-props) instead o
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/state" title="State management" />
-  <Card href="/docs/guides/production-ready" title="Production-ready tables" />
-  <Card href="/docs/guides/updating" title="Updating" />
-</Cards>
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+- [Production-ready tables](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/production-ready): A table over a real API: data fetched with React Query, paging, sorting and search done on the server, the table's state kept in one hook, and edits saved through a mutation.
+- [Updating](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating): shadcn add copies this block's source into your project — after that, the code is yours, and upstream releases don't reach it automatically.
 
 ---
 
@@ -6692,11 +6594,9 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/row-selection" title="Row selection" />
-  <Card href="/docs/guides/column-resizing" title="Column resizing" />
-  <Card href="/docs/guides/column-ordering" title="Column ordering" />
-</Cards>
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection): Set enableRowSelection: true to add a leading checkbox column.
+- [Column resizing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-resizing): Set enableColumnResizing: true to add a drag handle on each column's edge.
+- [Column ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-ordering): Set enableColumnOrdering: true to add a drag grip to each header.
 
 ---
 

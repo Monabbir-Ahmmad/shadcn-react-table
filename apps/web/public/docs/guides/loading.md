@@ -184,6 +184,4 @@ function SkeletonsExample() {
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/server-side" title="Server-side data" />
-</Cards>
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.

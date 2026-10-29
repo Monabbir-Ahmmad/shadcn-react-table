@@ -62,8 +62,6 @@ import { RiSearchLine } from "@remixicon/react"
 
 ## Related
 
-<Cards>
-  <Card href="/docs/api/icons" title="Icon slot reference" />
-  <Card href="/docs/guides/localization" title="Localization" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Icon slot reference](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/icons): Every glyph the table renders is a named slot.
+- [Localization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/localization): The table ships in 38 languages.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.

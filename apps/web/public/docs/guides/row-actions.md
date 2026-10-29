@@ -134,7 +134,5 @@ useDataTable({
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/cell-actions" title="Cell actions" />
-  <Card href="/docs/guides/editing" title="Editing" />
-</Cards>
+- [Cell actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/cell-actions): Cells can have a right-click menu.
+- [Editing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing): Set enableEditing: true to make rows editable, then choose how editing is presented with editDisplayMode.

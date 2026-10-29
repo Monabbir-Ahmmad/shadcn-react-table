@@ -56,8 +56,6 @@ Table options and `table.getState()` use `left` / `right`, while instance method
 
 ## Related
 
-<Cards>
-  <Card href="/docs/guides/column-ordering" title="Column ordering" />
-  <Card href="/docs/guides/sticky" title="Sticky" />
-  <Card href="/docs/api/use-data-table" title="useDataTable options" />
-</Cards>
+- [Column ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-ordering): Set enableColumnOrdering: true to add a drag grip to each header.
+- [Sticky](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky): The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
