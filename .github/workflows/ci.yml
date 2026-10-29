@@ -51,9 +51,13 @@ jobs:
         run: pnpm build
 
       # The build regenerates the committed artifacts (registry JSON, API
-      # reference); a diff here means source changed without regenerating.
+      # reference, example sources, llms.txt and the Markdown pages); any
+      # change or new file here means source changed without regenerating.
       - name: Generated artifacts are fresh
-        run: git diff --exit-code -- apps/web/public/r apps/web/lib/api-reference.generated.ts
+        run: |
+          paths="apps/web/public/r apps/web/lib/api-reference.generated.ts apps/web/lib/example-source.generated.ts apps/web/public/llms.txt apps/web/public/llms-full.txt apps/web/public/docs.md apps/web/public/docs"
+          git status --porcelain -- $paths
+          test -z "$(git status --porcelain -- $paths)"
 
       # Typechecks the registry output in a consumer-shaped fixture (the `@/`
       # aliases `shadcn add` produces), guarding the exact bytes consumers get.
