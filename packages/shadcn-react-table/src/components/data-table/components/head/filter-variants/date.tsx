@@ -43,6 +43,9 @@ export function DateFilterField<TData extends RowData, TValue>({
   }
 
   const value = column.getFilterValue() as Date | undefined
+  const shown = value
+    ? formatDate(value, localization.language)
+    : localization.pickDate
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -53,7 +56,8 @@ export function DateFilterField<TData extends RowData, TValue>({
             FIELD_CLASS,
             "w-full justify-start gap-2 px-2 font-normal"
           )}
-          aria-label={localization.filterByColumn(getColumnLabel(column))}
+          // The visible text is part of the name (WCAG 2.5.3).
+          aria-label={`${localization.filterByColumn(getColumnLabel(column))}: ${shown}`}
         >
           <icons.calendar className="text-muted-foreground" />
           {value ? (

@@ -35,6 +35,10 @@ for every rename.
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **Fixed (accessibility):** the columns the table adds itself (row actions,
+  drag handle, row pin, single-select, expand) name their headers for screen
+  readers; filter-row cells are cells, not column headers; the date filters'
+  names include their visible text. Checked with axe in CI.
 - **Faster:** changing the density no longer re-renders every row; cells
   read their padding from a CSS variable the table root sets.
 - **New:** `enableTableHead` / `enableTableFooter` hide the header or footer

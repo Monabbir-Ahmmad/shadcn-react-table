@@ -101,6 +101,8 @@ export function DataTableHeader<TData extends RowData>({
       key={layout?.key ?? header.id}
       {...mergeProps(
         {
+          // The filter row holds controls, not column headers.
+          role: enableKeyboardNavigation ? "gridcell" : "cell",
           colSpan: layout?.colSpan ?? header.colSpan,
           style: {
             ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),

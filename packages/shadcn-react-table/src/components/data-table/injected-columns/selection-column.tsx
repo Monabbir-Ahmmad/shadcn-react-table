@@ -78,9 +78,10 @@ export function createSelectionColumn<TData extends RowData>(
     minSize: 44,
     meta: { enableColumnActions: false, align: "center" },
     header: ({ table }) => {
-      // No select-all affordance for single-select tables or when disabled.
-      if (!enableSelectAll) return null
-      if (table.options.enableMultiRowSelection === false) return null
+      // No select-all affordance for single-select tables or when disabled;
+      // the header still names the column for screen readers.
+      if (!enableSelectAll || table.options.enableMultiRowSelection === false)
+        return <span className="sr-only">{localization.selectRow}</span>
       const allMode = selectAllMode === "all"
       const allSelected = allMode
         ? table.getIsAllRowsSelected()

@@ -33,6 +33,10 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
   ]
   const from = value[0]
   const to = value[1]
+  const shown =
+    from || to
+      ? `${from ? formatDate(from, localization.language) : "…"} – ${to ? formatDate(to, localization.language) : "…"}`
+      : localization.pickDateRange
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -43,7 +47,8 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
             FIELD_CLASS,
             "w-full justify-start gap-2 px-2 font-normal"
           )}
-          aria-label={localization.filterByColumn(getColumnLabel(column))}
+          // The visible text is part of the name (WCAG 2.5.3).
+          aria-label={`${localization.filterByColumn(getColumnLabel(column))}: ${shown}`}
         >
           <icons.calendar className="text-muted-foreground" />
           {from || to ? (

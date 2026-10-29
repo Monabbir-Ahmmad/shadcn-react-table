@@ -35,7 +35,12 @@ export function createRowActionsColumn<TData extends RowData>(
     size: 90,
     minSize: 80,
     meta: { enableColumnActions: false, align },
-    header: () => null,
+    // Named for screen readers; the column shows no header text.
+    header: ({ table }) => (
+      <span className="sr-only">
+        {dt(table as never).localization.rowActions}
+      </span>
+    ),
     cell: ({ row, table }) => (
       <RowActionsCell
         row={row}

@@ -38,7 +38,9 @@ export function createExpandColumn<TData extends RowData>(
             <icons.collapsed className="size-4 rtl:rotate-180" />
           )}
         </button>
-      ) : null,
+      ) : (
+        <span className="sr-only">{localization.toggleRowExpanded}</span>
+      ),
     cell: ({ row }) => {
       if (!row.getCanExpand()) return null
       return (

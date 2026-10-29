@@ -25,7 +25,7 @@ export function createRowPinColumn<TData extends RowData>(
     size: 40,
     minSize: 40,
     meta: { enableColumnActions: false, align: "center" },
-    header: () => null,
+    header: () => <span className="sr-only">{localization.pinRow}</span>,
     cell: ({ row }) => (
       <RowPinButton row={row} localization={localization} icons={icons} />
     ),

@@ -166,7 +166,7 @@ describe("localization language", () => {
       },
       localization: { ...defaultLocalization, language: "de" },
     })
-    const trigger = screen.getByRole("button", { name: "Filter by Born" })
+    const trigger = screen.getByRole("button", { name: /^Filter by Born/ })
     fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false })
     fireEvent.click(trigger)
     // The popup opens on the selected date's month.
