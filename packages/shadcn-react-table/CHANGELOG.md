@@ -80,6 +80,13 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 - **Fixed:** picking an option in a select editor keeps a numeric column's
   value a number.
 - **Fixed:** the date filter pickers open on the selected month, not today's.
+- **Added:** column reordering works with column virtualization.
+- **Fixed:** the search box keeps what the user is typing when a controlled
+  `globalFilter` stores earlier keystrokes late (router or async state).
+- **Fixed:** drag-and-drop announcements count rows across pages and name the
+  group drop zone ("Group by Name") instead of its internal id.
+- **Fixed:** page buttons, page-size options and row numbers use the
+  language's digits (Persian, Nepali…), like the rest of the pagination text.
 
 ## 0.5.0
 
