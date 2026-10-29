@@ -92,7 +92,10 @@ export interface DataTableRefs {
   searchInputRef: React.RefObject<HTMLInputElement | null>
 }
 
-/** Filter UI variants (full set wired in Phase 2; Phase 1 ships "text"). */
+/** Filter UI variants: the control in the filter row and the modes it offers.
+ *  `datetime*` compare to the minute and `time*` by time of day ("HH:mm"
+ *  strings or Dates); `autocomplete` is a text field suggesting the column's
+ *  values. */
 export type FilterVariant =
   | "text"
   | "select"
@@ -102,6 +105,11 @@ export type FilterVariant =
   | "range-slider"
   | "date"
   | "date-range"
+  | "datetime"
+  | "datetime-range"
+  | "time"
+  | "time-range"
+  | "autocomplete"
 
 export interface DataTableFilterOption {
   label: string

@@ -143,6 +143,7 @@ export function ClearableInput({
   ariaLabel,
   clearLabel,
   ClearIcon,
+  list,
 }: {
   value: string
   onChange: (next: string) => void
@@ -150,10 +151,13 @@ export function ClearableInput({
   ariaLabel: string
   clearLabel: string
   ClearIcon: IconComponent
+  /** Id of a `<datalist>` of suggestions. */
+  list?: string
 }) {
   return (
     <div className="relative flex-1">
       <Input
+        list={list}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}

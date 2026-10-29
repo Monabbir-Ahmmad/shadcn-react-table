@@ -184,6 +184,10 @@ export function getOperatorsForVariant(
       ]
     case "date":
     case "date-range":
+    case "datetime":
+    case "datetime-range":
+    case "time":
+    case "time-range":
       return [
         "equals",
         "notEquals",

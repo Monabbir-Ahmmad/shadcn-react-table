@@ -4,9 +4,11 @@ import type { RowData } from "@tanstack/react-table"
 
 import { DataTableFilterModeMenu } from "../menus/data-table-filter-mode-menu"
 import {
+  AutocompleteFilterField,
   CheckboxFilterField,
   DateFilterField,
   DateRangeFilterField,
+  DateTimeFilterField,
   MultiSelectFilterField,
   NumberFilterField,
   RangeSliderFilterField,
@@ -73,6 +75,16 @@ function FilterField<TData extends RowData, TValue>({
       return <DateFilterField column={column} table={table} />
     case "date-range":
       return <DateRangeFilterField column={column} table={table} />
+    case "datetime":
+    case "datetime-range":
+      return (
+        <DateTimeFilterField column={column} table={table} kind="datetime" />
+      )
+    case "time":
+    case "time-range":
+      return <DateTimeFilterField column={column} table={table} kind="time" />
+    case "autocomplete":
+      return <AutocompleteFilterField column={column} table={table} />
     default:
       return <TextFilterField column={column} table={table} />
   }

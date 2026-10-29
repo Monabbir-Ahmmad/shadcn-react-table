@@ -8,9 +8,22 @@ Each column can expose its own filter control in a per-column filter row. Toggle
 
 ## Choosing a filter control
 
-The UI for each filter is chosen by the column's `meta.filterVariant`. Supported variants are `"text"` (default), `"select"`, `"multi-select"`, `"checkbox"`, `"range"`, `"range-slider"`, `"date"`, and `"date-range"`.
+The UI for each filter is chosen by the column's `meta.filterVariant`:
 
-For `select` and `multi-select`, supply `meta.filterSelectOptions` as an array of `{ label, value }`. If you omit them, the options are derived from the column's faceted unique values.
+| Variant | Control | Values |
+| --- | --- | --- |
+| `"text"` (default) | Text box | Any |
+| `"autocomplete"` | Text box suggesting the column's values | Any |
+| `"select"` / `"multi-select"` | Dropdown / checklist | Strings |
+| `"checkbox"` | Checkbox | Booleans |
+| `"range"` / `"range-slider"` | Number boxes / slider | Numbers |
+| `"date"` / `"date-range"` | Calendar | Dates, compared by day |
+| `"datetime"` / `"datetime-range"` | Date-time box | Dates, compared to the minute |
+| `"time"` / `"time-range"` | Time box | `"HH:mm"` strings or Dates, compared by time of day |
+
+The date, date-time and time variants share the same modes (equals, before, after, between, empty…); the `-range` variants start in "between".
+
+For `select`, `multi-select` and `autocomplete`, supply `meta.filterSelectOptions` as an array of `{ label, value }`. If you omit them, the options are derived from the column's faceted unique values.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"

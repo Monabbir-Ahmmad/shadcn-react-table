@@ -38,16 +38,18 @@ export function useColumnFilterModes<TData extends RowData>(
   getCustomFns: () => CustomFilterFns<TData>
 ): ColumnFilterModes<TData> {
   // Per-column default mode derived from `meta.filterMode` / `meta.filterVariant`.
-  const defaultModes = React.useMemo(() => {
-    const map: Record<string, FilterMode> = {}
+  const { defaultModes, variants } = React.useMemo(() => {
+    const defaultModes: Record<string, FilterMode> = {}
+    const variants: Record<string, string> = {}
     for (const def of flattenLeafColumns(columns)) {
       const key = columnKey(def as { id?: string; accessorKey?: unknown })
       if (!key) continue
       const meta = def.meta
-      map[key] =
-        meta?.filterMode ?? defaultModeForVariant(meta?.filterVariant ?? "text")
+      const variant = meta?.filterVariant ?? "text"
+      defaultModes[key] = meta?.filterMode ?? defaultModeForVariant(variant)
+      variants[key] = variant
     }
-    return map
+    return { defaultModes, variants }
   }, [columns])
 
   // Refs let the dynamic filterFn read current modes without re-creating its
@@ -61,6 +63,9 @@ export function useColumnFilterModes<TData extends RowData>(
   const defaultModesRef = React.useRef(defaultModes)
   // eslint-disable-next-line react-hooks/refs
   defaultModesRef.current = defaultModes
+  const variantsRef = React.useRef(variants)
+  // eslint-disable-next-line react-hooks/refs
+  variantsRef.current = variants
   const getCustomFnsRef = React.useRef(getCustomFns)
   // eslint-disable-next-line react-hooks/refs
   getCustomFnsRef.current = getCustomFns
@@ -78,8 +83,10 @@ export function useColumnFilterModes<TData extends RowData>(
   /* eslint-disable react-hooks/refs */
   const dynamicFilterFn = React.useMemo(
     () =>
-      createDynamicFilterFn<TData>(getColumnMode, () =>
-        getCustomFnsRef.current()
+      createDynamicFilterFn<TData>(
+        getColumnMode,
+        () => getCustomFnsRef.current(),
+        (columnId) => variantsRef.current[columnId]
       ),
     [getColumnMode]
   )

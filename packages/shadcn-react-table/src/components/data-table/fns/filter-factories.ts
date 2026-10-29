@@ -24,7 +24,8 @@ export type CustomFilterFns<TData extends RowData> = Record<
  */
 export function createDynamicFilterFn<TData extends RowData>(
   getMode: (columnId: string) => FilterMode,
-  getCustomFns: () => CustomFilterFns<TData> = () => ({})
+  getCustomFns: () => CustomFilterFns<TData> = () => ({}),
+  getVariant: (columnId: string) => string | undefined = () => undefined
 ): DataTableFilterFn<TData> {
   const fn: DataTableFilterFn<TData> = (
     row,
@@ -35,7 +36,7 @@ export function createDynamicFilterFn<TData extends RowData>(
     const mode = getMode(columnId)
     const custom = getCustomFns()[mode]
     if (custom) return custom(row, columnId, filterValue, addMeta)
-    const modeFn = getModeFn(mode) ?? MODE_FNS.contains
+    const modeFn = getModeFn(mode, getVariant(columnId)) ?? MODE_FNS.contains
     return modeFn(row.getValue(columnId), filterValue)
   }
   // Keep valueless modes active even with a blank value; otherwise drop blanks.

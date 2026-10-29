@@ -50,9 +50,14 @@ function columnVariant<TData extends RowData>(
   return column?.columnDef.meta?.filterVariant ?? "text"
 }
 
-function valueInputType(variant: FilterVariant): "text" | "number" | "date" {
+function valueInputType(
+  variant: FilterVariant
+): "text" | "number" | "date" | "datetime-local" | "time" {
   if (variant === "range" || variant === "range-slider") return "number"
   if (variant === "date" || variant === "date-range") return "date"
+  if (variant === "datetime" || variant === "datetime-range")
+    return "datetime-local"
+  if (variant === "time" || variant === "time-range") return "time"
   return "text"
 }
 
