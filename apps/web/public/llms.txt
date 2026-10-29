@@ -75,11 +75,15 @@ Then `import { DataTable, useDataTable } from "@/components/ui/data-table"`: bui
 
 - [Loading state](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/loading.md): Pass `isLoading: true` to render skeleton rows and a progress bar in place of the data.
 - [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side.md): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Production-ready tables](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/production-ready.md): A table over a real API: data fetched with React Query, paging, sorting and search done on the server, the table's state kept in one hook, and edits saved through a mutation.
+- [Pagination](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/pagination.md): The table pages its rows by default, ten to a page, with a page-size menu and first / previous / next / last buttons below the rows.
 - [Infinite scroll](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/infinite-scroll.md): Infinite scroll loads more rows as the user scrolls toward the bottom, instead of paging through the data.
 - [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization.md): Virtualization renders only the cells currently in view, keeping large tables fast.
 - [Row height](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-height.md): By default rows size to their content (and the virtualizer measures them).
 - [Export](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/export.md): The table ships no built-in export — the same stance as Material React Table — so the block carries no CSV or spreadsheet dependencies.
 - [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state.md): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+- [Best practices](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/best-practices.md): A few habits keep tables fast, typed and easy to change.
+- [Accessibility & keyboard](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/accessibility.md): The table is built to be used without a mouse and with a screen reader.
 
 ## API reference
 

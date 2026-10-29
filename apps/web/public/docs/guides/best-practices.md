@@ -1,0 +1,73 @@
+# Best practices
+
+A few habits keep tables fast, typed and easy to change.
+
+## Keep `data` and `columns` stable
+
+The table rebuilds its rows when `data` or `columns` change identity. Define columns at module scope (or in `useMemo`), and keep data in state, a memo or your query cache:
+
+```tsx
+// Module scope: created once.
+const columns: DataTableColumnDef<Person>[] = [
+  { accessorKey: "name", header: "Name" },
+]
+
+function People() {
+  const { data = [] } = usePeopleQuery() // stable, from the cache
+  const table = useDataTable({ data, columns, getRowId: (row) => row.id })
+  return <DataTable table={table} />
+}
+```
+
+Avoid building them inline — this rebuilds the table on every render:
+
+```tsx
+useDataTable({
+  data: people.filter(isActive),
+  columns: [{ accessorKey: "name", header: "Name" }],
+})
+```
+
+The same goes for `displayColumnDefOptions` and the custom function maps (`filterFns`, `sortFns`, `aggregationFns`).
+
+## Always pass `getRowId`
+
+Selection, editing, pinning, drag and drop and the row-state optimizations all key rows by id. Without `getRowId` rows are keyed by index, so selecting row 3 and then sorting selects someone else.
+
+## Type columns with `DataTableColumnDef`
+
+```tsx
+import type { DataTableColumnDef } from "@/components/ui/data-table"
+
+const columns: DataTableColumnDef<Person>[] = [
+  { accessorKey: "age", header: "Age", meta: { filterVariant: "range" } },
+]
+```
+
+`accessorKey` is checked against your row type, `meta` knows every column option of the table, and render callbacks get the full table (`table.getState()`, `table.dataTable`, the methods).
+
+## Read state where you render it
+
+The component that calls `useDataTable` doesn't re-render when the table's state changes — that's what keeps big tables fast. When it shows state, subscribe to just that part:
+
+```tsx
+<table.Subscribe selector={(state) => state.rowSelection}>
+  {(selection) => <span>{Object.keys(selection).length} selected</span>}
+</table.Subscribe>
+```
+
+Event handlers, effects and the table's own render options can call `table.getState()` directly.
+
+## Control only what you need
+
+Pass `initialState` for starting values, and `state` + `on…Change` only for the slices your app owns (the URL, a server query). Everything else can stay inside the table.
+
+## Style through `slotProps`
+
+Add classes and attributes with [`slotProps`](/docs/guides/slot-props) instead of editing the installed files, so updating the block stays a re-install.
+
+## Related
+
+- [State management](/docs/guides/state)
+- [Production-ready tables](/docs/guides/production-ready)
+- [Updating](/docs/guides/updating)

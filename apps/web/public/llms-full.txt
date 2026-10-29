@@ -5507,6 +5507,202 @@ function DynamicColumnsExample() {
 
 ---
 
+<!-- https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/production-ready/ -->
+
+# Production-ready tables
+
+A table over a real API: data fetched with React Query, paging, sorting and search done on the server, the table's state kept in one hook, and edits saved through a mutation.
+
+Example (`react-query`):
+
+```tsx
+function ReactQueryExample() {
+  const [client] = React.useState(() => new QueryClient())
+  return (
+    <QueryClientProvider client={client}>
+      <PeopleFromServer />
+    </QueryClientProvider>
+  )
+}
+```
+
+## 1. Keep the server-facing state in one hook
+
+```tsx
+import type { PaginationState, SortingState } from "@tanstack/react-table"
+
+function usePeopleTableState() {
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 25,
+  })
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = React.useState("")
+  return {
+    state: { pagination, sorting, globalFilter },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    // What the API needs, derived in one place.
+    query: {
+      page: pagination.pageIndex + 1,
+      size: pagination.pageSize,
+      sort: sorting[0],
+      q: globalFilter,
+    },
+  }
+}
+```
+
+Swap the `useState` calls for your router's search params to make the URL the source of truth.
+
+## 2. Fetch with React Query
+
+```tsx
+const tableState = usePeopleTableState()
+const people = useQuery({
+  queryKey: ["people", tableState.query],
+  queryFn: () => api.people(tableState.query),
+  placeholderData: keepPreviousData, // keep the current page while the next loads
+})
+```
+
+## 3. Hand both to the table
+
+```tsx
+const table = useDataTable({
+  data: people.data?.rows ?? [],
+  columns,
+  getRowId: (row) => row.id,
+  rowCount: people.data?.total ?? 0,
+  manualPagination: true,
+  manualSorting: true,
+  manualFiltering: true,
+  state: tableState.state,
+  onPaginationChange: tableState.onPaginationChange,
+  onSortingChange: tableState.onSortingChange,
+  onGlobalFilterChange: tableState.onGlobalFilterChange,
+  isLoading: people.isPending, // skeletons on the first load
+  showProgressBars: people.isFetching, // a progress bar on later loads
+})
+```
+
+With manual filtering, the search box waits for a pause in typing before it sets `globalFilter`, so each keystroke doesn't send a request.
+
+## 4. Save edits through a mutation
+
+```tsx
+const save = useMutation({
+  mutationFn: api.updatePerson,
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["people"] }),
+})
+
+useDataTable({
+  // …
+  enableEditing: true,
+  editDisplayMode: "modal",
+  isSaving: save.isPending,
+  onEditingRowSave: async ({ row, values, exit }) => {
+    await save.mutateAsync({ id: row.id, ...values })
+    exit()
+  },
+})
+```
+
+`isSaving` shows the progress bar while the request runs; `exit()` closes the editor only once the save succeeds.
+
+## Checklist
+
+- `getRowId` from your API's id.
+- Stable `columns` (module scope).
+- `manual*` for everything the server does, plus `rowCount`.
+- `isLoading` for the first load, `showProgressBars` for refetches, `isSaving` for writes.
+- Show errors (`people.isError`) with `renderEmpty` or above the table.
+
+## Related
+
+- [Server-side data](/docs/guides/server-side)
+- [State management](/docs/guides/state)
+- [Best practices](/docs/guides/best-practices)
+
+---
+
+<!-- https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/pagination/ -->
+
+# Pagination
+
+The table pages its rows by default, ten to a page, with a page-size menu and first / previous / next / last buttons below the rows.
+
+## Page size and starting page
+
+```tsx
+useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  pageSizeOptions: [10, 25, 50],
+  initialState: { pagination: { pageIndex: 0, pageSize: 25 } },
+})
+```
+
+## How the controls look
+
+- `paginationDisplayMode: "default"` — the row range ("1–10 of 48") with first / previous / next / last buttons.
+- `paginationDisplayMode: "pages"` — numbered page buttons.
+- `paginationDisplayMode: "custom"` — no built-in controls; render your own in `renderBottomToolbarCustomActions`, or place the exported `DataTablePagination` anywhere (see [Composition](/docs/guides/composition)).
+
+`positionPagination` puts the controls at the `"bottom"` (default), `"top"`, `"both"` or `"none"`.
+
+Example (`pagination-pages`):
+
+```tsx
+function PaginationPagesExample() {
+  const data = React.useMemo(() => makeUsers(120), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    paginationDisplayMode: "pages",
+    positionPagination: "both",
+    pageSizeOptions: [5, 10, 20],
+    initialState: { pagination: { pageSize: 5 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Turning it off
+
+`enablePagination: false` shows every row. Pair it with a bounded surface and [virtualization](/docs/guides/virtualization) for long lists, or with [infinite scroll](/docs/guides/infinite-scroll).
+
+## Server pagination
+
+Set `manualPagination: true`, pass the total `rowCount`, and control `state.pagination` with `onPaginationChange`; the table renders the page you give it. See [Server-side data](/docs/guides/server-side).
+
+## Behavior worth knowing
+
+- Changing a filter or the search goes back to the first page.
+- When rows go away (a delete, a refetch) and the current page no longer exists, the table moves to the last page that does — except while `isLoading`, so a refetch doesn't jump pages.
+- The range text and page numbers follow the table's language (`localization.language`).
+
+## Relevant options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enablePagination` | `boolean` | `true` | Splits rows into pages with pagination controls. Default `true`; turn it off for virtualization or infinite scroll. |
+| `pageSizeOptions` | `number[]` | `DEFAULT_PAGE_SIZE_OPTIONS` | Choices in the rows-per-page select. Default `[5, 10, 25, 50, 100]`. |
+| `paginationDisplayMode` | `PaginationDisplayMode` | `"default"` | Pagination control style: `"default"` (range label + first/prev/next/last buttons), `"pages"` (numbered page buttons), or `"custom"` (render your own via `renderBottomToolbarCustomActions`). Default "default". |
+| `positionPagination` | `"top" \| "bottom" \| "both" \| "none"` | `"bottom"` | Where the pagination controls render. Default "bottom". "none" keeps pagination active but hides the controls. |
+
+## Related
+
+- [Server-side data](/docs/guides/server-side)
+- [Infinite scroll](/docs/guides/infinite-scroll)
+- [Display modes](/docs/guides/display-modes)
+
+---
+
 <!-- https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/infinite-scroll/ -->
 
 # Infinite scroll
@@ -6246,6 +6442,138 @@ The table is styled with Tailwind, not per-component style props. Structural slo
 - [Toolbar customization](/docs/guides/toolbar)
 - [Server-side data](/docs/guides/server-side)
 - [Table instance](/docs/api/table-instance)
+
+---
+
+<!-- https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/best-practices/ -->
+
+# Best practices
+
+A few habits keep tables fast, typed and easy to change.
+
+## Keep `data` and `columns` stable
+
+The table rebuilds its rows when `data` or `columns` change identity. Define columns at module scope (or in `useMemo`), and keep data in state, a memo or your query cache:
+
+```tsx
+// Module scope: created once.
+const columns: DataTableColumnDef<Person>[] = [
+  { accessorKey: "name", header: "Name" },
+]
+
+function People() {
+  const { data = [] } = usePeopleQuery() // stable, from the cache
+  const table = useDataTable({ data, columns, getRowId: (row) => row.id })
+  return <DataTable table={table} />
+}
+```
+
+Avoid building them inline — this rebuilds the table on every render:
+
+```tsx
+useDataTable({
+  data: people.filter(isActive),
+  columns: [{ accessorKey: "name", header: "Name" }],
+})
+```
+
+The same goes for `displayColumnDefOptions` and the custom function maps (`filterFns`, `sortFns`, `aggregationFns`).
+
+## Always pass `getRowId`
+
+Selection, editing, pinning, drag and drop and the row-state optimizations all key rows by id. Without `getRowId` rows are keyed by index, so selecting row 3 and then sorting selects someone else.
+
+## Type columns with `DataTableColumnDef`
+
+```tsx
+import type { DataTableColumnDef } from "@/components/ui/data-table"
+
+const columns: DataTableColumnDef<Person>[] = [
+  { accessorKey: "age", header: "Age", meta: { filterVariant: "range" } },
+]
+```
+
+`accessorKey` is checked against your row type, `meta` knows every column option of the table, and render callbacks get the full table (`table.getState()`, `table.dataTable`, the methods).
+
+## Read state where you render it
+
+The component that calls `useDataTable` doesn't re-render when the table's state changes — that's what keeps big tables fast. When it shows state, subscribe to just that part:
+
+```tsx
+<table.Subscribe selector={(state) => state.rowSelection}>
+  {(selection) => <span>{Object.keys(selection).length} selected</span>}
+</table.Subscribe>
+```
+
+Event handlers, effects and the table's own render options can call `table.getState()` directly.
+
+## Control only what you need
+
+Pass `initialState` for starting values, and `state` + `on…Change` only for the slices your app owns (the URL, a server query). Everything else can stay inside the table.
+
+## Style through `slotProps`
+
+Add classes and attributes with [`slotProps`](/docs/guides/slot-props) instead of editing the installed files, so updating the block stays a re-install.
+
+## Related
+
+- [State management](/docs/guides/state)
+- [Production-ready tables](/docs/guides/production-ready)
+- [Updating](/docs/guides/updating)
+
+---
+
+<!-- https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/accessibility/ -->
+
+# Accessibility & keyboard
+
+The table is built to be used without a mouse and with a screen reader. Its parts are checked with [axe](https://github.com/dequelabs/axe-core) in a real browser in CI.
+
+## The grid
+
+With `enableKeyboardNavigation` (on by default) the table is an ARIA grid: one Tab stop for the whole body, `aria-rowcount` / `aria-colcount` for the full data (also when rows or columns are virtualized), and `aria-rowindex` / `aria-colindex` on every row and cell. Turn it off and the table is a plain `<table>`.
+
+| Keys | What they do |
+| --- | --- |
+| Arrow keys | Move between cells (left and right are mirrored in right-to-left tables) |
+| Home / End | First / last cell in the row |
+| Ctrl + Home / Ctrl + End | First / last cell in the table |
+| Page Up / Page Down | Up / down a screenful of rows |
+| Enter or F2 | Activate the cell: open its editor, toggle its checkbox, follow its link |
+| Ctrl + C (Cmd + C) | Copy the focused cell's text |
+| Escape | Cancel an edit; leave full screen |
+
+Rows and columns that aren't rendered (virtualization) are scrolled into view as you reach them. Focus comes back to the same cell after an edit is saved or cancelled, and to the nearest cell when its row is deleted.
+
+## Headers and controls
+
+- Sort buttons report `aria-sort`; menus, filters and toggles are real buttons with names from `localization`.
+- **Resize a column** from the keyboard: Tab to its handle (a separator that announces the width), then the arrow keys (10px, or 50px with Shift), Home / End for the limits, Enter to fit.
+- **Reorder** columns and rows from the keyboard: focus the drag handle, Space to pick it up, the arrow keys to move, Space to drop, Escape to cancel. Each step is announced in the table's language, naming columns by their label and rows by their position.
+- The columns the table adds itself (selection, actions, expand, row pin, drag) have names for screen readers even when they show no header text.
+
+## State changes
+
+- Selecting rows updates a polite status banner; loading is announced the same way.
+- Full screen is a modal dialog: focus stays inside, the page doesn't scroll behind it, and Escape leaves it with focus still in the table.
+- Single selection uses radio buttons, multiple selection checkboxes (with a mixed state for "some selected").
+
+## Motion and language
+
+- The progress bar and the column-drag slide respect "reduce motion".
+- 38 languages, right-to-left included (see [Localization](/docs/guides/localization) and [Right-to-left](/docs/guides/rtl)); numbers and dates follow the language.
+
+## What you can do
+
+- Give each table a name with `slotProps: { table: { "aria-label": "People" } }` (a `title` shows above the table but doesn't name the grid).
+- Keep custom `cell` renderers keyboard-friendly: Enter activates the first focusable control in a cell.
+- Check your own colors: contrast comes from your theme, so it isn't part of the table's checks.
+
+## Related
+
+- [Row selection](/docs/guides/row-selection)
+- [Column resizing](/docs/guides/column-resizing)
+- [Column ordering](/docs/guides/column-ordering)
 
 ---
 

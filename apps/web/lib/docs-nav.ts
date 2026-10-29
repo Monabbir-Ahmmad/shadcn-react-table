@@ -96,11 +96,21 @@ export const docsNav: DocsNavGroup[] = [
     items: [
       { title: "Loading state", href: "/docs/guides/loading" },
       { title: "Server-side data", href: "/docs/guides/server-side" },
+      {
+        title: "Production-ready tables",
+        href: "/docs/guides/production-ready",
+      },
+      { title: "Pagination", href: "/docs/guides/pagination" },
       { title: "Infinite scroll", href: "/docs/guides/infinite-scroll" },
       { title: "Virtualization", href: "/docs/guides/virtualization" },
       { title: "Row height", href: "/docs/guides/row-height" },
       { title: "Export", href: "/docs/guides/export" },
       { title: "State management", href: "/docs/guides/state" },
+      { title: "Best practices", href: "/docs/guides/best-practices" },
+      {
+        title: "Accessibility & keyboard",
+        href: "/docs/guides/accessibility",
+      },
     ],
   },
   {
