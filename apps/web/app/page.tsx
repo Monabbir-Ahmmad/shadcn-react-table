@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { SiteHeader } from "@/components/site-header"
 import { AnatomyStage } from "@/components/home/anatomy/anatomy-stage"
 import { AnatomyStatic } from "@/components/home/anatomy/anatomy-static"
+import { LiveTableSection } from "@/components/home/live/live-table-section"
 import { FeatureGrid } from "@/components/home/feature-grid"
 import { TechStrip } from "@/components/home/tech-strip"
 import { StatsBand } from "@/components/home/stats-band"
@@ -25,6 +26,7 @@ export default function HomePage() {
       <main className="flex-1">
         <AnatomyStage />
         <AnatomyStatic />
+        <LiveTableSection />
         <TechStrip />
         <StatsBand />
         <FeaturePlayground />
