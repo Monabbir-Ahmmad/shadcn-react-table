@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest"
 import { defaultLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
 import { useDataTable } from "../core/use-data-table"
+import { GROUP_DROPZONE_ID } from "../components/toolbar/data-table-grouping"
 import { useDragAnnouncements } from "./use-drag-announcements"
 
 type Person = { id: string; name: string; age: number }
@@ -103,6 +104,44 @@ describe("useDragAnnouncements", () => {
     const { result } = setup([a, b])
     expect(result.current.screenReaderInstructions.draggable).toBe(
       defaultLocalization.dragInstructions
+    )
+  })
+
+  it("numbers rows across pages", () => {
+    const people = Array.from({ length: 15 }, (_, i) => ({
+      id: `p${i + 1}`,
+      name: `P${i + 1}`,
+      age: i,
+    }))
+    const { result } = renderHook(() => {
+      const table = useDataTable<Person>({
+        columns,
+        data: people,
+        getRowId: (row) => row.id,
+        initialState: { pagination: { pageIndex: 1, pageSize: 10 } },
+      })
+      return useDragAnnouncements(table)
+    })
+    expect(
+      result.current.announcements.onDragStart!(args(item("p11", "row")))
+    ).toBe(defaultLocalization.dragStart("Row 11"))
+  })
+
+  it("names the group drop zone by the grouping it would make", () => {
+    const { result } = setup([a, b])
+    const { announcements: ann } = result.current
+    const zone = item(GROUP_DROPZONE_ID)
+    expect(ann.onDragOver!(args(item("name", "column"), zone))).toBe(
+      defaultLocalization.dragOver(
+        "Name",
+        defaultLocalization.groupByColumn("Name")
+      )
+    )
+    expect(ann.onDragEnd!(args(item("name", "column"), zone))).toBe(
+      defaultLocalization.dragEnd(
+        "Name",
+        defaultLocalization.groupByColumn("Name")
+      )
     )
   })
 })
