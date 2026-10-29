@@ -117,6 +117,34 @@ export function makeUiStateHandler<K extends DataTableUiStateKey>(
   }
 }
 
+/** The table store, as far as reading its current state needs it. */
+interface ReadableStore {
+  state: object
+  subscribe: (listener: () => void) => unknown
+}
+
+// The latest state per store, kept by one listener. Reading `store.state`
+// costs a few microseconds (it resolves the derived atom); cells read UI
+// values thousands of times per render, so they read this copy instead. Only
+// for reads during render and in event handlers: inside another store
+// listener the copy can lag behind a nested update, so code there reads
+// `store.state` (or `getState()`) directly.
+const latestStates = new WeakMap<ReadableStore, { state: object }>()
+
+function latestState(store: ReadableStore): { state: object } {
+  let latest = latestStates.get(store)
+  if (!latest) {
+    const entry = { state: store.state }
+    // Lives as long as the store (the table): no unsubscribe needed.
+    store.subscribe(() => {
+      entry.state = store.state
+    })
+    latestStates.set(store, entry)
+    latest = entry
+  }
+  return latest
+}
+
 /**
  * Turns the UI state members of `config` into getters on the table store, so
  * reading them gives the current value whenever they are read, not the value
@@ -124,11 +152,12 @@ export function makeUiStateHandler<K extends DataTableUiStateKey>(
  */
 export function withLiveUiState<T extends object>(
   config: T,
-  store: { state: object }
+  store: ReadableStore
 ): T {
+  const latest = latestState(store)
   for (const key of UI_STATE_KEYS) {
     Object.defineProperty(config, key, {
-      get: () => (store.state as DataTableUiState)[key],
+      get: () => (latest.state as DataTableUiState)[key],
       enumerable: true,
       configurable: true,
     })

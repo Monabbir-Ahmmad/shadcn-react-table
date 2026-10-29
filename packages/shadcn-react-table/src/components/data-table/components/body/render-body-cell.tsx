@@ -11,6 +11,20 @@ import { DataTableBodyCellContent } from "../editing/data-table-edit-cell"
 import { Highlight } from "./highlight"
 import type { DataTableCell } from "../../core/table-types"
 
+/** Table state every cell reads, taken once per body render rather than per
+ *  cell (reading the state costs a few microseconds, times every cell). */
+export interface CellRenderState {
+  isGrouping: boolean
+  globalFilter: unknown
+}
+
+export function getCellRenderState<TData extends RowData>(
+  table: DataTableInstance<TData>
+): CellRenderState {
+  const { grouping, globalFilter } = table.getState()
+  return { isGrouping: grouping.length > 0, globalFilter }
+}
+
 /**
  * Resolves a body cell's content, handling grouped / aggregated / placeholder
  * cells and falling back to the highlight-aware value renderer.
@@ -20,7 +34,8 @@ export function renderBodyCell<TData extends RowData>(
   table: DataTableInstance<TData>,
   enableHighlight: boolean,
   columnsWithCustomCell: ReadonlySet<string>,
-  localization: DataTableInstance<TData>["tableInstance"]["localization"]
+  localization: DataTableInstance<TData>["tableInstance"]["localization"],
+  shared: CellRenderState = getCellRenderState(table)
 ): React.ReactNode {
   const { row, column } = cell
   const icons = table.tableInstance.icons
@@ -30,7 +45,7 @@ export function renderBodyCell<TData extends RowData>(
   // (getSubRows) also marks parent rows' cells as "aggregated", which would
   // bypass normal cell rendering (e.g. the expand chevron). Only take these
   // branches when grouping is actually active.
-  const isGrouping = table.getState().grouping.length > 0
+  const { isGrouping } = shared
 
   if (isGrouping && cell.getIsGrouped()) {
     return (
@@ -90,7 +105,8 @@ export function renderBodyCell<TData extends RowData>(
         cell,
         table,
         enableHighlight,
-        columnsWithCustomCell
+        columnsWithCustomCell,
+        shared.globalFilter
       )}
     />
   )
@@ -104,7 +120,8 @@ function renderCellContent<TData extends RowData>(
   cell: DataTableCell<TData, unknown>,
   table: DataTableInstance<TData>,
   enableHighlight: boolean,
-  columnsWithCustomCell: ReadonlySet<string>
+  columnsWithCustomCell: ReadonlySet<string>,
+  globalFilter: unknown
 ): React.ReactNode {
   const { column } = cell
   const value = cell.getValue()
@@ -115,7 +132,7 @@ function renderCellContent<TData extends RowData>(
     (typeof value === "string" || typeof value === "number")
 
   if (canHighlight) {
-    const query = resolveHighlightQuery(cell, table)
+    const query = resolveHighlightQuery(cell, table, globalFilter)
     if (query) {
       return <Highlight text={String(value)} query={query} />
     }
@@ -127,7 +144,8 @@ function renderCellContent<TData extends RowData>(
 /** The active highlight query for a cell: its column filter, else global search. */
 function resolveHighlightQuery<TData extends RowData>(
   cell: DataTableCell<TData, unknown>,
-  table: DataTableInstance<TData>
+  table: DataTableInstance<TData>,
+  globalFilter: unknown
 ): string | null {
   const filterValue = cell.column.getFilterValue()
   if (
@@ -137,7 +155,6 @@ function resolveHighlightQuery<TData extends RowData>(
   ) {
     return filterValue
   }
-  const globalFilter = table.getState().globalFilter
   if (
     typeof globalFilter === "string" &&
     globalFilter.length > 0 &&

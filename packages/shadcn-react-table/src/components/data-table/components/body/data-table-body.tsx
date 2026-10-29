@@ -33,7 +33,7 @@ import { DataTableBodyRow } from "./dnd"
 import { MemoRow } from "./memo-row"
 import { RowStateHubContext, useRowStateHub } from "./row-state-hub"
 import { getUiState } from "../../core/ui-state"
-import { renderBodyCell } from "./render-body-cell"
+import { getCellRenderState, renderBodyCell } from "./render-body-cell"
 import { SkeletonRows } from "./skeleton-rows"
 import type { DataTableCell, DataTableRow } from "../../core/table-types"
 
@@ -156,6 +156,8 @@ export function DataTableBody<TData extends RowData>({
   }
 
   const padding = DENSITY_CELL_PADDING[density]
+  // Changes to it re-render the body, so rows always see the current value.
+  const cellRenderState = getCellRenderState(table)
   const visibleColumnCount = table.getVisibleLeafColumns().length
   const topRows = table.getTopRows()
   const bottomRows = table.getBottomRows()
@@ -192,7 +194,8 @@ export function DataTableBody<TData extends RowData>({
       table,
       enableFilterMatchHighlighting,
       columnsWithCustomCell,
-      localization
+      localization,
+      cellRenderState
     )
     const indented =
       treeIndent > 0 ? (
