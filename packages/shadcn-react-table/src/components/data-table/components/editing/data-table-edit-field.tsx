@@ -56,7 +56,15 @@ export function DataTableEditField({
           // Always controlled: "" shows the placeholder in both Radix and
           // Base UI, while `undefined` would flip to uncontrolled.
           value={value == null ? "" : String(value)}
-          onValueChange={(next) => {
+          onValueChange={(picked) => {
+            // Options carry strings; a numeric value stays a number.
+            const next =
+              typeof value === "number" &&
+              typeof picked === "string" &&
+              picked.trim() !== "" &&
+              !Number.isNaN(Number(picked))
+                ? Number(picked)
+                : picked
             onChange(next)
             // Select commits on pick. Pass the value: the parent's draft
             // state has not updated yet in this tick.

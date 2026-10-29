@@ -130,4 +130,36 @@ describe("select cell editor", () => {
     expect(onEditCellSave).not.toHaveBeenCalled()
     expect(screen.getAllByText("no b").length).toBeGreaterThan(0)
   })
+
+  it("keeps a numeric column's values numeric", async () => {
+    type Task = { id: string; priority: number }
+    const onEditCellSave = vi.fn()
+    function Numeric() {
+      const table = useDataTable<Task>({
+        columns: [
+          {
+            accessorKey: "priority",
+            header: "Priority",
+            meta: {
+              editVariant: "select",
+              options: [
+                { label: "1", value: "1" },
+                { label: "2", value: "2" },
+              ],
+            },
+          },
+        ],
+        data: [{ id: "1", priority: 1 }],
+        getRowId: (row) => row.id,
+        enableEditing: true,
+        editDisplayMode: "table",
+        onEditCellSave,
+      })
+      return <DataTable table={table} />
+    }
+    render(<Numeric />)
+    await pickOption("2")
+    expect(onEditCellSave).toHaveBeenCalledTimes(1)
+    expect(onEditCellSave.mock.calls[0]![0].value).toBe(2)
+  })
 })
