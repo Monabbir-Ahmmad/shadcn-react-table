@@ -61,6 +61,12 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   padding was added on top).
 - **Fixed:** infinite scroll no longer misses the bottom when the browser
   reports several visibility changes at once.
+- **Fixed:** grouped (multi-level) headers and footers line up with their
+  columns under column virtualization.
+- **Fixed:** keyboard navigation keeps working after the focused cell is
+  scrolled out of a virtualized table.
+- **Fixed:** grouped headers render a single column filter row (an empty row
+  was added per group level).
 
 ## 0.5.0
 
