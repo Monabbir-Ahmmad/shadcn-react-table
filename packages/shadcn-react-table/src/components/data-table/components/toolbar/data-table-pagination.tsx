@@ -23,7 +23,6 @@ import { dt } from "../../core/internal"
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: DataTableInstance<TData>
-  pageSizeOptions?: number[]
 }
 
 /**
@@ -33,9 +32,9 @@ interface DataTablePaginationProps<TData extends RowData> {
  */
 export function DataTablePagination<TData extends RowData>({
   table,
-  pageSizeOptions = [5, 10, 25, 50, 100],
 }: DataTablePaginationProps<TData>) {
-  const { localization, icons, paginationDisplayMode } = dt(table)
+  const { localization, icons, paginationDisplayMode, pageSizeOptions } =
+    dt(table)
   if (paginationDisplayMode === "custom") return null
 
   const { pageIndex, pageSize } = table.getState().pagination

@@ -79,9 +79,7 @@ describe("body re-renders", () => {
       />
     )
     renders.count = 0
-    act(() =>
-      table.setEditingCell({ rowId: "5", columnId: "city" })
-    )
+    act(() => table.setEditingCell({ rowId: "5", columnId: "city" }))
     expect(renders.count).toBeLessThanOrEqual(4)
     expect(screen.getByRole("textbox")).toBeTruthy()
   })

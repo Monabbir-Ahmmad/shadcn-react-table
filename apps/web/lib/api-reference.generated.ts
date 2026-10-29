@@ -152,6 +152,14 @@ export const useDataTableOptions: ApiMember[] = [
       "While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering.",
   },
   {
+    name: "pageSizeOptions",
+    type: "number[]",
+    required: false,
+    default: "DEFAULT_PAGE_SIZE_OPTIONS",
+    description:
+      "Choices in the rows-per-page select. Default `[5, 10, 25, 50, 100]`.",
+  },
+  {
     name: "onDensityChange",
     type: "(density: Density) => void",
     required: false,
@@ -1459,6 +1467,13 @@ export const dataTableOptions: ApiMember[] = [
       'Pagination control style: `"default"` (range label + first/prev/next/last buttons), `"pages"` (numbered page buttons), or `"custom"` (render your own via `renderBottomToolbarCustomActions`). Default "default".',
   },
   {
+    name: "pageSizeOptions",
+    type: "number[]",
+    required: true,
+    default: null,
+    description: "Choices in the rows-per-page select.",
+  },
+  {
     name: "columnFilterDisplayMode",
     type: "ColumnFilterDisplayMode",
     required: true,
@@ -1718,13 +1733,6 @@ export const dataTableProps: ApiMember[] = [
     required: true,
     default: null,
     description: "The instance returned by `useDataTable`.",
-  },
-  {
-    name: "pageSizeOptions",
-    type: "number[]",
-    required: false,
-    default: null,
-    description: "Page-size options for the bottom pagination control.",
   },
   {
     name: "surfaceClassName",

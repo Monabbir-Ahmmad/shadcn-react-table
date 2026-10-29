@@ -74,8 +74,6 @@ interface DataTableProps<
 > extends React.ComponentProps<"div"> {
   /** The instance returned by `useDataTable`. */
   table: DataTableInstance<TData>
-  /** Page-size options for the bottom pagination control. */
-  pageSizeOptions?: number[]
   /** Extra classes for the scrollable table surface (e.g. a max-height that
    *  overrides the default sticky-header/virtualization bound). */
   surfaceClassName?: string
@@ -99,7 +97,6 @@ function assignRef<T>(ref: React.Ref<T> | undefined, el: T | null) {
  */
 export function DataTable<TData extends RowData>({
   table,
-  pageSizeOptions,
   surfaceClassName,
   className,
   ref: refProp,
@@ -309,11 +306,7 @@ export function DataTable<TData extends RowData>({
 
         {enablePagination &&
           (positionPagination === "top" || positionPagination === "both") && (
-            <PaginationRegion
-              table={table}
-              config={dt(table)}
-              pageSizeOptions={pageSizeOptions}
-            />
+            <PaginationRegion table={table} config={dt(table)} />
           )}
 
         <DndContext
@@ -485,11 +478,7 @@ export function DataTable<TData extends RowData>({
           <AlertBannerRegion table={table} config={dt(table)} />
         )}
 
-        <BottomToolbarRegion
-          table={table}
-          config={dt(table)}
-          pageSizeOptions={pageSizeOptions}
-        />
+        <BottomToolbarRegion table={table} config={dt(table)} />
 
         <DataTableEditModal table={table} />
       </div>

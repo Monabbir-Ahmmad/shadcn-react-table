@@ -63,6 +63,8 @@ type CoreStoreState = TableState<DataTableFeatures>
  *  table state change. */
 const selectNothing = () => null
 
+const DEFAULT_PAGE_SIZE_OPTIONS = [5, 10, 25, 50, 100]
+
 /**
  * Core hook. Wraps `useTable` with MRT-flavoured defaults (row models,
  * auto-injected selection column, localization) and attaches our presentation
@@ -99,6 +101,7 @@ export function useDataTable<TData extends RowData>(
     infiniteScrollThreshold = 200,
     positionPagination = "bottom",
     paginationDisplayMode = "default",
+    pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
     columnFilterDisplayMode = "subheader",
     positionGlobalFilter = "right",
     positionToolbarAlertBanner = "top",
@@ -782,6 +785,7 @@ export function useDataTable<TData extends RowData>(
     infiniteScrollThreshold,
     positionPagination,
     paginationDisplayMode,
+    pageSizeOptions,
     columnFilterDisplayMode,
     positionGlobalFilter,
     positionToolbarAlertBanner,

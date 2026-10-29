@@ -508,6 +508,8 @@ export interface DataTableConfig<TData extends RowData> {
   infiniteScrollThreshold: number
   positionPagination: "top" | "bottom" | "both" | "none"
   paginationDisplayMode: PaginationDisplayMode
+  /** Choices in the rows-per-page select. */
+  pageSizeOptions: number[]
   columnFilterDisplayMode: ColumnFilterDisplayMode
   positionGlobalFilter: "left" | "right" | "none"
   positionToolbarAlertBanner: "top" | "bottom" | "none"
@@ -628,6 +630,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping
    *  or expanded, or under manual sorting/filtering. */
   enableGlobalFilterRankedResults?: boolean
+  /** Choices in the rows-per-page select. Default `[5, 10, 25, 50, 100]`. */
+  pageSizeOptions?: number[]
   /** Called whenever the density changes (toolbar toggle or programmatic).
    *  Set it with `initialState.density`, control it with `state.density`. */
   onDensityChange?: (density: Density) => void

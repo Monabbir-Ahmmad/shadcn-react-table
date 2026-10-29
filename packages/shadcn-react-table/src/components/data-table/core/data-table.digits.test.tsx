@@ -1,10 +1,23 @@
-import { cleanup, render, screen, within } from "@testing-library/react"
-import { afterEach, describe, expect, it } from "vitest"
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react"
+import { afterEach, beforeAll, describe, expect, it } from "vitest"
 
 import { dataTableLocalizationFa } from "../locales/fa"
 import { DataTable } from "./data-table"
 import type { DataTableColumnDef } from "./table-types"
 import { useDataTable } from "./use-data-table"
+
+// jsdom lacks these; Radix Select calls them when opening.
+beforeAll(() => {
+  Element.prototype.scrollIntoView = () => {}
+  Element.prototype.hasPointerCapture = () => false
+  Element.prototype.releasePointerCapture = () => {}
+})
 
 // Vitest globals are off, so Testing Library does not auto-unmount.
 afterEach(cleanup)
@@ -46,5 +59,24 @@ describe("native digits", () => {
     expect(size.textContent).toBe("۱۰")
     const firstRow = screen.getAllByRole("row")[1]!
     expect(within(firstRow).getByText("۱")).toBeTruthy()
+  })
+
+  it("offers the page sizes given in pageSizeOptions", async () => {
+    function Sized() {
+      const table = useDataTable<Row>({
+        columns,
+        data: rows,
+        getRowId: (row) => row.id,
+        pageSizeOptions: [7, 14],
+        initialState: { pagination: { pageIndex: 0, pageSize: 7 } },
+      })
+      return <DataTable table={table} />
+    }
+    render(<Sized />)
+    const select = screen.getByRole("combobox", { name: /rows per page/i })
+    select.focus()
+    fireEvent.keyDown(select, { key: "Enter" })
+    expect(await screen.findByRole("option", { name: "14" })).toBeTruthy()
+    expect(screen.queryByRole("option", { name: "25" })).toBeNull()
   })
 })

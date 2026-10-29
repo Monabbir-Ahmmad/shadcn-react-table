@@ -10,7 +10,6 @@ import { dt } from "../../core/internal"
 
 interface DataTableBottomToolbarProps<TData extends RowData> {
   table: DataTableInstance<TData>
-  pageSizeOptions?: number[]
 }
 
 /**
@@ -20,7 +19,6 @@ interface DataTableBottomToolbarProps<TData extends RowData> {
  */
 export function DataTableBottomToolbar<TData extends RowData>({
   table,
-  pageSizeOptions,
 }: DataTableBottomToolbarProps<TData>) {
   const {
     enableBottomToolbar,
@@ -39,7 +37,7 @@ export function DataTableBottomToolbar<TData extends RowData>({
     enablePagination &&
     (positionPagination === "bottom" || positionPagination === "both")
   const pagination = showBottomPagination ? (
-    <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} />
+    <DataTablePagination table={table} />
   ) : null
 
   if (customActions == null && pagination == null) return null
