@@ -5,7 +5,6 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import type { RowData } from "@tanstack/react-table"
-import type { VirtualItem } from "@tanstack/react-virtual"
 import * as React from "react"
 
 import {
@@ -21,7 +20,10 @@ import {
   headerControlsOptionsFromTable,
   shouldShowColumnDragGrip,
 } from "../../helpers/header-controls"
-import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
+import type {
+  VirtualHeaderLayout,
+  WithHeaderSpacers,
+} from "../../hooks/use-table-virtualizers"
 import {
   getColumnPinningClass,
   getColumnPinningStyle,
@@ -34,8 +36,7 @@ import type { DataTableHeader } from "../../core/table-types"
 
 interface DataTableHeaderProps<TData extends RowData> {
   table: DataTableInstance<TData>
-  virtualColumns: VirtualItem[]
-  withColumnSpacers: WithColumnSpacers
+  withHeaderSpacers: WithHeaderSpacers
 }
 
 /**
@@ -45,8 +46,7 @@ interface DataTableHeaderProps<TData extends RowData> {
  */
 export function DataTableHeader<TData extends RowData>({
   table,
-  virtualColumns,
-  withColumnSpacers,
+  withHeaderSpacers,
 }: DataTableHeaderProps<TData>) {
   const {
     density,
@@ -72,18 +72,22 @@ export function DataTableHeader<TData extends RowData>({
     anyFilterable &&
     columnFilterDisplayMode === "subheader"
 
-  const renderHeadCell = (header: DataTableHeader<TData, unknown>) => (
+  const renderHeadCell = (
+    header: DataTableHeader<TData, unknown>,
+    layout?: VirtualHeaderLayout
+  ) => (
     <DataTableHeadCell
-      key={header.id}
+      key={layout?.key ?? header.id}
       header={header}
       table={table}
+      colSpan={layout?.colSpan}
       // Draggable for reordering (column ordering) or to drag onto the group
       // zone (grouping) — the drag-end handler routes by the drop target. The
       // grip's presence drives the column's reserved width, so both read the
       // same predicate (see helpers/header-controls).
       draggable={shouldShowColumnDragGrip(header.column, controls)}
       resizable={enableColumnResizing}
-      widthStyle={getWidthStyle(header.column, table)}
+      widthStyle={layout?.widthStyle ?? getWidthStyle(header.column, table)}
       padding={padding}
     >
       {header.isPlaceholder ? null : (
@@ -92,12 +96,15 @@ export function DataTableHeader<TData extends RowData>({
     </DataTableHeadCell>
   )
 
-  const renderFilterCell = (header: DataTableHeader<TData, unknown>) => (
+  const renderFilterCell = (
+    header: DataTableHeader<TData, unknown>,
+    layout?: VirtualHeaderLayout
+  ) => (
     <TableHead
-      key={header.id}
-      colSpan={header.colSpan}
+      key={layout?.key ?? header.id}
+      colSpan={layout?.colSpan ?? header.colSpan}
       style={{
-        ...getWidthStyle(header.column, table),
+        ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
         ...getColumnPinningStyle(header.column),
       }}
       className={cn("bg-card", getColumnPinningClass(header.column))}
@@ -120,11 +127,9 @@ export function DataTableHeader<TData extends RowData>({
           className="group/th hover:bg-transparent"
         >
           {enableColumnVirtualization ? (
-            withColumnSpacers(
-              virtualColumns.map((vc) => {
-                const header = headerGroup.headers[vc.index]
-                return header ? renderHeadCell(header) : null
-              }),
+            withHeaderSpacers(
+              headerGroup.headers,
+              renderHeadCell,
               `head-${headerGroup.id}`
             )
           ) : (
@@ -132,7 +137,7 @@ export function DataTableHeader<TData extends RowData>({
               items={leafColumnIds}
               strategy={horizontalListSortingStrategy}
             >
-              {headerGroup.headers.map(renderHeadCell)}
+              {headerGroup.headers.map((header) => renderHeadCell(header))}
             </SortableContext>
           )}
         </TableRow>
@@ -145,14 +150,12 @@ export function DataTableHeader<TData extends RowData>({
             className="hover:bg-transparent"
           >
             {enableColumnVirtualization
-              ? withColumnSpacers(
-                  virtualColumns.map((vc) => {
-                    const header = headerGroup.headers[vc.index]
-                    return header ? renderFilterCell(header) : null
-                  }),
+              ? withHeaderSpacers(
+                  headerGroup.headers,
+                  renderFilterCell,
                   `filter-${headerGroup.id}`
                 )
-              : headerGroup.headers.map(renderFilterCell)}
+              : headerGroup.headers.map((header) => renderFilterCell(header))}
           </TableRow>
         ))}
     </TableHeader>

@@ -131,6 +131,7 @@ export function DataTable<TData extends RowData>({
     virtualItems,
     virtualColumns,
     withColumnSpacers,
+    withHeaderSpacers,
   } = useTableVirtualizers(table, gridRef)
 
   // Keyboard navigation works on display indexes (top, center, bottom rows;
@@ -322,8 +323,7 @@ export function DataTable<TData extends RowData>({
               )}
               <DataTableHeader
                 table={table}
-                virtualColumns={virtualColumns}
-                withColumnSpacers={withColumnSpacers}
+                withHeaderSpacers={withHeaderSpacers}
               />
               <MemoizedDataTableBody
                 table={table}
@@ -335,8 +335,7 @@ export function DataTable<TData extends RowData>({
               {showFooter && (
                 <DataTableFooter
                   table={table}
-                  virtualColumns={virtualColumns}
-                  withColumnSpacers={withColumnSpacers}
+                  withHeaderSpacers={withHeaderSpacers}
                 />
               )}
             </Table>

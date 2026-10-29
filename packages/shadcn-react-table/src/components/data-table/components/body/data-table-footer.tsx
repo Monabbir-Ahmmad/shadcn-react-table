@@ -1,7 +1,6 @@
 "use client"
 
 import { flexRender, type RowData } from "@tanstack/react-table"
-import type { VirtualItem } from "@tanstack/react-virtual"
 
 import {
   TableCell,
@@ -16,7 +15,10 @@ import {
   FOOTER_CELL_CLASS,
 } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
-import type { WithColumnSpacers } from "../../hooks/use-table-virtualizers"
+import type {
+  VirtualHeaderLayout,
+  WithHeaderSpacers,
+} from "../../hooks/use-table-virtualizers"
 import {
   getColumnPinningClass,
   getColumnPinningStyle,
@@ -26,8 +28,7 @@ import type { DataTableHeader } from "../../core/table-types"
 
 interface DataTableFooterProps<TData extends RowData> {
   table: DataTableInstance<TData>
-  virtualColumns: VirtualItem[]
-  withColumnSpacers: WithColumnSpacers
+  withHeaderSpacers: WithHeaderSpacers
 }
 
 /** Whether any leaf column defines a footer (controls whether a `<tfoot>` renders). */
@@ -43,8 +44,7 @@ export function hasFooter<TData extends RowData>(
  */
 export function DataTableFooter<TData extends RowData>({
   table,
-  virtualColumns,
-  withColumnSpacers,
+  withHeaderSpacers,
 }: DataTableFooterProps<TData>) {
   const { density, enableColumnVirtualization, enableStickyFooter, refs } =
     table.tableInstance
@@ -58,32 +58,30 @@ export function DataTableFooter<TData extends RowData>({
       ref={refs.tableFooterRef}
       className={cn(enableStickyFooter && "sticky bottom-0 z-20")}
     >
-      {table.getFooterGroups().map((footerGroup) => {
-        // Under column virtualization, one entry per virtual column (aligned
-        // for the spacer layout).
-        const headers: (DataTableHeader<TData, unknown> | undefined)[] =
-          enableColumnVirtualization
-            ? virtualColumns.map((vc) => footerGroup.headers[vc.index])
-            : footerGroup.headers
-        const cells = headers.map((header) =>
-          header ? renderFooterCell(header) : null
-        )
-        return (
-          <TableRow key={footerGroup.id} className="hover:bg-transparent">
-            {withColumnSpacers(cells, `footer-${footerGroup.id}`)}
-          </TableRow>
-        )
-      })}
+      {table.getFooterGroups().map((footerGroup) => (
+        <TableRow key={footerGroup.id} className="hover:bg-transparent">
+          {enableColumnVirtualization
+            ? withHeaderSpacers(
+                footerGroup.headers,
+                renderFooterCell,
+                `footer-${footerGroup.id}`
+              )
+            : footerGroup.headers.map((header) => renderFooterCell(header))}
+        </TableRow>
+      ))}
     </TableFooter>
   )
 
-  function renderFooterCell(header: DataTableHeader<TData, unknown>) {
+  function renderFooterCell(
+    header: DataTableHeader<TData, unknown>,
+    layout?: VirtualHeaderLayout
+  ) {
     return (
       <TableCell
-        key={header.id}
-        colSpan={header.colSpan}
+        key={layout?.key ?? header.id}
+        colSpan={layout?.colSpan ?? header.colSpan}
         style={{
-          ...getWidthStyle(header.column, table),
+          ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
           ...getColumnPinningStyle(header.column),
         }}
         className={cn(

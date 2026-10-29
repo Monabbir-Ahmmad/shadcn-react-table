@@ -45,6 +45,7 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
   resizable,
   widthStyle,
   padding,
+  colSpan = header.colSpan,
   children,
 }: {
   header: DataTableHeader<TData, TValue>
@@ -53,6 +54,8 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
   resizable: boolean
   widthStyle: React.CSSProperties
   padding: string
+  /** Overrides `header.colSpan` (column virtualization renders part of a group). */
+  colSpan?: number
   children: React.ReactNode
 }) {
   const column = header.column
@@ -94,7 +97,7 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
   return (
     <TableHead
       ref={setNodeRef}
-      colSpan={header.colSpan}
+      colSpan={colSpan}
       style={style}
       data-pinned={getPinSide(column) || undefined}
       aria-sort={ariaSort(column.getIsSorted())}

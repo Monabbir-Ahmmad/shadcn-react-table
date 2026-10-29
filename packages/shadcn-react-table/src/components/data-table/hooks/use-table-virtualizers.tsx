@@ -8,6 +8,7 @@ import type { DataTableInstance } from "../core/types"
 import { getPinSide } from "../helpers/column-pinning"
 import { pinnedRangeExtractor } from "../helpers/pinned-range-extractor"
 import { resolveRowHeight } from "../helpers/resolve-row-height"
+import { getVirtualHeaderRuns } from "../helpers/virtual-header-runs"
 import type { DataTableRow } from "../core/table-types"
 
 export interface VirtualRowItem<TData extends RowData> {
@@ -18,6 +19,22 @@ export interface VirtualRowItem<TData extends RowData> {
 /** Lays out one cell per virtual column with spacers for the skipped columns. */
 export type WithColumnSpacers = (
   cells: React.ReactNode[],
+  keyPrefix: string
+) => React.ReactNode
+
+/** Where a header cell lands under column virtualization. */
+export interface VirtualHeaderLayout {
+  key: string
+  /** Rendered columns the cell spans (fewer than `colSpan` when cut off). */
+  colSpan: number
+  /** Width override when the cell spans only part of its columns. */
+  widthStyle?: React.CSSProperties
+}
+
+/** Lays out one header/footer row (any depth) with spacers. */
+export type WithHeaderSpacers = <H extends { id: string; colSpan: number }>(
+  headers: H[],
+  render: (header: H, layout: VirtualHeaderLayout) => React.ReactNode,
   keyPrefix: string
 ) => React.ReactNode
 
@@ -165,11 +182,36 @@ export function useTableVirtualizers<TData extends RowData>(
     return out
   }
 
+  /**
+   * Header and footer rows hold group headers spanning several columns, so
+   * each rendered column maps to the header covering it, and adjacent columns
+   * under one header share a cell.
+   */
+  const withHeaderSpacers: WithHeaderSpacers = (headers, render, keyPrefix) => {
+    const cells: React.ReactNode[] = virtualColumns.map(() => null)
+    const runs = getVirtualHeaderRuns(
+      headers,
+      virtualColumns.map((vc) => vc.index)
+    )
+    for (const { header, start, span } of runs) {
+      const covered = virtualColumns.slice(start, start + span)
+      const width = covered.reduce((sum, vc) => sum + vc.size, 0)
+      cells[start] = render(header, {
+        key: `${header.id}-${covered[0]!.index}`,
+        colSpan: span,
+        widthStyle:
+          span < header.colSpan ? { width, minWidth: width } : undefined,
+      })
+    }
+    return withColumnSpacers(cells, keyPrefix)
+  }
+
   return {
     rowVirtualizer,
     columnVirtualizer,
     virtualItems,
     virtualColumns,
     withColumnSpacers,
+    withHeaderSpacers,
   }
 }
