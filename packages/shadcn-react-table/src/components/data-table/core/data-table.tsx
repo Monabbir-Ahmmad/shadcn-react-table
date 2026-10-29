@@ -20,6 +20,7 @@ import { DataTableBottomToolbar } from "../components/toolbar/data-table-bottom-
 import { DataTableDropToGroupZone } from "../components/toolbar/data-table-grouping"
 import { DataTablePagination } from "../components/toolbar/data-table-pagination"
 import { DataTableToolbar } from "../components/toolbar/data-table-toolbar"
+import { EDITING_STATE, region } from "../components/region"
 import { useGridNavigation } from "../hooks/use-grid-navigation"
 import { useDragAnnouncements } from "../hooks/use-drag-announcements"
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll"
@@ -38,6 +39,17 @@ import { type DataTableInstance } from "./types"
  * from the CSS size vars on `<table>` and update without React. Outside of a
  * resize the comparator returns false, so normal re-rendering is unchanged.
  */
+// The parts around the body re-render on their own state, not on every change
+// to the table (see components/region.tsx). The edit modal shows the edit
+// draft, so it is not one of them.
+const ToolbarRegion = region(DataTableToolbar)
+const AlertBannerRegion = region(DataTableAlertBanner)
+const PaginationRegion = region(DataTablePagination)
+const BottomToolbarRegion = region(DataTableBottomToolbar)
+const DropToGroupZoneRegion = region(DataTableDropToGroupZone)
+const HeaderRegion = region(DataTableHeader, EDITING_STATE)
+const FooterRegion = region(DataTableFooter)
+
 const MemoizedDataTableBody = React.memo(
   DataTableBody,
   (_prev, next) =>
@@ -264,8 +276,9 @@ export function DataTable<TData extends RowData>({
         {renderTopToolbar
           ? renderTopToolbar({ table })
           : enableTopToolbar && (
-              <DataTableToolbar
+              <ToolbarRegion
                 table={table}
+                config={table.tableInstance}
                 // Forwarding the exposed ref objects as props (not reading
                 // .current during render).
                 toolbarRef={refs.topToolbarRef}
@@ -273,13 +286,14 @@ export function DataTable<TData extends RowData>({
               />
             )}
         {positionToolbarAlertBanner === "top" && (
-          <DataTableAlertBanner table={table} />
+          <AlertBannerRegion table={table} config={table.tableInstance} />
         )}
 
         {enablePagination &&
           (positionPagination === "top" || positionPagination === "both") && (
-            <DataTablePagination
+            <PaginationRegion
               table={table}
+              config={table.tableInstance}
               pageSizeOptions={pageSizeOptions}
             />
           )}
@@ -293,7 +307,10 @@ export function DataTable<TData extends RowData>({
           {enableGrouping &&
             (positionToolbarDropZone === "top" ||
               positionToolbarDropZone === "both") && (
-              <DataTableDropToGroupZone table={table} />
+              <DropToGroupZoneRegion
+                table={table}
+                config={table.tableInstance}
+              />
             )}
 
           <div
@@ -382,8 +399,9 @@ export function DataTable<TData extends RowData>({
               {renderCaption && (
                 <TableCaption>{renderCaption({ table })}</TableCaption>
               )}
-              <DataTableHeader
+              <HeaderRegion
                 table={table}
+                config={table.tableInstance}
                 withHeaderSpacers={withHeaderSpacers}
               />
               <MemoizedDataTableBody
@@ -394,8 +412,9 @@ export function DataTable<TData extends RowData>({
                 withColumnSpacers={withColumnSpacers}
               />
               {showFooter && (
-                <DataTableFooter
+                <FooterRegion
                   table={table}
+                  config={table.tableInstance}
                   withHeaderSpacers={withHeaderSpacers}
                 />
               )}
@@ -441,16 +460,20 @@ export function DataTable<TData extends RowData>({
           {enableGrouping &&
             (positionToolbarDropZone === "bottom" ||
               positionToolbarDropZone === "both") && (
-              <DataTableDropToGroupZone table={table} />
+              <DropToGroupZoneRegion
+                table={table}
+                config={table.tableInstance}
+              />
             )}
         </DndContext>
 
         {positionToolbarAlertBanner === "bottom" && (
-          <DataTableAlertBanner table={table} />
+          <AlertBannerRegion table={table} config={table.tableInstance} />
         )}
 
-        <DataTableBottomToolbar
+        <BottomToolbarRegion
           table={table}
+          config={table.tableInstance}
           pageSizeOptions={pageSizeOptions}
         />
 

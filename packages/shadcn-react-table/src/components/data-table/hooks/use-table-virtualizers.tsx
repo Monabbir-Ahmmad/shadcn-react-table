@@ -209,12 +209,26 @@ export function useTableVirtualizers<TData extends RowData>(
     return withColumnSpacers(cells, keyPrefix)
   }
 
+  // Kept stable while the rendered column window is unchanged, so the
+  // (memoized) header and footer skip renders that do not move it.
+  const columnWindowKey = [
+    enableColumnVirtualization,
+    totalColumnWidth,
+    ...virtualColumns.map((vc) => `${vc.index}:${vc.start}:${vc.size}`),
+  ].join()
+  const stableHeaderSpacers = React.useMemo(
+    () => withHeaderSpacers,
+    // The key captures everything the function reads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columnWindowKey]
+  )
+
   return {
     rowVirtualizer,
     columnVirtualizer,
     virtualItems,
     virtualColumns,
     withColumnSpacers,
-    withHeaderSpacers,
+    withHeaderSpacers: stableHeaderSpacers,
   }
 }

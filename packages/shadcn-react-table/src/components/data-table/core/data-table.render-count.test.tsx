@@ -155,4 +155,48 @@ describe("body re-renders", () => {
     expect(onRender.mock.calls.length).toBeGreaterThan(before)
     expect(onRender).toHaveBeenLastCalledWith("2")
   })
+
+  it("leaves the toolbar and header alone while a cell is edited", () => {
+    const toolbar = vi.fn(() => null)
+    const header = vi.fn(() => "Name")
+    let table!: DataTableInstance<Row>
+    function Holder({
+      onTable,
+    }: {
+      onTable: (table: DataTableInstance<Row>) => void
+    }) {
+      const columns = React.useMemo(
+        () =>
+          [
+            { accessorKey: "name", header },
+            { accessorKey: "city", header: "City" },
+          ] as DataTableColumnDef<Row>[],
+        []
+      )
+      const instance = useDataTable<Row>({
+        columns,
+        data,
+        getRowId: (row) => row.id,
+        enablePagination: false,
+        enableEditing: true,
+        editDisplayMode: "row",
+        renderToolbarActions: toolbar,
+      })
+      onTable(instance)
+      return <DataTable table={instance} />
+    }
+    render(<Holder onTable={(t) => (table = t)} />)
+    act(() => table.tableInstance.beginRowEdit(table.getRow("3")))
+    const toolbarBefore = toolbar.mock.calls.length
+    const headerBefore = header.mock.calls.length
+    act(() => table.tableInstance.setRowDraftValue("name", "typed"))
+    act(() => table.tableInstance.setRowDraftValue("name", "typed more"))
+    expect(toolbar).toHaveBeenCalledTimes(toolbarBefore)
+    expect(header).toHaveBeenCalledTimes(headerBefore)
+
+    // A real change still reaches them.
+    act(() => table.setSorting([{ id: "name", desc: true }]))
+    expect(toolbar.mock.calls.length).toBeGreaterThan(toolbarBefore)
+    expect(header.mock.calls.length).toBeGreaterThan(headerBefore)
+  })
 })
