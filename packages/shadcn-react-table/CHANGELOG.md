@@ -26,9 +26,9 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   `language` (Gregorian calendar); drag-and-drop announcements use column
   labels and row positions.
 - **Changed:** `DataTableLocalization` has ten new required keys (the nine
-  above plus `advancedFiltersMatch`). A custom
-  localization that spreads `defaultLocalization` (or a locale) keeps
-  compiling; one written out in full needs the new keys.
+  above plus `advancedFiltersMatch`). A custom localization that spreads
+  `defaultLocalization` (or a locale) keeps compiling; one written out in full
+  needs the new keys.
 - **Fixed:** clicks on controls inside a row (edit, save, cancel, row-action
   menu and its items, expand, pin, copy, drag handle, inline editors) no longer
   also fire `onRowClick` / `onCellClick`.
@@ -193,7 +193,7 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   string. See the [infinite scroll guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/infinite-scroll).
 - **Row height control** (`rowHeight`, `getRowHeight`): set a flat pixel height
   for every row, or a per-row height via `getRowHeight(row) => number | "auto" |
-  null`. `"auto"` wraps and grows the row to fit its content — even with column
+null`. `"auto"` wraps and grows the row to fit its content — even with column
   resizing on (which otherwise clips cells to one line); a number pins the row
   and clips overflow. Per-row heights feed the virtualizer estimate, and `"auto"`
   rows are measured after render so variable heights virtualize accurately. See
