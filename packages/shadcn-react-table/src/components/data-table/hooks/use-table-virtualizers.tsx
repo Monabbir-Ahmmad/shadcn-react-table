@@ -14,6 +14,8 @@ import { dt } from "../core/internal"
 
 export interface VirtualRowItem<TData extends RowData> {
   row: DataTableRow<TData>
+  /** The row's index among the center rows. */
+  index: number
   detail: boolean
 }
 
@@ -66,15 +68,31 @@ export function useTableVirtualizers<TData extends RowData>(
   } = dt(table)
 
   // Flatten center rows (+ expanded detail panels) into a virtualization list.
-  const virtualItems: VirtualRowItem<TData>[] = []
-  if (enableRowVirtualization) {
-    for (const row of table.getCenterRows()) {
-      virtualItems.push({ row, detail: false })
-      if (renderDetailPanel && row.getIsExpanded() && !row.getIsGrouped()) {
-        virtualItems.push({ row, detail: true })
+  // It walks every row, so it is rebuilt only when the rows or their expansion
+  // change, not on each scroll frame.
+  const centerRows = table.getCenterRows()
+  const expanded = table.getState().expanded
+  const getIsRowExpanded = table.options.getIsRowExpanded
+  const hasDetailPanel = !!renderDetailPanel
+  const virtualItems = React.useMemo(() => {
+    const items: VirtualRowItem<TData>[] = []
+    if (!enableRowVirtualization) return items
+    centerRows.forEach((row, index) => {
+      items.push({ row, index, detail: false })
+      if (hasDetailPanel && row.getIsExpanded() && !row.getIsGrouped()) {
+        items.push({ row, index, detail: true })
       }
-    }
-  }
+    })
+    return items
+    // Read through `row.getIsExpanded()`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    enableRowVirtualization,
+    hasDetailPanel,
+    centerRows,
+    expanded,
+    getIsRowExpanded,
+  ])
 
   // User-supplied passthrough options, resolved from their value-or-function form.
   const rowVOptions =

@@ -184,7 +184,6 @@ export function DataTableBody<TData extends RowData>({
   const bottomRows = table.getBottomRows()
   const centerRows = table.getCenterRows()
   const hasRows = topRows.length + centerRows.length + bottomRows.length > 0
-  const centerRowIds = centerRows.map((r) => r.id)
 
   // Tree data (getSubRows) indents the first real data column by row depth so
   // the hierarchy is visible (grouped rows self-indent via the group cell).
@@ -378,7 +377,6 @@ export function DataTableBody<TData extends RowData>({
   // navigation; detail panels get no number.
   const centerOffset = topRows.length
   const bottomOffset = centerOffset + centerRows.length
-  const centerIndexById = new Map(centerRows.map((r, i) => [r.id, i]))
 
   /** Grid semantics for a data row (keyboard navigation makes it a grid). */
   const gridRowProps = (row: DataTableRow<TData>, rowIndex: number) =>
@@ -447,15 +445,18 @@ export function DataTableBody<TData extends RowData>({
         createIndex > 0))
   const createBefore =
     showCreateRow && createIndex != null && createIndex > 0 ? createIndex : -1
-  const centerNodes = centerRows.map((row, i) =>
-    renderRow(row, centerOffset + i)
-  )
-  if (createBefore > 0 && createBefore < centerRows.length) {
-    centerNodes.splice(
-      createBefore,
-      0,
-      <DataTableCreateRow key="cn-create-row" table={table} />
-    )
+  // Every center row, for the non-virtualized body. A virtualized body
+  // renders only its window and must not walk all rows on each scroll frame.
+  const renderCenterRows = () => {
+    const nodes = centerRows.map((row, i) => renderRow(row, centerOffset + i))
+    if (createBefore > 0 && createBefore < centerRows.length) {
+      nodes.splice(
+        createBefore,
+        0,
+        <DataTableCreateRow key="cn-create-row" table={table} />
+      )
+    }
+    return nodes
   }
 
   // Pinned rows in their own sticky groups (just under the header / above
@@ -527,8 +528,7 @@ export function DataTableBody<TData extends RowData>({
                         </TableRow>
                       )
                     }
-                    const rowIndex =
-                      centerOffset + (centerIndexById.get(item.row.id) ?? 0)
+                    const rowIndex = centerOffset + item.index
                     return (
                       <MemoRow
                         key={item.row.id}
@@ -578,10 +578,10 @@ export function DataTableBody<TData extends RowData>({
           <>
             {!stickyPins && topRows.map((row, i) => renderRow(row, i))}
             <SortableContext
-              items={centerRowIds.map(dndId)}
+              items={centerRows.map((row) => dndId(row.id))}
               strategy={verticalListSortingStrategy}
             >
-              {centerNodes}
+              {renderCenterRows()}
             </SortableContext>
             {!stickyPins &&
               bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}

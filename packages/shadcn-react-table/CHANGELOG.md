@@ -197,6 +197,10 @@ for every rename.
   refetching) instead of dimming them. New `slotProps.skeleton` part.
 - **Faster:** changing the density no longer re-renders every row; cells
   read their padding from a CSS variable the table root sets.
+- **Faster:** virtualized tables now do work only for the rows on screen
+  while scrolling, so large datasets scroll smoothly; row numbers no longer
+  search every row for each numbered row, which speeds up paginated and
+  non-virtualized tables too.
 - **Changed:** `localization.filterModes` is merged with the built-in labels
   key by key, so adding a label no longer drops the others.
 - **Unchanged API:** column pinning in `initialState` / `state` /

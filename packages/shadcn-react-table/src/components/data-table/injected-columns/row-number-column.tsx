@@ -12,6 +12,23 @@ import { RowPinButton } from "./row-pin-button"
 
 export const ROW_NUMBER_COLUMN_ID = "cn-row-number"
 
+/** Each row's position in a row model's `rows`, built once per row model:
+ *  a virtualized body renders new rows on every scroll frame, and searching
+ *  the whole list for each would cost a pass over all rows per row. */
+const rowPositions = new WeakMap<readonly object[], Map<object, number>>()
+
+function indexOfRow(rows: readonly object[], row: object): number {
+  let positions = rowPositions.get(rows)
+  if (!positions) {
+    positions = new Map()
+    for (const [i, r] of rows.entries()) {
+      if (!positions.has(r)) positions.set(r, i)
+    }
+    rowPositions.set(rows, positions)
+  }
+  return positions.get(row) ?? -1
+}
+
 /** Row-number column. `static` numbers track the current view (page-aware);
  *  `original` uses the stable source index. Optionally shows a pin toggle. */
 export function createRowNumberColumn<TData extends RowData>(
@@ -34,7 +51,7 @@ export function createRowNumberColumn<TData extends RowData>(
       const number =
         mode === "original"
           ? row.index + 1
-          : table.getRowModel().rows.indexOf(row) +
+          : indexOfRow(table.getRowModel().rows, row) +
             1 +
             table.getState().pagination.pageIndex *
               table.getState().pagination.pageSize
