@@ -69,6 +69,7 @@ export type {
   ClickToCopyOption,
   DisplayColumnId,
   EditDialogContentProps,
+  RowPinningDisplayMode,
 } from "./core/types"
 
 export type {

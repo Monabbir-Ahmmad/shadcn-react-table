@@ -179,6 +179,11 @@ for every rename.
 
 ### Changed
 
+- **Changed:** pinned rows stay in view while scrolling (above the other rows
+  under the sticky header, or below them). New `rowPinningDisplayMode`:
+  `"top-and-bottom"` (default), `"top"`, `"bottom"`, `"static"` (the previous
+  behavior), and `"select-top"` / `"select-bottom"`, where selecting a row pins
+  it.
 - **Changed:** dragging a column moves the whole column (body, filter and
   footer cells) with its header, and the other columns slide aside, without
   re-rendering rows; reduced motion turns the slide off.

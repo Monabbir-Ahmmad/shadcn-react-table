@@ -32,6 +32,7 @@ import { useTableDnd } from "../hooks/use-table-dnd"
 import { useTableVirtualizers } from "../hooks/use-table-virtualizers"
 import { useTableState } from "../hooks/use-table-state"
 import { useFullscreenModal } from "../hooks/use-fullscreen-modal"
+import { useRowPinningDisplay } from "../hooks/use-row-pinning-display"
 import { getDataRowCount, getHeaderRowCount } from "../helpers/grid-rows"
 import { getColumnSizeVars } from "../utils/column-styles"
 import { type DataTableInstance } from "./types"
@@ -257,6 +258,13 @@ export function DataTable<TData extends RowData>({
     getDataRowCount(table) +
     (showFooter ? table.getFooterGroups().length : 0)
   const isBusy = isLoading || isSaving
+
+  useRowPinningDisplay({
+    table,
+    surfaceRef: gridRef,
+    stickyHeader: enableStickyHeader,
+    stickyFooter: dt(table).enableStickyFooter,
+  })
 
   const fullscreen = useFullscreenModal(paperElRef, isFullscreen, () =>
     setIsFullscreen(false)

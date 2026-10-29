@@ -168,6 +168,7 @@ export function useDataTable<TData extends RowData>(
     enableExpanding: enableExpandingProp,
     enableStickyFooter = false,
     enableTableHead = true,
+    rowPinningDisplayMode = "top-and-bottom",
     enableTableFooter = true,
     enableExpandAll = true,
     renderDetailPanel,
@@ -505,7 +506,9 @@ export function useDataTable<TData extends RowData>(
     positionExpandColumn,
     enableRowNumbers,
     rowNumberMode,
-    enableRowPinning,
+    // Select modes pin by selection, so they show no pin buttons.
+    enableRowPinning:
+      enableRowPinning && !rowPinningDisplayMode.startsWith("select"),
     renderRowActions,
     renderRowActionMenuItems,
     positionActionsColumn,
@@ -849,6 +852,7 @@ export function useDataTable<TData extends RowData>(
     enableExpanding,
     enableStickyFooter,
     enableTableHead,
+    rowPinningDisplayMode,
     enableTableFooter,
     enableExpandAll,
     renderDetailPanel,

@@ -631,7 +631,8 @@ Set the MRT value explicitly to keep the old behavior.
 
 ## Not here (yet)
 
-- `layoutMode` and column `grow`, `rowPinningDisplayMode`, the `"head-overlay"` alert banner position and aggregation arrays.
+- `layoutMode` and column `grow`, and the `"head-overlay"` alert banner position.
+- `rowPinningDisplayMode` values `"sticky"` and `"select-sticky"` (rows that stick in place); use `"top-and-bottom"` or `"select-top"`.
 - `enableColumnDragging` as a separate switch.
 - MUI theming: the table uses your shadcn/ui components and theme instead.
 
@@ -1797,6 +1798,29 @@ return <DataTable table={table} />
 ```
 
 > **Enable row numbers:** Turn on `enableRowNumbers` so the pin toggle has a column to live in.
+
+## Display modes
+
+`rowPinningDisplayMode` sets where pinned rows show and how rows get pinned:
+
+| Mode | Pinned rows | Pinned by |
+| --- | --- | --- |
+| `"top-and-bottom"` (default) | Stay in view above (or below) the other rows while scrolling | The pin button (to the top), or `row.pin("bottom")` |
+| `"top"` / `"bottom"` | The same | The pin button, to that side |
+| `"static"` | Listed first (or last), and scroll away with the rest | The pin button |
+| `"select-top"` / `"select-bottom"` | Stay in view on that side | Selecting the row; deselecting unpins it. No pin buttons |
+
+```tsx
+useDataTable({
+  data,
+  columns,
+  enableRowSelection: true,
+  enableRowPinning: true,
+  rowPinningDisplayMode: "select-top", // selected rows stay in view at the top
+})
+```
+
+Sticky pinned rows need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
 
 ## Related
 
@@ -5410,6 +5434,7 @@ The table is styled with Tailwind, not per-component style props. Structural slo
 | `enableGrouping` | `boolean` | `false` | Row grouping (group-by menu + drop-to-group zone + aggregated group rows). |
 | `enableExpanding` | `boolean` |  | Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided. |
 | `enableStickyFooter` | `boolean` | `false` | Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false. |
+| `rowPinningDisplayMode` | `RowPinningDisplayMode` | `"top-and-bottom"` | Where pinned rows show and how rows get pinned (see {@link RowPinningDisplayMode}). Default `"top-and-bottom"`. |
 | `enableTableHead` | `boolean` | `true` | Render the header rows. Default true; `false` shows the body only. |
 | `enableTableFooter` | `boolean` | `true` | Render the footer rows when columns define a `footer`. Default true. |
 | `enableExpandAll` | `boolean` | `true` | Show the expand-all toggle in the expand column's header. Default true. |
@@ -5622,6 +5647,7 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `enableGrouping` | `boolean` |  | Row grouping (group-by menu + drop-to-group zone + aggregated group rows). |
 | `enableExpanding` | `boolean` |  | Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided. |
 | `enableStickyFooter` | `boolean` |  | Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false. |
+| `rowPinningDisplayMode` | `RowPinningDisplayMode` |  | Where pinned rows show and how rows get pinned. |
 | `enableTableHead` | `boolean` |  | Whether the header rows render. |
 | `enableTableFooter` | `boolean` |  | Whether the footer rows render (when columns define footers). |
 | `enableExpandAll` | `boolean` |  | Whether the expand column's header toggles every row. |

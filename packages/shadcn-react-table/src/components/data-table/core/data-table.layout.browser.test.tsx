@@ -138,3 +138,33 @@ describe("loading skeletons", () => {
     })
   })
 })
+
+describe("pinned rows", () => {
+  it("stay in view under the sticky header while the body scrolls", async () => {
+    function Pinned() {
+      const table = useDataTable<Row>({
+        slotProps: { surface: { className: "max-h-[300px]" } },
+        columns: columns.slice(0, 3),
+        data,
+        getRowId: (row) => row.id,
+        enablePagination: false,
+        enableRowPinning: true,
+        initialState: { rowPinning: { top: ["150"], bottom: [] } },
+      })
+      return <DataTable table={table} />
+    }
+    render(<Pinned />)
+    await nextFrame()
+    const pinned = screen.getByText("name-150").closest("tr")!
+    const surface = surfaceOf(pinned)
+    surface.scrollTop = 2000
+    await nextFrame()
+    const head = surface.querySelector("thead")!.getBoundingClientRect()
+    const row = pinned.getBoundingClientRect()
+    // Right under the header, inside the visible surface.
+    expect(Math.abs(row.top - head.bottom)).toBeLessThan(2)
+    expect(row.bottom).toBeLessThanOrEqual(
+      surface.getBoundingClientRect().bottom
+    )
+  })
+})

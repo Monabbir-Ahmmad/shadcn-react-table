@@ -454,8 +454,22 @@ export function DataTableBody<TData extends RowData>({
     )
   }
 
+  // Pinned rows in their own sticky groups (just under the header / above
+  // the footer, whose heights the table publishes as CSS variables), so they
+  // stay in view while the rest scroll. `"static"` lists them in the body.
+  const stickyPins = dt(table).rowPinningDisplayMode !== "static" && hasRows
+
   return (
     <RowStateHubContext.Provider value={rowStateHub}>
+      {stickyPins && topRows.length > 0 && (
+        <TableBody
+          data-pinned-rows="top"
+          className="sticky z-10"
+          style={{ top: "var(--dt-head-h, 0px)" }}
+        >
+          {topRows.map((row, i) => renderRow(row, i))}
+        </TableBody>
+      )}
       <TableBody {...getSlotProps(table, "body", {})}>
         {createAtTop && <DataTableCreateRow table={table} />}
         {showSkeletons && !hasRows ? (
@@ -472,7 +486,7 @@ export function DataTableBody<TData extends RowData>({
           />
         ) : hasRows && enableRowVirtualization ? (
           <>
-            {topRows.map((row, i) => renderRow(row, i))}
+            {!stickyPins && topRows.map((row, i) => renderRow(row, i))}
             {(() => {
               const vRows = rowVirtualizer.getVirtualItems()
               const padTop = vRows.length ? (vRows[0]?.start ?? 0) : 0
@@ -553,18 +567,20 @@ export function DataTableBody<TData extends RowData>({
                 </>
               )
             })()}
-            {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
+            {!stickyPins &&
+              bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
           </>
         ) : hasRows ? (
           <>
-            {topRows.map((row, i) => renderRow(row, i))}
+            {!stickyPins && topRows.map((row, i) => renderRow(row, i))}
             <SortableContext
               items={centerRowIds}
               strategy={verticalListSortingStrategy}
             >
               {centerNodes}
             </SortableContext>
-            {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
+            {!stickyPins &&
+              bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
           </>
         ) : (
           <TableRow className="hover:bg-transparent">
@@ -581,6 +597,15 @@ export function DataTableBody<TData extends RowData>({
         )}
         {createAtBottom && <DataTableCreateRow table={table} />}
       </TableBody>
+      {stickyPins && bottomRows.length > 0 && (
+        <TableBody
+          data-pinned-rows="bottom"
+          className="sticky z-10"
+          style={{ bottom: "var(--dt-foot-h, 0px)" }}
+        >
+          {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
+        </TableBody>
+      )}
     </RowStateHubContext.Provider>
   )
 }

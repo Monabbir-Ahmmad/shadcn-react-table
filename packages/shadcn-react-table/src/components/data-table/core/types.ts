@@ -311,6 +311,22 @@ export type DisplayColumnId =
   | "cn-row-pin"
   | "cn-row-drag"
 
+/** Where pinned rows show and how rows get pinned:
+ *  - `"top-and-bottom"` (default): rows pinned to the top stay in view above
+ *    the others while scrolling, rows pinned to the bottom below them; the
+ *    pin button pins to the top.
+ *  - `"top"` / `"bottom"`: the same, with the pin button pinning to that side.
+ *  - `"static"`: pinned rows are listed first / last but scroll away.
+ *  - `"select-top"` / `"select-bottom"`: selecting a row pins it (and
+ *    deselecting unpins it) to that side; no pin buttons. */
+export type RowPinningDisplayMode =
+  | "top-and-bottom"
+  | "top"
+  | "bottom"
+  | "static"
+  | "select-top"
+  | "select-bottom"
+
 /** How cells copy their value: on click (`true`), from the cell menu
  *  (`"context-menu"`), not at all (`false`), or per cell. */
 export type ClickToCopyOption<TData extends RowData> =
@@ -607,6 +623,8 @@ export interface DataTableConfig<TData extends RowData> {
   enableGrouping: boolean
   enableExpanding: boolean
   enableStickyFooter: boolean
+  /** Where pinned rows show and how rows get pinned. */
+  rowPinningDisplayMode: RowPinningDisplayMode
   /** Whether the header rows render. */
   enableTableHead: boolean
   /** Whether the footer rows render (when columns define footers). */
@@ -1002,6 +1020,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Pin the footer (aggregation/footer cells) to the bottom of the surface.
    *  Default false. */
   enableStickyFooter?: boolean
+  /** Where pinned rows show and how rows get pinned (see
+   *  {@link RowPinningDisplayMode}). Default `"top-and-bottom"`. */
+  rowPinningDisplayMode?: RowPinningDisplayMode
   /** Render the header rows. Default true; `false` shows the body only. */
   enableTableHead?: boolean
   /** Render the footer rows when columns define a `footer`. Default true. */

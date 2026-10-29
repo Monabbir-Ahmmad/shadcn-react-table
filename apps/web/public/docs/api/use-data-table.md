@@ -57,6 +57,7 @@
 | `enableGrouping` | `boolean` | `false` | Row grouping (group-by menu + drop-to-group zone + aggregated group rows). |
 | `enableExpanding` | `boolean` |  | Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided. |
 | `enableStickyFooter` | `boolean` | `false` | Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false. |
+| `rowPinningDisplayMode` | `RowPinningDisplayMode` | `"top-and-bottom"` | Where pinned rows show and how rows get pinned (see {@link RowPinningDisplayMode}). Default `"top-and-bottom"`. |
 | `enableTableHead` | `boolean` | `true` | Render the header rows. Default true; `false` shows the body only. |
 | `enableTableFooter` | `boolean` | `true` | Render the footer rows when columns define a `footer`. Default true. |
 | `enableExpandAll` | `boolean` | `true` | Show the expand-all toggle in the expand column's header. Default true. |

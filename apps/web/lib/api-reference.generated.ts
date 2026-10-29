@@ -428,6 +428,14 @@ export const useDataTableOptions: ApiMember[] = [
       "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
   },
   {
+    name: "rowPinningDisplayMode",
+    type: "RowPinningDisplayMode",
+    required: false,
+    default: '"top-and-bottom"',
+    description:
+      'Where pinned rows show and how rows get pinned (see {@link RowPinningDisplayMode}). Default `"top-and-bottom"`.',
+  },
+  {
     name: "enableTableHead",
     type: "boolean",
     required: false,
@@ -1373,6 +1381,13 @@ export const dataTableOptions: ApiMember[] = [
     default: null,
     description:
       "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
+  },
+  {
+    name: "rowPinningDisplayMode",
+    type: "RowPinningDisplayMode",
+    required: true,
+    default: null,
+    description: "Where pinned rows show and how rows get pinned.",
   },
   {
     name: "enableTableHead",

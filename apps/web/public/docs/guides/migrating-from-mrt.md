@@ -131,7 +131,8 @@ Set the MRT value explicitly to keep the old behavior.
 
 ## Not here (yet)
 
-- `layoutMode` and column `grow`, `rowPinningDisplayMode`, the `"head-overlay"` alert banner position and aggregation arrays.
+- `layoutMode` and column `grow`, and the `"head-overlay"` alert banner position.
+- `rowPinningDisplayMode` values `"sticky"` and `"select-sticky"` (rows that stick in place); use `"top-and-bottom"` or `"select-top"`.
 - `enableColumnDragging` as a separate switch.
 - MUI theming: the table uses your shadcn/ui components and theme instead.
 
