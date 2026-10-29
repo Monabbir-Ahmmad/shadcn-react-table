@@ -67,6 +67,19 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   scrolled out of a virtualized table.
 - **Fixed:** grouped headers render a single column filter row (an empty row
   was added per group level).
+- **Fixed:** date filters read date-only values (`"2025-01-10"`) as that local
+  day; west of UTC they matched the previous day.
+- **Fixed:** double-clicks on in-row controls no longer fire
+  `onRowDoubleClick` / `onCellDoubleClick`.
+- **Fixed:** with `enableFilters: false`, cells no longer highlight filter or
+  search text kept in state.
+- **Fixed:** the expand and row-actions columns no longer show a column drag
+  grip.
+- **Fixed:** column ids that differ only in non-ASCII letters (`fødsel`,
+  `fådsel`) no longer share a resize width.
+- **Fixed:** picking an option in a select editor keeps a numeric column's
+  value a number.
+- **Fixed:** the date filter pickers open on the selected month, not today's.
 
 ## 0.5.0
 
