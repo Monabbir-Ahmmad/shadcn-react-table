@@ -25,7 +25,8 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   each locale formats its own numbers; date filters and the date picker follow
   `language` (Gregorian calendar); drag-and-drop announcements use column
   labels and row positions.
-- **Changed:** `DataTableLocalization` has nine new required keys. A custom
+- **Changed:** `DataTableLocalization` has ten new required keys (the nine
+  above plus `advancedFiltersMatch`). A custom
   localization that spreads `defaultLocalization` (or a locale) keeps
   compiling; one written out in full needs the new keys.
 - **Fixed:** clicks on controls inside a row (edit, save, cancel, row-action
