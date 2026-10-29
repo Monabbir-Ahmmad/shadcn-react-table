@@ -12,6 +12,7 @@ import type {
   DataTableRowModel,
   DataTableRowModelFactory,
 } from "../core/table-types"
+import { parseDate } from "../helpers/parse-date"
 
 /** A value that contributes nothing to a filter (no cell value / no input). */
 function isEmptyValue(value: unknown): boolean {
@@ -34,12 +35,8 @@ function asNumber(value: unknown): number | null {
 
 /** Parse an epoch time from a Date or date-ish string, or null. */
 function asTime(value: unknown): number | null {
-  if (value instanceof Date) return value.getTime()
-  if (typeof value === "string" && value.trim() !== "") {
-    const t = Date.parse(value)
-    return Number.isNaN(t) ? null : t
-  }
-  return null
+  if (!(value instanceof Date) && typeof value !== "string") return null
+  return parseDate(value)?.getTime() ?? null
 }
 
 /** Order two cell-ish values: numeric first, then date, then string. */

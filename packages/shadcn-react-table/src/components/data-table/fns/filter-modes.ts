@@ -33,17 +33,15 @@ export type FilterMode =
 import { rankItem } from "@tanstack/match-sorter-utils"
 import { endOfDay, isAfter, isBefore, startOfDay } from "date-fns"
 
+import { parseDate } from "../helpers/parse-date"
+
 const str = (v: unknown): string => (v == null ? "" : String(v))
 const lower = (v: unknown): string => str(v).toLowerCase()
 const num = (v: unknown): number =>
   typeof v === "number" ? v : parseFloat(str(v))
 const isBlank = (v: unknown): boolean =>
   v == null || v === "" || (Array.isArray(v) && v.length === 0)
-const toDate = (v: unknown): Date | null => {
-  if (v == null || v === "") return null
-  const d = v instanceof Date ? v : new Date(v as string)
-  return Number.isNaN(d.getTime()) ? null : d
-}
+const toDate = parseDate
 
 // Each entry: (row value already resolved) decides inclusion. The dynamic
 // `filterFn` resolves `row.getValue(columnId)` and dispatches by mode.
