@@ -20,13 +20,12 @@ export function PmTabs({ command }: { command: string }) {
   return (
     <div className="my-6 overflow-hidden rounded-lg border">
       <div className="flex items-center justify-between border-b bg-muted/40 px-2">
-        <div role="tablist" aria-label="Package manager" className="flex">
+        <div role="group" aria-label="Package manager" className="flex">
           {(Object.keys(RUNNERS) as Manager[]).map((m) => (
             <button
               key={m}
               type="button"
-              role="tab"
-              aria-selected={m === manager}
+              aria-pressed={m === manager}
               onClick={() => setManager(m)}
               className={cn(
                 "-mb-px border-b-2 px-3 py-2 font-mono text-xs transition-colors",
@@ -42,10 +41,13 @@ export function PmTabs({ command }: { command: string }) {
         <button
           type="button"
           onClick={() =>
-            void navigator.clipboard.writeText(line).then(() => {
-              setCopied(true)
-              setTimeout(() => setCopied(false), 1500)
-            })
+            void navigator.clipboard
+              .writeText(line)
+              .then(() => {
+                setCopied(true)
+                setTimeout(() => setCopied(false), 1500)
+              })
+              .catch(() => {})
           }
           className="rounded-md px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
         >
