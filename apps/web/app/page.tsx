@@ -5,6 +5,7 @@ import { Hero } from "@/components/home/hero"
 import { FeatureGrid } from "@/components/home/feature-grid"
 import { TechStrip } from "@/components/home/tech-strip"
 import { StatsBand } from "@/components/home/stats-band"
+import { FeaturePlayground } from "@/components/home/feature-playground"
 import { ExampleCategories } from "@/components/home/example-categories"
 import { ClosingBanner } from "@/components/home/closing-banner"
 import { InstallSection } from "@/components/home/install-section"
@@ -24,6 +25,7 @@ export default function HomePage() {
         <Hero />
         <TechStrip />
         <StatsBand />
+        <FeaturePlayground />
         <FeatureGrid />
         <ExampleCategories />
         <InstallSection />
