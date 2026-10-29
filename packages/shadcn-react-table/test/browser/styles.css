@@ -1,0 +1,4 @@
+/* The shared stylesheet, plus this package's sources so Tailwind generates
+   the classes the data table uses. */
+@import "../../../ui/src/styles/globals.css";
+@source "../../src";

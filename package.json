@@ -9,7 +9,8 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "typecheck": "turbo typecheck",
-    "test": "turbo test"
+    "test": "turbo test",
+    "test:browser": "turbo test:browser"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

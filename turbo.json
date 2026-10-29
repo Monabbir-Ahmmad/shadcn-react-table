@@ -20,6 +20,9 @@
     "test": {
       "dependsOn": []
     },
+    "test:browser": {
+      "dependsOn": []
+    },
     "dev": {
       "cache": false,
       "persistent": true
