@@ -19,6 +19,7 @@ import type { DataTableState } from "../helpers/table-state"
 import type { DataTableFeatures } from "./features"
 import type { DataTableIcons } from "./icons"
 import type { DataTableLocalization } from "./localization"
+import type { DataTableUiState } from "./ui-state"
 import type {
   DataTableCell,
   DataTableColumn,
@@ -224,6 +225,13 @@ declare module "@tanstack/react-table" {
   // inert for tables that don't include it.
   interface Plugins {
     dataTableInstanceFeature: TableFeature
+    dataTableUiFeature: TableFeature
+  }
+
+  // The table's UI state slices (density, editing, filter modes…) are table
+  // state like sorting: typed in `initialState`, `state` and the store.
+  interface TableState_FeatureMap {
+    dataTableUiFeature: DataTableUiState
   }
 
   // Our instance members on TanStack's `Table` type, only for tables whose
@@ -590,6 +598,24 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   globalFilterMode?: GlobalFilterMode
   /** Called whenever the global search mode changes. */
   onGlobalFilterModeChange?: (mode: GlobalFilterMode) => void
+  /** Called when a column's filter mode changes, with every column's mode.
+   *  Control it with `state.columnFilterModes`. */
+  onColumnFilterModesChange?: (modes: Record<string, FilterMode>) => void
+  /** Called when the advanced filter dialog opens or closes. Control it with
+   *  `state.showAdvancedFilterPanel`. */
+  onShowAdvancedFilterPanelChange?: (open: boolean) => void
+  /** Called when cell editing starts or ends (`null`). Control it with
+   *  `state.editingCell`. */
+  onEditingCellChange?: (cell: EditingCell | null) => void
+  /** Called when row editing starts or ends (`null`). Control it with
+   *  `state.editingRowId`. */
+  onEditingRowIdChange?: (rowId: string | null) => void
+  /** Called when the new-row editor opens or closes. Control it with
+   *  `state.isCreating`. */
+  onIsCreatingChange?: (isCreating: boolean) => void
+  /** Called when the draft of the row being edited or created changes. Control
+   *  it with `state.rowDraft`. */
+  onRowDraftChange?: (draft: Record<string, unknown>) => void
   /** Drag-and-drop column reordering (adds a grip to each header). */
   enableColumnOrdering?: boolean
   /** Column pinning (left/right) via the column-actions menu + sticky columns. */

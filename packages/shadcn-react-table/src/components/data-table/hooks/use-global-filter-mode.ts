@@ -8,16 +8,14 @@ import {
   createRankedSortedRowModel,
   type GlobalFilterMode,
 } from "../fns/filter-fns"
-import { useControllableState } from "./use-controllable-state"
 import type {
   DataTableFilterFn,
   DataTableRowModelFactory,
 } from "../core/table-types"
 
 interface UseGlobalFilterModeParams {
-  globalFilterMode?: GlobalFilterMode
-  defaultGlobalFilterMode: GlobalFilterMode
-  onGlobalFilterModeChange?: (mode: GlobalFilterMode) => void
+  /** The current mode (table state), read when filtering and ranking. */
+  getMode: () => GlobalFilterMode
   enableGlobalFilterRankedResults: boolean
   manualSorting: boolean
   manualFiltering: boolean
@@ -25,9 +23,8 @@ interface UseGlobalFilterModeParams {
 }
 
 export interface GlobalFilterModeState<TData extends RowData> {
-  globalFilterMode: GlobalFilterMode
-  setGlobalFilterMode: (mode: GlobalFilterMode) => void
-  /** Mode-aware global filter fn (new identity per mode → re-runs filtering). */
+  /** Mode-aware global filter fn. Stable: it reads the mode when it runs, and
+   *  the filtered row model re-filters when the mode changes. */
   dynamicGlobalFilterFn: DataTableFilterFn<TData>
   /** Sorted row model that re-orders by fuzzy rank when ranking is active. */
   rankedSortedRowModel: DataTableRowModelFactory<TData>
@@ -41,33 +38,26 @@ export interface GlobalFilterModeState<TData extends RowData> {
  * keeps a stable identity (recreating it would defeat TanStack's memoization).
  */
 export function useGlobalFilterMode<TData extends RowData>({
-  globalFilterMode: globalFilterModeProp,
-  defaultGlobalFilterMode,
-  onGlobalFilterModeChange,
+  getMode,
   enableGlobalFilterRankedResults,
   manualSorting,
   manualFiltering,
   enableGrouping,
 }: UseGlobalFilterModeParams): GlobalFilterModeState<TData> {
-  const [globalFilterMode, setGlobalFilterMode] =
-    useControllableState<GlobalFilterMode>(
-      globalFilterModeProp,
-      defaultGlobalFilterMode,
-      onGlobalFilterModeChange
-    )
-
-  // Recreated per mode so it has a new identity: the filtered row model
-  // (fns/advanced-filter.ts) keys its TanStack delegate on
-  // `options.globalFilterFn` and rebuilds it when the fn changes. TanStack's
-  // own memo ignores the fn, so without that the switch would not re-filter.
+  const getModeRef = React.useRef(getMode)
+  // eslint-disable-next-line react-hooks/refs
+  getModeRef.current = getMode
+  // Stable; the filtered row model (fns/advanced-filter.ts) re-filters when
+  // the mode changes, since TanStack's own memo ignores filter functions.
   const dynamicGlobalFilterFn = React.useMemo(
-    () => createGlobalFilterFn<TData>(() => globalFilterMode),
-    [globalFilterMode]
+    // Read inside TanStack's filtering pass, not during this render.
+    // eslint-disable-next-line react-hooks/refs
+    () => createGlobalFilterFn<TData>(() => getModeRef.current()),
+    []
   )
 
   const rankingRef = React.useRef<{
     enabled: boolean
-    mode: GlobalFilterMode
     manualSorting: boolean
     manualFiltering: boolean
     grouping: boolean
@@ -78,7 +68,6 @@ export function useGlobalFilterMode<TData extends RowData>({
   // eslint-disable-next-line react-hooks/refs
   rankingRef.current = {
     enabled: enableGlobalFilterRankedResults,
-    mode: globalFilterMode,
     manualSorting,
     manualFiltering,
     grouping: enableGrouping,
@@ -90,7 +79,7 @@ export function useGlobalFilterMode<TData extends RowData>({
       // eslint-disable-next-line react-hooks/refs
       createRankedSortedRowModel<TData>((t) => {
         const c = rankingRef.current
-        if (!c.enabled || c.mode !== "fuzzy") return false
+        if (!c.enabled || getModeRef.current() !== "fuzzy") return false
         if (c.manualSorting || c.manualFiltering) return false
         const s = t.store.state
         if (!s.globalFilter) return false
@@ -104,8 +93,6 @@ export function useGlobalFilterMode<TData extends RowData>({
   )
 
   return {
-    globalFilterMode,
-    setGlobalFilterMode,
     dynamicGlobalFilterFn,
     rankedSortedRowModel,
   }

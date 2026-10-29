@@ -22,6 +22,7 @@ import {
 
 import { toDataTableState } from "../helpers/table-state"
 import type { DataTableCoreTable } from "./table-types"
+import { createUiStateFeature, type DataTableUiState } from "./ui-state"
 
 // TanStack types `aggregationFns` with a type alias it doesn't export, which
 // declaration emit can't name. A named interface over the same type gives the
@@ -39,6 +40,9 @@ const builtInAggregationFns: BuiltInAggregationFns = aggregationFns
 // base entry is a placeholder that puts the key on `DataTableFeatures`; each
 // table gets the working one from `createDataTableFeatures`.
 const dataTableInstanceFeature: TableFeature = {}
+// Placeholder for the typed feature map; `createDataTableFeatures` supplies
+// the real one (it needs the hook's defaults).
+const dataTableUiFeature: TableFeature = {}
 
 // Filtering and sorting are filled per table with our own factories, each
 // typed for the hook's `TData`. Their slots take TanStack's own declared type
@@ -58,6 +62,7 @@ const sortedRowModel: SortedRowModelSlot = createSortedRowModel()
 const baseFeatures = tableFeatures({
   ...stockFeatures,
   dataTableInstanceFeature,
+  dataTableUiFeature,
   filteredRowModel,
   sortedRowModel,
   groupedRowModel: createGroupedRowModel(),
@@ -97,8 +102,11 @@ export function createDataTableFeatures({
   getTableInstance,
   filteredRowModel,
   sortedRowModel,
+  uiDefaults,
 }: {
   gates: () => RowModelGates
+  /** Starting values of the UI state slices (see `ui-state.ts`). */
+  uiDefaults: () => DataTableUiState
   /** The hook's `tableInstance` config, read lazily. */
   getTableInstance: () => unknown
   filteredRowModel: DataTableFeatures["filteredRowModel"]
@@ -119,6 +127,7 @@ export function createDataTableFeatures({
         })
       },
     },
+    dataTableUiFeature: createUiStateFeature(uiDefaults),
     filteredRowModel,
     sortedRowModel,
     groupedRowModel: (table) => {

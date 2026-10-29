@@ -74,9 +74,9 @@ Neither `@monabbir/shadcn-react-table` nor `@workspace/ui` has a **build step**.
 The product lives at `packages/shadcn-react-table/src/components/data-table/`, organized by **layer**:
 
 - `index.ts` — the public API barrel; the single entry consumers import (`@monabbir/shadcn-react-table/components/data-table`). Treat it as the API surface — keep it curated.
-- `core/` — the engine and shared definitions: `data-table.tsx`, `use-data-table.ts`, `types.ts`, `constants.ts`, `config-context.tsx`, `icons.tsx`, `localization.ts`.
+- `core/` — the engine and shared definitions: `data-table.tsx`, `use-data-table.ts`, `types.ts`, `ui-state.ts` (the table's UI state — density, editing, filter modes… — as a TanStack feature with its own state slices), `constants.ts`, `config-context.tsx`, `icons.tsx`, `localization.ts`.
 - `components/` — the supporting UI grouped by region (`head/ body/ toolbar/ editing/ menus/`); regions nest their own subfolders (`head/filter-variants/`, `body/dnd/`, `toolbar/controls/`).
-- `hooks/` — auxiliary hooks: `use-grid-navigation.ts`, the state-slice hooks composed by `use-data-table` (`use-controllable-state`, `use-editing-state`, `use-column-filter-modes`, `use-global-filter-mode`, `use-resolved-columns`, `use-page-reset-on-filter-change`), and the render hooks (`use-table-dnd`, `use-table-virtualizers`).
+- `hooks/` — auxiliary hooks: `use-grid-navigation.ts`, the pieces composed by `use-data-table` (`use-editing-state` actions, `use-column-filter-modes`, `use-global-filter-mode`, `use-advanced-filter`, `use-resolved-columns`, `use-page-reset-on-filter-change`), and the render hooks (`use-table-dnd`, `use-table-virtualizers`).
 - `injected-columns/` — column-def factories for the injected columns (`selection`, `expand`, `row-drag`, `row-number`, `row-actions`) + `RowDragContext`.
 - `helpers/` — pure, framework-light helpers (`column-key`, `column-label`, `effective-filter-mode`, `is-column-editable`).
 - `fns/` — the filter engine (`filter-modes`, `filter-factories`, `ranked-row-model`, `variant-modes`) behind the `filter-fns` barrel · `utils/` — style + export helpers (`column-styles.ts`, `export-utils.ts`).

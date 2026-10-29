@@ -13,10 +13,6 @@ import { flattenLeafColumns } from "../helpers/flatten-leaf-columns"
 import type { DataTableColumnDef, DataTableFilterFn } from "../core/table-types"
 
 export interface ColumnFilterModes<TData extends RowData> {
-  columnFilterModes: Record<string, FilterMode>
-  setColumnFilterModes: React.Dispatch<
-    React.SetStateAction<Record<string, FilterMode>>
-  >
   /** Resolve the active mode for a column (active → default → "contains"). */
   getColumnMode: (columnId: string) => FilterMode
   /** Single dynamic filter fn assigned to every column via `defaultColumn`. */
@@ -24,22 +20,20 @@ export interface ColumnFilterModes<TData extends RowData> {
 }
 
 /**
- * Per-column filter-mode state and the dynamic filter function that reads it.
- * Default modes are derived from each column's `meta.filterMode` / `meta.variant`.
- * Modes are read through refs so the filter fn keeps a stable identity (changing
- * it would thrash the filtered row model every render).
+ * The dynamic filter function behind per-column filter modes. The chosen modes
+ * are table state (`columnFilterModes`, read through `getModes` at filter
+ * time); defaults come from each column's `meta.filterMode` / `meta.variant`.
+ * The filter fn keeps a stable identity (changing it would thrash the filtered
+ * row model every render).
  *
  * The value-resetting `setColumnFilterMode` action lives in `useDataTable`
  * because it needs the table instance, which can't exist before this hook
  * supplies `dynamicFilterFn`.
  */
 export function useColumnFilterModes<TData extends RowData>(
-  columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>
+  columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>,
+  getModes: () => Record<string, FilterMode>
 ): ColumnFilterModes<TData> {
-  const [columnFilterModes, setColumnFilterModes] = React.useState<
-    Record<string, FilterMode>
-  >({})
-
   // Per-column default mode derived from `meta.filterMode` / `meta.variant`.
   const defaultModes = React.useMemo(() => {
     const map: Record<string, FilterMode> = {}
@@ -58,16 +52,16 @@ export function useColumnFilterModes<TData extends RowData>(
   // The render-phase writes are load-bearing: TanStack filters during render,
   // so the filterFn must see this render's modes (an effect write would
   // filter with stale modes for a full frame).
-  const modesRef = React.useRef(columnFilterModes)
+  const getModesRef = React.useRef(getModes)
   // eslint-disable-next-line react-hooks/refs
-  modesRef.current = columnFilterModes
+  getModesRef.current = getModes
   const defaultModesRef = React.useRef(defaultModes)
   // eslint-disable-next-line react-hooks/refs
   defaultModesRef.current = defaultModes
 
   const getColumnMode = React.useCallback(
     (columnId: string): FilterMode =>
-      modesRef.current[columnId] ??
+      getModesRef.current()[columnId] ??
       defaultModesRef.current[columnId] ??
       "contains",
     []
@@ -82,8 +76,6 @@ export function useColumnFilterModes<TData extends RowData>(
   )
 
   return {
-    columnFilterModes,
-    setColumnFilterModes,
     getColumnMode,
     dynamicFilterFn,
   }

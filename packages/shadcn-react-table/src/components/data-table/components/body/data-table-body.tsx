@@ -51,7 +51,14 @@ const ROW_SCOPED_KEYS = new Set([
 
 // State scoped to single rows (selection) or not rendered by rows at all
 // (the in-progress resize, during which the body is frozen anyway).
-const ROW_SCOPED_STATE = new Set(["rowSelection", "columnSizingInfo"])
+const ROW_SCOPED_STATE = new Set([
+  "rowSelection",
+  "columnSizingInfo",
+  "editingCell",
+  "editingRowId",
+  "rowDraft",
+  "isCreating",
+])
 
 interface DataTableBodyProps<TData extends RowData> {
   table: DataTableInstance<TData>
