@@ -172,6 +172,7 @@ export const FONTS = [
     value: "ui-sans-serif, system-ui, sans-serif",
   },
   { name: "serif", label: "Serif", value: "var(--font-noto-serif)" },
+  { name: "mono", label: "Geist Mono", value: "var(--font-mono)" },
 ] as const
 
 export const RADII = ["0rem", "0.3rem", "0.45rem", "0.65rem", "1rem"]

@@ -45,3 +45,16 @@ describe("themeVars", () => {
     expect(BASE_COLORS.length).toBeGreaterThan(1)
   })
 })
+
+describe("FONTS", () => {
+  it("offers the mono font the site loads", () => {
+    const mono = FONTS.find((f) => f.name === "mono")
+    expect(mono?.value).toBe("var(--font-mono)")
+    expect(
+      themeVars(
+        { accent: "lime", base: "neutral", font: "mono", radius: "0rem" },
+        false
+      )["--font-sans"]
+    ).toBe("var(--font-mono)")
+  })
+})

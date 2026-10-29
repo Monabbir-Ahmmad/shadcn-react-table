@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { IconLibrary } from "@/components/examples/icon-sets"
+import { STYLE_DEFAULT, type FrameChoice } from "@/lib/deck"
 import {
   ACCENTS,
   BASE_COLORS,
@@ -13,21 +13,19 @@ import {
   RADII,
 } from "@/lib/theme-presets"
 
-/** The theme choices the deck sends to every style frame. */
-export type DeckChoice = {
-  accent: string
-  base: string
-  font: string
-  radius: string
-  icons: IconLibrary
+/** The deck's picks; font and radius may be STYLE_DEFAULT. */
+export type DeckChoice = FrameChoice
+
+// The site's radius steps, with the one nearest shadcn's default (0.625rem)
+// swapped for the default itself, so "every style at shadcn's default" is one
+// click away.
+const DECK_RADII = RADII.map((r) => (r === "0.65rem" ? "0.625rem" : r))
+
+const OWN: Option = {
+  value: STYLE_DEFAULT,
+  label: "Style default",
+  content: "Default",
 }
-
-/** shadcn's own default radius, so each style first shows its natural shape. */
-export const DECK_RADIUS = "0.625rem"
-
-// The site's radius steps, with the one nearest shadcn's default swapped for
-// the default itself (0.65rem and 0.625rem look the same at table scale).
-const DECK_RADII = RADII.map((r) => (r === "0.65rem" ? DECK_RADIUS : r))
 
 type Option = { value: string; label: string; content?: React.ReactNode }
 
@@ -95,7 +93,44 @@ export function DeckPickers({
       onChange({ ...value, [key]: v as DeckChoice[K] })
 
   return (
-    <div className="flex flex-wrap items-end gap-x-5 gap-y-5 xl:justify-between">
+    <div className="flex flex-wrap items-end gap-x-5 gap-y-5 lg:grid lg:grid-cols-[repeat(3,auto)] lg:justify-start lg:gap-x-10">
+      <Segmented
+        label="Font"
+        value={value.font}
+        onChange={set("font")}
+        options={[
+          OWN,
+          ...FONTS.map((f) => ({
+            value: f.name,
+            label: f.label,
+            content: <span style={{ fontFamily: f.value }}>{f.label}</span>,
+          })),
+        ]}
+      />
+      <Segmented
+        label="Radius · rem"
+        value={value.radius}
+        onChange={set("radius")}
+        options={[
+          OWN,
+          ...DECK_RADII.map((r) => {
+            const n = r.replace("rem", "")
+            return {
+              value: r,
+              label: `${n} rem`,
+              content: (
+                <span className="font-mono">{n.replace(/^0(?=\.)/, "")}</span>
+              ),
+            }
+          }),
+        ]}
+      />
+      <Segmented
+        label="Icons"
+        value={value.icons}
+        onChange={set("icons")}
+        options={ICON_LIBS.map((i) => ({ value: i.name, label: i.label }))}
+      />
       <Segmented
         label="Base color"
         value={value.base}
@@ -117,37 +152,6 @@ export function DeckPickers({
             />
           ),
         }))}
-      />
-      <Segmented
-        label="Font"
-        value={value.font}
-        onChange={set("font")}
-        options={FONTS.map((f) => ({
-          value: f.name,
-          label: f.label,
-          content: <span style={{ fontFamily: f.value }}>{f.label}</span>,
-        }))}
-      />
-      <Segmented
-        label="Radius · rem"
-        value={value.radius}
-        onChange={set("radius")}
-        options={DECK_RADII.map((r) => {
-          const n = r.replace("rem", "")
-          return {
-            value: r,
-            label: `${n} rem`,
-            content: (
-              <span className="font-mono">{n.replace(/^0(?=\.)/, "")}</span>
-            ),
-          }
-        })}
-      />
-      <Segmented
-        label="Icons"
-        value={value.icons}
-        onChange={set("icons")}
-        options={ICON_LIBS.map((i) => ({ value: i.name, label: i.label }))}
       />
     </div>
   )

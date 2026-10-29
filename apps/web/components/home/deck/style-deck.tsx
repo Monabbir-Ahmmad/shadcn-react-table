@@ -10,18 +10,13 @@ import { cn } from "@workspace/ui/lib/utils"
 import styles from "@/style-kits/styles.json"
 import { SectionLabel } from "@/components/home/section-label"
 import {
-  DECK_RADIUS,
   DeckPickers,
   type DeckChoice,
 } from "@/components/home/deck/deck-pickers"
-import { deckSlot } from "@/lib/deck"
+import { coverflow, deckSlot, frameTheme, STYLE_DEFAULT } from "@/lib/deck"
 import { BASE_COLORS, FONTS, ICON_LIBS } from "@/lib/theme-presets"
 import { DEFAULT_PREFS, readPrefs } from "@/lib/theme-store"
-import {
-  isFromFrame,
-  type FrameTheme,
-  type ToFrame,
-} from "@/lib/style-frame-protocol"
+import { isFromFrame, type ToFrame } from "@/lib/style-frame-protocol"
 
 const STYLES: { name: string; label: string }[] = styles
 const COUNT = STYLES.length
@@ -76,7 +71,8 @@ export function StyleDeck() {
   const is3d = use3d()
   const [choice, setChoice] = React.useState<DeckChoice>({
     ...DEFAULT_PREFS,
-    radius: DECK_RADIUS,
+    font: STYLE_DEFAULT,
+    radius: STYLE_DEFAULT,
   })
   const [rotation, setRotation] = React.useState(0)
   const [dragging, setDragging] = React.useState(false)
@@ -92,28 +88,33 @@ export function StyleDeck() {
   const greeted = React.useRef(new Set<string>())
   const drag = React.useRef<Drag | null>(null)
 
-  const theme: FrameTheme = React.useMemo(
-    () => ({ ...choice, dark: resolvedTheme === "dark" }),
-    [choice, resolvedTheme]
-  )
-  const themeRef = React.useRef(theme)
+  const dark = resolvedTheme === "dark"
+  // The latest picks, read when a frame asks for its theme (no stale closure).
+  const latest = React.useRef({ choice, dark })
 
-  const send = React.useCallback((frame: HTMLIFrameElement) => {
-    const message: ToFrame = { type: "srt:theme", theme: themeRef.current }
+  /** Sends one frame its style's theme for the current picks. */
+  const send = React.useCallback((name: string, frame: HTMLIFrameElement) => {
+    const { choice, dark } = latest.current
+    const message: ToFrame = {
+      type: "srt:theme",
+      theme: frameTheme(choice, name, dark),
+    }
     frame.contentWindow?.postMessage(message, window.location.origin)
   }, [])
 
-  // Start from the site's own theme, except the radius (see DECK_RADIUS).
+  // Start from the site's own base color, accent and icons; font and radius
+  // start as each style's own.
   React.useEffect(() => {
+    const { accent, base, icons } = readPrefs()
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setChoice({ ...readPrefs(), radius: DECK_RADIUS })
+    setChoice((c) => ({ ...c, accent, base, icons }))
   }, [])
 
   // Restyle every frame whenever a picker or the site's light/dark changes.
   React.useEffect(() => {
-    themeRef.current = theme
-    for (const frame of frames.current.values()) send(frame)
-  }, [theme, send])
+    latest.current = { choice, dark }
+    for (const [name, frame] of frames.current) send(name, frame)
+  }, [choice, dark, send])
 
   // Frames report their height; the first report means a frame is listening,
   // so that is when it gets the theme.
@@ -127,7 +128,7 @@ export function StyleDeck() {
         setHeights((h) => (h[name] === height ? h : { ...h, [name]: height }))
         if (!greeted.current.has(name)) {
           greeted.current.add(name)
-          send(frame)
+          send(name, frame)
         }
         return
       }
@@ -170,7 +171,12 @@ export function StyleDeck() {
   const stageHeight =
     CHROME + Math.max(...STYLES.map((s) => bodyHeight(s.name)))
 
-  const front = is3d ? mod(Math.round(rotation)) : flatFront
+  const front = is3d
+    ? Math.max(
+        0,
+        STYLES.findIndex((_, i) => deckSlot(i, rotation, COUNT).front)
+      )
+    : flatFront
   const go = (delta: number) => setRotation((r) => Math.round(r) + delta)
 
   /** Turn (or, when flat, scroll) to a style by the shortest way. */
@@ -228,8 +234,8 @@ export function StyleDeck() {
       d.moved = true
       setDragging(true)
     }
-    // Dragging a card's width turns the deck by one card.
-    setRotation(d.start - dx / Math.max(cardWidth, 200))
+    // Dragging about two thirds of a card turns the deck by one card.
+    setRotation(d.start - dx / Math.max(cardWidth * 0.65, 160))
   }
 
   const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -254,9 +260,17 @@ export function StyleDeck() {
   }
 
   const base = BASE_COLORS.find((b) => b.name === choice.base) ?? BASE_COLORS[0]
-  const font = FONTS.find((f) => f.name === choice.font) ?? FONTS[0]
   const icons = ICON_LIBS.find((i) => i.name === choice.icons) ?? ICON_LIBS[0]
-  const caption = [base?.label, icons?.label, font?.label].join(" · ")
+  // The front card's effective values (its own font and radius by default).
+  const shown = frameTheme(choice, STYLES[front]?.name ?? "", dark)
+  const font = FONTS.find((f) => f.name === shown.font) ?? FONTS[0]
+  const caption = [
+    STYLES[front]?.label,
+    base?.label,
+    icons?.label,
+    font?.label,
+    shown.radius,
+  ].join(" · ")
 
   return (
     <section
@@ -282,11 +296,7 @@ export function StyleDeck() {
           </p>
         </div>
         <div className="mt-10 border-t pt-6 md:mt-12">
-          <DeckPickers
-            value={choice}
-            onChange={setChoice}
-            dark={resolvedTheme === "dark"}
-          />
+          <DeckPickers value={choice} onChange={setChoice} dark={dark} />
         </div>
       </div>
 
@@ -307,7 +317,7 @@ export function StyleDeck() {
           !is3d &&
             "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset",
           is3d
-            ? "[container-type:inline-size] relative mx-auto mt-12 max-w-[96rem] touch-pan-y select-none [perspective:2000px]"
+            ? "[container-type:inline-size] relative mx-auto mt-12 max-w-[96rem] touch-pan-y select-none [perspective:1800px]"
             : "relative mt-10 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-4 sm:scroll-px-6 sm:px-6 lg:scroll-px-[max(2rem,calc((100%_-_72rem)/2_+_2rem))] lg:px-[max(2rem,calc((100%_-_72rem)/2_+_2rem))]"
         )}
         style={
@@ -315,8 +325,7 @@ export function StyleDeck() {
             ? ({
                 height: stageHeight,
                 cursor: dragging ? "grabbing" : "grab",
-                "--deck-r": "clamp(16rem, 47cqw, 42rem)",
-                "--deck-w": "calc(var(--deck-r) * 1.12)",
+                "--deck-w": "clamp(28rem, 60cqw, 52rem)",
               } as React.CSSProperties)
             : undefined
         }
@@ -326,16 +335,12 @@ export function StyleDeck() {
             is3d && "absolute inset-0 [transform-style:preserve-3d]",
             !is3d && "contents"
           )}
-          style={
-            is3d
-              ? { transform: "translateZ(calc(var(--deck-r) * -1))" }
-              : undefined
-          }
         >
           {STYLES.map((style, i) => {
             const slot = deckSlot(i, rotation, COUNT)
             const isFront = is3d ? slot.front : true
             const hidden = is3d && !slot.front
+            const place = coverflow(slot.angle / STEP)
             return (
               <div
                 key={style.name}
@@ -353,20 +358,21 @@ export function StyleDeck() {
                     isFront &&
                     "group-focus-visible/deck:ring-2 group-focus-visible/deck:ring-ring/50",
                   is3d
-                    ? "absolute top-0 left-1/2 [backface-visibility:hidden]"
+                    ? "absolute top-0 left-1/2"
                     : "w-[85vw] shrink-0 snap-start md:w-[40rem]",
                   is3d && !isFront && "pointer-events-none",
                   is3d &&
                     !dragging &&
-                    "transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                    "transition-[transform,opacity,visibility] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 )}
                 style={
                   is3d
                     ? {
                         width: "var(--deck-w)",
                         marginLeft: "calc(var(--deck-w) / -2)",
-                        transform: `rotateY(${(i - rotation) * STEP}deg) translateZ(var(--deck-r))`,
-                        opacity: 0.35 + 0.65 * Math.max(0, slot.depth),
+                        transform: `translateX(calc(var(--deck-w) * ${place.x})) translateZ(calc(var(--deck-w) * ${place.z})) rotateY(${place.turn}deg)`,
+                        opacity: place.opacity,
+                        visibility: place.opacity > 0 ? "visible" : "hidden",
                       }
                     : undefined
                 }
@@ -407,7 +413,7 @@ export function StyleDeck() {
                       loading="lazy"
                       onLoad={(event) => {
                         greeted.current.delete(style.name)
-                        send(event.currentTarget)
+                        send(style.name, event.currentTarget)
                       }}
                       className={cn(
                         "absolute top-0 left-0 block origin-top-left border-0",
@@ -472,7 +478,7 @@ export function StyleDeck() {
             )}
           </div>
           <p aria-live="polite" className="text-foreground">
-            {STYLES[front]?.label} · {caption}
+            {caption}
           </p>
         </div>
       </div>
