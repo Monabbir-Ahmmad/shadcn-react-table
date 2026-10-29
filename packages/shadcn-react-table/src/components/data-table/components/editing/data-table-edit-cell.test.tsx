@@ -88,9 +88,7 @@ describe("select cell editor", () => {
       editDisplayMode: "cell",
       onEditingCellSave,
     })
-    act(() =>
-      table().setEditingCell({ rowId: "1", columnId: "status" })
-    )
+    act(() => table().setEditingCell({ rowId: "1", columnId: "status" }))
     await pickOption("b")
     expect(onEditingCellSave).toHaveBeenCalledTimes(1)
     expect(onEditingCellSave.mock.calls[0]![0].value).toBe("b")

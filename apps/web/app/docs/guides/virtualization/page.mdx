@@ -10,7 +10,7 @@ Set `enableRowVirtualization: true` to render only the visible rows. This is rec
 
 <Example slug="virtualized" />
 
-With row virtualization on, the table surface becomes the scroll container, so give it a bounded height via `surfaceClassName` (it defaults to `max-h-[600px]`).
+With row virtualization on, the table surface becomes the scroll container, so give it a bounded height via `slotProps.surface` (it defaults to a viewport-based height).
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
@@ -20,7 +20,7 @@ const table = useDataTable({
   columns,
   getRowId: (row) => row.id,
   enableRowVirtualization: true,
-  surfaceClassName: "max-h-[600px]",
+  slotProps: { surface: { className: "max-h-[600px]" } },
   estimateRowHeight: 52,
   virtualOverscan: 8,
 })

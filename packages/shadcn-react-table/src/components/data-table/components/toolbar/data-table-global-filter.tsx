@@ -20,11 +20,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
-import { cn } from "@workspace/ui/lib/utils"
-
 import type { DataTableInstance } from "../../core/types"
 import type { GlobalFilterMode } from "../../fns/filter-fns"
 import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 const GLOBAL_MODES: GlobalFilterMode[] = [
   "fuzzy",
@@ -137,16 +136,23 @@ export function DataTableGlobalFilter<TData extends RowData>({
     <div className="flex h-9 items-center gap-0.5 rounded-md border bg-background ps-2 pe-1 focus-within:border-ring">
       <icons.search className="size-3.5 shrink-0 text-muted-foreground" />
       <Input
-        ref={inputRef}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={() => {
-          if (!value) setExpanded(false)
-        }}
-        placeholder={localization.searchPlaceholder}
-        aria-label={localization.search}
-        className={cn(
-          "h-7 w-40 border-0 px-1 text-xs font-normal tracking-normal normal-case shadow-none focus-visible:ring-0 sm:w-56"
+        {...mergeProps(
+          // The ref is forwarded to the input, not read during render.
+          // eslint-disable-next-line react-hooks/refs
+          {
+            ref: inputRef,
+            value,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+              setValue(e.target.value),
+            onBlur: () => {
+              if (!value) setExpanded(false)
+            },
+            placeholder: localization.searchPlaceholder,
+            "aria-label": localization.search,
+            className:
+              "h-7 w-40 border-0 px-1 text-xs font-normal tracking-normal normal-case shadow-none focus-visible:ring-0 sm:w-56",
+          } as React.ComponentProps<"input">,
+          getSlotProps(table, "searchInput", {})
         )}
       />
       {value && (

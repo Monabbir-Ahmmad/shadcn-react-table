@@ -20,6 +20,7 @@ import {
 import type { DataTableInstance } from "../../core/types"
 import { formatInteger } from "../../helpers/format-integer"
 import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -44,8 +45,13 @@ export function DataTablePagination<TData extends RowData>({
 
   return (
     <div
-      data-slot="data-table-pagination"
-      className="flex flex-wrap items-center justify-between gap-4 py-1"
+      {...mergeProps(
+        {
+          "data-slot": "data-table-pagination",
+          className: "flex flex-wrap items-center justify-between gap-4 py-1",
+        } as React.ComponentProps<"div">,
+        getSlotProps(table, "pagination", {})
+      )}
     >
       <div className="flex items-center gap-2">
         <span className="text-xs font-medium tracking-wide text-muted-foreground">

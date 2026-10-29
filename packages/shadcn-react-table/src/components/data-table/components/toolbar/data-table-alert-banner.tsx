@@ -1,11 +1,12 @@
 "use client"
 
-import type { RowData } from "@tanstack/react-table"
+import type * as React from "react"
 
-import { cn } from "@workspace/ui/lib/utils"
+import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableInstance } from "../../core/types"
 import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 /**
  * Selection alert banner shown between the toolbar and the table when any rows
@@ -26,11 +27,15 @@ export function DataTableAlertBanner<TData extends RowData>({
 
   return (
     <div
-      data-slot="data-table-alert-banner"
-      className={cn(
-        "flex items-center justify-between gap-3 rounded-md border bg-muted px-3 py-2 text-xs font-medium text-muted-foreground"
+      {...mergeProps(
+        {
+          "data-slot": "data-table-alert-banner",
+          className:
+            "flex items-center justify-between gap-3 rounded-md border bg-muted px-3 py-2 text-xs font-medium text-muted-foreground",
+          role: "status",
+        } as React.ComponentProps<"div">,
+        getSlotProps(table, "alertBanner", {})
       )}
-      role="status"
     >
       <span>{localization.rowsSelected(selectedCount, totalCount)}</span>
       <button

@@ -17,6 +17,7 @@ import { ClickToCopy } from "../body/click-to-copy"
 import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableCell } from "../../core/table-types"
 import { dt } from "../../core/internal"
+import { getSlotProps } from "../../helpers/slot-props"
 
 /**
  * Resolves a leaf data cell's interactive content: an inline editor when this
@@ -132,6 +133,12 @@ function RowDraftEditor<TData extends RowData>({
       error={error}
       ariaLabel={getColumnLabel(column)}
       onChange={(next) => cn.setRowDraftValue(column.id, next)}
+      fieldProps={getSlotProps(
+        table,
+        "editField",
+        { column, row: cell.row },
+        meta?.slotProps?.editField
+      )}
     />
   )
 }
@@ -176,6 +183,12 @@ function LocalDraftEditor<TData extends RowData>({
       onChange={setDraft}
       onCommit={commit}
       onCancel={cancel}
+      fieldProps={getSlotProps(
+        table,
+        "editField",
+        { column, row },
+        meta?.slotProps?.editField
+      )}
     />
   )
 }

@@ -37,6 +37,7 @@ function Table({
   const [columns] = React.useState(() => makeColumns(colCount))
   const [data] = React.useState(() => makeRows(rowCount, colCount))
   const table = useDataTable<Row>({
+    slotProps: { surface: { className: "max-h-[400px]" } },
     columns,
     data,
     getRowId: (row) => row.id,
@@ -45,7 +46,7 @@ function Table({
   })
   return (
     <div style={{ width: 600 }}>
-      <DataTable table={table} surfaceClassName="max-h-[400px]" />
+      <DataTable table={table} />
     </div>
   )
 }

@@ -14,6 +14,7 @@ import {
 import { DataTableGlobalFilter } from "./data-table-global-filter"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 /**
  * Top toolbar. Left region: title slot + consumer toolbar actions. Right
@@ -57,9 +58,14 @@ export function DataTableToolbar<TData extends RowData>({
   return (
     <>
       <div
-        ref={toolbarRef}
-        data-slot="data-table-toolbar"
-        className="flex items-start justify-between gap-3 py-1"
+        {...mergeProps(
+          {
+            ref: toolbarRef,
+            "data-slot": "data-table-toolbar",
+            className: "flex items-start justify-between gap-3 py-1",
+          } as React.ComponentProps<"div">,
+          getSlotProps(table, "topToolbar", {})
+        )}
       >
         <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
           {showGlobalFilter && positionGlobalFilter === "left" && (

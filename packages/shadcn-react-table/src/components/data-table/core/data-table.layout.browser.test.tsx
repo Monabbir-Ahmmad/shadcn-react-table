@@ -30,6 +30,7 @@ const data: Row[] = Array.from({ length: ROW_COUNT }, (_, r) => {
 
 function Table() {
   const table = useDataTable<Row>({
+    slotProps: { surface: { className: "max-h-[300px]" } },
     columns,
     data,
     getRowId: (row) => row.id,
@@ -39,7 +40,7 @@ function Table() {
   })
   return (
     <div style={{ width: 600 }}>
-      <DataTable table={table} surfaceClassName="max-h-[300px]" />
+      <DataTable table={table} />
     </div>
   )
 }

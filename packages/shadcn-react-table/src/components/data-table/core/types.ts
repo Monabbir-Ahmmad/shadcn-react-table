@@ -23,6 +23,8 @@ import type { DataTableUiState } from "./ui-state"
 import type {
   DataTableCell,
   DataTableColumn,
+  DataTableHeader,
+  DataTableHeaderGroup,
   DataTableRow,
 } from "./table-types"
 
@@ -221,6 +223,12 @@ declare module "@tanstack/react-table" {
     enableColumnActions?: boolean
     /** Human-readable label for menus when the header is not a plain string. */
     label?: string
+    /** Props for this column's cells, applied after the table's `slotProps`
+     *  for the same part. */
+    slotProps?: Pick<
+      DataTableSlots<TData>,
+      "headCell" | "filterCell" | "bodyCell" | "footerCell" | "editField"
+    >
   }
 
   // Registers our feature key (TanStack's plugin mechanism). Optional, and
@@ -254,6 +262,128 @@ declare module "@tanstack/react-table" {
       dataTable: DataTableOptionsResolved<TData>
     } & DataTableMethods<TData>
   }
+}
+
+/** Props for one part of the table (`data-*` attributes included), or a
+ *  function of its context. */
+export type SlotProp<Ctx, Props> =
+  SlotPropsOf<Props> | ((context: Ctx) => SlotPropsOf<Props>)
+
+type SlotPropsOf<Props> = Partial<Props> & {
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined
+}
+
+type WithTable<TData extends RowData, Ctx = object> = Ctx & {
+  table: DataTableInstance<TData>
+}
+
+/** Props for each part of the table (`slotProps`). */
+export interface DataTableSlots<TData extends RowData> {
+  /** The outer wrapper (`<DataTable>`'s own props also land here). */
+  root?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The scroll container around the table. Bound its height here. */
+  surface?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The `<table>` element. */
+  table?: SlotProp<WithTable<TData>, React.ComponentProps<"table">>
+  /** `<thead>`. */
+  head?: SlotProp<WithTable<TData>, React.ComponentProps<"thead">>
+  /** Each header row. */
+  headRow?: SlotProp<
+    WithTable<TData, { headerGroup: DataTableHeaderGroup<TData> }>,
+    React.ComponentProps<"tr">
+  >
+  /** Each header cell. */
+  headCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        header: DataTableHeader<TData, unknown>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"th">
+  >
+  /** Each cell of the column filter row. */
+  filterCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        header: DataTableHeader<TData, unknown>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"th">
+  >
+  /** `<tbody>`. */
+  body?: SlotProp<WithTable<TData>, React.ComponentProps<"tbody">>
+  /** Each body row. */
+  bodyRow?: SlotProp<
+    WithTable<TData, { row: DataTableRow<TData>; rowIndex: number }>,
+    React.ComponentProps<"tr">
+  >
+  /** Each body cell. */
+  bodyCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        cell: DataTableCell<TData, unknown>
+        row: DataTableRow<TData>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"td">
+  >
+  /** The cell holding an expanded row's detail panel. */
+  detailPanel?: SlotProp<
+    WithTable<TData, { row: DataTableRow<TData> }>,
+    React.ComponentProps<"td">
+  >
+  /** `<tfoot>`. */
+  footer?: SlotProp<WithTable<TData>, React.ComponentProps<"tfoot">>
+  /** Each footer row. */
+  footerRow?: SlotProp<
+    WithTable<TData, { footerGroup: DataTableHeaderGroup<TData> }>,
+    React.ComponentProps<"tr">
+  >
+  /** Each footer cell. */
+  footerCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        header: DataTableHeader<TData, unknown>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"td">
+  >
+  /** The toolbar above the table. */
+  topToolbar?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The toolbar below the table. */
+  bottomToolbar?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The pagination controls. */
+  pagination?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The selection banner. */
+  alertBanner?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The global search input. */
+  searchInput?: SlotProp<WithTable<TData>, React.ComponentProps<"input">>
+  /** Each inline / dialog edit field (the input, or the select's trigger). */
+  editField?: SlotProp<
+    WithTable<
+      TData,
+      { column: DataTableColumn<TData, unknown>; row?: DataTableRow<TData> }
+    >,
+    React.ComponentProps<"input">
+  >
+  /** The edit / create dialog's content. */
+  editDialog?: SlotProp<
+    WithTable<TData, { row?: DataTableRow<TData>; isCreating: boolean }>,
+    React.ComponentProps<"div">
+  >
+  /** Each row selection checkbox (and the select-all one, without `row`). */
+  selectCheckbox?: SlotProp<
+    WithTable<TData, { row?: DataTableRow<TData> }>,
+    React.ComponentProps<"button">
+  >
 }
 
 export interface DataTableSlotProps<TData extends RowData> {
@@ -510,6 +640,8 @@ export interface DataTableConfig<TData extends RowData> {
   paginationDisplayMode: PaginationDisplayMode
   /** Choices in the rows-per-page select. */
   pageSizeOptions: number[]
+  /** Props for the table's parts; see the `slotProps` option. */
+  slotProps: DataTableSlots<TData> | undefined
   columnFilterDisplayMode: ColumnFilterDisplayMode
   positionGlobalFilter: "left" | "right" | "none"
   positionToolbarAlertBanner: "top" | "bottom" | "none"
@@ -630,6 +762,11 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping
    *  or expanded, or under manual sorting/filtering. */
   enableGlobalFilterRankedResults?: boolean
+  /** Props for the table's parts (cells, rows, toolbars, …), as an object or
+   *  a function of the part's context. `className` is combined with the
+   *  table's, `style` merged, event handlers both run; other props replace
+   *  the table's. See `DataTableSlots`. */
+  slotProps?: DataTableSlots<TData>
   /** Choices in the rows-per-page select. Default `[5, 10, 25, 50, 100]`. */
   pageSizeOptions?: number[]
   /** Called whenever the density changes (toolbar toggle or programmatic).
@@ -830,7 +967,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Pin the header rows to the top of the scrollable surface. Also gives the
    *  surface a default viewport-bound max-height (`clamp(350px, 100dvh -
    *  200px, 9999px)`) so tall content scrolls internally; override the bound
-   *  with `surfaceClassName`. Default true. */
+   *  with `slotProps.surface`. Default true. */
   enableStickyHeader?: boolean
   /** Splits rows into pages with pagination controls. Default `true`; turn it
    *  off for virtualization or infinite scroll. */

@@ -152,6 +152,14 @@ export const useDataTableOptions: ApiMember[] = [
       "While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering.",
   },
   {
+    name: "slotProps",
+    type: "DataTableSlots<TData>",
+    required: false,
+    default: null,
+    description:
+      "Props for the table's parts (cells, rows, toolbars, …), as an object or a function of the part's context. `className` is combined with the table's, `style` merged, event handlers both run; other props replace the table's. See `DataTableSlots`.",
+  },
+  {
     name: "pageSizeOptions",
     type: "number[]",
     required: false,
@@ -576,7 +584,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "true",
     description:
-      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `surfaceClassName`. Default true.",
+      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `slotProps.surface`. Default true.",
   },
   {
     name: "enablePagination",
@@ -962,6 +970,14 @@ export const columnOptions: ApiMember[] = [
     default: null,
     description:
       "Human-readable label for menus when the header is not a plain string.",
+  },
+  {
+    name: "slotProps",
+    type: 'Pick< DataTableSlots<TData>, "headCell" | "filterCell" | "bodyCell" | "footerCell" | "editField" >',
+    required: false,
+    default: null,
+    description:
+      "Props for this column's cells, applied after the table's `slotProps` for the same part.",
   },
 ]
 
@@ -1403,7 +1419,7 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description:
-      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `surfaceClassName`. Default true.",
+      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `slotProps.surface`. Default true.",
   },
   {
     name: "enablePagination",
@@ -1472,6 +1488,13 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description: "Choices in the rows-per-page select.",
+  },
+  {
+    name: "slotProps",
+    type: "DataTableSlots<TData> | undefined",
+    required: true,
+    default: null,
+    description: "Props for the table's parts; see the `slotProps` option.",
   },
   {
     name: "columnFilterDisplayMode",
@@ -1733,14 +1756,6 @@ export const dataTableProps: ApiMember[] = [
     required: true,
     default: null,
     description: "The instance returned by `useDataTable`.",
-  },
-  {
-    name: "surfaceClassName",
-    type: "string",
-    required: false,
-    default: null,
-    description:
-      "Extra classes for the scrollable table surface (e.g. a max-height that overrides the default sticky-header/virtualization bound).",
   },
 ]
 
@@ -2730,20 +2745,6 @@ export const slots: ApiMember[] = [
     description: "Outermost wrapper element.",
   },
   {
-    name: "data-table-alert-banner",
-    type: "",
-    required: true,
-    default: null,
-    description: "Selection alert banner.",
-  },
-  {
-    name: "data-table-bottom-toolbar",
-    type: "",
-    required: true,
-    default: null,
-    description: "Bottom toolbar (custom actions and/or pagination).",
-  },
-  {
     name: "data-table-create-row",
     type: "",
     required: true,
@@ -2767,13 +2768,6 @@ export const slots: ApiMember[] = [
       "Invisible marker after the last row; infinite scroll loads more when it nears the viewport.",
   },
   {
-    name: "data-table-pagination",
-    type: "",
-    required: true,
-    default: null,
-    description: "Pagination controls.",
-  },
-  {
     name: "data-table-progress",
     type: "",
     required: true,
@@ -2795,18 +2789,172 @@ export const slots: ApiMember[] = [
     description: "The scroll container for the table (both axes).",
   },
   {
-    name: "data-table-toolbar",
-    type: "",
-    required: true,
-    default: null,
-    description: "Top toolbar root.",
-  },
-  {
     name: "data-table-toolbar-actions",
     type: "",
     required: true,
     default: null,
     description:
       "Internal actions cluster (search, filters, density, full screen, …).",
+  },
+]
+
+export const slotParts: ApiMember[] = [
+  {
+    name: "root",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description:
+      "The outer wrapper (`<DataTable>`'s own props also land here).",
+  },
+  {
+    name: "surface",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description:
+      "The scroll container around the table. Bound its height here.",
+  },
+  {
+    name: "table",
+    type: "<table> props · { table }",
+    required: false,
+    default: null,
+    description: "The `<table>` element.",
+  },
+  {
+    name: "head",
+    type: "<thead> props · { table }",
+    required: false,
+    default: null,
+    description: "`<thead>`.",
+  },
+  {
+    name: "headRow",
+    type: "<tr> props · { headerGroup, table }",
+    required: false,
+    default: null,
+    description: "Each header row.",
+  },
+  {
+    name: "headCell",
+    type: "<th> props · { header, column, table }",
+    required: false,
+    default: null,
+    description: "Each header cell.",
+  },
+  {
+    name: "filterCell",
+    type: "<th> props · { header, column, table }",
+    required: false,
+    default: null,
+    description: "Each cell of the column filter row.",
+  },
+  {
+    name: "body",
+    type: "<tbody> props · { table }",
+    required: false,
+    default: null,
+    description: "`<tbody>`.",
+  },
+  {
+    name: "bodyRow",
+    type: "<tr> props · { row, rowIndex, table }",
+    required: false,
+    default: null,
+    description: "Each body row.",
+  },
+  {
+    name: "bodyCell",
+    type: "<td> props · { cell, row, column, table }",
+    required: false,
+    default: null,
+    description: "Each body cell.",
+  },
+  {
+    name: "detailPanel",
+    type: "<td> props · { row, table }",
+    required: false,
+    default: null,
+    description: "The cell holding an expanded row's detail panel.",
+  },
+  {
+    name: "footer",
+    type: "<tfoot> props · { table }",
+    required: false,
+    default: null,
+    description: "`<tfoot>`.",
+  },
+  {
+    name: "footerRow",
+    type: "<tr> props · { footerGroup, table }",
+    required: false,
+    default: null,
+    description: "Each footer row.",
+  },
+  {
+    name: "footerCell",
+    type: "<td> props · { header, column, table }",
+    required: false,
+    default: null,
+    description: "Each footer cell.",
+  },
+  {
+    name: "topToolbar",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The toolbar above the table.",
+  },
+  {
+    name: "bottomToolbar",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The toolbar below the table.",
+  },
+  {
+    name: "pagination",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The pagination controls.",
+  },
+  {
+    name: "alertBanner",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The selection banner.",
+  },
+  {
+    name: "searchInput",
+    type: "<input> props · { table }",
+    required: false,
+    default: null,
+    description: "The global search input.",
+  },
+  {
+    name: "editField",
+    type: "<input> props · { column, row?, table }",
+    required: false,
+    default: null,
+    description:
+      "Each inline / dialog edit field (the input, or the select's trigger).",
+  },
+  {
+    name: "editDialog",
+    type: "<div> props · { row?, isCreating, table }",
+    required: false,
+    default: null,
+    description: "The edit / create dialog's content.",
+  },
+  {
+    name: "selectCheckbox",
+    type: "<button> props · { row?, table }",
+    required: false,
+    default: null,
+    description:
+      "Each row selection checkbox (and the select-all one, without `row`).",
   },
 ]

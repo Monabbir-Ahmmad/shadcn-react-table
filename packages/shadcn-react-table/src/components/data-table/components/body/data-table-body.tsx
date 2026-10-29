@@ -31,6 +31,7 @@ import {
 import { DataTableCreateRow } from "../editing/data-table-create-row"
 import { DataTableBodyRow } from "./dnd"
 import { MemoRow } from "./memo-row"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import { RowStateHubContext, useRowStateHub } from "./row-state-hub"
 import { getUiState } from "../../core/ui-state"
 import { getCellRenderState, renderBodyCell } from "./render-body-cell"
@@ -212,45 +213,56 @@ export function DataTableBody<TData extends RowData>({
     return (
       <TableCell
         key={cell.id}
-        data-cell-row={rowIndex}
-        data-cell-col={colIndex}
-        aria-colindex={isGrid ? colIndex + 1 : undefined}
-        data-pinned={getPinSide(cell.column) || undefined}
-        // The grid navigation hook makes one rendered cell the tab stop.
-        tabIndex={enableKeyboardNavigation ? -1 : undefined}
-        style={{
-          ...getWidthStyle(cell.column, table),
-          ...getColumnPinningStyle(cell.column),
-        }}
-        onClick={
-          onCellClick
-            ? (event) =>
-                latest.current.onCellClick?.({ cell, row, table, event })
-            : undefined
-        }
-        onDoubleClick={
-          onCellDoubleClick
-            ? (event) =>
-                latest.current.onCellDoubleClick?.({ cell, row, table, event })
-            : undefined
-        }
-        className={cn(
-          "relative",
-          BODY_CELL_CLASS,
-          // A fixed height is the whole row's height, so the cell drops its
-          // vertical padding and the content box below fills the row.
-          isFixedHeight ? "py-0" : padding,
-          ALIGN_CELL[align],
-          // Fixed layout (resizing on) clips overflowing content with an
-          // ellipsis instead of letting it bleed into the next column. An
-          // "auto" row opts out so its content wraps and the row grows.
-          enableColumnResizing &&
-            !isAutoHeight &&
-            "overflow-hidden text-ellipsis",
-          isAutoHeight && "align-top wrap-break-word whitespace-normal",
-          getColumnPinningClass(cell.column),
-          enableKeyboardNavigation &&
-            "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:-outline-offset-2 focus-visible:outline-none"
+        {...mergeProps(
+          {
+            "data-cell-row": rowIndex,
+            "data-cell-col": colIndex,
+            "aria-colindex": isGrid ? colIndex + 1 : undefined,
+            "data-pinned": getPinSide(cell.column) || undefined,
+            // The grid navigation hook makes one rendered cell the tab stop.
+            tabIndex: enableKeyboardNavigation ? -1 : undefined,
+            style: {
+              ...getWidthStyle(cell.column, table),
+              ...getColumnPinningStyle(cell.column),
+            },
+            onClick: onCellClick
+              ? (event: React.MouseEvent<HTMLTableCellElement>) =>
+                  latest.current.onCellClick?.({ cell, row, table, event })
+              : undefined,
+            onDoubleClick: onCellDoubleClick
+              ? (event: React.MouseEvent<HTMLTableCellElement>) =>
+                  latest.current.onCellDoubleClick?.({
+                    cell,
+                    row,
+                    table,
+                    event,
+                  })
+              : undefined,
+            className: cn(
+              "relative",
+              BODY_CELL_CLASS,
+              // A fixed height is the whole row's height, so the cell drops its
+              // vertical padding and the content box below fills the row.
+              isFixedHeight ? "py-0" : padding,
+              ALIGN_CELL[align],
+              // Fixed layout (resizing on) clips overflowing content with an
+              // ellipsis instead of letting it bleed into the next column. An
+              // "auto" row opts out so its content wraps and the row grows.
+              enableColumnResizing &&
+                !isAutoHeight &&
+                "overflow-hidden text-ellipsis",
+              isAutoHeight && "align-top wrap-break-word whitespace-normal",
+              getColumnPinningClass(cell.column),
+              enableKeyboardNavigation &&
+                "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:-outline-offset-2 focus-visible:outline-none"
+            ),
+          } as React.ComponentProps<"td">,
+          getSlotProps(
+            table,
+            "bodyCell",
+            { cell, row, column: cell.column },
+            cell.column.columnDef.meta?.slotProps?.bodyCell
+          )
         )}
       >
         {isFixedHeight ? (
@@ -292,9 +304,35 @@ export function DataTableBody<TData extends RowData>({
     )
   }
 
+  const detailCellProps = (row: DataTableRow<TData>) =>
+    mergeProps(
+      {
+        colSpan: visibleColumnCount,
+        className: "bg-muted/20 p-0",
+      } as React.ComponentProps<"td">,
+      getSlotProps(table, "detailPanel", { row })
+    )
+
+  /** Row props from the table (grid semantics, clicks) and `slotProps`. */
+  const bodyRowProps = (row: DataTableRow<TData>, rowIndex: number) =>
+    mergeProps(
+      {
+        ...gridRowProps(row, rowIndex),
+        onClick: onRowClick
+          ? (event: React.MouseEvent<HTMLTableRowElement>) =>
+              latest.current.onRowClick?.({ row, table, event })
+          : undefined,
+        onDoubleClick: onRowDoubleClick
+          ? (event: React.MouseEvent<HTMLTableRowElement>) =>
+              latest.current.onRowDoubleClick?.({ row, table, event })
+          : undefined,
+      } as React.ComponentProps<"tr">,
+      getSlotProps(table, "bodyRow", { row, rowIndex })
+    )
+
   const detailRow = (row: DataTableRow<TData>) => (
     <TableRow className="hover:bg-transparent">
-      <TableCell colSpan={visibleColumnCount} className="bg-muted/20 p-0">
+      <TableCell {...detailCellProps(row)}>
         <div className="p-3">{renderDetailPanel?.({ row, table })}</div>
       </TableCell>
     </TableRow>
@@ -333,24 +371,13 @@ export function DataTableBody<TData extends RowData>({
     return (
       <React.Fragment>
         <DataTableBodyRow
-          {...gridRowProps(row, rowIndex)}
+          {...bodyRowProps(row, rowIndex)}
           row={row}
           draggable={
             enableRowOrdering &&
             !enableRowVirtualization &&
             !row.getIsPinned() &&
             !isGrouped
-          }
-          onClick={
-            onRowClick
-              ? (event) => latest.current.onRowClick?.({ row, table, event })
-              : undefined
-          }
-          onDoubleClick={
-            onRowDoubleClick
-              ? (event) =>
-                  latest.current.onRowDoubleClick?.({ row, table, event })
-              : undefined
           }
         >
           {renderCells(row, rowIndex)}
@@ -362,7 +389,7 @@ export function DataTableBody<TData extends RowData>({
 
   return (
     <RowStateHubContext.Provider value={rowStateHub}>
-      <TableBody>
+      <TableBody {...getSlotProps(table, "body", {})}>
         {dt(table).enableEditing &&
           dt(table).isCreating &&
           dt(table).createDisplayMode === "row" && (
@@ -407,10 +434,7 @@ export function DataTableBody<TData extends RowData>({
                           ref={rowVirtualizer.measureElement}
                           className="hover:bg-transparent"
                         >
-                          <TableCell
-                            colSpan={visibleColumnCount}
-                            className="bg-muted/20 p-0"
-                          >
+                          <TableCell {...detailCellProps(item.row)}>
                             <div className="p-3">
                               {renderDetailPanel?.({ row: item.row, table })}
                             </div>
@@ -429,36 +453,20 @@ export function DataTableBody<TData extends RowData>({
                         tableDeps={tableDeps}
                         render={() => (
                           <TableRow
-                            {...gridRowProps(item.row, rowIndex)}
-                            data-index={vRow.index}
-                            ref={rowVirtualizer.measureElement}
-                            data-state={
-                              item.row.getIsSelected() ? "selected" : undefined
-                            }
-                            onClick={
-                              onRowClick
-                                ? (event) =>
-                                    latest.current.onRowClick?.({
-                                      row: item.row,
-                                      table,
-                                      event,
-                                    })
-                                : undefined
-                            }
-                            onDoubleClick={
-                              onRowDoubleClick
-                                ? (event) =>
-                                    latest.current.onRowDoubleClick?.({
-                                      row: item.row,
-                                      table,
-                                      event,
-                                    })
-                                : undefined
-                            }
-                            className={cn(
-                              BODY_ROW_CLASS,
-                              (onRowClick || onRowDoubleClick) &&
-                                "cursor-pointer"
+                            {...mergeProps(
+                              {
+                                "data-index": vRow.index,
+                                ref: rowVirtualizer.measureElement,
+                                "data-state": item.row.getIsSelected()
+                                  ? "selected"
+                                  : undefined,
+                                className: cn(
+                                  BODY_ROW_CLASS,
+                                  (onRowClick || onRowDoubleClick) &&
+                                    "cursor-pointer"
+                                ),
+                              } as React.ComponentProps<"tr">,
+                              bodyRowProps(item.row, rowIndex)
                             )}
                           >
                             {renderCells(item.row, rowIndex)}

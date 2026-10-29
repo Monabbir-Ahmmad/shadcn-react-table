@@ -39,10 +39,14 @@ const table = useDataTable({
 
 `<DataTable table={table} />` reads `table.dataTable` and renders the full layout: top toolbar → alert banner → drop-to-group zone → bordered scroll surface (sticky header, optional filter row, body, optional sticky footer) → pagination.
 
-It takes a few presentational props — see [DataTable props](/docs/api/data-table-props). The most common is `surfaceClassName`, used to bound the scroll surface for sticky headers or virtualization:
+Any extra `div` props land on its root — see [DataTable props](/docs/api/data-table-props). To style or add props to an inner part, such as bounding the scroll surface for sticky headers or virtualization, use [`slotProps`](/docs/guides/slot-props):
 
 ```tsx
-<DataTable table={table} surfaceClassName="max-h-[600px]" />
+const table = useDataTable({
+  data,
+  columns,
+  slotProps: { surface: { className: "max-h-[600px]" } },
+})
 ```
 
 ## The instance

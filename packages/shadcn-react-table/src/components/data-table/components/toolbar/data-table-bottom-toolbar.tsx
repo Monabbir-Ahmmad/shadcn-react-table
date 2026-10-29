@@ -1,5 +1,7 @@
 "use client"
 
+import type * as React from "react"
+
 import type { RowData } from "@tanstack/react-table"
 
 import { cn } from "@workspace/ui/lib/utils"
@@ -7,6 +9,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableInstance } from "../../core/types"
 import { DataTablePagination } from "./data-table-pagination"
 import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 interface DataTableBottomToolbarProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -44,14 +47,17 @@ export function DataTableBottomToolbar<TData extends RowData>({
 
   return (
     <div
-      // Forwarding the exposed DOM ref object as a JSX ref (not reading
-      // .current during render).
-      // eslint-disable-next-line react-hooks/refs
-      ref={refs.bottomToolbarRef}
-      data-slot="data-table-bottom-toolbar"
-      className={cn(
-        customActions != null &&
-          "flex flex-wrap items-center justify-between gap-4"
+      {...mergeProps(
+        {
+          // Forwarding the exposed DOM ref object as a JSX ref.
+          ref: refs.bottomToolbarRef,
+          "data-slot": "data-table-bottom-toolbar",
+          className: cn(
+            customActions != null &&
+              "flex flex-wrap items-center justify-between gap-4"
+          ),
+        } as React.ComponentProps<"div">,
+        getSlotProps(table, "bottomToolbar", {})
       )}
     >
       {customActions != null ? (

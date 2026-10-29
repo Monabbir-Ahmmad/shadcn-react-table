@@ -59,8 +59,9 @@ const detect = (
   } as Parameters<CollisionDetection>[0]).map((c) => c.id)
 
 const setup = () =>
-  renderHook(() => useTableDnd({ dataTable: {} } as unknown as DataTableInstance))
-    .result.current.collisionDetection
+  renderHook(() =>
+    useTableDnd({ dataTable: {} } as unknown as DataTableInstance)
+  ).result.current.collisionDetection
 
 describe("useTableDnd collisionDetection", () => {
   it("keyboard row drag never resolves to the group zone or a header", () => {

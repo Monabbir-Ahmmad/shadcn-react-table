@@ -8,6 +8,8 @@ import { CSS } from "@dnd-kit/utilities"
 import { TableRow } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { mergeProps } from "../../../helpers/slot-props"
+
 import { BODY_ROW_CLASS } from "../../../core/constants"
 import { RowDragContext } from "../../../injected-columns/injected-columns"
 import type { DataTableRow } from "../../../core/table-types"
@@ -62,17 +64,18 @@ export function DataTableBodyRow<TData extends RowData>({
   return (
     <RowDragContext.Provider value={dragProps}>
       <TableRow
-        {...rest}
-        ref={setNodeRef}
-        style={style}
-        data-state={row.getIsSelected() ? "selected" : undefined}
-        data-dragging={isDragging || undefined}
-        onClick={onClick}
-        onDoubleClick={onDoubleClick}
-        className={cn(
-          BODY_ROW_CLASS,
-          (onClick || onDoubleClick) && "cursor-pointer",
-          className
+        {...mergeProps(
+          {
+            ref: setNodeRef,
+            style,
+            "data-state": row.getIsSelected() ? "selected" : undefined,
+            "data-dragging": isDragging || undefined,
+            className: cn(
+              BODY_ROW_CLASS,
+              (onClick || onDoubleClick) && "cursor-pointer"
+            ),
+          } as React.ComponentProps<"tr">,
+          { ...rest, onClick, onDoubleClick, className }
         )}
       >
         {children}

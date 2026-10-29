@@ -5,6 +5,7 @@ import type {
   ColumnDef,
   FilterFn,
   Header,
+  HeaderGroup,
   Row,
   RowData,
   RowModel,
@@ -41,7 +42,12 @@ export type DataTableHeader<
   TValue extends CellData = CellData,
 > = Header<DataTableFeatures, TData, TValue>
 
-/** The raw TanStack table (no `tableInstance` config attached). */
+export type DataTableHeaderGroup<TData extends RowData> = HeaderGroup<
+  DataTableFeatures,
+  TData
+>
+
+/** The raw TanStack table (no `dataTable` config attached). */
 export type DataTableCoreTable<TData extends RowData> = Table<
   DataTableFeatures,
   TData

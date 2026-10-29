@@ -19,6 +19,7 @@ import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
 import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any
@@ -93,7 +94,15 @@ export function DataTableEditModal<TData extends RowData>({
 
   return (
     <Dialog open onOpenChange={(next) => !next && cancelEdit()}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        {...mergeProps(
+          { className: "sm:max-w-lg" } as React.ComponentProps<"div">,
+          getSlotProps(table, "editDialog", {
+            row: editingRow ?? undefined,
+            isCreating,
+          })
+        )}
+      >
         <DialogHeader>
           <DialogTitle>
             {isCreating ? localization.createNewRow : localization.editRow}
@@ -116,6 +125,12 @@ export function DataTableEditModal<TData extends RowData>({
                   error={meta?.validate?.(value)}
                   ariaLabel={getColumnLabel(column)}
                   onChange={(next) => setRowDraftValue(column.id, next)}
+                  fieldProps={getSlotProps(
+                    table,
+                    "editField",
+                    { column, row: editingRow ?? undefined },
+                    meta?.slotProps?.editField
+                  )}
                 />
               </div>
             )

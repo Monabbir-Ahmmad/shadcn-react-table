@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
+import { mergeProps } from "../../helpers/slot-props"
 
 interface SelectionCheckboxProps extends Omit<
   React.ComponentProps<"button">,
@@ -37,19 +38,22 @@ function SelectionCheckbox({
   const active = checked || indeterminate
   return (
     <button
-      type="button"
-      role="checkbox"
-      data-slot="checkbox"
-      aria-checked={indeterminate ? "mixed" : checked}
-      onClick={() => onCheckedChange?.(!checked)}
-      className={cn(
-        "peer relative flex size-4.5 shrink-0 items-center justify-center rounded-none border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-input",
-        className
+      {...mergeProps(
+        {
+          type: "button",
+          role: "checkbox",
+          "data-slot": "checkbox",
+          "aria-checked": indeterminate ? "mixed" : checked,
+          onClick: () => onCheckedChange?.(!checked),
+          className: cn(
+            "peer relative flex size-4.5 shrink-0 items-center justify-center rounded-none border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
+            active
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-input"
+          ),
+        } as React.ComponentProps<"button">,
+        { ...props, className }
       )}
-      {...props}
     >
       {active && (
         <svg

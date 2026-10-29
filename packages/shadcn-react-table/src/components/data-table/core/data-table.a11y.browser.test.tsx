@@ -31,6 +31,7 @@ function Table({
 }: Partial<UseDataTableOptions<Row>> & { rowCount?: number }) {
   const [data, setData] = React.useState(() => makeRows(rowCount))
   const table = useDataTable<Row>({
+    slotProps: { surface: { className: "max-h-[300px]" } },
     columns,
     data,
     getRowId: (row) => row.id,
@@ -47,7 +48,7 @@ function Table({
   return (
     <>
       <button type="button">before</button>
-      <DataTable table={table} surfaceClassName="max-h-[300px]" />
+      <DataTable table={table} />
       <button type="button" onClick={() => setData((d) => d.slice(1))}>
         delete first
       </button>

@@ -9,6 +9,8 @@ import { Button } from "@workspace/ui/components/button"
 import { TableHead } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { getSlotProps, mergeProps } from "../../../helpers/slot-props"
+
 import {
   getColumnPinningClass,
   getColumnPinningStyle,
@@ -17,7 +19,10 @@ import type { IconComponent } from "../../../core/icons"
 import type { DataTableInstance } from "../../../core/types"
 import { getPinSide } from "../../../helpers/column-pinning"
 import { ColumnResizeHandle } from "./column-resize-handle"
-import type { DataTableHeader } from "../../../core/table-types"
+import type {
+  DataTableColumn,
+  DataTableHeader,
+} from "../../../core/table-types"
 
 /** dnd-kit activator props for the current column's drag handle. */
 export interface ColumnDragHandleProps {
@@ -96,18 +101,31 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
 
   return (
     <TableHead
-      ref={setNodeRef}
-      colSpan={colSpan}
-      style={style}
-      data-pinned={getPinSide(column) || undefined}
-      aria-sort={ariaSort(column.getIsSorted())}
-      className={cn(
-        "relative bg-card",
-        padding,
-        // Match the body: under fixed layout, keep long header labels from
-        // bleeding past the (resizable) column edge.
-        resizable && "overflow-hidden",
-        getColumnPinningClass(column)
+      {...mergeProps(
+        {
+          ref: setNodeRef,
+          colSpan,
+          style,
+          "data-pinned": getPinSide(column) || undefined,
+          "aria-sort": ariaSort(column.getIsSorted()),
+          className: cn(
+            "relative bg-card",
+            padding,
+            // Match the body: under fixed layout, keep long header labels from
+            // bleeding past the (resizable) column edge.
+            resizable && "overflow-hidden",
+            getColumnPinningClass(column)
+          ),
+        } as React.ComponentProps<"th">,
+        getSlotProps(
+          table,
+          "headCell",
+          {
+            header: header as DataTableHeader<TData, unknown>,
+            column: column as DataTableColumn<TData, unknown>,
+          },
+          column.columnDef.meta?.slotProps?.headCell
+        )
       )}
     >
       <ColumnDragContext.Provider value={draggable ? dragProps : null}>

@@ -35,6 +35,7 @@ function RtlTable({
   const [columns] = React.useState(() => makeColumns(colCount))
   const [data] = React.useState(() => makeRows(5, colCount))
   const table = useDataTable<Row>({
+    slotProps: { surface: { className: "max-h-[400px]" } },
     columns,
     data,
     getRowId: (row) => row.id,
@@ -43,7 +44,7 @@ function RtlTable({
   })
   return (
     <div dir="rtl" style={{ width: 600 }}>
-      <DataTable table={table} surfaceClassName="max-h-[400px]" />
+      <DataTable table={table} />
     </div>
   )
 }

@@ -33,6 +33,7 @@ import { DataTableHeadCell } from "../body/dnd"
 import { DataTableColumnFilter } from "./data-table-column-filter"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { isFilterRowVisible } from "../../helpers/grid-rows"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import type { DataTableHeader } from "../../core/table-types"
 import { dt } from "../../core/internal"
 
@@ -99,12 +100,22 @@ export function DataTableHeader<TData extends RowData>({
   ) => (
     <TableHead
       key={layout?.key ?? header.id}
-      colSpan={layout?.colSpan ?? header.colSpan}
-      style={{
-        ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
-        ...getColumnPinningStyle(header.column),
-      }}
-      className={cn("bg-card", getColumnPinningClass(header.column))}
+      {...mergeProps(
+        {
+          colSpan: layout?.colSpan ?? header.colSpan,
+          style: {
+            ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
+            ...getColumnPinningStyle(header.column),
+          },
+          className: cn("bg-card", getColumnPinningClass(header.column)),
+        } as React.ComponentProps<"th">,
+        getSlotProps(
+          table,
+          "filterCell",
+          { header, column: header.column },
+          header.column.columnDef.meta?.slotProps?.filterCell
+        )
+      )}
     >
       <DataTableColumnFilter header={header} table={table} />
     </TableHead>
@@ -112,17 +123,25 @@ export function DataTableHeader<TData extends RowData>({
 
   return (
     <TableHeader
-      // Forwarding the exposed DOM ref object as a JSX ref (not reading
-      // .current during render).
-      // eslint-disable-next-line react-hooks/refs
-      ref={refs.tableHeadRef}
-      className={cn(enableStickyHeader && "sticky top-0 z-20 bg-card")}
+      {...mergeProps(
+        {
+          // Forwarding the exposed DOM ref object as a JSX ref.
+          ref: refs.tableHeadRef,
+          className: cn(enableStickyHeader && "sticky top-0 z-20 bg-card"),
+        } as React.ComponentProps<"thead">,
+        getSlotProps(table, "head", {})
+      )}
     >
       {headerGroups.map((headerGroup, index) => (
         <TableRow
           key={headerGroup.id}
-          aria-rowindex={rowIndex(index)}
-          className="group/th hover:bg-transparent"
+          {...mergeProps(
+            {
+              "aria-rowindex": rowIndex(index),
+              className: "group/th hover:bg-transparent",
+            } as React.ComponentProps<"tr">,
+            getSlotProps(table, "headRow", { headerGroup })
+          )}
         >
           <SortableContext
             items={leafColumnIds}

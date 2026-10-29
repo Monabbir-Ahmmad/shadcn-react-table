@@ -8,6 +8,8 @@ import { Table, TableCaption } from "@workspace/ui/components/table"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { getSlotProps, mergeProps } from "../helpers/slot-props"
+
 import { DataTableBody } from "../components/body/data-table-body"
 import {
   DataTableFooter,
@@ -74,9 +76,6 @@ interface DataTableProps<
 > extends React.ComponentProps<"div"> {
   /** The instance returned by `useDataTable`. */
   table: DataTableInstance<TData>
-  /** Extra classes for the scrollable table surface (e.g. a max-height that
-   *  overrides the default sticky-header/virtualization bound). */
-  surfaceClassName?: string
 }
 
 /**
@@ -97,7 +96,6 @@ function assignRef<T>(ref: React.Ref<T> | undefined, el: T | null) {
  */
 export function DataTable<TData extends RowData>({
   table,
-  surfaceClassName,
   className,
   ref: refProp,
   onKeyDown: onKeyDownProp,
@@ -267,23 +265,26 @@ export function DataTable<TData extends RowData>({
       } as Partial<React.ComponentProps<typeof TooltipProvider>>)}
     >
       <div
-        ref={paperRef}
-        data-slot="data-table"
-        className={cn(
-          "flex w-full flex-col gap-2",
-          isFullscreen &&
-            "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4",
-          className
+        {...mergeProps(
+          // The ref is forwarded to the element, not read during render.
+          // eslint-disable-next-line react-hooks/refs
+          {
+            ref: paperRef,
+            "data-slot": "data-table",
+            className: cn(
+              "flex w-full flex-col gap-2",
+              isFullscreen &&
+                "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4"
+            ),
+            "data-density": density,
+            // Full screen covers the page, so it is a modal dialog meanwhile.
+            role: isFullscreen ? "dialog" : undefined,
+            "aria-modal": isFullscreen || undefined,
+            onKeyDown: fullscreen.onKeyDown,
+          } as React.ComponentProps<"div">,
+          getSlotProps(table, "root", {}),
+          { ...props, className, onKeyDown: onKeyDownProp }
         )}
-        data-density={density}
-        // Full screen covers the page, so it is a modal dialog meanwhile.
-        role={isFullscreen ? "dialog" : undefined}
-        aria-modal={isFullscreen || undefined}
-        {...props}
-        onKeyDown={(event) => {
-          onKeyDownProp?.(event)
-          fullscreen.onKeyDown(event)
-        }}
       >
         <div role="status" aria-live="polite" className="sr-only">
           {isLoading ? localization.loading : ""}
@@ -322,39 +323,46 @@ export function DataTable<TData extends RowData>({
             )}
 
           <div
-            // Callback refs run after render; assigning .current there is
-            // legal React.
-            // eslint-disable-next-line react-hooks/immutability
-            ref={(node) => {
-              gridRef.current = node
-              // The exposed container ref is a RefObject, mutable by contract.
-              // eslint-disable-next-line react-hooks/immutability
-              refs.tableContainerRef.current = node
-            }}
-            onKeyDown={onKeyDown}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            // Focusable (not a Tab stop) so keyboard navigation can park focus
-            // here when the focused cell scrolls out of a virtual window.
-            tabIndex={enableKeyboardNavigation ? -1 : undefined}
-            data-slot="data-table-surface"
-            className={cn(
-              // This surface is the single scroll container for both axes, so
-              // the sticky header/footer engage and the horizontal scrollbar
-              // stays pinned to the visible bottom. Neutralize the shadcn
-              // <Table> wrapper's own overflow so it doesn't become a second
-              // (unbounded) scroll container that breaks sticky positioning.
-              "relative overflow-auto rounded-md border bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
-              "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
-              // MRT-parity default bound: with a sticky header the surface
-              // caps near the viewport height, so tall content (long groups,
-              // trees, detail panels) scrolls internally under the pinned
-              // header instead of stretching the page. `surfaceClassName`
-              // (via tailwind-merge) or `enableStickyHeader: false` opts out.
-              enableStickyHeader &&
-                "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
-              enableRowVirtualization && "max-h-150",
-              surfaceClassName
+            {...mergeProps(
+              // The callback ref runs after render; assigning .current there
+              // is legal React.
+              // eslint-disable-next-line react-hooks/refs
+              {
+                ref: (node: HTMLDivElement | null) => {
+                  gridRef.current = node
+                  // The exposed container ref is a RefObject, mutable by
+                  // contract.
+                  // eslint-disable-next-line react-hooks/immutability
+                  refs.tableContainerRef.current = node
+                },
+                onKeyDown,
+                onFocus,
+                onBlur,
+                // Focusable (not a Tab stop) so keyboard navigation can park
+                // focus here when the focused cell scrolls out of a virtual
+                // window.
+                tabIndex: enableKeyboardNavigation ? -1 : undefined,
+                "data-slot": "data-table-surface",
+                className: cn(
+                  // This surface is the single scroll container for both axes, so
+                  // the sticky header/footer engage and the horizontal scrollbar
+                  // stays pinned to the visible bottom. Neutralize the shadcn
+                  // <Table> wrapper's own overflow so it doesn't become a second
+                  // (unbounded) scroll container that breaks sticky positioning.
+                  "relative overflow-auto rounded-md border bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
+                  "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
+                  // MRT-parity default bound: with a sticky header the surface
+                  // caps near the viewport height, so tall content (long groups,
+                  // trees, detail panels) scrolls internally under the pinned
+                  // header instead of stretching the page. A `slotProps.surface`
+                  // class (via tailwind-merge) or `enableStickyHeader: false` opts
+                  // out.
+                  enableStickyHeader &&
+                    "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
+                  enableRowVirtualization && "max-h-150"
+                ),
+              } as React.ComponentProps<"div">,
+              getSlotProps(table, "surface", {})
             )}
           >
             {showProgressBars && (
@@ -383,26 +391,31 @@ export function DataTable<TData extends RowData>({
             )}
 
             <Table
-              role={isGrid ? "grid" : undefined}
-              aria-rowcount={isGrid ? ariaRowCount : undefined}
-              aria-colcount={
-                isGrid ? table.getVisibleLeafColumns().length : undefined
-              }
-              aria-busy={isBusy || undefined}
-              style={{
-                ...columnSizeVars,
-                // Fixed layout makes per-column widths authoritative (auto
-                // layout would stretch/redistribute them and ignore a resize).
-                // `max(100%, totalSize)` keeps the table at least as wide as the
-                // surface: when the columns are narrower than the surface, fixed
-                // layout distributes the slack proportionally so they fill it
-                // (no trailing empty space); when they outgrow the surface, the
-                // table exceeds 100% and scrolls horizontally.
-                ...(enableColumnResizing
-                  ? { width: `max(100%, ${table.getTotalSize()}px)` }
-                  : null),
-              }}
-              className={cn(enableColumnResizing && "table-fixed")}
+              {...mergeProps(
+                {
+                  role: isGrid ? "grid" : undefined,
+                  "aria-rowcount": isGrid ? ariaRowCount : undefined,
+                  "aria-colcount": isGrid
+                    ? table.getVisibleLeafColumns().length
+                    : undefined,
+                  "aria-busy": isBusy || undefined,
+                  style: {
+                    ...columnSizeVars,
+                    // Fixed layout makes per-column widths authoritative (auto
+                    // layout would stretch/redistribute them and ignore a resize).
+                    // `max(100%, totalSize)` keeps the table at least as wide as the
+                    // surface: when the columns are narrower than the surface, fixed
+                    // layout distributes the slack proportionally so they fill it
+                    // (no trailing empty space); when they outgrow the surface, the
+                    // table exceeds 100% and scrolls horizontally.
+                    ...(enableColumnResizing
+                      ? { width: `max(100%, ${table.getTotalSize()}px)` }
+                      : null),
+                  },
+                  className: cn(enableColumnResizing && "table-fixed"),
+                } as React.ComponentProps<"table">,
+                getSlotProps(table, "table", {})
+              )}
             >
               {renderCaption && (
                 <TableCaption>{renderCaption({ table })}</TableCaption>

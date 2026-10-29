@@ -176,6 +176,27 @@ const iconSlots = iconsSf
 // --- Instance refs (table.dataTable.refs = DataTableRefs)
 const tableRefs = membersOf(typesSf.getInterfaceOrThrow("DataTableRefs"))
 
+// --- slotProps parts (DataTableSlots): the element each one reaches and the
+// context a function form receives.
+const slotParts = typesSf
+  .getInterfaceOrThrow("DataTableSlots")
+  .getProperties()
+  .map((p) => {
+    const text = oneLine(p.getTypeNode().getText())
+    const element = text.match(/ComponentProps<"(\w+)">/)?.[1]
+    const ctx = text.match(/WithTable<\s*TData,\s*\{(.*)\}\s*>/)?.[1]
+    const keys = ctx
+      ? [...ctx.matchAll(/(\w+)(\?)?:/g)].map((m) => m[1] + (m[2] ?? ""))
+      : []
+    return {
+      name: p.getName(),
+      type: `<${element}> props · { ${[...keys, "table"].join(", ")} }`,
+      required: false,
+      default: null,
+      description: describe(p),
+    }
+  })
+
 // --- Structural `data-slot` attributes (scanned from the component source so
 // the list can't drift). Descriptions are curated here since the source can't
 // supply them.
@@ -246,6 +267,7 @@ const body =
     ["iconSlots", iconSlots],
     ["tableRefs", tableRefs],
     ["slots", slots],
+    ["slotParts", slotParts],
   ]
     .map(
       ([name, rows]) =>
@@ -265,6 +287,7 @@ const undocumented = [
   ["icon slot", iconSlots],
   ["ref", tableRefs],
   ["data-slot", slots],
+  ["slotProps part", slotParts],
 ].flatMap(([kind, rows]) =>
   rows.filter((row) => !row.description).map((row) => `${kind} ${row.name}`)
 )

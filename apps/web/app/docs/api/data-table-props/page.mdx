@@ -7,12 +7,9 @@ export const metadata = { title: "DataTable props" }
 <ApiTable of="dataTableProps" propLabel="Prop" />
 
 ```tsx
-<DataTable
-  table={table}
-  surfaceClassName="max-h-[600px]"
-/>
+<DataTable table={table} className="mx-auto max-w-5xl" />
 ```
 
-<Callout variant="tip" title="surfaceClassName">
-Use `surfaceClassName` to bound the scroll surface (e.g. `max-h-[600px]`) — required to engage the [sticky header & footer](/docs/guides/sticky) and to size a [virtualized](/docs/guides/virtualization) list.
+<Callout variant="tip" title="Styling inner parts">
+To reach the scroll surface, rows, cells or any other part, use the [`slotProps`](/docs/guides/slot-props) option on `useDataTable` — for example `slotProps: { surface: { className: "max-h-[600px]" } }` bounds the scroll surface for a [sticky header](/docs/guides/sticky) or a [virtualized](/docs/guides/virtualization) list.
 </Callout>

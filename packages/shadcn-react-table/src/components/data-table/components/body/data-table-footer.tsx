@@ -1,5 +1,7 @@
 "use client"
 
+import type * as React from "react"
+
 import { flexRender, type RowData } from "@tanstack/react-table"
 
 import {
@@ -27,6 +29,7 @@ import {
 } from "../../utils/column-styles"
 import type { DataTableHeader } from "../../core/table-types"
 import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 interface DataTableFooterProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -59,22 +62,28 @@ export function DataTableFooter<TData extends RowData>({
 
   return (
     <TableFooter
-      // Forwarding the exposed DOM ref object as a JSX ref (not reading
-      // .current during render).
-      // eslint-disable-next-line react-hooks/refs
-      ref={refs.tableFooterRef}
-      className={cn(enableStickyFooter && "sticky bottom-0 z-20")}
+      {...mergeProps(
+        {
+          // Forwarding the exposed DOM ref object as a JSX ref.
+          ref: refs.tableFooterRef,
+          className: cn(enableStickyFooter && "sticky bottom-0 z-20"),
+        } as React.ComponentProps<"tfoot">,
+        getSlotProps(table, "footer", {})
+      )}
     >
       {table.getFooterGroups().map((footerGroup, index) => (
         <TableRow
           key={footerGroup.id}
-          // Grid row position, after the header and data rows.
-          aria-rowindex={
-            enableKeyboardNavigation
-              ? getHeaderRowCount(table) + getDataRowCount(table) + index + 1
-              : undefined
-          }
-          className="hover:bg-transparent"
+          {...mergeProps(
+            {
+              // Grid row position, after the header and data rows.
+              "aria-rowindex": enableKeyboardNavigation
+                ? getHeaderRowCount(table) + getDataRowCount(table) + index + 1
+                : undefined,
+              className: "hover:bg-transparent",
+            } as React.ComponentProps<"tr">,
+            getSlotProps(table, "footerRow", { footerGroup })
+          )}
         >
           {enableColumnVirtualization
             ? withHeaderSpacers(
@@ -95,16 +104,26 @@ export function DataTableFooter<TData extends RowData>({
     return (
       <TableCell
         key={layout?.key ?? header.id}
-        colSpan={layout?.colSpan ?? header.colSpan}
-        style={{
-          ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
-          ...getColumnPinningStyle(header.column),
-        }}
-        className={cn(
-          FOOTER_CELL_CLASS,
-          padding,
-          ALIGN_CELL[header.column.columnDef.meta?.align ?? "left"],
-          getColumnPinningClass(header.column)
+        {...mergeProps(
+          {
+            colSpan: layout?.colSpan ?? header.colSpan,
+            style: {
+              ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
+              ...getColumnPinningStyle(header.column),
+            },
+            className: cn(
+              FOOTER_CELL_CLASS,
+              padding,
+              ALIGN_CELL[header.column.columnDef.meta?.align ?? "left"],
+              getColumnPinningClass(header.column)
+            ),
+          } as React.ComponentProps<"td">,
+          getSlotProps(
+            table,
+            "footerCell",
+            { header, column: header.column },
+            header.column.columnDef.meta?.slotProps?.footerCell
+          )
         )}
       >
         {header.isPlaceholder

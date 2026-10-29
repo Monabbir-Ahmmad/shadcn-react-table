@@ -5,6 +5,7 @@ import type { RowData } from "@tanstack/react-table"
 import { SelectionCheckbox } from "../components/body/selection-checkbox"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
+import { getSlotProps } from "../helpers/slot-props"
 
 export const SELECTION_COLUMN_ID = "cn-select"
 
@@ -48,6 +49,7 @@ export function createSelectionColumn<TData extends RowData>(
           onDoubleClick={(e) => e.stopPropagation()}
         >
           <SelectionCheckbox
+            {...getSlotProps(table as never, "selectCheckbox", {})}
             aria-label={localization.selectAll}
             checked={allSelected}
             indeterminate={someSelected && !allSelected}
@@ -60,13 +62,16 @@ export function createSelectionColumn<TData extends RowData>(
         </div>
       )
     },
-    cell: ({ row }) => (
+    cell: ({ row, table }) => (
       <div
         className="flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <SelectionCheckbox
+          {...getSlotProps(table as never, "selectCheckbox", {
+            row: row as never,
+          })}
           aria-label={localization.selectRow}
           checked={row.getIsSelected()}
           disabled={!row.getCanSelect()}

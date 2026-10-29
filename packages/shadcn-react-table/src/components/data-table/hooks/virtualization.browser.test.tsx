@@ -36,9 +36,10 @@ function Table({
     data: rows,
     getRowId: (row) => row.id,
     enablePagination: false,
+    slotProps: { surface: { className: surfaceClassName } },
     ...options,
   })
-  return <DataTable table={table} surfaceClassName={surfaceClassName} />
+  return <DataTable table={table} />
 }
 
 const surface = () =>

@@ -30,6 +30,7 @@ const data: Row[] = Array.from({ length: 30 }, (_, r) => {
 
 function Table() {
   const table = useDataTable<Row>({
+    slotProps: { surface: { className: "max-h-[400px]" } },
     columns,
     data,
     getRowId: (row) => row.id,
@@ -40,7 +41,7 @@ function Table() {
   })
   return (
     <div style={{ width: 600 }}>
-      <DataTable table={table} surfaceClassName="max-h-[400px]" />
+      <DataTable table={table} />
     </div>
   )
 }
@@ -103,6 +104,7 @@ describe("column virtualization with pinned columns", () => {
 
 function OrderingTable() {
   const table = useDataTable<Row>({
+    slotProps: { surface: { className: "max-h-[400px]" } },
     columns: columns.slice(0, 20),
     data,
     getRowId: (row) => row.id,
@@ -112,7 +114,7 @@ function OrderingTable() {
   })
   return (
     <div style={{ width: 600 }}>
-      <DataTable table={table} surfaceClassName="max-h-[400px]" />
+      <DataTable table={table} />
     </div>
   )
 }

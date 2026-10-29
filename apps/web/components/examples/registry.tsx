@@ -205,13 +205,14 @@ function StickyExample() {
   const data = React.useMemo(() => makeUsers(40), [])
   const columns = useUserColumns()
   const table = useDataTable({
+    slotProps: { surface: { className: "max-h-[460px]" } },
     data,
     columns,
     getRowId: (row) => row.id,
     enablePagination: false,
     enableStickyFooter: true,
   })
-  return <DataTable table={table} surfaceClassName="max-h-[460px]" />
+  return <DataTable table={table} />
 }
 
 function LoadingExample() {
@@ -441,11 +442,7 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       exit()
     },
     renderTopToolbarCustomActions: ({ table }) => (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => table.beginCreate()}
-      >
+      <Button variant="outline" size="sm" onClick={() => table.beginCreate()}>
         <RiAddLine />
         New
       </Button>
@@ -551,6 +548,7 @@ function ColumnVirtualizationExample() {
   const data = React.useMemo(() => makeUsers(300), [])
   const columns = React.useMemo(() => wideColumns(), [])
   const table = useDataTable({
+    slotProps: { surface: { className: "max-h-[600px]" } },
     data,
     columns,
     getRowId: (row) => row.id,
@@ -558,7 +556,7 @@ function ColumnVirtualizationExample() {
     enableRowVirtualization: true,
     enableColumnVirtualization: true,
   })
-  return <DataTable table={table} surfaceClassName="max-h-[600px]" />
+  return <DataTable table={table} />
 }
 
 function EventListenersExample() {
@@ -763,6 +761,7 @@ function InfiniteScrollExample() {
 
   const columns = useUserColumns()
   const table = useDataTable({
+    slotProps: { surface: { className: "max-h-[460px]" } },
     data: rows,
     columns,
     getRowId: (row) => row.id,
@@ -776,7 +775,7 @@ function InfiniteScrollExample() {
       </span>
     ),
   })
-  return <DataTable table={table} surfaceClassName="max-h-[460px]" />
+  return <DataTable table={table} />
 }
 
 function AutoRowHeightExample() {

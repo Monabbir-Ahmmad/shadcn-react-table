@@ -12,6 +12,7 @@ import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableColumn } from "../../core/table-types"
 import { dt } from "../../core/internal"
+import { getSlotProps } from "../../helpers/slot-props"
 
 /**
  * Inline create row for `createDisplayMode: "row"`. Renders an editor per
@@ -96,6 +97,12 @@ function CreateField<TData extends RowData>({
       error={meta?.validate?.(value)}
       ariaLabel={getColumnLabel(column)}
       onChange={(next) => cn.setRowDraftValue(column.id, next)}
+      fieldProps={getSlotProps(
+        table,
+        "editField",
+        { column },
+        meta?.slotProps?.editField
+      )}
     />
   )
 }

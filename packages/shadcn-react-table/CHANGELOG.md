@@ -29,6 +29,13 @@ for every rename.
   `enableColumnActions: false`.
 - **Changed (breaking):** `pageSizeOptions` is a `useDataTable` option, no
   longer a `<DataTable>` prop.
+- **New `slotProps` option:** extra props (classes, styles, `data-*`,
+  handlers, refs) for every part of the table — surface, rows, cells,
+  toolbars, search box, edit fields, dialog, checkboxes — as objects or
+  functions of the part's context. Columns can target their own cells with
+  `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **Changed (breaking):** `<DataTable surfaceClassName>` is replaced by
+  `slotProps: { surface: { className } }`.
 - **Removed:** the deprecated localization keys `advancedFiltersMatchLabel`
   and `advancedFiltersOf`.
 - **Breaking — TanStack Table v9:** the engine now runs on
