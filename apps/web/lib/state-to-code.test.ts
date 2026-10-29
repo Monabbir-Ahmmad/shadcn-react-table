@@ -50,6 +50,26 @@ describe("stateToCode", () => {
     expect(code).toContain('    density: "compact",')
   })
 
+  it("prints dates, undefined and non-identifier keys", () => {
+    const code = stateToCode({
+      ...EMPTY,
+      columnFilters: [
+        {
+          id: "startDate",
+          value: [new Date("2024-01-02T00:00:00.000Z"), undefined],
+        },
+        { id: "bad", value: [new Date("nope")] },
+      ],
+      columnVisibility: { "first-name": false, age: false },
+    })
+    expect(code).toContain(
+      '    columnFilters: [{ id: "startDate", value: [new Date("2024-01-02T00:00:00.000Z"), undefined] }, { id: "bad", value: [new Date(NaN)] }],'
+    )
+    expect(code).toContain(
+      '    columnVisibility: { "first-name": false, age: false },'
+    )
+  })
+
   it("adds the Arabic locale and the large-data options", () => {
     const code = stateToCode({ ...EMPTY, locale: "ar", big: true })
     expect(

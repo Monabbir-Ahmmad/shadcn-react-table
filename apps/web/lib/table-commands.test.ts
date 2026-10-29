@@ -76,6 +76,74 @@ describe("parseCommand", () => {
   })
 })
 
+const REAL_COLUMNS: CommandColumn[] = [
+  { id: "id", label: "ID" },
+  { id: "firstName", label: "First name" },
+  { id: "lastName", label: "Last name" },
+  { id: "email", label: "Email" },
+  { id: "role", label: "Role", values: ["Owner", "Admin"] },
+  { id: "department", label: "Department", values: ["Sales"], multi: true },
+  { id: "status", label: "Status", values: ["active"], multi: true },
+  { id: "age", label: "Age" },
+  { id: "salary", label: "Salary" },
+  { id: "startDate", label: "Start date" },
+  { id: "progress", label: "Progress" },
+]
+const real = (text: string) => parseCommand(text, REAL_COLUMNS)
+
+describe("column matching", () => {
+  it.each([
+    ["group by date", "startDate"],
+    ["group by dept", "department"],
+    ["group by sal", "salary"],
+    ["group by first", "firstName"],
+    ["group by first name", "firstName"],
+    ["group by start date", "startDate"],
+    ["group by startDate", "startDate"],
+    ["group by prog", "progress"],
+  ])("%s resolves to %s", (text, column) => {
+    expect(real(text)).toEqual({ ok: true, command: { kind: "group", column } })
+  })
+
+  it.each([
+    "group by name", // firstName vs lastName
+    "group by sta", // status vs startDate
+    "group by state", // not a word of any column
+    "group by pos", // too short to be an abbreviation
+    "group by sad",
+    "group by sat",
+    "group by banana",
+  ])("%s is not guessed", (text) => {
+    const result = real(text)
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.suggestions.length).toBeGreaterThan(0)
+  })
+})
+
+describe("parseCommand edge cases", () => {
+  it("tells show all from show <column>", () => {
+    expect(ok("show all")).toEqual({
+      ok: true,
+      command: { kind: "clearFilters" },
+    })
+    expect(ok("show email")).toEqual({
+      ok: true,
+      command: { kind: "visibility", column: "email", visible: true },
+    })
+  })
+
+  it.each(["", "   ", "\u{1F642}"])("rejects %j without throwing", (text) => {
+    expect(ok(text).ok).toBe(false)
+  })
+
+  it("ignores punctuation and case", () => {
+    expect(ok("Only, Active.")).toEqual({
+      ok: true,
+      command: { kind: "filter", column: "status", value: "active" },
+    })
+  })
+})
+
 type MockTarget = { [K in keyof CommandTarget]: Mock<CommandTarget[K]> }
 
 function target(): MockTarget {

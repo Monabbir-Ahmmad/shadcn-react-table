@@ -45,6 +45,17 @@ const norm = (s: string) =>
 const squash = (s: string) => norm(s).replace(/ /g, "")
 const singular = (s: string) => s.replace(/(ies)$/, "y").replace(/s$/, "")
 
+/** The words a column goes by: its label's words and its id's camelCase words. */
+function wordsOf(column: CommandColumn): string[] {
+  const idWords = column.id
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .split(/[^A-Za-z0-9]+/)
+    .map((w) => w.toLowerCase())
+  return [...new Set([...norm(column.label).split(" "), ...idWords])].filter(
+    Boolean
+  )
+}
+
 /** True when `abbr` reads as a shortening of `word` ("dept" of "department"). */
 function abbreviates(abbr: string, word: string) {
   if (abbr[0] !== word[0]) return false
@@ -53,24 +64,33 @@ function abbreviates(abbr: string, word: string) {
   return i === abbr.length
 }
 
-/** A column by id or label; a prefix or abbreviation of 3+ letters matches too. */
+/**
+ * A column by id or label. Matched in tiers, and the first tier with exactly
+ * one hit wins: the whole id or label, a whole word of it ("date"), the start
+ * of a word ("sal"), then an abbreviation of a single word ("dept", 4+ letters).
+ * A tier with several hits is ambiguous, so nothing is picked.
+ */
 function findColumn(
   text: string,
   columns: CommandColumn[]
 ): CommandColumn | undefined {
   const t = squash(text)
   if (!t) return undefined
-  return (
-    columns.find((c) => squash(c.id) === t || squash(c.label) === t) ??
-    (t.length >= 3
-      ? (columns.find(
-          (c) => squash(c.label).startsWith(t) || squash(c.id).startsWith(t)
-        ) ??
-        columns.find(
-          (c) => abbreviates(t, squash(c.label)) || abbreviates(t, squash(c.id))
-        ))
-      : undefined)
-  )
+  const tiers: ((c: CommandColumn) => boolean)[] = [
+    (c) => squash(c.id) === t || squash(c.label) === t,
+    (c) => wordsOf(c).includes(t),
+    (c) =>
+      t.length >= 3 &&
+      (squash(c.label).startsWith(t) ||
+        squash(c.id).startsWith(t) ||
+        wordsOf(c).some((w) => w.startsWith(t))),
+    (c) => t.length >= 4 && wordsOf(c).some((w) => abbreviates(t, w)),
+  ]
+  for (const tier of tiers) {
+    const hits = columns.filter(tier)
+    if (hits.length) return hits.length === 1 ? hits[0] : undefined
+  }
+  return undefined
 }
 
 /** A column value ("active", "admins", "sales"). */

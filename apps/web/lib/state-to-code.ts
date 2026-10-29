@@ -12,14 +12,23 @@ export type CodeState = {
 const LOCALE_IMPORT =
   'import { dataTableLocalizationAr } from "@/components/ui/data-table/locales/ar"'
 
+/** An object key, quoted when it is not a plain identifier. */
+const printKey = (key: string) =>
+  /^[A-Za-z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)
+
 /** A value as source code ({ a: 1 }, ["x"], "s"). */
 function print(value: unknown): string {
   if (typeof value === "string") return JSON.stringify(value)
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime())
+      ? "new Date(NaN)"
+      : `new Date(${JSON.stringify(value.toISOString())})`
+  }
   if (Array.isArray(value)) return `[${value.map(print).join(", ")}]`
   if (value && typeof value === "object") {
     const entries = Object.entries(value)
     return entries.length
-      ? `{ ${entries.map(([k, v]) => `${k}: ${print(v)}`).join(", ")} }`
+      ? `{ ${entries.map(([k, v]) => `${printKey(k)}: ${print(v)}`).join(", ")} }`
       : "{}"
   }
   return String(value)
