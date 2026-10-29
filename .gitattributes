@@ -1,0 +1,3 @@
+# Prettier and the generated registry files expect LF everywhere, including
+# Windows checkouts.
+* text=auto eol=lf
