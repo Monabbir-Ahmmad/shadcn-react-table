@@ -10,6 +10,10 @@ npx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/dat
 
 Then `import { DataTable, useDataTable } from "@/components/ui/data-table"`: build the table with `const table = useDataTable({ data, columns, getRowId })` and render `<DataTable table={table} />`.
 
+## Docs
+
+- [Guides](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides.md): every guide, grouped by feature area
+
 ## Getting started
 
 - [Introduction](https://monabbir-ahmmad.github.io/shadcn-react-table/docs.md): A shadcn/ui data table with Material React Table (MRT V3) feature parity, built on TanStack Table v9.

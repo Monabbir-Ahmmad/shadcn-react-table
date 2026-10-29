@@ -175,8 +175,38 @@ npx shadcn@latest add ${SITE}/r/data-table.json
 
 Then \`import { DataTable, useDataTable } from "@/components/ui/data-table"\`: build the table with \`const table = useDataTable({ data, columns, getRowId })\` and render \`<DataTable table={table} />\`.`
 
+// The guides index (`app/docs/guides/page.tsx`) is a React page, not MDX, so
+// its Markdown copy is built from the nav: every group that has guide pages,
+// with the same card links and summaries as the page.
+const guidesIndex = [
+  "# Guides",
+  "One page per feature, each with live examples you can copy.",
+  ...groups
+    .map((group) => ({
+      title: group.title,
+      items: group.items.filter((i) => i.href.startsWith("/docs/guides/")),
+    }))
+    .filter((group) => group.items.length > 0)
+    .map((group) =>
+      [
+        `## ${group.title}`,
+        "",
+        ...group.items.map((item) => {
+          const text = summaries[item.href]
+          return `- [${item.title}](${SITE}${item.href})${text ? `: ${text}` : ""}`
+        }),
+      ].join("\n")
+    ),
+].join("\n\n")
+writeFileSync(join(PUBLIC, "docs/guides.md"), `${guidesIndex}\n`)
+
 const index = [
   intro,
+  [
+    "## Docs",
+    "",
+    `- [Guides](${SITE}/docs/guides.md): every guide, grouped by feature area`,
+  ].join("\n"),
   ...groups.map((group) =>
     [
       `## ${group.title}`,
@@ -210,7 +240,10 @@ const missing = [
   ...SKILL.matchAll(/\/shadcn-react-table(\/docs\/[\w/-]+\.md)/g),
 ]
   .map((m) => m[1])
-  .filter((path) => !pages.some((p) => p.mdPath === path))
+  .filter(
+    (path) =>
+      path !== "/docs/guides.md" && !pages.some((p) => p.mdPath === path)
+  )
 if (missing.length > 0) {
   console.error(`SKILL.md links to missing docs pages: ${missing.join(", ")}`)
   process.exit(1)
@@ -228,5 +261,5 @@ writeFileSync(
 )
 
 console.log(
-  `llms built → apps/web/public/llms.txt, llms-full.txt + ${pages.length} page .md files`
+  `llms built → apps/web/public/llms.txt, llms-full.txt + ${pages.length + 1} page .md files`
 )

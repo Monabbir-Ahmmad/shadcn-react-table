@@ -23,6 +23,19 @@ export function pageMarkdownUrl(pathname: string, basePath = ""): string {
   return `${basePath}${normalizeDocsPath(pathname)}.md`
 }
 
+/**
+ * Docs pages whose source is not `app<path>/page.mdx` (React index pages),
+ * as their path in the repo.
+ */
+const PAGE_SOURCE: Record<string, string> = {
+  "/docs/guides": "apps/web/app/docs/guides/page.tsx",
+}
+
+/** Index pages outside the sidebar nav, by path, for the breadcrumb. */
+const INDEX_TITLES: Record<string, string> = {
+  "/docs/guides": "Guides",
+}
+
 /** Absolute links for a page's actions. */
 export function pageLinks(pathname: string) {
   const path = normalizeDocsPath(pathname)
@@ -30,9 +43,10 @@ export function pageLinks(pathname: string) {
   const prompt = encodeURIComponent(
     `Read ${markdown} and help me use it in my project.`
   )
+  const source = PAGE_SOURCE[path] ?? `apps/web/app${path}/page.mdx`
   return {
     markdown,
-    github: `${GITHUB_URL}/blob/main/apps/web/app${path}/page.mdx`,
+    github: `${GITHUB_URL}/blob/main/${source}`,
     chatgpt: `https://chatgpt.com/?hints=search&q=${prompt}`,
     claude: `https://claude.ai/new?q=${prompt}`,
   }
@@ -44,6 +58,8 @@ export function breadcrumbFor(
 ): { title: string; href?: string }[] {
   const path = normalizeDocsPath(pathname)
   if (path === "/docs") return [{ title: "Docs" }]
+  const index = INDEX_TITLES[path]
+  if (index) return [{ title: "Docs", href: "/docs" }, { title: index }]
   const item = docsFlatNav.find((i) => i.href === path)
   const group = groupFor(path)
   return [

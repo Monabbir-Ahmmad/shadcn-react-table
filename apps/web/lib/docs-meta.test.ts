@@ -67,4 +67,18 @@ describe("page links", () => {
     ])
     expect(breadcrumbFor("/docs")).toEqual([{ title: "Docs" }])
   })
+
+  it("links the guides index to its React source and gives it a crumb", () => {
+    const links = pageLinks("/docs/guides/")
+    expect(links.markdown).toBe(
+      "https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides.md"
+    )
+    expect(links.github).toBe(
+      "https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/apps/web/app/docs/guides/page.tsx"
+    )
+    expect(breadcrumbFor("/docs/guides")).toEqual([
+      { title: "Docs", href: "/docs" },
+      { title: "Guides" },
+    ])
+  })
 })
