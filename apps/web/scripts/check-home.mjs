@@ -31,7 +31,8 @@ const BIG_ROW_COUNT = Number(
 )
 if (!BIG_ROW_COUNT) throw new Error("could not read BIG_ROW_COUNT")
 const BIG_LABEL = BIG_ROW_COUNT.toLocaleString("en-US")
-const LAST_ID = `U-${1000 + BIG_ROW_COUNT - 1}` // makeUsers: id U-(1000 + i)
+// Row ids come from makeUsers in apps/web/lib/example-data.ts: `U-${1000 + i}`.
+const LAST_ID = `U-${1000 + BIG_ROW_COUNT - 1}`
 
 class CheckError extends Error {}
 function assert(condition, message) {
@@ -94,6 +95,11 @@ try {
       shown.length === 1,
       `expected one visible layer panel, found ${shown.length}`
     )
+    // 50% of the walk-through is the third part, "Rows".
+    assert(
+      shown[0].title === "Rows",
+      `expected the "Rows" panel at 50%, found "${shown[0].title}"`
+    )
     assert(shown[0].guides > 0, `panel "${shown[0].title}" has no Guide link`)
   })
 
@@ -140,7 +146,9 @@ try {
     )
     await run("reset")
     await page.waitForFunction(
-      () => !document.querySelector('#try thead th[data-pinned="left"]'),
+      () =>
+        !document.querySelector('#try thead th[data-pinned="left"]') &&
+        !document.querySelector("#try tbody button[aria-expanded]"),
       undefined,
       { timeout: 5000 }
     )
@@ -162,11 +170,13 @@ try {
     )
 
     await page.getByRole("button", { name: "Fling to bottom" }).click()
-    // The last row has to be rendered (virtualized) within 2 s of the click.
+    // The fling eases for 1.8 s and then holds the bottom for a few frames, so
+    // allow generous slack for slow machines: the last row (virtualized) has to
+    // be rendered, which only happens once the table has scrolled to the end.
     await page
       .locator(`#try tbody td`, { hasText: new RegExp(`^${LAST_ID}$`) })
       .first()
-      .waitFor({ timeout: 2000 })
+      .waitFor({ timeout: 6000 })
   })
 
   await step("deck: six frames, arrow key turns the front card", async () => {
