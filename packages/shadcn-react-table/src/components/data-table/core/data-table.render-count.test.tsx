@@ -108,18 +108,18 @@ describe("body re-renders", () => {
 
   it("does not re-render the component holding the table on state changes", () => {
     const renders = { count: 0 }
-    let callerRenders = 0
-    function Caller() {
-      callerRenders++
+    const onRender = vi.fn()
+    function Caller({ onRender }: { onRender: () => void }) {
+      onRender()
       return <Table renders={renders} enableRowSelection />
     }
-    render(<Caller />)
-    const before = callerRenders
+    render(<Caller onRender={onRender} />)
+    const before = onRender.mock.calls.length
     fireEvent.click(screen.getByRole("button", { name: /sort by name/i }))
     fireEvent.click(
       screen.getAllByRole("checkbox", { name: /select row/i })[0]!
     )
-    expect(callerRenders).toBe(before)
+    expect(onRender).toHaveBeenCalledTimes(before)
     // The table itself still shows the new state.
     expect(
       screen.getByText("Name").closest("th")!.getAttribute("aria-sort")
@@ -133,10 +133,8 @@ describe("body re-renders", () => {
 
   it("re-renders the holder for the state it selects", () => {
     const renders = { count: 0 }
-    let callerRenders = 0
-    let selected = ""
-    function Caller() {
-      callerRenders++
+    const onRender = vi.fn()
+    function Caller({ onRender }: { onRender: (selected: string) => void }) {
       const table = useDataTable<Row>({
         columns: makeColumns(renders),
         data,
@@ -144,17 +142,17 @@ describe("body re-renders", () => {
         enableRowSelection: true,
         stateSelector: (state) => state.rowSelection,
       })
-      selected = Object.keys(table.getState().rowSelection).join()
+      onRender(Object.keys(table.getState().rowSelection).join())
       return <DataTable table={table} />
     }
-    render(<Caller />)
-    const before = callerRenders
+    render(<Caller onRender={onRender} />)
+    const before = onRender.mock.calls.length
     fireEvent.click(screen.getByRole("button", { name: /sort by name/i }))
-    expect(callerRenders).toBe(before)
+    expect(onRender).toHaveBeenCalledTimes(before)
     fireEvent.click(
       screen.getAllByRole("checkbox", { name: /select row/i })[1]!
     )
-    expect(callerRenders).toBeGreaterThan(before)
-    expect(selected).toBe("2")
+    expect(onRender.mock.calls.length).toBeGreaterThan(before)
+    expect(onRender).toHaveBeenLastCalledWith("2")
   })
 })
