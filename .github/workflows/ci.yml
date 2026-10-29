@@ -108,17 +108,15 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
+      # No workspace install: both scripts use only Node built-ins (the smoke
+      # app installs its own dependencies through pnpm).
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Build the registry
-        run: pnpm --filter shadcn-react-table-web registry:build
+        run: node apps/web/scripts/build-registry.mjs
 
       - name: Install into a fresh app, typecheck, build
-        run: pnpm --filter shadcn-react-table-web registry:smoke -- --base ${{ matrix.base }}
+        run: node apps/web/scripts/smoke-install.mjs --base ${{ matrix.base }}

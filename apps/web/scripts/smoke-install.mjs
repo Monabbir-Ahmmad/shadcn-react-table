@@ -176,7 +176,13 @@ async function main() {
       app
     )
     console.log(`\n[smoke:${base}] copy fixture`)
-    await cp(FIXTURE, join(app, "app/page.tsx"))
+    // The fixture replaces the template's home page; fail clearly if the
+    // template stops shipping one there.
+    const page = join(app, "app/page.tsx")
+    await stat(page).catch(() => {
+      throw new Error(`the template has no ${page}; update the fixture copy`)
+    })
+    await cp(FIXTURE, page)
     await run(base, "typecheck", "pnpm", ["exec", "tsc", "--noEmit"], app)
     await run(base, "next build", "pnpm", ["exec", "next", "build"], app)
     console.log(`\n[smoke:${base}] OK`)
