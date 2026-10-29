@@ -132,13 +132,8 @@ export function DataTableBody<TData extends RowData>({
         data-cell-row={rowIndex}
         data-cell-col={colIndex}
         data-pinned={getPinSide(cell.column) || undefined}
-        tabIndex={
-          enableKeyboardNavigation
-            ? rowIndex === 0 && colIndex === 0
-              ? 0
-              : -1
-            : undefined
-        }
+        // The grid navigation hook makes one rendered cell the tab stop.
+        tabIndex={enableKeyboardNavigation ? -1 : undefined}
         style={{
           ...getWidthStyle(cell.column, table),
           ...getColumnPinningStyle(cell.column),
@@ -219,9 +214,13 @@ export function DataTableBody<TData extends RowData>({
     </TableRow>
   )
 
-  let runningRowIndex = 0
-  const renderRow = (row: DataTableRow<TData>) => {
-    const rowIndex = runningRowIndex++
+  // Rows are numbered in display order (top, center, bottom) for keyboard
+  // navigation; detail panels get no number.
+  const centerOffset = topRows.length
+  const bottomOffset = centerOffset + centerRows.length
+  const centerIndexById = new Map(centerRows.map((r, i) => [r.id, i]))
+
+  const renderRow = (row: DataTableRow<TData>, rowIndex: number) => {
     const isGrouped = row.getIsGrouped()
     const showDetail = !!renderDetailPanel && row.getIsExpanded() && !isGrouped
 
@@ -268,7 +267,7 @@ export function DataTableBody<TData extends RowData>({
         />
       ) : hasRows && enableRowVirtualization ? (
         <>
-          {topRows.map(renderRow)}
+          {topRows.map((row, i) => renderRow(row, i))}
           {(() => {
             const vRows = rowVirtualizer.getVirtualItems()
             const padTop = vRows.length ? (vRows[0]?.start ?? 0) : 0
@@ -333,7 +332,10 @@ export function DataTableBody<TData extends RowData>({
                         (onRowClick || onRowDoubleClick) && "cursor-pointer"
                       )}
                     >
-                      {renderCells(item.row, vRow.index)}
+                      {renderCells(
+                        item.row,
+                        centerOffset + (centerIndexById.get(item.row.id) ?? 0)
+                      )}
                     </TableRow>
                   )
                 })}
@@ -348,18 +350,18 @@ export function DataTableBody<TData extends RowData>({
               </>
             )
           })()}
-          {bottomRows.map(renderRow)}
+          {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
         </>
       ) : hasRows ? (
         <>
-          {topRows.map(renderRow)}
+          {topRows.map((row, i) => renderRow(row, i))}
           <SortableContext
             items={centerRowIds}
             strategy={verticalListSortingStrategy}
           >
-            {centerRows.map(renderRow)}
+            {centerRows.map((row, i) => renderRow(row, centerOffset + i))}
           </SortableContext>
-          {bottomRows.map(renderRow)}
+          {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
         </>
       ) : (
         <TableRow className="hover:bg-transparent">

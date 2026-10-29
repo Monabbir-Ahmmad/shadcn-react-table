@@ -96,6 +96,7 @@ export function DataTable<TData extends RowData>({
     positionToolbarDropZone,
     enableTopToolbar,
     enableKeyboardNavigation,
+    enableColumnVirtualization,
     localization,
     renderCaption,
     renderTopToolbar,
@@ -121,13 +122,41 @@ export function DataTable<TData extends RowData>({
     [refs.tablePaperRef, refProp]
   )
 
-  const { ref: gridRef, onKeyDown } = useGridNavigation<HTMLDivElement>(
-    enableKeyboardNavigation
-  )
+  const gridRef = React.useRef<HTMLDivElement>(null)
   const { sensors, collisionDetection, handleDragEnd } = useTableDnd(table)
   const accessibility = useDragAnnouncements(table)
-  const { rowVirtualizer, virtualItems, virtualColumns, withColumnSpacers } =
-    useTableVirtualizers(table, gridRef)
+  const {
+    rowVirtualizer,
+    columnVirtualizer,
+    virtualItems,
+    virtualColumns,
+    withColumnSpacers,
+  } = useTableVirtualizers(table, gridRef)
+
+  // Keyboard navigation works on display indexes (top, center, bottom rows;
+  // visible leaf columns), which it maps back to the virtualizers' indexes to
+  // scroll a cell that is not rendered into view.
+  const { onKeyDown, onFocus } = useGridNavigation<HTMLDivElement>({
+    enabled: enableKeyboardNavigation,
+    ref: gridRef,
+    rowCount: () =>
+      table.getTopRows().length +
+      table.getCenterRows().length +
+      table.getBottomRows().length,
+    colCount: () => table.getVisibleLeafColumns().length,
+    scrollToCell: ({ row, col }) => {
+      if (enableRowVirtualization) {
+        const center = table.getCenterRows()[row - table.getTopRows().length]
+        const index = center
+          ? virtualItems.findIndex(
+              (item) => !item.detail && item.row.id === center.id
+            )
+          : -1
+        if (index >= 0) rowVirtualizer.scrollToIndex(index)
+      }
+      if (enableColumnVirtualization) columnVirtualizer.scrollToIndex(col)
+    },
+  })
 
   // Infinite scroll: observe a bottom sentinel against the scroll surface and
   // ask the consumer to append the next chunk when it nears the viewport.
@@ -227,6 +256,7 @@ export function DataTable<TData extends RowData>({
               refs.tableContainerRef.current = node
             }}
             onKeyDown={onKeyDown}
+            onFocus={onFocus}
             data-slot="data-table-surface"
             className={cn(
               // This surface is the single scroll container for both axes, so
