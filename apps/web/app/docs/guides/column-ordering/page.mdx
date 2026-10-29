@@ -17,6 +17,11 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+
+## While you drag
+
+The whole column moves with its header — body, filter and footer cells included — and the other columns slide aside to show where it will land. The movement comes from CSS variables on the scroll surface, so dragging doesn't re-render any rows. With "reduce motion" turned on in the operating system, the columns move without the slide animation.
+
 ## Initial order
 Provide the starting order with `initialState.columnOrder`, an array of column ids.
 

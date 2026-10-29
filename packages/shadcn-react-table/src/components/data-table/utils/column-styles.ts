@@ -87,3 +87,57 @@ export function getWidthStyle<TData extends RowData>(
   }
   return {}
 }
+
+const DRAG_VARS = ["dx", "ms", "z", "op"] as const
+
+/**
+ * The style that lets a column's body, filter and footer cells follow its
+ * header while it is dragged: the header writes its offset into CSS
+ * variables on the scroll surface (see {@link setColumnDragVars}), so a drag
+ * moves the whole column without re-rendering a row. `baseZIndex` keeps a
+ * pinned cell's stacking when no drag is running.
+ */
+export function getColumnDragStyle(
+  columnId: string,
+  baseZIndex?: number
+): CSSProperties {
+  const id = cssVarId(columnId)
+  return {
+    translate: `var(--col-${id}-dx, 0px) 0`,
+    transition: `translate var(--col-${id}-ms, 0ms) ease`,
+    zIndex: `var(--col-${id}-z, ${baseZIndex ?? "auto"})` as never,
+    opacity: `var(--col-${id}-op, 1)` as never,
+  }
+}
+
+/**
+ * Writes a column's drag offset onto the scroll surface for its cells, or
+ * clears it (offset 0 and not dragging), in which case the cells snap back
+ * with no animation.
+ */
+export function setColumnDragVars(
+  surface: HTMLElement,
+  columnId: string,
+  offsetX: number,
+  dragging: boolean,
+  animate: boolean
+) {
+  const id = cssVarId(columnId)
+  if (offsetX === 0 && !dragging) {
+    for (const key of DRAG_VARS)
+      surface.style.removeProperty(`--col-${id}-${key}`)
+    return
+  }
+  surface.style.setProperty(`--col-${id}-dx`, `${offsetX}px`)
+  surface.style.setProperty(
+    `--col-${id}-ms`,
+    dragging || !animate ? "0ms" : "200ms"
+  )
+  if (dragging) {
+    surface.style.setProperty(`--col-${id}-z`, "30")
+    surface.style.setProperty(`--col-${id}-op`, "0.85")
+  } else {
+    surface.style.removeProperty(`--col-${id}-z`)
+    surface.style.removeProperty(`--col-${id}-op`)
+  }
+}

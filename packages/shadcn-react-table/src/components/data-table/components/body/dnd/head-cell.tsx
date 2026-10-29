@@ -23,6 +23,7 @@ import type {
   DataTableColumn,
   DataTableHeader,
 } from "../../../core/table-types"
+import { setColumnDragVars } from "../../../utils/column-styles"
 
 /** dnd-kit activator props for the current column's drag handle. */
 export interface ColumnDragHandleProps {
@@ -70,6 +71,7 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
     setNodeRef,
     setActivatorNodeRef,
     transform,
+    transition: sortTransition,
     isDragging,
   } = useSortable({
     id: column.id,
@@ -77,14 +79,58 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
     data: { type: "column" },
   })
 
+  // While a column is dragged, its header follows the pointer and the others
+  // slide aside; the same offsets go to CSS variables on the scroll surface so
+  // the body, filter and footer cells move with their headers (no row
+  // re-renders). Reduced motion: no slide animation.
+  const offsetX = transform?.x ?? 0
+  // The surface is found from this cell, not from `refs.tableContainerRef`,
+  // which is briefly detached while the table commits a re-render.
+  const cellRef = React.useRef<HTMLTableCellElement | null>(null)
+  const setCellRef = React.useCallback(
+    (node: HTMLTableCellElement | null) => {
+      cellRef.current = node
+      setNodeRef(node)
+    },
+    [setNodeRef]
+  )
+  const surfaceOf = () =>
+    cellRef.current?.closest<HTMLElement>('[data-slot="data-table-surface"]')
+  const written = React.useRef("0:false")
+  React.useLayoutEffect(() => {
+    const surface = surfaceOf()
+    const key = `${offsetX}:${isDragging}`
+    if (!surface || written.current === key) return
+    written.current = key
+    setColumnDragVars(
+      surface,
+      column.id,
+      offsetX,
+      isDragging,
+      !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    )
+  })
+  React.useEffect(() => {
+    const surface = surfaceOf()
+    return () => {
+      if (surface) setColumnDragVars(surface, column.id, 0, false, false)
+    }
+    // Clean up once, when the column's header goes away.
+  }, [column.id])
+
   const style: React.CSSProperties = {
     ...widthStyle,
     ...getColumnPinningStyle(column),
     transform: CSS.Translate.toString(transform),
     // Animate width for programmatic changes (autosize, pinning) but not during
-    // an active drag, where the easing makes the header lag behind the cursor.
-    transition: column.getIsResizing() ? undefined : "width 0.15s ease",
-    opacity: isDragging ? 0.7 : undefined,
+    // an active drag, where the easing makes the header lag behind the cursor;
+    // the other headers slide aside with dnd-kit's own transition.
+    transition: column.getIsResizing()
+      ? undefined
+      : ["width 0.15s ease", !isDragging && offsetX !== 0 && sortTransition]
+          .filter(Boolean)
+          .join(", "),
+    opacity: isDragging ? 0.85 : undefined,
     zIndex: isDragging ? 30 : undefined,
   }
 
@@ -102,8 +148,10 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
   return (
     <TableHead
       {...mergeProps(
+        // The ref callback is handed to the cell, not read during render.
+        // eslint-disable-next-line react-hooks/refs
         {
-          ref: setNodeRef,
+          ref: setCellRef,
           colSpan,
           style,
           "data-pinned": getPinSide(column) || undefined,

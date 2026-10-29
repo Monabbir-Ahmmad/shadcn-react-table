@@ -24,6 +24,7 @@ import type {
   WithColumnSpacers,
 } from "../../hooks/use-table-virtualizers"
 import {
+  getColumnDragStyle,
   getColumnPinningClass,
   getColumnPinningStyle,
   getWidthStyle,
@@ -105,6 +106,7 @@ export function DataTableBody<TData extends RowData>({
     enableFilterMatchHighlighting,
     columnsWithCustomCell,
     enableColumnResizing,
+    enableColumnOrdering,
     enableColumnVirtualization,
     enableRowVirtualization,
     enableRowOrdering,
@@ -189,6 +191,18 @@ export function DataTableBody<TData extends RowData>({
     .getVisibleLeafColumns()
     .find((c) => !NON_DATA_COLUMN_IDS.has(c.id))?.id
 
+  // Width, pinning and the column-drag offset (see `getColumnDragStyle`);
+  // the drag style only applies while column ordering is on.
+  const dragStyle = (column: DataTableCell<TData, unknown>["column"]) => {
+    const pinning = getColumnPinningStyle(column)
+    return {
+      ...getWidthStyle(column, table),
+      ...pinning,
+      ...(enableColumnOrdering &&
+        getColumnDragStyle(column.id, pinning.zIndex as number | undefined)),
+    }
+  }
+
   const renderCell = (
     cell: DataTableCell<TData, unknown>,
     row: DataTableRow<TData>,
@@ -242,10 +256,7 @@ export function DataTableBody<TData extends RowData>({
             "data-pinned": getPinSide(cell.column) || undefined,
             // The grid navigation hook makes one rendered cell the tab stop.
             tabIndex: enableKeyboardNavigation ? -1 : undefined,
-            style: {
-              ...getWidthStyle(cell.column, table),
-              ...getColumnPinningStyle(cell.column),
-            },
+            style: dragStyle(cell.column),
             onClick: onCellClick
               ? (event: React.MouseEvent<HTMLTableCellElement>) =>
                   latest.current.onCellClick?.({ cell, row, table, event })

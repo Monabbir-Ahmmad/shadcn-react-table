@@ -59,6 +59,82 @@ describe("column reordering", () => {
     expect(headerOrder()).toEqual(["Bravo", "Alpha", "Charlie"])
   })
 
+  it("moves the whole column with the header while dragging", async () => {
+    render(<Table enableColumnOrdering enableStickyFooter />)
+    const grip = screen.getAllByRole("button", { name: /reorder column/i })[0]!
+    const head = screen.getByText("Alpha").closest("th")!
+    const cell = screen.getByText("a3").closest("td")!
+    const neighbour = screen.getByText("b3").closest("td")!
+    const startCell = cell.getBoundingClientRect().left
+    const startNeighbour = neighbour.getBoundingClientRect().left
+
+    const rect = grip.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const base = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      isPrimary: true,
+      pointerType: "mouse",
+      button: 0,
+    }
+    grip.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        ...base,
+        buttons: 1,
+        clientX: x,
+        clientY: y,
+      })
+    )
+    await nextFrame()
+    for (let i = 1; i <= 8; i++) {
+      document.dispatchEvent(
+        new PointerEvent("pointermove", {
+          ...base,
+          buttons: 1,
+          clientX: x + (head.offsetWidth * 1.5 * i) / 8,
+          clientY: y,
+        })
+      )
+      await nextFrame()
+    }
+    // Let the neighbour's shift animation finish.
+    await new Promise((resolve) => setTimeout(resolve, 300))
+
+    // Mid-drag: the body cell moved as far as its header did, and the
+    // neighbouring column moved aside.
+    const headNow = screen.getByText("Alpha").closest("th")!
+    const cellNow = screen.getByText("a3").closest("td")!
+    expect(
+      Math.abs(
+        cellNow.getBoundingClientRect().left -
+          headNow.getBoundingClientRect().left
+      )
+    ).toBeLessThan(2)
+    expect(cellNow.getBoundingClientRect().left - startCell).toBeGreaterThan(50)
+    expect(neighbour.getBoundingClientRect().left).toBeLessThan(startNeighbour)
+
+    document.dispatchEvent(
+      new PointerEvent("pointerup", {
+        ...base,
+        buttons: 0,
+        clientX: x + head.offsetWidth * 1.5,
+        clientY: y,
+      })
+    )
+    await nextFrame()
+    await nextFrame()
+    // After the drop the cells sit in their new places with no offset left.
+    expect(headerOrder()).toEqual(["Bravo", "Alpha", "Charlie"])
+    expect(
+      Math.abs(
+        screen.getByText("a3").closest("td")!.getBoundingClientRect().left -
+          screen.getByText("Alpha").closest("th")!.getBoundingClientRect().left
+      )
+    ).toBeLessThan(2)
+  })
+
   it("moves a column with the keyboard", async () => {
     render(<Table enableColumnOrdering />)
     const grip = screen.getAllByRole("button", { name: /reorder column/i })[0]!

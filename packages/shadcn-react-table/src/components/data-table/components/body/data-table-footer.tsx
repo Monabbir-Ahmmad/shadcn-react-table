@@ -23,6 +23,7 @@ import type {
   WithHeaderSpacers,
 } from "../../hooks/use-table-virtualizers"
 import {
+  getColumnDragStyle,
   getColumnPinningClass,
   getColumnPinningStyle,
   getWidthStyle,
@@ -109,6 +110,13 @@ export function DataTableFooter<TData extends RowData>({
             style: {
               ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
               ...getColumnPinningStyle(header.column),
+              // Follows its header while the column is dragged.
+              ...(dt(table).enableColumnOrdering &&
+                getColumnDragStyle(
+                  header.column.id,
+                  getColumnPinningStyle(header.column).zIndex as
+                    number | undefined
+                )),
             },
             className: cn(
               FOOTER_CELL_CLASS,

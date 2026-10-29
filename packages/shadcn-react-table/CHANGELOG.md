@@ -179,6 +179,9 @@ for every rename.
 
 ### Changed
 
+- **Changed:** dragging a column moves the whole column (body, filter and
+  footer cells) with its header, and the other columns slide aside, without
+  re-rendering rows; reduced motion turns the slide off.
 - **Changed:** loading skeletons are drawn in each column, at its width and
   pinning, with bars of varying length that line up with the header. An
   explicit `showSkeletons: true` also covers rows already shown (e.g. while
