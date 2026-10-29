@@ -11,6 +11,10 @@ import { DataTableBodyCellContent } from "../editing/data-table-edit-cell"
 import { Highlight } from "./highlight"
 import type { DataTableCell } from "../../core/table-types"
 import { dt } from "../../core/internal"
+import {
+  DEFAULT_AGGREGATION_LABELS,
+  type DataTableLocalization,
+} from "../../core/localization"
 
 /** Table state every cell reads, taken once per body render rather than per
  *  cell (reading the state costs a few microseconds, times every cell). */
@@ -164,4 +168,62 @@ function resolveHighlightQuery<TData extends RowData>(
     return globalFilter
   }
   return null
+}
+
+/**
+ * The table's default `aggregatedCell`: several aggregations
+ * (`aggregationFn: ["sum", "mean"]`) show each result with its label;
+ * a single one shows its value, as TanStack's default does.
+ */
+export function DefaultAggregatedCell<TData extends RowData>({
+  getValue,
+  column,
+  table,
+}: {
+  getValue: () => unknown
+  column: { columnDef: { aggregationFn?: unknown } }
+  table: unknown
+}): React.ReactNode {
+  const value = getValue()
+  if (Array.isArray(column.columnDef.aggregationFn)) {
+    return (
+      <AggregationResults
+        value={value}
+        localization={dt(table as DataTableInstance<TData>).localization}
+      />
+    )
+  }
+  return (value as { toString?: () => string } | null)?.toString?.() ?? null
+}
+
+/** "Sum 4,000 · Mean 2,000": each aggregation's label and value. */
+function AggregationResults({
+  value,
+  localization,
+}: {
+  value: unknown
+  localization: DataTableLocalization
+}) {
+  if (value == null || typeof value !== "object")
+    return <>{String(value ?? "")}</>
+  const labels = {
+    ...DEFAULT_AGGREGATION_LABELS,
+    ...localization.aggregationFns,
+  }
+  const format = (result: unknown): string =>
+    typeof result === "number"
+      ? result.toLocaleString(localization.language)
+      : Array.isArray(result)
+        ? result.map(format).join(" – ")
+        : String(result ?? "")
+  return (
+    <span className="inline-flex flex-wrap gap-x-3">
+      {Object.entries(value).map(([name, result]) => (
+        <span key={name}>
+          <span className="text-muted-foreground">{labels[name] ?? name}</span>{" "}
+          <span className="font-medium tabular-nums">{format(result)}</span>
+        </span>
+      ))}
+    </span>
+  )
 }

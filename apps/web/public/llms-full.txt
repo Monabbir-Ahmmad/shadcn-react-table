@@ -2100,6 +2100,16 @@ const table = useDataTable({
 })
 ```
 
+Pass several aggregations as an array and each result shows with its label — `Sum 4,000 · Mean 2,000`, with numbers in the table's language. Rename the labels with `localization.aggregationFns`, or render them yourself with `aggregatedCell`, which receives every result (`getValue()` returns `{ sum, mean }`).
+
+```tsx
+{
+  accessorKey: "salary",
+  header: "Salary",
+  aggregationFn: ["sum", "mean"],
+}
+```
+
 > **Keep totals in view:** Grouping pairs well with a pinned footer. Add `enableStickyFooter: true` so
 >   the grand total stays visible while scrolling long groups.
 
@@ -5796,6 +5806,7 @@ See the [Localization guide](/docs/guides/localization) for a full example. The 
 | `cellActions` | `string` | `Cell actions` |  |
 | `noRecordsToDisplay` | `string` | `No records to display` |  |
 | `noResultsFound` | `string` | `No results found` | Shown instead of `noRecordsToDisplay` when filters or the search hide every row. |
+| `aggregationFns` | `Record<string, string>` |  | Labels for aggregation function names, shown when a column lists several (`aggregationFn: ["sum", "mean"]`). Merged with the English defaults by key; unknown names show as written. |
 | `loading` | `string` | `Loading…` |  |
 | `loadingMore` | `string` | `Loading more…` |  |
 | `dragStart` | `(label: string) => string` | `(label) => `Picked up ${label}.`` |  |

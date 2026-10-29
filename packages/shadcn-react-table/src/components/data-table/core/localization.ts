@@ -135,6 +135,10 @@ export interface DataTableLocalization {
   /** Shown instead of `noRecordsToDisplay` when filters or the search hide
    *  every row. */
   noResultsFound: string
+  /** Labels for aggregation function names, shown when a column lists several
+   *  (`aggregationFn: ["sum", "mean"]`). Merged with the English defaults by
+   *  key; unknown names show as written. */
+  aggregationFns?: Record<string, string>
   loading: string
   loadingMore: string
 
@@ -145,6 +149,21 @@ export interface DataTableLocalization {
   dragCancel: (label: string) => string
   dragInstructions: string
   dragRowLabel: (position: number) => string
+}
+
+/** English labels for the built-in aggregation functions. */
+export const DEFAULT_AGGREGATION_LABELS: Record<string, string> = {
+  sum: "Sum",
+  mean: "Mean",
+  median: "Median",
+  min: "Min",
+  max: "Max",
+  count: "Count",
+  unique: "Unique",
+  uniqueCount: "Unique count",
+  extent: "Range",
+  first: "First",
+  last: "Last",
 }
 
 export const defaultLocalization: DataTableLocalization = {

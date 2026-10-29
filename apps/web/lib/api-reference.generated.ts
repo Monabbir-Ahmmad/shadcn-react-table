@@ -2706,6 +2706,14 @@ export const localizationKeys: ApiMember[] = [
       "Shown instead of `noRecordsToDisplay` when filters or the search hide every row.",
   },
   {
+    name: "aggregationFns",
+    type: "Record<string, string>",
+    required: false,
+    default: null,
+    description:
+      'Labels for aggregation function names, shown when a column lists several (`aggregationFn: ["sum", "mean"]`). Merged with the English defaults by key; unknown names show as written.',
+  },
+  {
     name: "loading",
     type: "string",
     required: true,

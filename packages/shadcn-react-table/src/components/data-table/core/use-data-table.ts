@@ -30,6 +30,7 @@ import { measureColumnWidth } from "../helpers/measure-column-width"
 import { toDataTableState } from "../helpers/table-state"
 import { useAdvancedFilter } from "../hooks/use-advanced-filter"
 import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
+import { DefaultAggregatedCell } from "../components/body/render-body-cell"
 import { createEditingActions } from "../hooks/use-editing-state"
 import { useGlobalFilterMode } from "../hooks/use-global-filter-mode"
 import { usePageIndexClamp } from "../hooks/use-page-index-clamp"
@@ -251,6 +252,11 @@ export function useDataTable<TData extends RowData>(
         ...defaultLocalization.filterModes,
         ...configCtx.localization?.filterModes,
         ...localizationProp?.filterModes,
+      },
+      aggregationFns: {
+        ...defaultLocalization.aggregationFns,
+        ...configCtx.localization?.aggregationFns,
+        ...localizationProp?.aggregationFns,
       },
     }),
     [configCtx.localization, localizationProp]
@@ -598,6 +604,7 @@ export function useDataTable<TData extends RowData>(
       ...(tableOptions.enableFilters === false && { manualFiltering: true }),
       defaultColumn: {
         filterFn: dynamicFilterFn,
+        aggregatedCell: DefaultAggregatedCell,
         ...tableOptions.defaultColumn,
       },
       enableGlobalFilter,

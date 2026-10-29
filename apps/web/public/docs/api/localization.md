@@ -110,6 +110,7 @@ See the [Localization guide](/docs/guides/localization) for a full example. The 
 | `cellActions` | `string` | `Cell actions` |  |
 | `noRecordsToDisplay` | `string` | `No records to display` |  |
 | `noResultsFound` | `string` | `No results found` | Shown instead of `noRecordsToDisplay` when filters or the search hide every row. |
+| `aggregationFns` | `Record<string, string>` |  | Labels for aggregation function names, shown when a column lists several (`aggregationFn: ["sum", "mean"]`). Merged with the English defaults by key; unknown names show as written. |
 | `loading` | `string` | `Loading…` |  |
 | `loadingMore` | `string` | `Loading more…` |  |
 | `dragStart` | `(label: string) => string` | `(label) => `Picked up ${label}.`` |  |

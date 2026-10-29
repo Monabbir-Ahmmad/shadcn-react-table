@@ -87,6 +87,16 @@ const table = useDataTable({
 })
 ```
 
+Pass several aggregations as an array and each result shows with its label — `Sum 4,000 · Mean 2,000`, with numbers in the table's language. Rename the labels with `localization.aggregationFns`, or render them yourself with `aggregatedCell`, which receives every result (`getValue()` returns `{ sum, mean }`).
+
+```tsx
+{
+  accessorKey: "salary",
+  header: "Salary",
+  aggregationFn: ["sum", "mean"],
+}
+```
+
 > **Keep totals in view:** Grouping pairs well with a pinned footer. Add `enableStickyFooter: true` so
 >   the grand total stays visible while scrolling long groups.
 

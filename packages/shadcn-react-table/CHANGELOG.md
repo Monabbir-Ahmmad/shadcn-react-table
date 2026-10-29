@@ -86,6 +86,9 @@ for every rename.
 
 ### New
 
+- **New:** a column with several aggregations (`aggregationFn: ["sum",
+  "mean"]`) shows each labelled, formatted result in grouped rows; labels come
+  from the new optional `localization.aggregationFns`.
 - **New:** when filters or the search hide every row, the empty table says
   "No results found" (new localization key `noResultsFound`, in every locale)
   instead of "No records to display".
