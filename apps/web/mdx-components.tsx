@@ -4,7 +4,11 @@ import Link from "next/link"
 import { cn } from "@workspace/ui/lib/utils"
 import { ApiTable } from "@/components/docs/api-table"
 import { Callout } from "@/components/docs/callout"
+import { Card, Cards } from "@/components/docs/cards"
+import { CodeBlock } from "@/components/docs/code-block"
 import { Example } from "@/components/docs/example"
+import { PmTabs } from "@/components/docs/pm-tabs"
+import { Step, Steps } from "@/components/docs/steps"
 
 // Provides element styling + custom components to every MDX page in the app.
 // https://nextjs.org/docs/app/guides/mdx
@@ -129,19 +133,16 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    pre: ({ className, ...props }) => (
-      <pre
-        className={cn(
-          "my-6 overflow-x-auto rounded-lg border bg-muted/40 p-4 text-sm [&>code]:bg-transparent [&>code]:p-0",
-          className
-        )}
-        {...props}
-      />
-    ),
+    pre: CodeBlock,
     // Custom doc components (usable in MDX without importing).
     ApiTable,
     Callout,
     Example,
+    Steps,
+    Step,
+    PmTabs,
+    Cards,
+    Card,
     ...components,
   }
 }

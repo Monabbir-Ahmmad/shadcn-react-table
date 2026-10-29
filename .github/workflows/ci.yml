@@ -76,7 +76,7 @@ jobs:
       # change or new file here means source changed without regenerating.
       - name: Generated artifacts are fresh
         run: |
-          paths="apps/web/public/r apps/web/lib/api-reference.generated.ts apps/web/lib/example-source.generated.ts apps/web/public/llms.txt apps/web/public/llms-full.txt apps/web/public/docs.md apps/web/public/docs apps/web/public/SKILL.md apps/web/public/skills"
+          paths="apps/web/public/r apps/web/lib/api-reference.generated.ts apps/web/lib/example-source.generated.ts apps/web/lib/docs-summaries.generated.ts apps/web/public/llms.txt apps/web/public/llms-full.txt apps/web/public/docs.md apps/web/public/docs apps/web/public/SKILL.md apps/web/public/skills"
           git status --porcelain -- $paths
           test -z "$(git status --porcelain -- $paths)"
 
