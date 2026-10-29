@@ -116,3 +116,22 @@ export function makeUiStateHandler<K extends DataTableUiStateKey>(
     onChange?.(next)
   }
 }
+
+/**
+ * Turns the UI state members of `config` into getters on the table store, so
+ * reading them gives the current value whenever they are read, not the value
+ * from the render that built `config`.
+ */
+export function withLiveUiState<T extends object>(
+  config: T,
+  store: { state: object }
+): T {
+  for (const key of UI_STATE_KEYS) {
+    Object.defineProperty(config, key, {
+      get: () => (store.state as DataTableUiState)[key],
+      enumerable: true,
+      configurable: true,
+    })
+  }
+  return config
+}

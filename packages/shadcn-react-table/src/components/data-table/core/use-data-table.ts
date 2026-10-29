@@ -43,6 +43,7 @@ import {
   EMPTY_ADVANCED_FILTER,
   getUiState,
   makeUiStateHandler,
+  withLiveUiState,
   UI_STATE_KEYS,
   type DataTableUiState,
   type DataTableUiStateKey,
@@ -580,29 +581,10 @@ export function useDataTable<TData extends RowData>(
     showSkeletons,
   })
 
-  // Advanced filter edits can shrink the result set; jump back to the first
-  // page so the user isn't stranded on an out-of-range page (mirrors the
-  // column-filter reset above).
-  const advancedFilter = ui.advancedFilter
-  const advancedFilterResetRef = React.useRef(advancedFilter)
-  React.useEffect(() => {
-    if (advancedFilterResetRef.current === advancedFilter) return
-    advancedFilterResetRef.current = advancedFilter
-    if (
-      enableAdvancedFilter &&
-      enablePagination &&
-      !tableOptions.manualPagination
-    ) {
-      table.setPageIndex(0)
-    }
-  }, [
-    advancedFilter,
-    enableAdvancedFilter,
-    enablePagination,
-    tableOptions.manualPagination,
-    table,
-  ])
-
+  // The callbacks below end up on the instance config, which gets live UI
+  // getters attached (see `withLiveUiState`); the compiler cannot keep them
+  // memoized across that, and skips this hook as noted above.
+  /* eslint-disable react-hooks/preserve-manual-memoization */
   // Switching a column's mode resets its value so a stale value (e.g. a
   // numeric range left over from "between") can't break the new mode. Valueless
   // modes (empty/notEmpty) get a truthy sentinel so they stay active. Lives here
@@ -694,6 +676,8 @@ export function useDataTable<TData extends RowData>(
     }
   }, [table, autoSizeColumn])
 
+  /* eslint-enable react-hooks/preserve-manual-memoization */
+
   const config: DataTableConfig<TData> = {
     localization,
     icons,
@@ -721,7 +705,7 @@ export function useDataTable<TData extends RowData>(
     enableGlobalFilter,
     enableGlobalFilterModes,
     enableAdvancedFilter,
-    advancedFilter,
+    advancedFilter: ui.advancedFilter,
     setAdvancedFilter: uiActions.setAdvancedFilter,
     showAdvancedFilterPanel: ui.showAdvancedFilterPanel,
     setShowAdvancedFilterPanel: uiActions.setShowAdvancedFilterPanel,
@@ -818,6 +802,12 @@ export function useDataTable<TData extends RowData>(
     renderCaption,
     renderEmpty,
   }
+
+  // UI state members read the store when accessed, so they are current even
+  // where the component calling this hook has not re-rendered. (The config
+  // holds the DOM ref objects, which are only handed on, not read.)
+  // eslint-disable-next-line react-hooks/refs
+  withLiveUiState(config, reactTable.store)
 
   // The instance is TanStack's mutable object; attaching our config is the
   // contract (`table.tableInstance`).

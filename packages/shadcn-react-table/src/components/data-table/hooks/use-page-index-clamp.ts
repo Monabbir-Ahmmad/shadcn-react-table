@@ -4,6 +4,7 @@ import * as React from "react"
 import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableInstance } from "../core/types"
+import { useTableStateListener } from "./use-table-state"
 
 interface PageIndexClampParams {
   enablePagination: boolean
@@ -28,15 +29,18 @@ export function usePageIndexClamp<TData extends RowData>(
     showSkeletons,
   }: PageIndexClampParams
 ): void {
-  // Runs after every render but is a no-op on the first page, so the row count
-  // (which computes the filtered/sorted row models) is only read when the user
-  // is actually past page 0.
-  React.useEffect(() => {
+  // A no-op on the first page, so the row count (which computes the
+  // filtered/sorted row models) is only read when the user is past page 0.
+  const clamp = () => {
     if (!enablePagination || manualPagination || isLoading || showSkeletons)
       return
     const { pageIndex, pageSize } = table.getState().pagination
     if (pageIndex === 0) return
     const lastPage = Math.max(0, Math.ceil(table.getRowCount() / pageSize) - 1)
     if (pageIndex > lastPage) table.setPageIndex(lastPage)
-  })
+  }
+  // After renders of the component holding the table (new data), and after
+  // state changes (narrower filters), which may not re-render it.
+  React.useEffect(clamp)
+  useTableStateListener(table, clamp)
 }

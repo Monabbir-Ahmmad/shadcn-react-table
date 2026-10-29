@@ -4,6 +4,7 @@ import * as React from "react"
 import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableInstance } from "../core/types"
+import { useTableStateListener } from "./use-table-state"
 
 interface PageResetParams {
   enablePagination: boolean
@@ -11,30 +12,35 @@ interface PageResetParams {
   autoResetPageIndex?: boolean
 }
 
+const filtersKey = <TData extends RowData>(table: DataTableInstance<TData>) => {
+  const { columnFilters, globalFilter, advancedFilter } = table.getState()
+  return JSON.stringify([columnFilters, globalFilter, advancedFilter])
+}
+
 /**
- * Clamps to the first page when the filter set changes (MRT behaviour),
- * replacing TanStack's render-phase auto-reset (which warns in React 19 dev).
- * Runs after mount so there is no state update during render. Skipped under
- * manual pagination (server owns it) and when the consumer opted into the
- * native auto-reset. Guarded by comparing the previous filters key — not by
- * counting effect runs — so StrictMode's double-invoke on mount is a no-op.
+ * Goes back to the first page when the filters change (column filters, global
+ * search or the advanced filter; MRT behaviour), replacing TanStack's
+ * render-phase auto-reset (which warns in React 19 dev). Listens to the table
+ * store, so it works whether or not the component holding the table
+ * re-renders. Skipped under manual pagination (the server owns it) and when
+ * the consumer opted into the native auto-reset.
  */
 export function usePageResetOnFilterChange<TData extends RowData>(
   table: DataTableInstance<TData>,
   { enablePagination, manualPagination, autoResetPageIndex }: PageResetParams
 ): void {
-  const filtersKey = JSON.stringify([
-    table.getState().columnFilters,
-    table.getState().globalFilter,
-  ])
-  const prevFiltersKeyRef = React.useRef<string | undefined>(undefined)
-  React.useEffect(() => {
-    const prevFiltersKey = prevFiltersKeyRef.current
-    prevFiltersKeyRef.current = filtersKey
-    if (prevFiltersKey === undefined || prevFiltersKey === filtersKey) return
+  const prevKeyRef = React.useRef<string | null>(null)
+  useTableStateListener(table, () => {
+    const key = filtersKey(table)
+    const prevKey = prevKeyRef.current
+    prevKeyRef.current = key
+    if (prevKey === null || prevKey === key) return
     if (enablePagination && !manualPagination && autoResetPageIndex == null) {
-      table.setPageIndex(0)
+      if (table.getState().pagination.pageIndex !== 0) table.setPageIndex(0)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtersKey])
+  })
+  // The starting filters, so the first change is compared against them.
+  React.useEffect(() => {
+    if (prevKeyRef.current === null) prevKeyRef.current = filtersKey(table)
+  }, [table])
 }
