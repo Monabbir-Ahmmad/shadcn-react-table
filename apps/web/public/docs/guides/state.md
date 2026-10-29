@@ -64,6 +64,54 @@ const table = useDataTable({
 | `onIsCreatingChange` | `(isCreating: boolean) => void` |  | Called when the new-row editor opens or closes. Control it with `state.isCreating`. |
 | `onRowDraftChange` | `(draft: Record<string, unknown>) => void` |  | Called when the draft of the row being edited or created changes. Control it with `state.rowDraft`. |
 
+Example (`controlled-state`):
+
+```tsx
+function ControlledStateExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const [sorting, setSorting] = React.useState<SortingState>([
+    { id: "salary", desc: true },
+  ])
+  const [density, setDensity] = React.useState<Density>("compact")
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    state: { sorting, density },
+    onSortingChange: setSorting,
+    onDensityChange: setDensity,
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSorting([{ id: "age", desc: false }])}
+        >
+          Sort by age
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            setDensity((d) => (d === "compact" ? "spacious" : "compact"))
+          }
+        >
+          Toggle density
+        </Button>
+        <code className="text-xs text-muted-foreground">
+          {JSON.stringify({ sorting, density })}
+        </code>
+      </div>
+      <DataTable table={table} />
+    </div>
+  )
+}
+```
+
 ## Reading state in your component
 
 `<DataTable>` subscribes to the state it shows. The component that calls `useDataTable` does **not** re-render when the table's state changes, so code there that reads the state during render would show an old value. Tell `useDataTable` what your render reads with `stateSelector`; the component then re-renders when that part changes (compared shallowly):

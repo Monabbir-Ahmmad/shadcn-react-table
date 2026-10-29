@@ -82,6 +82,8 @@ return <DataTable table={table} />
 
 Click one row's checkbox, then shift-click another: every row between them takes the same state — selected, or cleared if the shift-clicked row was selected. Ranges follow the rows as displayed (sorted and filtered). Turn it off with `enableBatchRowSelection: false`.
 
+<Example slug="selection-actions" />
+
 ## Select-all behavior
 
 The selection column header carries a select-all checkbox. `selectAllMode` controls its scope — `"page"` (default) toggles the current page, `"all"` toggles every row across pages. Set `enableSelectAll: false` to hide the header checkbox entirely.

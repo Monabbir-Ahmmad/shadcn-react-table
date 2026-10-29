@@ -19,6 +19,35 @@ const table = useDataTable({
 
 Each part takes either an object of props, or a function that receives the part's context (always including `table`) and returns props.
 
+Example (`slot-props`):
+
+```tsx
+function SlotPropsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    slotProps: {
+      // Dim inactive people and mark pending ones with a left border.
+      bodyRow: ({ row }) => ({
+        className:
+          row.original.status === "inactive"
+            ? "text-muted-foreground"
+            : row.original.status === "pending"
+              ? "border-l-2 border-l-amber-500"
+              : undefined,
+      }),
+      headCell: { className: "text-[11px] uppercase tracking-wide" },
+      surface: { className: "max-h-[480px]" },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## How props combine
 
 Your props are merged with the table's own, so you add to the built-in behavior rather than replacing it:

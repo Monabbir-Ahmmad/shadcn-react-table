@@ -365,9 +365,89 @@ useDataTable({
 })
 ```
 
+Example (`edit-dialog`):
+
+```tsx
+function EditDialogExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    editDisplayMode: "modal",
+    onEditingRowSave: ({ row, values, exit }) => {
+      setData((prev) =>
+        prev.map((user) => (user.id === row.id ? { ...user, ...values } : user))
+      )
+      exit()
+    },
+    // Two columns of fields and our own buttons.
+    renderEditRowDialogContent: ({
+      row,
+      internalEditComponents,
+      save,
+      cancel,
+      hasErrors,
+    }) => (
+      <>
+        <DialogHeader>
+          <DialogTitle>
+            Edit {row.original.firstName} {row.original.lastName}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3">{internalEditComponents}</div>
+        <DialogFooter>
+          <Button variant="ghost" size="sm" onClick={cancel}>
+            Discard
+          </Button>
+          <Button size="sm" onClick={save} disabled={hasErrors}>
+            Save changes
+          </Button>
+        </DialogFooter>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ### Inline create row position
 
 With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below.
+
+Example (`create-row`):
+
+```tsx
+function CreateRowExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 8))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    createDisplayMode: "row",
+    positionCreatingRow: "bottom",
+    createRowDefaults: { role: "Viewer", status: "pending" },
+    onCreatingRowSave: ({ values, exit }) => {
+      setData((prev) => [
+        ...prev,
+        { ...baseUsers[0]!, ...values, id: `U-new-${prev.length}` } as User,
+      ])
+      exit()
+    },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button size="sm" onClick={() => table.beginCreate()}>
+        <RiAddLine />
+        Add person
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Per-column editing config
 
@@ -426,6 +506,37 @@ const table = useDataTable({
 ```
 
 To check a row yourself, call `table.dataTable.getCanEditRow(row)`.
+
+Example (`editing-per-row`):
+
+```tsx
+function EditingPerRowExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: (row) => row.original.status !== "inactive",
+    editDisplayMode: "cell",
+    onEditingCellSave: ({ row, column, value }) =>
+      setData((prev) =>
+        prev.map((user) =>
+          user.id === row.id ? { ...user, [column.id]: value } : user
+        )
+      ),
+    slotProps: {
+      bodyRow: ({ row }) => ({
+        className:
+          row.original.status === "inactive"
+            ? "text-muted-foreground"
+            : undefined,
+      }),
+    },
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Custom editor
 

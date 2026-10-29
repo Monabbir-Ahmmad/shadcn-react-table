@@ -685,6 +685,20 @@ const table = useDataTable({ data, columns, getRowId: (row) => row.id })
 return <DataTable table={table} />
 ```
 
+Example (`datetime-filters`):
+
+```tsx
+function DateTimeFiltersExample() {
+  const table = useDataTable({
+    data: SHIFTS,
+    columns: SHIFT_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Open the filter row by default
 
 ```tsx
@@ -872,6 +886,33 @@ const table = useDataTable({
 ```
 
 The menu labels a custom function with `localization.filterModes[name]`, or the name itself when there is no label. The names are read when the table is created, so define the functions outside your component (or memoize them).
+
+Example (`custom-filter-fns`):
+
+```tsx
+function CustomFilterFnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data,
+    columns: NAME_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: {
+      showColumnFilters: true,
+      pagination: { pageSize: 10 },
+    },
+    // Matches when any word of the cell starts with the typed text.
+    filterFns: {
+      wordStartsWith: (row, columnId, value) =>
+        String(row.getValue(columnId))
+          .toLowerCase()
+          .split(/\s+/)
+          .some((word) => word.startsWith(String(value).toLowerCase())),
+    },
+    localization: { filterModes: { wordStartsWith: "Any word starts with" } },
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Custom mode menu
 
@@ -1397,6 +1438,33 @@ table.autoSizeColumn("firstName")
 table.autoSizeAllColumns()
 ```
 
+Example (`column-autosize`):
+
+```tsx
+function ColumnAutosizeExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableColumnResizing: true,
+    enableColumnAutosize: true,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => table.autoSizeAllColumns()}
+      >
+        Fit all columns
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Column options](/docs/api/column-options)
@@ -1516,6 +1584,44 @@ return <DataTable table={table} />
 ## Selecting a range
 
 Click one row's checkbox, then shift-click another: every row between them takes the same state — selected, or cleared if the shift-clicked row was selected. Ranges follow the rows as displayed (sorted and filtered). Turn it off with `enableBatchRowSelection: false`.
+
+Example (`selection-actions`):
+
+```tsx
+function SelectionActionsExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 20))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <table.Subscribe selector={(state) => state.rowSelection}>
+        {(selection) => {
+          const count = Object.keys(selection).length
+          return (
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={count === 0}
+              onClick={() => {
+                setData((prev) => prev.filter((user) => !selection[user.id]))
+                table.resetRowSelection()
+              }}
+            >
+              <RiDeleteBinLine />
+              Delete {count > 0 ? count : ""}
+            </Button>
+          )
+        }}
+      </table.Subscribe>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Select-all behavior
 
@@ -1821,6 +1927,39 @@ const table = useDataTable({
 })
 ```
 
+Example (`custom-sort-fns`):
+
+```tsx
+function CustomSortFnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () =>
+      userColumns().map((column) =>
+        "accessorKey" in column && column.accessorKey === "role"
+          ? { ...column, sortFn: "byRole" }
+          : column
+      ),
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Sort roles by rank, not alphabetically.
+    sortFns: {
+      byRole: (rowA, rowB, columnId) =>
+        ROLE_ORDER.indexOf(rowA.getValue(columnId)) -
+        ROLE_ORDER.indexOf(rowB.getValue(columnId)),
+    },
+    initialState: {
+      sorting: [{ id: "role", desc: false }],
+      pagination: { pageSize: 10 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Controlled sorting
 
 Pass `state.sorting` and `onSortingChange` to control it yourself — for example to sort on the server (`manualSorting: true`).
@@ -1936,6 +2075,50 @@ const table = useDataTable({
 
 > **Keep totals in view:** Grouping pairs well with a pinned footer. Add `enableStickyFooter: true` so
 >   the grand total stays visible while scrolling long groups.
+
+Example (`custom-aggregation`):
+
+```tsx
+function CustomAggregationExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () => [
+      { accessorKey: "department", header: "Department" },
+      { accessorKey: "firstName", header: "First name" },
+      {
+        accessorKey: "salary",
+        header: "Salary",
+        aggregationFn: "spread",
+        cell: ({ getValue }) => currency.format(getValue() as number),
+        aggregatedCell: ({ getValue }) => (
+          <span className="text-muted-foreground">
+            spread {currency.format(getValue() as number)}
+          </span>
+        ),
+        meta: { align: "right" },
+      },
+    ],
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    // The gap between the highest and lowest salary in each group.
+    aggregationFns: {
+      spread: {
+        aggregate: ({ rows, getValue }) => {
+          const values = rows.map((row) => Number(getValue(row)))
+          return Math.max(...values) - Math.min(...values)
+        },
+      },
+    },
+    initialState: { grouping: ["department"], pagination: { pageSize: 20 } },
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Custom group cells
 
@@ -2464,9 +2647,89 @@ useDataTable({
 })
 ```
 
+Example (`edit-dialog`):
+
+```tsx
+function EditDialogExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    editDisplayMode: "modal",
+    onEditingRowSave: ({ row, values, exit }) => {
+      setData((prev) =>
+        prev.map((user) => (user.id === row.id ? { ...user, ...values } : user))
+      )
+      exit()
+    },
+    // Two columns of fields and our own buttons.
+    renderEditRowDialogContent: ({
+      row,
+      internalEditComponents,
+      save,
+      cancel,
+      hasErrors,
+    }) => (
+      <>
+        <DialogHeader>
+          <DialogTitle>
+            Edit {row.original.firstName} {row.original.lastName}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3">{internalEditComponents}</div>
+        <DialogFooter>
+          <Button variant="ghost" size="sm" onClick={cancel}>
+            Discard
+          </Button>
+          <Button size="sm" onClick={save} disabled={hasErrors}>
+            Save changes
+          </Button>
+        </DialogFooter>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ### Inline create row position
 
 With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below.
+
+Example (`create-row`):
+
+```tsx
+function CreateRowExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 8))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    createDisplayMode: "row",
+    positionCreatingRow: "bottom",
+    createRowDefaults: { role: "Viewer", status: "pending" },
+    onCreatingRowSave: ({ values, exit }) => {
+      setData((prev) => [
+        ...prev,
+        { ...baseUsers[0]!, ...values, id: `U-new-${prev.length}` } as User,
+      ])
+      exit()
+    },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button size="sm" onClick={() => table.beginCreate()}>
+        <RiAddLine />
+        Add person
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Per-column editing config
 
@@ -2525,6 +2788,37 @@ const table = useDataTable({
 ```
 
 To check a row yourself, call `table.dataTable.getCanEditRow(row)`.
+
+Example (`editing-per-row`):
+
+```tsx
+function EditingPerRowExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: (row) => row.original.status !== "inactive",
+    editDisplayMode: "cell",
+    onEditingCellSave: ({ row, column, value }) =>
+      setData((prev) =>
+        prev.map((user) =>
+          user.id === row.id ? { ...user, [column.id]: value } : user
+        )
+      ),
+    slotProps: {
+      bodyRow: ({ row }) => ({
+        className:
+          row.original.status === "inactive"
+            ? "text-muted-foreground"
+            : undefined,
+      }),
+    },
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Custom editor
 
@@ -2667,6 +2961,44 @@ const table = useDataTable({
 })
 ```
 
+Example (`row-actions-menu`):
+
+```tsx
+function RowActionsMenuExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    editDisplayMode: "modal",
+    onEditingRowSave: ({ row, values, exit }) => {
+      setData((prev) =>
+        prev.map((user) => (user.id === row.id ? { ...user, ...values } : user))
+      )
+      exit()
+    },
+    // The built-in Edit item, then our own.
+    renderRowActionMenuItems: ({ row, internalMenuItems }) => (
+      <>
+        {internalMenuItems}
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={() =>
+            setData((prev) => prev.filter((user) => user.id !== row.id))
+          }
+        >
+          <RiDeleteBinLine />
+          Delete
+        </DropdownMenuItem>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Positioning the column
 
 The actions column trails the data columns by default. Set `positionActionsColumn: "first"` to move it to the leading edge.
@@ -2788,6 +3120,41 @@ const table = useDataTable({
     </>
   ),
 })
+```
+
+Example (`column-actions-menu`):
+
+```tsx
+function ColumnActionsMenuExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    renderColumnActionsMenuItems: ({ column, table, internalMenuItems }) => (
+      <>
+        {internalMenuItems}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() =>
+            table.setColumnVisibility(
+              Object.fromEntries(
+                table
+                  .getAllLeafColumns()
+                  .map((c) => [c.id, c.id === column.id || !c.getCanHide()])
+              )
+            )
+          }
+        >
+          Show only this column
+        </DropdownMenuItem>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
 ```
 
 ## Related
@@ -3007,6 +3374,32 @@ const table = useDataTable({
 })
 ```
 
+Example (`body-only`):
+
+```tsx
+function BodyOnlyExample() {
+  const table = useDataTable({
+    data: ACTIVITY,
+    columns: [
+      { accessorKey: "who", header: "Who" },
+      { accessorKey: "what", header: "What" },
+      {
+        accessorKey: "when",
+        header: "When",
+        meta: { align: "right" },
+      },
+    ],
+    getRowId: (row) => row.id,
+    enableTableHead: false,
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+    enableKeyboardNavigation: false,
+    initialState: { density: "compact" },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Internal actions (the icon cluster)
 
 The right-hand cluster holds global search, the filter toggle, column visibility, the density toggle, and the full-screen toggle. Hide individual items, or the whole cluster:
@@ -3131,6 +3524,35 @@ const table = useDataTable({
 
 Each part takes either an object of props, or a function that receives the part's context (always including `table`) and returns props.
 
+Example (`slot-props`):
+
+```tsx
+function SlotPropsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    slotProps: {
+      // Dim inactive people and mark pending ones with a left border.
+      bodyRow: ({ row }) => ({
+        className:
+          row.original.status === "inactive"
+            ? "text-muted-foreground"
+            : row.original.status === "pending"
+              ? "border-l-2 border-l-amber-500"
+              : undefined,
+      }),
+      headCell: { className: "text-[11px] uppercase tracking-wide" },
+      surface: { className: "max-h-[480px]" },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## How props combine
 
 Your props are merged with the table's own, so you add to the built-in behavior rather than replacing it:
@@ -3246,6 +3668,36 @@ useDataTable({
 
 > **Inline is fine:** The table rebuilds these columns only when a plain value changes; functions such as `cell` or `header` are read when they run. You can write the options inline without memoizing them.
 
+Example (`display-columns`):
+
+```tsx
+function DisplayColumnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowNumbers: true,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 10 } },
+    displayColumnDefOptions: {
+      "cn-row-number": {
+        header: "#",
+        size: 56,
+        cell: ({ row }) => (
+          <span className="text-muted-foreground tabular-nums">
+            {row.index + 1}
+          </span>
+        ),
+      },
+      "cn-select": { size: 40 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Row selection](/docs/guides/row-selection)
@@ -3327,6 +3779,35 @@ function People() {
 
 Here the built-in toolbars are turned off and the same controls appear in your own header and footer.
 
+Example (`composition`):
+
+```tsx
+function CompositionExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableTopToolbar: false,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2">
+          <span className="mr-auto text-sm font-medium">Team directory</span>
+          <DataTableGlobalFilter table={table} />
+          <DataTableViewOptions table={table} />
+          <DataTableDensityToggle table={table} />
+        </div>
+        <DataTable table={table} />
+      </div>
+    </DataTableProvider>
+  )
+}
+```
+
 ## The parts
 
 | Part | What it is |
@@ -3378,6 +3859,25 @@ const table = useDataTable({
   columns,
   paginationDisplayMode: "pages",
 })
+```
+
+Example (`pagination-pages`):
+
+```tsx
+function PaginationPagesExample() {
+  const data = React.useMemo(() => makeUsers(120), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    paginationDisplayMode: "pages",
+    positionPagination: "both",
+    pageSizeOptions: [5, 10, 20],
+    initialState: { pagination: { pageSize: 5 } },
+  })
+  return <DataTable table={table} />
+}
 ```
 
 ## Column filter display mode
@@ -3668,6 +4168,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
+Example (`config-provider`):
+
+```tsx
+function ConfigProviderShell() {
+  // App-wide strings and icons for every table below the provider.
+  return (
+    <DataTableConfigProvider
+      localization={{ search: "Find", noRecordsToDisplay: "Nothing here" }}
+      icons={{ search: RiSearch2Line }}
+    >
+      <ConfigProviderExample />
+    </DataTableConfigProvider>
+  )
+}
+```
+
 ## Change single strings
 
 A language is a plain object, so spread it and replace only the keys you want. Define the object outside the component: a new object on every render rebuilds the columns.
@@ -3900,6 +4416,32 @@ const table = useDataTable({
 })
 
 return <DataTable table={table} />
+```
+
+Example (`empty-state`):
+
+```tsx
+function EmptyStateExample() {
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data: [] as User[],
+    columns,
+    getRowId: (row) => row.id,
+    renderEmpty: () => (
+      <div className="flex flex-col items-center gap-2 py-6">
+        <span className="font-medium">No people yet</span>
+        <span className="text-muted-foreground">
+          Invite your team to see them here.
+        </span>
+        <Button size="sm" variant="outline">
+          <RiAddLine />
+          Invite
+        </Button>
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
 ```
 
 ## Reading the state
@@ -4424,6 +4966,25 @@ const table = useDataTable({
 })
 ```
 
+Example (`fixed-row-height`):
+
+```tsx
+function FixedRowHeightExample() {
+  const data = React.useMemo(() => makeUsers(200), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    enableRowVirtualization: true,
+    rowHeight: 36,
+    slotProps: { surface: { className: "max-h-[420px]" } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Precedence
 
 For each row: `getRowHeight(row)` wins unless it returns `null`/`undefined`, then `rowHeight`, then the density default.
@@ -4641,6 +5202,54 @@ const table = useDataTable({
 | `onEditingRowIdChange` | `(rowId: string \| null) => void` |  | Called when row editing starts or ends (`null`). Control it with `state.editingRowId`. |
 | `onIsCreatingChange` | `(isCreating: boolean) => void` |  | Called when the new-row editor opens or closes. Control it with `state.isCreating`. |
 | `onRowDraftChange` | `(draft: Record<string, unknown>) => void` |  | Called when the draft of the row being edited or created changes. Control it with `state.rowDraft`. |
+
+Example (`controlled-state`):
+
+```tsx
+function ControlledStateExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const [sorting, setSorting] = React.useState<SortingState>([
+    { id: "salary", desc: true },
+  ])
+  const [density, setDensity] = React.useState<Density>("compact")
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    state: { sorting, density },
+    onSortingChange: setSorting,
+    onDensityChange: setDensity,
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSorting([{ id: "age", desc: false }])}
+        >
+          Sort by age
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            setDensity((d) => (d === "compact" ? "spacious" : "compact"))
+          }
+        >
+          Toggle density
+        </Button>
+        <code className="text-xs text-muted-foreground">
+          {JSON.stringify({ sorting, density })}
+        </code>
+      </div>
+      <DataTable table={table} />
+    </div>
+  )
+}
+```
 
 ## Reading state in your component
 

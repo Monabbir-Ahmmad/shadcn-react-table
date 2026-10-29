@@ -5,6 +5,7 @@
 //   node apps/web/scripts/build-api-docs.mjs
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
+import process from "node:process"
 import { fileURLToPath } from "node:url"
 import prettier from "prettier"
 import { Project, SyntaxKind } from "ts-morph"

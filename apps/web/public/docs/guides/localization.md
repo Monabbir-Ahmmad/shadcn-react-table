@@ -62,6 +62,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
+Example (`config-provider`):
+
+```tsx
+function ConfigProviderShell() {
+  // App-wide strings and icons for every table below the provider.
+  return (
+    <DataTableConfigProvider
+      localization={{ search: "Find", noRecordsToDisplay: "Nothing here" }}
+      icons={{ search: RiSearch2Line }}
+    >
+      <ConfigProviderExample />
+    </DataTableConfigProvider>
+  )
+}
+```
+
 ## Change single strings
 
 A language is a plain object, so spread it and replace only the keys you want. Define the object outside the component: a new object on every render rebuilds the columns.

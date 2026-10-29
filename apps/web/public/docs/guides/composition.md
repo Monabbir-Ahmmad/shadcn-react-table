@@ -69,6 +69,35 @@ function People() {
 
 Here the built-in toolbars are turned off and the same controls appear in your own header and footer.
 
+Example (`composition`):
+
+```tsx
+function CompositionExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableTopToolbar: false,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2">
+          <span className="mr-auto text-sm font-medium">Team directory</span>
+          <DataTableGlobalFilter table={table} />
+          <DataTableViewOptions table={table} />
+          <DataTableDensityToggle table={table} />
+        </div>
+        <DataTable table={table} />
+      </div>
+    </DataTableProvider>
+  )
+}
+```
+
 ## The parts
 
 | Part | What it is |

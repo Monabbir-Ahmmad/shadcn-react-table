@@ -18,6 +18,25 @@ const table = useDataTable({
 })
 ```
 
+Example (`pagination-pages`):
+
+```tsx
+function PaginationPagesExample() {
+  const data = React.useMemo(() => makeUsers(120), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    paginationDisplayMode: "pages",
+    positionPagination: "both",
+    pageSizeOptions: [5, 10, 20],
+    initialState: { pagination: { pageSize: 5 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Column filter display mode
 
 `columnFilterDisplayMode` controls where per-column filter inputs live:

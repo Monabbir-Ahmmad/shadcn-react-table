@@ -109,6 +109,44 @@ return <DataTable table={table} />
 
 Click one row's checkbox, then shift-click another: every row between them takes the same state — selected, or cleared if the shift-clicked row was selected. Ranges follow the rows as displayed (sorted and filtered). Turn it off with `enableBatchRowSelection: false`.
 
+Example (`selection-actions`):
+
+```tsx
+function SelectionActionsExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 20))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <table.Subscribe selector={(state) => state.rowSelection}>
+        {(selection) => {
+          const count = Object.keys(selection).length
+          return (
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={count === 0}
+              onClick={() => {
+                setData((prev) => prev.filter((user) => !selection[user.id]))
+                table.resetRowSelection()
+              }}
+            >
+              <RiDeleteBinLine />
+              Delete {count > 0 ? count : ""}
+            </Button>
+          )
+        }}
+      </table.Subscribe>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Select-all behavior
 
 The selection column header carries a select-all checkbox. `selectAllMode` controls its scope — `"page"` (default) toggles the current page, `"all"` toggles every row across pages. Set `enableSelectAll: false` to hide the header checkbox entirely.

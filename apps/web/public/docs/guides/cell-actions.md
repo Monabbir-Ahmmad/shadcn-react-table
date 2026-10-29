@@ -101,6 +101,41 @@ const table = useDataTable({
 })
 ```
 
+Example (`column-actions-menu`):
+
+```tsx
+function ColumnActionsMenuExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    renderColumnActionsMenuItems: ({ column, table, internalMenuItems }) => (
+      <>
+        {internalMenuItems}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() =>
+            table.setColumnVisibility(
+              Object.fromEntries(
+                table
+                  .getAllLeafColumns()
+                  .map((c) => [c.id, c.id === column.id || !c.getCanHide()])
+              )
+            )
+          }
+        >
+          Show only this column
+        </DropdownMenuItem>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Row actions](/docs/guides/row-actions)

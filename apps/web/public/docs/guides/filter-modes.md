@@ -125,6 +125,33 @@ const table = useDataTable({
 
 The menu labels a custom function with `localization.filterModes[name]`, or the name itself when there is no label. The names are read when the table is created, so define the functions outside your component (or memoize them).
 
+Example (`custom-filter-fns`):
+
+```tsx
+function CustomFilterFnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data,
+    columns: NAME_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: {
+      showColumnFilters: true,
+      pagination: { pageSize: 10 },
+    },
+    // Matches when any word of the cell starts with the typed text.
+    filterFns: {
+      wordStartsWith: (row, columnId, value) =>
+        String(row.getValue(columnId))
+          .toLowerCase()
+          .split(/\s+/)
+          .some((word) => word.startsWith(String(value).toLowerCase())),
+    },
+    localization: { filterModes: { wordStartsWith: "Any word starts with" } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Custom mode menu
 
 Replace the built-in radio items with your own using `renderColumnFilterModeMenuItems`. You get the allowed `modes`, the `currentMode`, and an `onSelect(mode)` to switch.

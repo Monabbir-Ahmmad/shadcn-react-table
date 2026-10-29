@@ -70,6 +70,25 @@ const table = useDataTable({
 })
 ```
 
+Example (`fixed-row-height`):
+
+```tsx
+function FixedRowHeightExample() {
+  const data = React.useMemo(() => makeUsers(200), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    enableRowVirtualization: true,
+    rowHeight: 36,
+    slotProps: { surface: { className: "max-h-[420px]" } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Precedence
 
 For each row: `getRowHeight(row)` wins unless it returns `null`/`undefined`, then `rowHeight`, then the density default.

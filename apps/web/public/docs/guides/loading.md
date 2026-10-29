@@ -55,6 +55,32 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+Example (`empty-state`):
+
+```tsx
+function EmptyStateExample() {
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data: [] as User[],
+    columns,
+    getRowId: (row) => row.id,
+    renderEmpty: () => (
+      <div className="flex flex-col items-center gap-2 py-6">
+        <span className="font-medium">No people yet</span>
+        <span className="text-muted-foreground">
+          Invite your team to see them here.
+        </span>
+        <Button size="sm" variant="outline">
+          <RiAddLine />
+          Invite
+        </Button>
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Reading the state
 
 You can read the current value back from the table instance:

@@ -90,6 +90,39 @@ const table = useDataTable({
 })
 ```
 
+Example (`custom-sort-fns`):
+
+```tsx
+function CustomSortFnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () =>
+      userColumns().map((column) =>
+        "accessorKey" in column && column.accessorKey === "role"
+          ? { ...column, sortFn: "byRole" }
+          : column
+      ),
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Sort roles by rank, not alphabetically.
+    sortFns: {
+      byRole: (rowA, rowB, columnId) =>
+        ROLE_ORDER.indexOf(rowA.getValue(columnId)) -
+        ROLE_ORDER.indexOf(rowB.getValue(columnId)),
+    },
+    initialState: {
+      sorting: [{ id: "role", desc: false }],
+      pagination: { pageSize: 10 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Controlled sorting
 
 Pass `state.sorting` and `onSortingChange` to control it yourself — for example to sort on the server (`manualSorting: true`).

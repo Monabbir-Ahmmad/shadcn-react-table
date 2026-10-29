@@ -14,6 +14,32 @@ const table = useDataTable({
 })
 ```
 
+Example (`body-only`):
+
+```tsx
+function BodyOnlyExample() {
+  const table = useDataTable({
+    data: ACTIVITY,
+    columns: [
+      { accessorKey: "who", header: "Who" },
+      { accessorKey: "what", header: "What" },
+      {
+        accessorKey: "when",
+        header: "When",
+        meta: { align: "right" },
+      },
+    ],
+    getRowId: (row) => row.id,
+    enableTableHead: false,
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+    enableKeyboardNavigation: false,
+    initialState: { density: "compact" },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Internal actions (the icon cluster)
 
 The right-hand cluster holds global search, the filter toggle, column visibility, the density toggle, and the full-screen toggle. Hide individual items, or the whole cluster:

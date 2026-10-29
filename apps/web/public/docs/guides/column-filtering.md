@@ -60,6 +60,20 @@ const table = useDataTable({ data, columns, getRowId: (row) => row.id })
 return <DataTable table={table} />
 ```
 
+Example (`datetime-filters`):
+
+```tsx
+function DateTimeFiltersExample() {
+  const table = useDataTable({
+    data: SHIFTS,
+    columns: SHIFT_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Open the filter row by default
 
 ```tsx

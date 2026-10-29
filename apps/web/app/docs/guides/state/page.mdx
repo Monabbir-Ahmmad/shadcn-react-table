@@ -69,6 +69,8 @@ const table = useDataTable({
   ]}
 />
 
+<Example slug="controlled-state" />
+
 ## Reading state in your component
 
 `<DataTable>` subscribes to the state it shows. The component that calls `useDataTable` does **not** re-render when the table's state changes, so code there that reads the state during render would show an old value. Tell `useDataTable` what your render reads with `stateSelector`; the component then re-renders when that part changes (compared shallowly):

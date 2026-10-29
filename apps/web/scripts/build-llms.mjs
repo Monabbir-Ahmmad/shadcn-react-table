@@ -32,7 +32,7 @@ const { EXAMPLE_SOURCE } = loadGenerated("lib/example-source.generated.ts")
 function readNav() {
   const source = readFileSync(join(WEB, "lib/docs-nav.ts"), "utf8")
   const groups = []
-  for (const block of source.split(/\n  \{\n    title: /).slice(1)) {
+  for (const block of source.split(/\n {2}\{\n {4}title: /).slice(1)) {
     const title = /^"([^"]+)"/.exec(block)[1]
     const items = [
       ...block.matchAll(/title:\s*"([^"]+)",\s*href:\s*"([^"]+)"/g),

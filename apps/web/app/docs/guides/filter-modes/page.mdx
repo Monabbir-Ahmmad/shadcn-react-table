@@ -112,6 +112,8 @@ const table = useDataTable({
 
 The menu labels a custom function with `localization.filterModes[name]`, or the name itself when there is no label. The names are read when the table is created, so define the functions outside your component (or memoize them).
 
+<Example slug="custom-filter-fns" />
+
 ## Custom mode menu
 
 Replace the built-in radio items with your own using `renderColumnFilterModeMenuItems`. You get the allowed `modes`, the `currentMode`, and an `onSelect(mode)` to switch.

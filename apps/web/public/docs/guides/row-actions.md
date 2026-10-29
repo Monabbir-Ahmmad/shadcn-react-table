@@ -83,6 +83,44 @@ const table = useDataTable({
 })
 ```
 
+Example (`row-actions-menu`):
+
+```tsx
+function RowActionsMenuExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    editDisplayMode: "modal",
+    onEditingRowSave: ({ row, values, exit }) => {
+      setData((prev) =>
+        prev.map((user) => (user.id === row.id ? { ...user, ...values } : user))
+      )
+      exit()
+    },
+    // The built-in Edit item, then our own.
+    renderRowActionMenuItems: ({ row, internalMenuItems }) => (
+      <>
+        {internalMenuItems}
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={() =>
+            setData((prev) => prev.filter((user) => user.id !== row.id))
+          }
+        >
+          <RiDeleteBinLine />
+          Delete
+        </DropdownMenuItem>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Positioning the column
 
 The actions column trails the data columns by default. Set `positionActionsColumn: "first"` to move it to the leading edge.

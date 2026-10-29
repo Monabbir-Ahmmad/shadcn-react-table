@@ -135,9 +135,13 @@ useDataTable({
 })
 ```
 
+<Example slug="edit-dialog" />
+
 ### Inline create row position
 
 With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below.
+
+<Example slug="create-row" />
 
 ## Per-column editing config
 
@@ -196,6 +200,8 @@ const table = useDataTable({
 ```
 
 To check a row yourself, call `table.dataTable.getCanEditRow(row)`.
+
+<Example slug="editing-per-row" />
 
 ## Custom editor
 

@@ -78,6 +78,33 @@ table.autoSizeColumn("firstName")
 table.autoSizeAllColumns()
 ```
 
+Example (`column-autosize`):
+
+```tsx
+function ColumnAutosizeExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableColumnResizing: true,
+    enableColumnAutosize: true,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => table.autoSizeAllColumns()}
+      >
+        Fit all columns
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Column options](/docs/api/column-options)

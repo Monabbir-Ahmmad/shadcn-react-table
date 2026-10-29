@@ -42,6 +42,36 @@ useDataTable({
 
 > **Inline is fine:** The table rebuilds these columns only when a plain value changes; functions such as `cell` or `header` are read when they run. You can write the options inline without memoizing them.
 
+Example (`display-columns`):
+
+```tsx
+function DisplayColumnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowNumbers: true,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 10 } },
+    displayColumnDefOptions: {
+      "cn-row-number": {
+        header: "#",
+        size: 56,
+        cell: ({ row }) => (
+          <span className="text-muted-foreground tabular-nums">
+            {row.index + 1}
+          </span>
+        ),
+      },
+      "cn-select": { size: 40 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Row selection](/docs/guides/row-selection)

@@ -90,6 +90,50 @@ const table = useDataTable({
 > **Keep totals in view:** Grouping pairs well with a pinned footer. Add `enableStickyFooter: true` so
 >   the grand total stays visible while scrolling long groups.
 
+Example (`custom-aggregation`):
+
+```tsx
+function CustomAggregationExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () => [
+      { accessorKey: "department", header: "Department" },
+      { accessorKey: "firstName", header: "First name" },
+      {
+        accessorKey: "salary",
+        header: "Salary",
+        aggregationFn: "spread",
+        cell: ({ getValue }) => currency.format(getValue() as number),
+        aggregatedCell: ({ getValue }) => (
+          <span className="text-muted-foreground">
+            spread {currency.format(getValue() as number)}
+          </span>
+        ),
+        meta: { align: "right" },
+      },
+    ],
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    // The gap between the highest and lowest salary in each group.
+    aggregationFns: {
+      spread: {
+        aggregate: ({ rows, getValue }) => {
+          const values = rows.map((row) => Number(getValue(row)))
+          return Math.max(...values) - Math.min(...values)
+        },
+      },
+    },
+    initialState: { grouping: ["department"], pagination: { pageSize: 20 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Custom group cells
 
 For finer control over how grouped rows render, the column `meta` exposes render hooks that receive the full table instance: `renderGroupedCell` (the group-header cell), `renderAggregatedCell` (overrides `aggregatedCell`), and `renderPlaceholderCell` (cells with no value because another column owns the group; empty by default).

@@ -74,6 +74,8 @@ const table = useDataTable({
   the grand total stays visible while scrolling long groups.
 </Callout>
 
+<Example slug="custom-aggregation" />
+
 ## Custom group cells
 
 For finer control over how grouped rows render, the column `meta` exposes render hooks that receive the full table instance: `renderGroupedCell` (the group-header cell), `renderAggregatedCell` (overrides `aggregatedCell`), and `renderPlaceholderCell` (cells with no value because another column owns the group; empty by default).
