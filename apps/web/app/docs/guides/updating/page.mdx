@@ -50,14 +50,6 @@ pnpm dlx shadcn@latest add --overwrite <registry-url>/r/data-table-locale-de.jso
 Do this after re-adding the table, and re-apply any edits you made to a locale
 file.
 
-## Re-renders after the state rework
-
-The component that calls `useDataTable` no longer re-renders when the table's
-state changes. If it reads the state while rendering (a selection count, the
-current density), add `stateSelector` for what it reads, or wrap that part in
-`table.Subscribe`. See
-[State management](/docs/guides/state#reading-state-in-your-component).
-
 ## Upgrading to 0.5.0 (TanStack Table v9)
 
 0.5.0 moves the engine to TanStack Table v9. Re-add the block, then:
@@ -115,6 +107,11 @@ current density), add `stateSelector` for what it reads, or wrap that part in
     `Plugins` / `Table_FeatureMap` / `TableState_FeatureMap` interfaces, scoped
     to tables built with the block's feature set. Other TanStack tables in
     your app are unaffected, except ones typed `Table<any, …>`.
+12. **The component holding the table no longer re-renders on table state
+    changes.** If it reads the state while rendering (a selection count, the
+    current density), add `stateSelector` for what it reads, or wrap that part
+    in `table.Subscribe`. See
+    [State management](/docs/guides/state#reading-state-in-your-component).
 
 ## Related
 

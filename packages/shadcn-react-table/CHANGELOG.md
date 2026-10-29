@@ -4,8 +4,56 @@ The version applies to the registry block: `/r/data-table.json` carries it
 in `meta.version`. After installing, record the version you received —
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
 
-## Unreleased
+## 0.5.0
 
+- **Breaking — TanStack Table v9:** the engine now runs on
+  `@tanstack/react-table` v9 (native `useTable` with every built-in feature,
+  row model, and sort/filter/aggregation function registered, so behaviour
+  matches 0.4.x). Re-add the block to pick up the new dependencies. See the
+  [upgrade guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
+- **New `DataTableColumnDef<TData>` type** (plus `DataTableRow`,
+  `DataTableColumn`, `DataTableCell`, `DataTableHeader`, `DataTableState`,
+  `DataTableColumnPinningState`, `DataTableFeatures`). Type your columns with
+  `DataTableColumnDef` instead of TanStack's `ColumnDef`, which now needs a
+  feature-set parameter.
+- **Unchanged API:** column pinning in `initialState` / `state` /
+  `onColumnPinningChange` and in `table.getState()` keeps `left` / `right`, and
+  the value returned by `table.getState()` keeps its `columnSizingInfo` name
+  (the `columnSizingInfo` options below are renamed). The table instance keeps a
+  stable identity across renders, and render contexts
+  (`cell: ({ table }) => …`, likewise `header`, `footer`, `aggregatedCell`)
+  still receive the enriched instance and are typed as such, so
+  `table.getState()` and `table.tableInstance` type-check and work as before.
+- **Removed options:** `getCoreRowModel` and the other `get*RowModel` options;
+  the table wires every row model itself.
+- **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
+  `column.getIsPinned()` returns `"start" | "end"`, and
+  `getPrePaginationRowModel()` is now `getPrePaginatedRowModel()` and
+  `getPaginationRowModel()` is now `getPaginatedRowModel()`. `getLeft*` /
+  `getRight*` are `getStart*` / `getEnd*` (leaf columns, visible cells, header
+  groups, total size), and `column.getStart("left")` / `column.getAfter("right")`
+  take `"start"` / `"end"`. Custom aggregation functions use
+  `constructAggregationFn({ aggregate })`.
+- **Renamed options reach you too:** the column option `sortingFn` is now
+  `sortFn`, and `state.columnSizingInfo`, `initialState.columnSizingInfo` and
+  `onColumnSizingInfoChange` are now `columnResizing` and
+  `onColumnResizingChange`.
+- **Removed options:** `filterFns`, `sortingFns` and `aggregationFns`. Pass
+  custom functions inline on the column (`filterFn`, `sortFn`,
+  `aggregationFn`); built-in string names still work. Type inline filter
+  functions with the exported `DataTableFilterFn<TData>`.
+- **Row type must satisfy `RowData`:** TanStack v9 requires
+  `Record<string, any> | Array<any>`, so `unknown` is no longer accepted.
+  `DataTableInstance<unknown>` and `useDataTable<unknown>` need a concrete row
+  type; `DataTableInstance` with no type argument now defaults to `RowData`.
+- **`table.options`** is now the options object the table was created with on
+  each render (TanStack v9's React adapter behaviour), not TanStack's
+  internally merged options with feature defaults.
+- **Type registration:** the block's types register a small TanStack feature
+  (`dataTableInstanceFeature`) through TanStack's `Plugins` /
+  `Table_FeatureMap` interfaces, scoped to tables built with the block's
+  feature set. Other TanStack tables in your app are unaffected, except ones
+  typed `Table<any, …>`.
 - **Changed (breaking):** the component that calls `useDataTable` no longer
   re-renders when the table's state changes; `<DataTable>` subscribes to what
   it shows. Code that reads the state during that component's render (a
@@ -141,57 +189,6 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   All/Any picker where its grammar needs it. `advancedFiltersMatchLabel` and
   `advancedFiltersOf` are deprecated and unused; a custom localization that
   spreads `defaultLocalization` (or a locale) keeps compiling.
-
-## 0.5.0
-
-- **Breaking — TanStack Table v9:** the engine now runs on
-  `@tanstack/react-table` v9 (native `useTable` with every built-in feature,
-  row model, and sort/filter/aggregation function registered, so behaviour
-  matches 0.4.x). Re-add the block to pick up the new dependencies. See the
-  [upgrade guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
-- **New `DataTableColumnDef<TData>` type** (plus `DataTableRow`,
-  `DataTableColumn`, `DataTableCell`, `DataTableHeader`, `DataTableState`,
-  `DataTableColumnPinningState`, `DataTableFeatures`). Type your columns with
-  `DataTableColumnDef` instead of TanStack's `ColumnDef`, which now needs a
-  feature-set parameter.
-- **Unchanged API:** column pinning in `initialState` / `state` /
-  `onColumnPinningChange` and in `table.getState()` keeps `left` / `right`, and
-  the value returned by `table.getState()` keeps its `columnSizingInfo` name
-  (the `columnSizingInfo` options below are renamed). The table instance keeps a
-  stable identity across renders, and render contexts
-  (`cell: ({ table }) => …`, likewise `header`, `footer`, `aggregatedCell`)
-  still receive the enriched instance and are typed as such, so
-  `table.getState()` and `table.tableInstance` type-check and work as before.
-- **Removed options:** `getCoreRowModel` and the other `get*RowModel` options;
-  the table wires every row model itself.
-- **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
-  `column.getIsPinned()` returns `"start" | "end"`, and
-  `getPrePaginationRowModel()` is now `getPrePaginatedRowModel()` and
-  `getPaginationRowModel()` is now `getPaginatedRowModel()`. `getLeft*` /
-  `getRight*` are `getStart*` / `getEnd*` (leaf columns, visible cells, header
-  groups, total size), and `column.getStart("left")` / `column.getAfter("right")`
-  take `"start"` / `"end"`. Custom aggregation functions use
-  `constructAggregationFn({ aggregate })`.
-- **Renamed options reach you too:** the column option `sortingFn` is now
-  `sortFn`, and `state.columnSizingInfo`, `initialState.columnSizingInfo` and
-  `onColumnSizingInfoChange` are now `columnResizing` and
-  `onColumnResizingChange`.
-- **Removed options:** `filterFns`, `sortingFns` and `aggregationFns`. Pass
-  custom functions inline on the column (`filterFn`, `sortFn`,
-  `aggregationFn`); built-in string names still work. Type inline filter
-  functions with the exported `DataTableFilterFn<TData>`.
-- **Row type must satisfy `RowData`:** TanStack v9 requires
-  `Record<string, any> | Array<any>`, so `unknown` is no longer accepted.
-  `DataTableInstance<unknown>` and `useDataTable<unknown>` need a concrete row
-  type; `DataTableInstance` with no type argument now defaults to `RowData`.
-- **`table.options`** is now the options object the table was created with on
-  each render (TanStack v9's React adapter behaviour), not TanStack's
-  internally merged options with feature defaults.
-- **Type registration:** the block's types register a small TanStack feature
-  (`dataTableInstanceFeature`) through TanStack's `Plugins` /
-  `Table_FeatureMap` interfaces, scoped to tables built with the block's
-  feature set. Other TanStack tables in your app are unaffected, except ones
-  typed `Table<any, …>`.
 
 ## 0.4.2
 
