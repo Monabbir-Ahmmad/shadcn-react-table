@@ -6,6 +6,7 @@ import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
 import { stopPropagation } from "../helpers/stop-propagation"
+import { dt } from "../core/internal"
 
 export const EXPAND_COLUMN_ID = "cn-expand"
 
@@ -24,7 +25,7 @@ export function createExpandColumn<TData extends RowData>(
     minSize: 44,
     meta: { enableColumnActions: false },
     header: ({ table }) =>
-      table.getCanSomeRowsExpand() ? (
+      dt(table as never).enableExpandAll && table.getCanSomeRowsExpand() ? (
         <button
           type="button"
           aria-label={localization.expandAll}

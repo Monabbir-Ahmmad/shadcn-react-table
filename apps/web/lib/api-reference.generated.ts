@@ -420,6 +420,30 @@ export const useDataTableOptions: ApiMember[] = [
       "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
   },
   {
+    name: "enableTableHead",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Render the header rows. Default true; `false` shows the body only.",
+  },
+  {
+    name: "enableTableFooter",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Render the footer rows when columns define a `footer`. Default true.",
+  },
+  {
+    name: "enableExpandAll",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Show the expand-all toggle in the expand column's header. Default true.",
+  },
+  {
     name: "renderDetailPanel",
     type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
@@ -1072,6 +1096,14 @@ export const columnOptions: ApiMember[] = [
       "`false` opts this column out of match highlighting (the table option of the same name turns it on or off for every column).",
   },
   {
+    name: "visibleInShowHideMenu",
+    type: "boolean",
+    required: false,
+    default: null,
+    description:
+      "`false` leaves this column out of the show / hide columns menu.",
+  },
+  {
     name: "enableColumnActions",
     type: "boolean",
     required: false,
@@ -1325,6 +1357,28 @@ export const dataTableOptions: ApiMember[] = [
     default: null,
     description:
       "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
+  },
+  {
+    name: "enableTableHead",
+    type: "boolean",
+    required: true,
+    default: null,
+    description: "Whether the header rows render.",
+  },
+  {
+    name: "enableTableFooter",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether the footer rows render (when columns define footers).",
+  },
+  {
+    name: "enableExpandAll",
+    type: "boolean",
+    required: true,
+    default: null,
+    description: "Whether the expand column's header toggles every row.",
   },
   {
     name: "renderDetailPanel",

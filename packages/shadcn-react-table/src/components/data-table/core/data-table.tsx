@@ -124,6 +124,8 @@ export function DataTable<TData extends RowData>({
     positionToolbarDropZone,
     enableTopToolbar,
     enableKeyboardNavigation,
+    enableTableHead,
+    enableTableFooter,
     direction,
     setDirection,
     enableColumnVirtualization,
@@ -229,7 +231,7 @@ export function DataTable<TData extends RowData>({
       table.getCenterRows().length +
       table.getBottomRows().length >
     0
-  const showFooter = hasFooter(table)
+  const showFooter = enableTableFooter && hasFooter(table)
 
   // Grid semantics (keyboard navigation makes the table a grid): the full row
   // and column counts, since virtualization and pinning render a subset.
@@ -411,11 +413,13 @@ export function DataTable<TData extends RowData>({
               {renderCaption && (
                 <TableCaption>{renderCaption({ table })}</TableCaption>
               )}
-              <HeaderRegion
-                table={table}
-                config={dt(table)}
-                withHeaderSpacers={withHeaderSpacers}
-              />
+              {enableTableHead && (
+                <HeaderRegion
+                  table={table}
+                  config={dt(table)}
+                  withHeaderSpacers={withHeaderSpacers}
+                />
+              )}
               <GridSyncContext.Provider value={scheduleSync}>
                 <MemoizedDataTableBody
                   table={table}

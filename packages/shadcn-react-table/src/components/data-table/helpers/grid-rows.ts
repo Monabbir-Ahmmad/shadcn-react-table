@@ -22,6 +22,7 @@ export function isFilterRowVisible<TData extends RowData>(
 export function getHeaderRowCount<TData extends RowData>(
   table: DataTableInstance<TData>
 ): number {
+  if (!dt(table).enableTableHead) return 0
   return table.getHeaderGroups().length + (isFilterRowVisible(table) ? 1 : 0)
 }
 

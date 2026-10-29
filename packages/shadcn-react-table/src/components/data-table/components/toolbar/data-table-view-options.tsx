@@ -34,7 +34,11 @@ export function DataTableViewOptions<TData extends RowData>({
   const { localization, icons } = dt(table)
   const hideableColumns = table
     .getAllColumns()
-    .filter((column) => column.getCanHide())
+    .filter(
+      (column) =>
+        column.getCanHide() &&
+        column.columnDef.meta?.visibleInShowHideMenu !== false
+    )
 
   if (hideableColumns.length === 0) return null
 

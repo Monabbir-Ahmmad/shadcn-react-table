@@ -241,6 +241,8 @@ declare module "@tanstack/react-table" {
     /** `false` opts this column out of match highlighting (the table option of
      *  the same name turns it on or off for every column). */
     enableFilterMatchHighlighting?: boolean
+    /** `false` leaves this column out of the show / hide columns menu. */
+    visibleInShowHideMenu?: boolean
     /** `false` hides the column-actions menu for this column. */
     enableColumnActions?: boolean
     /** Human-readable label for menus when the header is not a plain string. */
@@ -588,6 +590,12 @@ export interface DataTableConfig<TData extends RowData> {
   enableGrouping: boolean
   enableExpanding: boolean
   enableStickyFooter: boolean
+  /** Whether the header rows render. */
+  enableTableHead: boolean
+  /** Whether the footer rows render (when columns define footers). */
+  enableTableFooter: boolean
+  /** Whether the expand column's header toggles every row. */
+  enableExpandAll: boolean
   renderDetailPanel?: (props: {
     row: DataTableRow<TData>
     table: DataTableInstance<TData>
@@ -960,6 +968,12 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Pin the footer (aggregation/footer cells) to the bottom of the surface.
    *  Default false. */
   enableStickyFooter?: boolean
+  /** Render the header rows. Default true; `false` shows the body only. */
+  enableTableHead?: boolean
+  /** Render the footer rows when columns define a `footer`. Default true. */
+  enableTableFooter?: boolean
+  /** Show the expand-all toggle in the expand column's header. Default true. */
+  enableExpandAll?: boolean
   /** Render an expanding detail panel for each row. */
   renderDetailPanel?: (props: {
     row: DataTableRow<TData>
