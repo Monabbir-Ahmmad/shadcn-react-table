@@ -11,8 +11,7 @@ import { DocsMobileNav } from "@/components/docs/mobile-nav"
 import { DocsSearch } from "@/components/docs/search"
 import { useIconLibrary } from "@/components/icon-library-provider"
 import { ThemeCustomizer } from "@/components/theme-customizer"
-
-const GITHUB_URL = "https://github.com/Monabbir-Ahmmad/shadcn-react-table"
+import { GITHUB_URL, VERSION } from "@/lib/site"
 
 /**
  * The shared top bar for the docs site: brand, primary nav (with active
@@ -22,16 +21,20 @@ export function SiteHeader() {
   const pathname = usePathname()
   const { iconLibrary, setIconLibrary } = useIconLibrary()
 
+  const inGuides = pathname?.startsWith("/docs/guides") ?? false
+  const inApi = pathname?.startsWith("/docs/api") ?? false
   const links = [
     {
       href: "/docs",
       label: "Docs",
-      active: pathname?.startsWith("/docs") ?? true,
+      active: (pathname?.startsWith("/docs") ?? false) && !inGuides && !inApi,
     },
+    { href: "/docs/guides", label: "Guides", active: inGuides },
+    { href: "/docs/api/use-data-table", label: "API", active: inApi },
   ]
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b bg-background/80 px-4 py-3 backdrop-blur md:px-6">
+    <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b bg-background/70 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 md:px-6">
       <div className="flex items-center gap-3 md:gap-6">
         <div className="md:hidden">
           <DocsMobileNav />
@@ -39,6 +42,9 @@ export function SiteHeader() {
         <Link href="/" className="text-base font-semibold tracking-tight">
           Shadcn React Table
         </Link>
+        <span className="rounded-full border bg-card px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+          v{VERSION}
+        </span>
         <nav className="hidden items-center gap-4 text-sm md:flex">
           {links.map((link) => (
             <Link

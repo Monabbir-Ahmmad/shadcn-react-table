@@ -1,12 +1,12 @@
 import type { CSSProperties } from "react"
 import Link from "next/link"
-import { RiArrowRightLine, RiGithubFill } from "@remixicon/react"
+import { RiArrowRightLine } from "@remixicon/react"
 
 import { Button } from "@workspace/ui/components/button"
 
+import { CopyInstall } from "@/components/home/copy-install"
 import { DemoShowcase } from "@/components/home/demo-showcase"
-
-const GITHUB_URL = "https://github.com/Monabbir-Ahmmad/shadcn-react-table"
+import { WindowFrame } from "@/components/home/window-frame"
 
 const META = ["MRT V3 parity", "TanStack Table v9", "shadcn registry"]
 
@@ -36,10 +36,13 @@ export function Hero() {
 
       <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-2 border bg-card px-3 py-1 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
+          <Link
+            href="/docs/guides/updating"
+            className="inline-flex items-center gap-2 border bg-card px-3 py-1 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase transition-colors hover:border-primary/50 hover:text-foreground"
+          >
             <span className="size-1.5 bg-primary" />
-            Material React Table parity for shadcn/ui
-          </span>
+            New in 1.0 · TanStack Table v9, slotProps, row dragging
+          </Link>
 
           <h1 className="mt-6 font-heading text-4xl leading-[1.05] font-semibold tracking-tight text-balance md:text-6xl">
             Every data-table feature, in your shadcn style
@@ -58,12 +61,7 @@ export function Hero() {
                 <RiArrowRightLine data-icon="inline-end" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <a href={GITHUB_URL} target="_blank" rel="noreferrer">
-                <RiGithubFill data-icon="inline-start" />
-                GitHub
-              </a>
-            </Button>
+            <CopyInstall />
           </div>
 
           <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium tracking-wide text-muted-foreground">
@@ -76,7 +74,9 @@ export function Hero() {
           </ul>
         </div>
 
-        <DemoShowcase className="mx-auto mt-14 max-w-5xl md:mt-16" />
+        <WindowFrame className="mx-auto mt-14 max-w-5xl md:mt-16">
+          <DemoShowcase />
+        </WindowFrame>
       </div>
     </section>
   )

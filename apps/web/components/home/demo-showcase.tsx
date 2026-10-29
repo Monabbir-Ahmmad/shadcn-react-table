@@ -24,7 +24,7 @@ export function DemoShowcase({ className }: { className?: string }) {
   const Component = example?.Component
 
   return (
-    <div className={cn("overflow-hidden border bg-card shadow-sm", className)}>
+    <div className={cn("overflow-hidden", className)}>
       <div className="flex items-center justify-between gap-2 border-b bg-muted/40 px-2 sm:px-3">
         <div
           role="tablist"

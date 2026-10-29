@@ -3,7 +3,10 @@ import type { Metadata } from "next"
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/home/hero"
 import { FeatureGrid } from "@/components/home/feature-grid"
-import { WhySection } from "@/components/home/why-section"
+import { TechStrip } from "@/components/home/tech-strip"
+import { StatsBand } from "@/components/home/stats-band"
+import { ExampleCategories } from "@/components/home/example-categories"
+import { ClosingBanner } from "@/components/home/closing-banner"
 import { InstallSection } from "@/components/home/install-section"
 import { SiteFooter } from "@/components/home/site-footer"
 
@@ -19,9 +22,12 @@ export default function HomePage() {
       <SiteHeader />
       <main className="flex-1">
         <Hero />
+        <TechStrip />
+        <StatsBand />
         <FeatureGrid />
-        <WhySection />
+        <ExampleCategories />
         <InstallSection />
+        <ClosingBanner />
       </main>
       <SiteFooter />
     </div>
