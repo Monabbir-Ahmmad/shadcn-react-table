@@ -23,5 +23,9 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "scripts/smoke-fixture"]
+  "exclude": [
+    "node_modules",
+    "scripts/smoke-fixture",
+    "scripts/style-frame-template.tsx"
+  ]
 }
