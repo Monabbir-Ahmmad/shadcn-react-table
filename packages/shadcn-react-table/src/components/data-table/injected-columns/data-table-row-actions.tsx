@@ -58,6 +58,7 @@ function RowActionsCell<TData extends RowData>({
     localization,
     icons,
     enableEditing,
+    getCanEditRow,
     editDisplayMode,
     editingRowId,
     rowDraft,
@@ -107,7 +108,9 @@ function RowActionsCell<TData extends RowData>({
   }
 
   const canInlineEdit =
-    enableEditing && (editDisplayMode === "row" || editDisplayMode === "modal")
+    enableEditing &&
+    getCanEditRow(row) &&
+    (editDisplayMode === "row" || editDisplayMode === "modal")
 
   return (
     <div

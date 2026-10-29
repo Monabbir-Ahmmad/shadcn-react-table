@@ -60,6 +60,7 @@ import type {
   DataTableInstance,
   UseDataTableOptions,
 } from "./types"
+import type { DataTableRow } from "./table-types"
 
 type CoreTableState = Partial<TableState<DataTableFeatures>>
 type CoreStoreState = TableState<DataTableFeatures>
@@ -157,7 +158,7 @@ export function useDataTable<TData extends RowData>(
     enableExpanding: enableExpandingProp,
     enableStickyFooter = false,
     renderDetailPanel,
-    enableEditing = false,
+    enableEditing: enableEditingProp = false,
     editDisplayMode = "cell",
     createDisplayMode = "modal",
     createRowDefaults,
@@ -198,6 +199,13 @@ export function useDataTable<TData extends RowData>(
     columns,
     ...tableOptions
   } = options
+
+  // A per-row function turns editing on; it then decides row by row.
+  const enableEditing = enableEditingProp !== false
+  const getCanEditRow = (row: DataTableRow<TData>) =>
+    typeof enableEditingProp === "function"
+      ? enableEditingProp(row)
+      : enableEditingProp
 
   // Infinite scroll implies a single growing page: hide the pager and drop the
   // pagination row model so every appended row renders.
@@ -774,6 +782,7 @@ export function useDataTable<TData extends RowData>(
     enableStickyFooter,
     renderDetailPanel,
     enableEditing,
+    getCanEditRow,
     editDisplayMode,
     createDisplayMode,
     editingCell: ui.editingCell,

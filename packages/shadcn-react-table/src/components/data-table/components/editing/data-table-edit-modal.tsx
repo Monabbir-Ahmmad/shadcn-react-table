@@ -68,7 +68,7 @@ export function DataTableEditModal<TData extends RowData>({
 
   const editableColumns = table
     .getAllLeafColumns()
-    .filter((column) => isColumnEditable(column))
+    .filter((column) => isColumnEditable(column, editingRow ?? undefined))
 
   const hasErrors = editableColumns.some((column) => {
     const value =

@@ -34,6 +34,9 @@ for every rename.
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **New:** `enableEditing` (table option and column `meta`) takes a
+  `(row) => boolean` function to allow editing row by row;
+  `table.dataTable.getCanEditRow(row)` reads the table-level answer.
 - **New custom functions:** `filterFns`, `sortFns` and `aggregationFns`
   options register your own functions by name. Columns use them with
   `filterFn` / `sortFn` / `aggregationFn: "name"`; custom filter functions can

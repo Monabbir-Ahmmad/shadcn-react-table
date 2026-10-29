@@ -404,10 +404,11 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "enableEditing",
-    type: "boolean",
+    type: "boolean | ((row: DataTableRow<TData>) => boolean)",
     required: false,
     default: "false",
-    description: "Enable inline editing.",
+    description:
+      "Enable inline editing, or decide per row with a function (rows it returns false for can't be edited; creating rows is still allowed).",
   },
   {
     name: "editDisplayMode",
@@ -913,11 +914,11 @@ export const columnOptions: ApiMember[] = [
   },
   {
     name: "enableEditing",
-    type: "boolean",
+    type: "boolean | ((row: DataTableRow<TData>) => boolean)",
     required: false,
     default: null,
     description:
-      "Allow editing this column (defaults to true when table editing is on).",
+      "Allow editing this column (defaults to true when table editing is on), or decide per row with a function.",
   },
   {
     name: "editVariant",
@@ -1263,7 +1264,16 @@ export const dataTableOptions: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "Enable inline editing.",
+    description:
+      "Whether editing is on (a per-row `enableEditing` function counts).",
+  },
+  {
+    name: "getCanEditRow",
+    type: "(row: DataTableRow<TData>) => boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether a row can be edited: the `enableEditing` function's answer, or `enableEditing` itself.",
   },
   {
     name: "editDisplayMode",

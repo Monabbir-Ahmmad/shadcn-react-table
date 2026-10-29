@@ -36,7 +36,7 @@ export function DataTableBodyCellContent<TData extends RowData>({
 }) {
   const cn = dt(table)
   const { row, column } = cell
-  const editable = cn.enableEditing && isColumnEditable(column)
+  const editable = cn.getCanEditRow(row) && isColumnEditable(column, row)
   const mode = cn.editDisplayMode
 
   const isCellEditing =

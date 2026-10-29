@@ -189,8 +189,9 @@ declare module "@tanstack/react-table" {
      *  of modes (built-in ones and custom `filterFns` names). Include the
      *  column's default mode. */
     columnFilterModeOptions?: FilterMode[]
-    /** Allow editing this column (defaults to true when table editing is on). */
-    enableEditing?: boolean
+    /** Allow editing this column (defaults to true when table editing is on),
+     *  or decide per row with a function. */
+    enableEditing?: boolean | ((row: DataTableRow<TData>) => boolean)
     /** Inline editor variant. Defaults to "text". */
     editVariant?: EditVariant
     /** Options for the "select" edit variant. */
@@ -546,7 +547,11 @@ export interface DataTableConfig<TData extends RowData> {
   }) => React.ReactNode
 
   // Editing / actions
+  /** Whether editing is on (a per-row `enableEditing` function counts). */
   enableEditing: boolean
+  /** Whether a row can be edited: the `enableEditing` function's answer, or
+   *  `enableEditing` itself. */
+  getCanEditRow: (row: DataTableRow<TData>) => boolean
   editDisplayMode: EditDisplayMode
   createDisplayMode: CreateDisplayMode
   /** The cell being edited in cell mode (`{ rowId, columnId }`), or `null`. */
@@ -874,8 +879,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   }) => React.ReactNode
 
   // Editing / actions
-  /** Enable inline editing. */
-  enableEditing?: boolean
+  /** Enable inline editing, or decide per row with a function (rows it
+   *  returns false for can't be edited; creating rows is still allowed). */
+  enableEditing?: boolean | ((row: DataTableRow<TData>) => boolean)
   /** How edits are surfaced. Default "cell". */
   editDisplayMode?: EditDisplayMode
   /** How the create form is surfaced, independent of `editDisplayMode`:

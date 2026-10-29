@@ -111,7 +111,7 @@ Configure editors on each column's `meta`:
 - `editVariant: "text" | "number" | "select"` — the input type.
 - `editSelectOptions` — options for the `"select"` variant.
 - `validate: (value) => string | undefined` — return a message to block the save.
-- `enableEditing: false` — lock a single column.
+- `enableEditing: false` — lock a single column, or `(row) => boolean` to lock it on some rows.
 
 ```tsx
 const columns = [
@@ -139,6 +139,28 @@ const columns = [
   },
 ]
 ```
+
+## Editing some rows only
+
+Pass a function as `enableEditing` to decide row by row. Rows it returns `false` for show no click-to-edit cells and no edit button; creating new rows still works. The same works per column with `meta.enableEditing`.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns: [
+    { accessorKey: "name", header: "Name" },
+    {
+      accessorKey: "salary",
+      header: "Salary",
+      // Only managers' salaries are editable.
+      meta: { enableEditing: (row) => row.original.role === "manager" },
+    },
+  ],
+  enableEditing: (row) => !row.original.archived,
+})
+```
+
+To check a row yourself, call `table.dataTable.getCanEditRow(row)`.
 
 ## Custom editor
 
