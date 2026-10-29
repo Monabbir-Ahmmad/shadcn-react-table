@@ -30,9 +30,28 @@ import {
 } from "../../utils/column-styles"
 import { DataTableCreateRow } from "../editing/data-table-create-row"
 import { DataTableBodyRow } from "./dnd"
+import { MemoRow } from "./memo-row"
 import { renderBodyCell } from "./render-body-cell"
 import { SkeletonRows } from "./skeleton-rows"
 import type { DataTableCell, DataTableRow } from "../../core/table-types"
+
+// Table-instance members scoped to single rows (handled by `rowDeps`), event
+// handlers (read through a ref), and the refs object (new every render).
+const ROW_SCOPED_KEYS = new Set([
+  "editingCell",
+  "editingRowId",
+  "rowDraft",
+  "isCreating",
+  "onRowClick",
+  "onRowDoubleClick",
+  "onCellClick",
+  "onCellDoubleClick",
+  "refs",
+])
+
+// State scoped to single rows (selection) or not rendered by rows at all
+// (the in-progress resize, during which the body is frozen anyway).
+const ROW_SCOPED_STATE = new Set(["rowSelection", "columnSizingInfo"])
 
 interface DataTableBodyProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -79,6 +98,46 @@ export function DataTableBody<TData extends RowData>({
   } = table.tableInstance
   const isGrid = enableKeyboardNavigation
   const headerRowCount = getHeaderRowCount(table)
+
+  // Event handlers read the latest options, so a row that skipped re-rendering
+  // still calls the consumer's current (often inline) callback.
+  const latest = React.useRef(table.tableInstance)
+  React.useLayoutEffect(() => {
+    latest.current = table.tableInstance
+  })
+
+  // What every row reads: table options and state, except the parts scoped to
+  // single rows (selection, editing) and the click handlers read through
+  // `latest`. A change here re-renders every row (see MemoRow).
+  const tableDeps = [
+    ...Object.entries(table.tableInstance)
+      .filter(([key]) => !ROW_SCOPED_KEYS.has(key))
+      .map(([, value]) => value),
+    ...Object.entries(table.getState())
+      .filter(([key]) => !ROW_SCOPED_STATE.has(key))
+      .map(([, value]) => value),
+    !!onRowClick,
+    !!onRowDoubleClick,
+    !!onCellClick,
+    !!onCellDoubleClick,
+    table.options.data,
+    table.options.columns,
+    headerRowCount,
+    virtualColumns.map((vc) => vc.index).join(),
+  ]
+  const { editingCell, editingRowId, rowDraft } = table.tableInstance
+  /** What only this row reads. */
+  const rowDeps = (row: DataTableRow<TData>, rowIndex: number) => [
+    row,
+    rowIndex,
+    row.getIsSelected(),
+    row.getIsSomeSelected(),
+    row.getIsAllSubRowsSelected(),
+    row.getIsExpanded(),
+    row.getIsPinned(),
+    editingCell?.rowId === row.id ? editingCell.columnId : null,
+    editingRowId === row.id ? rowDraft : null,
+  ]
 
   const padding = DENSITY_CELL_PADDING[density]
   const visibleColumnCount = table.getVisibleLeafColumns().length
@@ -145,12 +204,14 @@ export function DataTableBody<TData extends RowData>({
         }}
         onClick={
           onCellClick
-            ? (event) => onCellClick({ cell, row, table, event })
+            ? (event) =>
+                latest.current.onCellClick?.({ cell, row, table, event })
             : undefined
         }
         onDoubleClick={
           onCellDoubleClick
-            ? (event) => onCellDoubleClick({ cell, row, table, event })
+            ? (event) =>
+                latest.current.onCellDoubleClick?.({ cell, row, table, event })
             : undefined
         }
         className={cn(
@@ -234,12 +295,21 @@ export function DataTableBody<TData extends RowData>({
         }
       : {}
 
-  const renderRow = (row: DataTableRow<TData>, rowIndex: number) => {
+  const renderRow = (row: DataTableRow<TData>, rowIndex: number) => (
+    <MemoRow
+      key={row.id}
+      rowDeps={rowDeps(row, rowIndex)}
+      tableDeps={tableDeps}
+      render={() => renderRowContent(row, rowIndex)}
+    />
+  )
+
+  const renderRowContent = (row: DataTableRow<TData>, rowIndex: number) => {
     const isGrouped = row.getIsGrouped()
     const showDetail = !!renderDetailPanel && row.getIsExpanded() && !isGrouped
 
     return (
-      <React.Fragment key={row.id}>
+      <React.Fragment>
         <DataTableBodyRow
           {...gridRowProps(row, rowIndex)}
           row={row}
@@ -251,12 +321,13 @@ export function DataTableBody<TData extends RowData>({
           }
           onClick={
             onRowClick
-              ? (event) => onRowClick({ row, table, event })
+              ? (event) => latest.current.onRowClick?.({ row, table, event })
               : undefined
           }
           onDoubleClick={
             onRowDoubleClick
-              ? (event) => onRowDoubleClick({ row, table, event })
+              ? (event) =>
+                  latest.current.onRowDoubleClick?.({ row, table, event })
               : undefined
           }
         >
@@ -322,40 +393,50 @@ export function DataTableBody<TData extends RowData>({
                       </TableRow>
                     )
                   }
+                  const rowIndex =
+                    centerOffset + (centerIndexById.get(item.row.id) ?? 0)
                   return (
-                    <TableRow
+                    <MemoRow
                       key={item.row.id}
-                      {...gridRowProps(
-                        item.row,
-                        centerOffset + (centerIndexById.get(item.row.id) ?? 0)
+                      rowDeps={[...rowDeps(item.row, rowIndex), vRow.index]}
+                      tableDeps={tableDeps}
+                      render={() => (
+                        <TableRow
+                          {...gridRowProps(item.row, rowIndex)}
+                          data-index={vRow.index}
+                          ref={rowVirtualizer.measureElement}
+                          data-state={
+                            item.row.getIsSelected() ? "selected" : undefined
+                          }
+                          onClick={
+                            onRowClick
+                              ? (event) =>
+                                  latest.current.onRowClick?.({
+                                    row: item.row,
+                                    table,
+                                    event,
+                                  })
+                              : undefined
+                          }
+                          onDoubleClick={
+                            onRowDoubleClick
+                              ? (event) =>
+                                  latest.current.onRowDoubleClick?.({
+                                    row: item.row,
+                                    table,
+                                    event,
+                                  })
+                              : undefined
+                          }
+                          className={cn(
+                            BODY_ROW_CLASS,
+                            (onRowClick || onRowDoubleClick) && "cursor-pointer"
+                          )}
+                        >
+                          {renderCells(item.row, rowIndex)}
+                        </TableRow>
                       )}
-                      data-index={vRow.index}
-                      ref={rowVirtualizer.measureElement}
-                      data-state={
-                        item.row.getIsSelected() ? "selected" : undefined
-                      }
-                      onClick={
-                        onRowClick
-                          ? (event) =>
-                              onRowClick({ row: item.row, table, event })
-                          : undefined
-                      }
-                      onDoubleClick={
-                        onRowDoubleClick
-                          ? (event) =>
-                              onRowDoubleClick({ row: item.row, table, event })
-                          : undefined
-                      }
-                      className={cn(
-                        BODY_ROW_CLASS,
-                        (onRowClick || onRowDoubleClick) && "cursor-pointer"
-                      )}
-                    >
-                      {renderCells(
-                        item.row,
-                        centerOffset + (centerIndexById.get(item.row.id) ?? 0)
-                      )}
-                    </TableRow>
+                    />
                   )
                 })}
                 {padBottom > 0 && (
