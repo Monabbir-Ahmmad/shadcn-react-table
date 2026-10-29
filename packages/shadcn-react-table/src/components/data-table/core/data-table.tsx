@@ -21,7 +21,10 @@ import { DataTableDropToGroupZone } from "../components/toolbar/data-table-group
 import { DataTablePagination } from "../components/toolbar/data-table-pagination"
 import { DataTableToolbar } from "../components/toolbar/data-table-toolbar"
 import { EDITING_STATE, region } from "../components/region"
-import { useGridNavigation } from "../hooks/use-grid-navigation"
+import {
+  GridSyncContext,
+  useGridNavigation,
+} from "../hooks/use-grid-navigation"
 import { useDragAnnouncements } from "../hooks/use-drag-announcements"
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll"
 import { useTableDnd } from "../hooks/use-table-dnd"
@@ -49,6 +52,15 @@ const BottomToolbarRegion = region(DataTableBottomToolbar)
 const DropToGroupZoneRegion = region(DataTableDropToGroupZone)
 const HeaderRegion = region(DataTableHeader, EDITING_STATE)
 const FooterRegion = region(DataTableFooter)
+
+// State that rows (and the editors) subscribe to themselves: the table
+// around them does not re-render for it.
+const ROW_STATE = new Set([
+  "rowSelection",
+  "rowDraft",
+  "editingCell",
+  "editingRowId",
+])
 
 const MemoizedDataTableBody = React.memo(
   DataTableBody,
@@ -150,7 +162,11 @@ export function DataTable<TData extends RowData>({
   const gridRef = React.useRef<HTMLDivElement>(null)
   // The table re-renders itself on state changes; the component holding the
   // table does not (see `useDataTable`'s `stateSelector`).
-  useTableState(table, (state) => state)
+  useTableState(table, (state) =>
+    Object.fromEntries(
+      Object.entries(state).filter(([key]) => !ROW_STATE.has(key))
+    )
+  )
 
   // Read the direction the table actually renders in (`dir` on it or any
   // ancestor), for the behaviour CSS cannot mirror: resizing, arrow keys and
@@ -175,28 +191,29 @@ export function DataTable<TData extends RowData>({
   // Keyboard navigation works on display indexes (top, center, bottom rows;
   // visible leaf columns), which it maps back to the virtualizers' indexes to
   // scroll a cell that is not rendered into view.
-  const { onKeyDown, onFocus, onBlur } = useGridNavigation<HTMLDivElement>({
-    enabled: enableKeyboardNavigation,
-    rtl: direction === "rtl",
-    ref: gridRef,
-    rowCount: () =>
-      table.getTopRows().length +
-      table.getCenterRows().length +
-      table.getBottomRows().length,
-    colCount: () => table.getVisibleLeafColumns().length,
-    scrollToCell: ({ row, col }) => {
-      if (enableRowVirtualization) {
-        const center = table.getCenterRows()[row - table.getTopRows().length]
-        const index = center
-          ? virtualItems.findIndex(
-              (item) => !item.detail && item.row.id === center.id
-            )
-          : -1
-        if (index >= 0) rowVirtualizer.scrollToIndex(index)
-      }
-      if (enableColumnVirtualization) columnVirtualizer.scrollToIndex(col)
-    },
-  })
+  const { onKeyDown, onFocus, onBlur, scheduleSync } =
+    useGridNavigation<HTMLDivElement>({
+      enabled: enableKeyboardNavigation,
+      rtl: direction === "rtl",
+      ref: gridRef,
+      rowCount: () =>
+        table.getTopRows().length +
+        table.getCenterRows().length +
+        table.getBottomRows().length,
+      colCount: () => table.getVisibleLeafColumns().length,
+      scrollToCell: ({ row, col }) => {
+        if (enableRowVirtualization) {
+          const center = table.getCenterRows()[row - table.getTopRows().length]
+          const index = center
+            ? virtualItems.findIndex(
+                (item) => !item.detail && item.row.id === center.id
+              )
+            : -1
+          if (index >= 0) rowVirtualizer.scrollToIndex(index)
+        }
+        if (enableColumnVirtualization) columnVirtualizer.scrollToIndex(col)
+      },
+    })
 
   // Infinite scroll: observe a bottom sentinel against the scroll surface and
   // ask the consumer to append the next chunk when it nears the viewport.
@@ -404,13 +421,15 @@ export function DataTable<TData extends RowData>({
                 config={table.tableInstance}
                 withHeaderSpacers={withHeaderSpacers}
               />
-              <MemoizedDataTableBody
-                table={table}
-                rowVirtualizer={rowVirtualizer}
-                virtualItems={virtualItems}
-                virtualColumns={virtualColumns}
-                withColumnSpacers={withColumnSpacers}
-              />
+              <GridSyncContext.Provider value={scheduleSync}>
+                <MemoizedDataTableBody
+                  table={table}
+                  rowVirtualizer={rowVirtualizer}
+                  virtualItems={virtualItems}
+                  virtualColumns={virtualColumns}
+                  withColumnSpacers={withColumnSpacers}
+                />
+              </GridSyncContext.Provider>
               {showFooter && (
                 <FooterRegion
                   table={table}

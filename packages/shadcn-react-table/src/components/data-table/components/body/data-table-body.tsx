@@ -31,6 +31,8 @@ import {
 import { DataTableCreateRow } from "../editing/data-table-create-row"
 import { DataTableBodyRow } from "./dnd"
 import { MemoRow } from "./memo-row"
+import { RowStateHubContext, useRowStateHub } from "./row-state-hub"
+import { getUiState } from "../../core/ui-state"
 import { renderBodyCell } from "./render-body-cell"
 import { SkeletonRows } from "./skeleton-rows"
 import type { DataTableCell, DataTableRow } from "../../core/table-types"
@@ -104,6 +106,11 @@ export function DataTableBody<TData extends RowData>({
     enableRowSelection,
   } = table.tableInstance
   const isGrid = enableKeyboardNavigation
+  const rowStateHub = useRowStateHub(table.store, () => {
+    const { rowSelection, rowDraft, editingCell, editingRowId } =
+      table.getState()
+    return [rowSelection, rowDraft, editingCell, editingRowId]
+  })
   const headerRowCount = getHeaderRowCount(table)
 
   // Event handlers read the latest options, so a row that skipped re-rendering
@@ -132,19 +139,21 @@ export function DataTableBody<TData extends RowData>({
     headerRowCount,
     virtualColumns.map((vc) => vc.index).join(),
   ]
-  const { editingCell, editingRowId, rowDraft } = table.tableInstance
   /** What only this row reads. */
-  const rowDeps = (row: DataTableRow<TData>, rowIndex: number) => [
-    row,
-    rowIndex,
-    row.getIsSelected(),
-    row.getIsSomeSelected(),
-    row.getIsAllSubRowsSelected(),
-    row.getIsExpanded(),
-    row.getIsPinned(),
-    editingCell?.rowId === row.id ? editingCell.columnId : null,
-    editingRowId === row.id ? rowDraft : null,
-  ]
+  // The state rows subscribe to themselves (the body does not re-render for
+  // it): selection and inline editing. Read live, since it runs on store
+  // changes; kept cheap, since it runs for every row on each change.
+  const rowState = (row: DataTableRow<TData>) => {
+    const { editingCell, editingRowId, rowDraft } = getUiState(table)
+    const hasSubRows = row.subRows.length > 0
+    return [
+      row.getIsSelected(),
+      hasSubRows && row.getIsSomeSelected(),
+      hasSubRows && row.getIsAllSubRowsSelected(),
+      editingCell?.rowId === row.id ? editingCell.columnId : null,
+      editingRowId === row.id ? rowDraft : null,
+    ]
+  }
 
   const padding = DENSITY_CELL_PADDING[density]
   const visibleColumnCount = table.getVisibleLeafColumns().length
@@ -305,7 +314,9 @@ export function DataTableBody<TData extends RowData>({
   const renderRow = (row: DataTableRow<TData>, rowIndex: number) => (
     <MemoRow
       key={row.id}
-      rowDeps={rowDeps(row, rowIndex)}
+      stateKey={`${row.id}@${rowIndex}`}
+      rowKey={[row, rowIndex]}
+      selectRowState={() => rowState(row)}
       tableDeps={tableDeps}
       render={() => renderRowContent(row, rowIndex)}
     />
@@ -346,140 +357,147 @@ export function DataTableBody<TData extends RowData>({
   }
 
   return (
-    <TableBody>
-      {table.tableInstance.enableEditing &&
-        table.tableInstance.isCreating &&
-        table.tableInstance.createDisplayMode === "row" && (
-          <DataTableCreateRow table={table} />
-        )}
-      {showSkeletons && !hasRows ? (
-        <SkeletonRows
-          rowCount={enablePagination ? table.getState().pagination.pageSize : 8}
-          columnCount={visibleColumnCount}
-          padding={padding}
-        />
-      ) : hasRows && enableRowVirtualization ? (
-        <>
-          {topRows.map((row, i) => renderRow(row, i))}
-          {(() => {
-            const vRows = rowVirtualizer.getVirtualItems()
-            const padTop = vRows.length ? (vRows[0]?.start ?? 0) : 0
-            const padBottom = vRows.length
-              ? rowVirtualizer.getTotalSize() -
-                (vRows[vRows.length - 1]?.end ?? 0)
-              : 0
-            return (
-              <>
-                {padTop > 0 && (
-                  <tr aria-hidden>
-                    <td
-                      colSpan={visibleColumnCount}
-                      style={{ height: padTop, padding: 0, border: 0 }}
-                    />
-                  </tr>
-                )}
-                {vRows.map((vRow) => {
-                  const item = virtualItems[vRow.index]
-                  if (!item) return null
-                  if (item.detail) {
-                    return (
-                      <TableRow
-                        key={`${item.row.id}-detail`}
-                        data-index={vRow.index}
-                        ref={rowVirtualizer.measureElement}
-                        className="hover:bg-transparent"
-                      >
-                        <TableCell
-                          colSpan={visibleColumnCount}
-                          className="bg-muted/20 p-0"
-                        >
-                          <div className="p-3">
-                            {renderDetailPanel?.({ row: item.row, table })}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  }
-                  const rowIndex =
-                    centerOffset + (centerIndexById.get(item.row.id) ?? 0)
-                  return (
-                    <MemoRow
-                      key={item.row.id}
-                      rowDeps={[...rowDeps(item.row, rowIndex), vRow.index]}
-                      tableDeps={tableDeps}
-                      render={() => (
+    <RowStateHubContext.Provider value={rowStateHub}>
+      <TableBody>
+        {table.tableInstance.enableEditing &&
+          table.tableInstance.isCreating &&
+          table.tableInstance.createDisplayMode === "row" && (
+            <DataTableCreateRow table={table} />
+          )}
+        {showSkeletons && !hasRows ? (
+          <SkeletonRows
+            rowCount={
+              enablePagination ? table.getState().pagination.pageSize : 8
+            }
+            columnCount={visibleColumnCount}
+            padding={padding}
+          />
+        ) : hasRows && enableRowVirtualization ? (
+          <>
+            {topRows.map((row, i) => renderRow(row, i))}
+            {(() => {
+              const vRows = rowVirtualizer.getVirtualItems()
+              const padTop = vRows.length ? (vRows[0]?.start ?? 0) : 0
+              const padBottom = vRows.length
+                ? rowVirtualizer.getTotalSize() -
+                  (vRows[vRows.length - 1]?.end ?? 0)
+                : 0
+              return (
+                <>
+                  {padTop > 0 && (
+                    <tr aria-hidden>
+                      <td
+                        colSpan={visibleColumnCount}
+                        style={{ height: padTop, padding: 0, border: 0 }}
+                      />
+                    </tr>
+                  )}
+                  {vRows.map((vRow) => {
+                    const item = virtualItems[vRow.index]
+                    if (!item) return null
+                    if (item.detail) {
+                      return (
                         <TableRow
-                          {...gridRowProps(item.row, rowIndex)}
+                          key={`${item.row.id}-detail`}
                           data-index={vRow.index}
                           ref={rowVirtualizer.measureElement}
-                          data-state={
-                            item.row.getIsSelected() ? "selected" : undefined
-                          }
-                          onClick={
-                            onRowClick
-                              ? (event) =>
-                                  latest.current.onRowClick?.({
-                                    row: item.row,
-                                    table,
-                                    event,
-                                  })
-                              : undefined
-                          }
-                          onDoubleClick={
-                            onRowDoubleClick
-                              ? (event) =>
-                                  latest.current.onRowDoubleClick?.({
-                                    row: item.row,
-                                    table,
-                                    event,
-                                  })
-                              : undefined
-                          }
-                          className={cn(
-                            BODY_ROW_CLASS,
-                            (onRowClick || onRowDoubleClick) && "cursor-pointer"
-                          )}
+                          className="hover:bg-transparent"
                         >
-                          {renderCells(item.row, rowIndex)}
+                          <TableCell
+                            colSpan={visibleColumnCount}
+                            className="bg-muted/20 p-0"
+                          >
+                            <div className="p-3">
+                              {renderDetailPanel?.({ row: item.row, table })}
+                            </div>
+                          </TableCell>
                         </TableRow>
-                      )}
-                    />
-                  )
-                })}
-                {padBottom > 0 && (
-                  <tr aria-hidden>
-                    <td
-                      colSpan={visibleColumnCount}
-                      style={{ height: padBottom, padding: 0, border: 0 }}
-                    />
-                  </tr>
-                )}
-              </>
-            )
-          })()}
-          {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
-        </>
-      ) : hasRows ? (
-        <>
-          {topRows.map((row, i) => renderRow(row, i))}
-          <SortableContext
-            items={centerRowIds}
-            strategy={verticalListSortingStrategy}
-          >
-            {centerRows.map((row, i) => renderRow(row, centerOffset + i))}
-          </SortableContext>
-          {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
-        </>
-      ) : (
-        <TableRow className="hover:bg-transparent">
-          <TableCell
-            colSpan={visibleColumnCount}
-            className="h-32 text-center text-sm text-muted-foreground"
-          >
-            {renderEmpty?.({ table }) ?? localization.noRecordsToDisplay}
-          </TableCell>
-        </TableRow>
-      )}
-    </TableBody>
+                      )
+                    }
+                    const rowIndex =
+                      centerOffset + (centerIndexById.get(item.row.id) ?? 0)
+                    return (
+                      <MemoRow
+                        key={item.row.id}
+                        stateKey={`${item.row.id}@${rowIndex}`}
+                        rowKey={[item.row, rowIndex, vRow.index]}
+                        selectRowState={() => rowState(item.row)}
+                        tableDeps={tableDeps}
+                        render={() => (
+                          <TableRow
+                            {...gridRowProps(item.row, rowIndex)}
+                            data-index={vRow.index}
+                            ref={rowVirtualizer.measureElement}
+                            data-state={
+                              item.row.getIsSelected() ? "selected" : undefined
+                            }
+                            onClick={
+                              onRowClick
+                                ? (event) =>
+                                    latest.current.onRowClick?.({
+                                      row: item.row,
+                                      table,
+                                      event,
+                                    })
+                                : undefined
+                            }
+                            onDoubleClick={
+                              onRowDoubleClick
+                                ? (event) =>
+                                    latest.current.onRowDoubleClick?.({
+                                      row: item.row,
+                                      table,
+                                      event,
+                                    })
+                                : undefined
+                            }
+                            className={cn(
+                              BODY_ROW_CLASS,
+                              (onRowClick || onRowDoubleClick) &&
+                                "cursor-pointer"
+                            )}
+                          >
+                            {renderCells(item.row, rowIndex)}
+                          </TableRow>
+                        )}
+                      />
+                    )
+                  })}
+                  {padBottom > 0 && (
+                    <tr aria-hidden>
+                      <td
+                        colSpan={visibleColumnCount}
+                        style={{ height: padBottom, padding: 0, border: 0 }}
+                      />
+                    </tr>
+                  )}
+                </>
+              )
+            })()}
+            {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
+          </>
+        ) : hasRows ? (
+          <>
+            {topRows.map((row, i) => renderRow(row, i))}
+            <SortableContext
+              items={centerRowIds}
+              strategy={verticalListSortingStrategy}
+            >
+              {centerRows.map((row, i) => renderRow(row, centerOffset + i))}
+            </SortableContext>
+            {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
+          </>
+        ) : (
+          <TableRow className="hover:bg-transparent">
+            <TableCell
+              colSpan={visibleColumnCount}
+              className="h-32 text-center text-sm text-muted-foreground"
+            >
+              {renderEmpty?.({ table }) ?? localization.noRecordsToDisplay}
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </RowStateHubContext.Provider>
   )
 }

@@ -6,6 +6,7 @@ import { Button } from "@workspace/ui/components/button"
 import { TableCell, TableRow } from "@workspace/ui/components/table"
 
 import type { DataTableInstance } from "../../core/types"
+import { useTableState } from "../../hooks/use-table-state"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
@@ -23,6 +24,8 @@ export function DataTableCreateRow<TData extends RowData>({
 }) {
   const { enableEditing, rowDraft, onCreateRow, cancelEdit, localization } =
     table.tableInstance
+  // The body does not re-render for the edit draft.
+  useTableState(table, (state) => state.rowDraft)
 
   const leafColumns = table.getVisibleLeafColumns()
   const editableColumns = leafColumns.filter(

@@ -14,6 +14,7 @@ import {
 import { Label } from "@workspace/ui/components/label"
 
 import type { DataTableInstance } from "../../core/types"
+import { useTableState } from "../../hooks/use-table-state"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
@@ -40,6 +41,12 @@ export function DataTableEditModal<TData extends RowData>({
     onSaveRow,
     onCreateRow,
   } = table.tableInstance
+  // The table around this dialog does not re-render for the edit draft.
+  useTableState(table, (state) => [
+    state.rowDraft,
+    state.editingRowId,
+    state.isCreating,
+  ])
 
   // `table.getRow` throws when the id is gone (row deleted / refetched while
   // the dialog is open); look it up without throwing and bail out below.

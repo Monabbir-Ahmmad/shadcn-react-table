@@ -17,6 +17,10 @@ const NAV_KEYS = new Set([
 const FOCUSABLE =
   'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
+/** Asks the grid to restore focus and its tab stop after a row rendered on
+ *  its own (provided by DataTable). */
+export const GridSyncContext = React.createContext<(() => void) | null>(null)
+
 const EDITABLE = new Set(["INPUT", "TEXTAREA", "SELECT"])
 
 /** Frames to wait for a scrolled-to cell to render before giving up. */
@@ -70,7 +74,10 @@ export function useGridNavigation<T extends HTMLElement>({
 
   // After every render, exactly one rendered cell is the tab stop: the active
   // cell when it is rendered, otherwise the first rendered cell.
-  React.useLayoutEffect(() => {
+  // After a render of the grid or of a row: restore focus that fell to the
+  // page, and keep exactly one rendered cell as the tab stop. Rows render on
+  // their own (see MemoRow), so they ask for this through `scheduleSync`.
+  const sync = () => {
     const root = ref.current
     if (!enabled || !root) return
     // The focused element unmounted and focus fell to the page: an inline
@@ -99,6 +106,23 @@ export function useGridNavigation<T extends HTMLElement>({
     if (cells.length === 0) return
     const stop = findCell(root, activeCellRef.current) ?? cells[0]!
     for (const cell of cells) cell.tabIndex = cell === stop ? 0 : -1
+  }
+  React.useLayoutEffect(sync)
+
+  // One sync per commit, however many rows rendered in it; microtasks run
+  // before the browser paints.
+  const syncRef = React.useRef(sync)
+  const pendingSyncRef = React.useRef(false)
+  React.useLayoutEffect(() => {
+    syncRef.current = sync
+  })
+  const [scheduleSync] = React.useState(() => () => {
+    if (pendingSyncRef.current) return
+    pendingSyncRef.current = true
+    queueMicrotask(() => {
+      pendingSyncRef.current = false
+      syncRef.current()
+    })
   })
 
   React.useEffect(
@@ -262,5 +286,5 @@ export function useGridNavigation<T extends HTMLElement>({
     }
   }
 
-  return { onKeyDown, onFocus, onBlur, activeCellRef }
+  return { onKeyDown, onFocus, onBlur, activeCellRef, scheduleSync }
 }
