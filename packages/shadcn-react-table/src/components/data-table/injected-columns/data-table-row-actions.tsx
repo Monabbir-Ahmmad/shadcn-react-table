@@ -74,6 +74,7 @@ function RowActionsCell<TData extends RowData>({
       <div
         className={`flex items-center gap-1 ${justify}`}
         onClick={stopPropagation}
+        onDoubleClick={stopPropagation}
       >
         <Button
           variant="ghost"
@@ -106,6 +107,7 @@ function RowActionsCell<TData extends RowData>({
     <div
       className={`flex items-center gap-1 ${justify}`}
       onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
     >
       {canInlineEdit && (
         <Button

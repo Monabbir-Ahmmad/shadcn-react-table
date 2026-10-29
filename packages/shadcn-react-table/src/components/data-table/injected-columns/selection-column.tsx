@@ -45,6 +45,7 @@ export function createSelectionColumn<TData extends RowData>(
         <div
           className="flex items-center justify-center"
           onClick={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
         >
           <SelectionCheckbox
             aria-label={localization.selectAll}
@@ -63,6 +64,7 @@ export function createSelectionColumn<TData extends RowData>(
       <div
         className="flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
+        onDoubleClick={(e) => e.stopPropagation()}
       >
         <SelectionCheckbox
           aria-label={localization.selectRow}

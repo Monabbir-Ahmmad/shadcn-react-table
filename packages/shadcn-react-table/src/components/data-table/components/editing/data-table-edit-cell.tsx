@@ -82,6 +82,7 @@ export function DataTableBodyCellContent<TData extends RowData>({
           stopPropagation(event)
           cn.setEditingCell({ rowId: row.id, columnId: column.id })
         }}
+        onDoubleClick={stopPropagation}
         className="-mx-1 w-full rounded-sm px-1 text-left transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"
       >
         {node}
@@ -95,7 +96,10 @@ export function DataTableBodyCellContent<TData extends RowData>({
         <ContextMenuTrigger asChild>
           <span className="block">{node}</span>
         </ContextMenuTrigger>
-        <ContextMenuContent onClick={stopPropagation}>
+        <ContextMenuContent
+          onClick={stopPropagation}
+          onDoubleClick={stopPropagation}
+        >
           {cn.renderCellActionMenuItems({ cell, row, table })}
         </ContextMenuContent>
       </ContextMenu>

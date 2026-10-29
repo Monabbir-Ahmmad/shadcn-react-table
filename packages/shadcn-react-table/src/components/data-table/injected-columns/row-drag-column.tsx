@@ -64,6 +64,7 @@ function RowDragHandle({
       {...(ctx?.attributes ?? {})}
       {...(ctx?.listeners ?? {})}
       onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
       // touch-none: let dnd-kit's pointer sensor own the touch gesture
       // (otherwise the browser scrolls/selects text before a drag can start on
       // a phone). size-7 gives a finger-friendly tap target.

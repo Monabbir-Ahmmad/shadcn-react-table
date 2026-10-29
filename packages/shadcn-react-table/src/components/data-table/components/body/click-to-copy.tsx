@@ -51,6 +51,7 @@ export function ClickToCopy({
             stopPropagation(event)
             void copy()
           }}
+          onDoubleClick={stopPropagation}
           aria-label={copyLabel}
           className={cn(
             "-mx-1 rounded-sm px-1 text-left transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"

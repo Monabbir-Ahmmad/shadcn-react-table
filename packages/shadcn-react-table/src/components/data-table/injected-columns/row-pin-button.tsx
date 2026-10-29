@@ -32,6 +32,7 @@ export function RowPinButton<TData extends RowData>({
         stopPropagation(event)
         row.pin(pinned ? false : "top")
       }}
+      onDoubleClick={stopPropagation}
       className={cn(
         "flex items-center justify-center text-muted-foreground transition-opacity outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40",
         pinned && "text-primary",

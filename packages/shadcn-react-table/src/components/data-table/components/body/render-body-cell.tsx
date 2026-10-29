@@ -42,6 +42,7 @@ export function renderBodyCell<TData extends RowData>(
           stopPropagation(event)
           row.getToggleExpandedHandler()()
         }}
+        onDoubleClick={stopPropagation}
         style={{ paddingInlineStart: `${row.depth * 1}rem` }}
         className="flex items-center gap-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
       >

@@ -152,3 +152,85 @@ describe("in-row controls do not bubble to row/cell click handlers", () => {
     expect(onRowClick).not.toHaveBeenCalled()
   })
 })
+
+describe("in-row controls do not bubble to row/cell double-click handlers", () => {
+  function handlers() {
+    return { onRowDoubleClick: vi.fn(), onCellDoubleClick: vi.fn() }
+  }
+  function expectNotFired(h: ReturnType<typeof handlers>) {
+    expect(h.onRowDoubleClick).not.toHaveBeenCalled()
+    expect(h.onCellDoubleClick).not.toHaveBeenCalled()
+  }
+
+  it("still fires for a plain cell double-click", () => {
+    const h = handlers()
+    mount(h)
+    fireEvent.doubleClick(screen.getByText("Mason"))
+    expect(h.onRowDoubleClick).toHaveBeenCalledTimes(1)
+    expect(h.onCellDoubleClick).toHaveBeenCalledTimes(1)
+  })
+
+  it("row-actions edit button", () => {
+    const h = handlers()
+    mount({ enableEditing: true, editDisplayMode: "row", ...h })
+    fireEvent.doubleClick(
+      screen.getAllByRole("button", { name: /^edit$/i })[0]!
+    )
+    expectNotFired(h)
+  })
+
+  it("row-edit text input", () => {
+    const h = handlers()
+    mount({ enableEditing: true, editDisplayMode: "row", ...h })
+    fireEvent.click(screen.getAllByRole("button", { name: /^edit$/i })[0]!)
+    fireEvent.doubleClick(screen.getAllByRole("textbox")[0]!)
+    expectNotFired(h)
+  })
+
+  it("expand chevron", () => {
+    const h = handlers()
+    mount({ renderDetailPanel: () => <div>detail</div>, ...h })
+    const buttons = screen.getAllByRole("button", { name: /expand/i })
+    fireEvent.doubleClick(buttons[buttons.length - 1]!)
+    expectNotFired(h)
+  })
+
+  it("row pin button", () => {
+    const h = handlers()
+    mount({ enableRowNumbers: true, enableRowPinning: true, ...h })
+    fireEvent.doubleClick(
+      screen.getAllByRole("button", { name: /pin row/i })[0]!
+    )
+    expectNotFired(h)
+  })
+
+  it("click-to-copy button", () => {
+    const h = handlers()
+    mount({ enableClickToCopy: true, ...h })
+    fireEvent.doubleClick(screen.getAllByRole("button", { name: /copy/i })[0]!)
+    expectNotFired(h)
+  })
+
+  it("click-to-edit cell button", () => {
+    const h = handlers()
+    mount({ enableEditing: true, editDisplayMode: "cell", ...h })
+    fireEvent.doubleClick(screen.getByText("Mason"))
+    expectNotFired(h)
+  })
+
+  it("row drag handle", () => {
+    const h = handlers()
+    mount({ enableRowOrdering: true, ...h })
+    fireEvent.doubleClick(
+      screen.getAllByRole("button", { name: /reorder row/i })[0]!
+    )
+    expectNotFired(h)
+  })
+
+  it("row selection checkbox", () => {
+    const h = handlers()
+    mount({ enableRowSelection: true, ...h })
+    fireEvent.doubleClick(screen.getAllByRole("checkbox")[1]!)
+    expectNotFired(h)
+  })
+})

@@ -47,7 +47,11 @@ export function DataTableEditField({
 }) {
   if (variant === "select") {
     return (
-      <div className="flex flex-col gap-0.5" onClick={stopPropagation}>
+      <div
+        className="flex flex-col gap-0.5"
+        onClick={stopPropagation}
+        onDoubleClick={stopPropagation}
+      >
         <Select
           // Always controlled: "" shows the placeholder in both Radix and
           // Base UI, while `undefined` would flip to uncontrolled.
@@ -81,7 +85,11 @@ export function DataTableEditField({
   }
 
   return (
-    <div className="flex flex-col gap-0.5" onClick={stopPropagation}>
+    <div
+      className="flex flex-col gap-0.5"
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
+    >
       <Input
         autoFocus={autoFocus}
         type={variant === "number" ? "number" : "text"}
