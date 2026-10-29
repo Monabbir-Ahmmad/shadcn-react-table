@@ -167,4 +167,5 @@ export const dataTableLocalizationFa: DataTableLocalization = {
   dragInstructions:
     "برای برداشتن یک مورد، کلید فاصله یا Enter را فشار دهید. هنگام کشیدن، با کلیدهای جهتی آن را جابجا کنید. برای رها کردن دوباره کلید فاصله یا Enter را فشار دهید یا برای لغو Escape را بزنید.", // needs review
   dragRowLabel: (position) => `ردیف ${position.toLocaleString("fa")}`, // needs review
+  noResultsFound: "موردی یافت نشد.",
 }

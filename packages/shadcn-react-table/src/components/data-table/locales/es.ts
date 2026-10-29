@@ -167,4 +167,5 @@ export const dataTableLocalizationEs: DataTableLocalization = {
   dragInstructions:
     "Para recoger un elemento, pulsa la barra espaciadora o Intro. Mientras arrastras, usa las teclas de flecha para moverlo. Pulsa de nuevo la barra espaciadora o Intro para soltarlo, o pulsa Escape para cancelar.", // needs review
   dragRowLabel: (position) => `Fila ${position.toLocaleString("es")}`, // needs review
+  noResultsFound: "No se encontraron resultados",
 }

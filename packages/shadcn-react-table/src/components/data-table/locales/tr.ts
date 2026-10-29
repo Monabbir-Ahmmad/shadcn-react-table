@@ -167,4 +167,5 @@ export const dataTableLocalizationTr: DataTableLocalization = {
   dragInstructions:
     "Bir öğeyi almak için boşluk veya Enter tuşuna basın. Sürüklerken öğeyi taşımak için ok tuşlarını kullanın. Bırakmak için tekrar boşluk veya Enter tuşuna basın ya da iptal etmek için Escape tuşuna basın.", // needs review
   dragRowLabel: (position) => `${position.toLocaleString("tr")}. Satır`, // needs review
+  noResultsFound: "Herhangi Bir Sonuç Bulunamadı",
 }

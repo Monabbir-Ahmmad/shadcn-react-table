@@ -167,4 +167,5 @@ export const dataTableLocalizationKo: DataTableLocalization = {
   dragInstructions:
     "항목을 집으려면 스페이스바 또는 Enter 키를 누르세요. 드래그하는 동안 화살표 키로 이동할 수 있습니다. 스페이스바 또는 Enter 키를 다시 누르면 놓고, Esc 키를 누르면 취소합니다.", // needs review
   dragRowLabel: (position) => `${position.toLocaleString("ko")}번째 행`, // needs review
+  noResultsFound: "찾은 결과가 없습니다.",
 }

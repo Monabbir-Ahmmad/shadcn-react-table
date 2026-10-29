@@ -50,6 +50,7 @@ const SAME_NAME = [
   "cancel",
   "copy",
   "noRecordsToDisplay",
+  "noResultsFound",
 ]
 
 // Keys that share a name with an MRT key but not its shape: MRT's string takes

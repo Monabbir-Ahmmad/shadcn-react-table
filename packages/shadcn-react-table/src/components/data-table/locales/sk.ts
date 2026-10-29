@@ -167,4 +167,5 @@ export const dataTableLocalizationSk: DataTableLocalization = {
   dragInstructions:
     "Ak chcete zdvihnúť položku, stlačte medzerník alebo Enter. Počas presúvania ju premiestňujte šípkami. Opätovným stlačením medzerníka alebo Enter ju pustíte, alebo stlačením Escape presúvanie zrušíte.", // needs review
   dragRowLabel: (position) => `Riadok ${position.toLocaleString("sk")}`, // needs review
+  noResultsFound: "Nenájdené žiadne výsledky",
 }

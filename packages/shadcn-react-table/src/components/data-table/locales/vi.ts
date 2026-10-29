@@ -167,4 +167,5 @@ export const dataTableLocalizationVi: DataTableLocalization = {
   dragInstructions:
     "Để nhấc một mục, nhấn phím cách hoặc Enter. Khi đang kéo, dùng các phím mũi tên để di chuyển mục đó. Nhấn phím cách hoặc Enter lần nữa để thả, hoặc nhấn Escape để huỷ.", // needs review
   dragRowLabel: (position) => `Hàng ${position.toLocaleString("vi")}`, // needs review
+  noResultsFound: "Không có kết quả nào được tìm thấy",
 }

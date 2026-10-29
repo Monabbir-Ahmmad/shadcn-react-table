@@ -167,4 +167,5 @@ export const dataTableLocalizationPl: DataTableLocalization = {
   dragInstructions:
     "Aby podnieść element, naciśnij spację lub Enter. Podczas przeciągania użyj klawiszy strzałek, aby go przesunąć. Naciśnij ponownie spację lub Enter, aby go upuścić, albo Escape, aby anulować.", // needs review
   dragRowLabel: (position) => `Wiersz ${position.toLocaleString("pl")}`, // needs review
+  noResultsFound: "Brak wyników",
 }

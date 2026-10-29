@@ -168,4 +168,5 @@ export const dataTableLocalizationHu: DataTableLocalization = {
   dragInstructions:
     "Elem felvételéhez nyomja meg a szóközt vagy az Entert. Húzás közben a nyílbillentyűkkel mozgathatja. A leejtéshez nyomja meg újra a szóközt vagy az Entert, a megszakításhoz pedig az Escape billentyűt.", // needs review
   dragRowLabel: (position) => `${position.toLocaleString("hu")}. sor`, // needs review
+  noResultsFound: "Nincs találat",
 }

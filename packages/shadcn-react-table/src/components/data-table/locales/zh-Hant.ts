@@ -167,4 +167,5 @@ export const dataTableLocalizationZhHant: DataTableLocalization = {
   dragInstructions:
     "若要拾起項目，請按空白鍵或 Enter 鍵。拖曳時，使用方向鍵移動項目。再按一次空白鍵或 Enter 鍵即可放下，或按 Esc 鍵取消。", // needs review
   dragRowLabel: (position) => `第 ${position.toLocaleString("zh-Hant")} 橫列`, // needs review
+  noResultsFound: "未找到結果",
 }

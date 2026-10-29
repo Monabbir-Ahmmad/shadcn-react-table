@@ -167,4 +167,5 @@ export const dataTableLocalizationSrCyrlRS: DataTableLocalization = {
   dragInstructions:
     "Да подигнеш ставку, притисни размакницу или Enter. Током превлачења користи тастере са стрелицама да је помериш. Поново притисни размакницу или Enter да је пустиш, или притисни Escape да откажеш.", // needs review
   dragRowLabel: (position) => `Ред ${position.toLocaleString("sr-Cyrl-RS")}`, // needs review
+  noResultsFound: "Нема резултата",
 }

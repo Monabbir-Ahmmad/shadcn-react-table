@@ -82,6 +82,17 @@ interface DataTableBodyProps<TData extends RowData> {
  * the empty-state row. Owns per-row / per-cell rendering, tree indentation, and
  * expanded detail panels.
  */
+/** Whether a column filter, the search or the advanced filter is active
+ *  (then an empty body means "no results", not "no records"). */
+function isFiltered<TData extends RowData>(table: DataTableInstance<TData>) {
+  const state = table.getState()
+  return (
+    state.columnFilters.length > 0 ||
+    !!state.globalFilter ||
+    state.advancedFilter.rules.length > 0
+  )
+}
+
 export function DataTableBody<TData extends RowData>({
   table,
   rowVirtualizer,
@@ -539,7 +550,10 @@ export function DataTableBody<TData extends RowData>({
               colSpan={visibleColumnCount}
               className="h-32 text-center text-sm text-muted-foreground"
             >
-              {renderEmpty?.({ table }) ?? localization.noRecordsToDisplay}
+              {renderEmpty?.({ table }) ??
+                (isFiltered(table)
+                  ? localization.noResultsFound
+                  : localization.noRecordsToDisplay)}
             </TableCell>
           </TableRow>
         )}

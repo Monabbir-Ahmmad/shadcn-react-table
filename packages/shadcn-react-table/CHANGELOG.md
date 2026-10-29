@@ -86,6 +86,9 @@ for every rename.
 
 ### New
 
+- **New:** when filters or the search hide every row, the empty table says
+  "No results found" (new localization key `noResultsFound`, in every locale)
+  instead of "No records to display".
 - **New:** the global search box's open state is table state,
   `showGlobalFilter` (`initialState`, `state`, `onShowGlobalFilterChange`,
   `table.setShowGlobalFilter`).

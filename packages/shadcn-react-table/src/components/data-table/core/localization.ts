@@ -132,6 +132,9 @@ export interface DataTableLocalization {
 
   // Empty / loading
   noRecordsToDisplay: string
+  /** Shown instead of `noRecordsToDisplay` when filters or the search hide
+   *  every row. */
+  noResultsFound: string
   loading: string
   loadingMore: string
 
@@ -286,6 +289,7 @@ export const defaultLocalization: DataTableLocalization = {
   cellActions: "Cell actions",
 
   noRecordsToDisplay: "No records to display",
+  noResultsFound: "No results found",
   loading: "Loading…",
   loadingMore: "Loading more…",
 

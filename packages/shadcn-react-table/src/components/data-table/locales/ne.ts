@@ -169,4 +169,5 @@ export const dataTableLocalizationNe: DataTableLocalization = {
   dragInstructions:
     "कुनै वस्तु उठाउन स्पेस वा इन्टर थिच्नुहोस्। तान्दै गर्दा सार्न एरो कुञ्जीहरू प्रयोग गर्नुहोस्। छोड्न फेरि स्पेस वा इन्टर थिच्नुहोस्, वा रद्द गर्न एस्केप थिच्नुहोस्।", // needs review
   dragRowLabel: (position) => `पंक्ति ${position.toLocaleString("ne")}`, // needs review
+  noResultsFound: "कुनै परिणाम फेला परेन",
 }

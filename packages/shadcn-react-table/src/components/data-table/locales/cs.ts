@@ -170,4 +170,5 @@ export const dataTableLocalizationCs: DataTableLocalization = {
   dragInstructions:
     "Chcete-li položku zvednout, stiskněte mezerník nebo Enter. Při přetahování ji přesouvejte šipkami. Dalším stisknutím mezerníku nebo Enter ji upustíte, klávesou Escape akci zrušíte.", // needs review
   dragRowLabel: (position) => `Řádek ${position.toLocaleString("cs")}`, // needs review
+  noResultsFound: "Nenalezeny žádné výsledky",
 }

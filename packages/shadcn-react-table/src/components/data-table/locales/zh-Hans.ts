@@ -167,4 +167,5 @@ export const dataTableLocalizationZhHans: DataTableLocalization = {
   dragInstructions:
     "要拾起项目，请按空格键或回车键。拖动时，使用方向键移动它。再次按空格键或回车键放下，或按 Esc 键取消。", // needs review
   dragRowLabel: (position) => `第 ${position.toLocaleString("zh-Hans")} 行`, // needs review
+  noResultsFound: "未找到结果",
 }

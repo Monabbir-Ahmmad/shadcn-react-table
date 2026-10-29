@@ -168,4 +168,5 @@ export const dataTableLocalizationFi: DataTableLocalization = {
   dragInstructions:
     "Poimi kohde painamalla välilyöntiä tai Enteriä. Siirrä sitä vetäessäsi nuolinäppäimillä. Pudota se painamalla uudelleen välilyöntiä tai Enteriä tai peruuta painamalla Esc-näppäintä.", // needs review
   dragRowLabel: (position) => `Rivi ${position.toLocaleString("fi")}`, // needs review
+  noResultsFound: "Ei tuloksia",
 }

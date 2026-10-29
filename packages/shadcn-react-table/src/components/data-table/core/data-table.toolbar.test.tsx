@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeAll, describe, expect, it } from "vitest"
 
 import { DataTable } from "./data-table"
@@ -103,5 +103,30 @@ describe("toolbar controls", () => {
     ).toBeNull()
     expect(screen.queryByRole("button", { name: "Search" })).toBeNull()
     expect(button("Show filters")).toBeTruthy()
+  })
+})
+
+describe("empty state", () => {
+  it("says no records when there is no data", () => {
+    mount({ data: [] })
+    expect(screen.getByText("No records to display")).toBeTruthy()
+  })
+
+  it("says no results when the search or filters hide every row", () => {
+    const { table } = mount()
+    act(() => table().setGlobalFilter("zzz"))
+    expect(screen.getByText("No results found")).toBeTruthy()
+    act(() => table().setGlobalFilter(undefined))
+    act(() => table().setColumnFilters([{ id: "city", value: "nowhere" }]))
+    expect(screen.getByText("No results found")).toBeTruthy()
+  })
+
+  it("says no results for an empty server response to a filter", () => {
+    mount({
+      data: [],
+      manualFiltering: true,
+      initialState: { globalFilter: "zzz" },
+    })
+    expect(screen.getByText("No results found")).toBeTruthy()
   })
 })

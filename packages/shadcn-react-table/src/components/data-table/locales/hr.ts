@@ -167,4 +167,5 @@ export const dataTableLocalizationHr: DataTableLocalization = {
   dragInstructions:
     "Za podizanje stavke pritisnite razmaknicu ili Enter. Tijekom povlačenja koristite tipke sa strelicama za pomicanje. Ponovno pritisnite razmaknicu ili Enter za ispuštanje ili Escape za otkazivanje.", // needs review
   dragRowLabel: (position) => `Redak ${position.toLocaleString("hr")}`, // needs review
+  noResultsFound: "Nema pronađenih rezultata",
 }

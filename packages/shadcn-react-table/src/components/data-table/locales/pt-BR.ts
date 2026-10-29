@@ -167,4 +167,5 @@ export const dataTableLocalizationPtBR: DataTableLocalization = {
   dragInstructions:
     "Para pegar um item, pressione Espaço ou Enter. Ao arrastar, use as setas do teclado para movê-lo. Pressione Espaço ou Enter novamente para soltá-lo, ou pressione Escape para cancelar.", // needs review
   dragRowLabel: (position) => `Linha ${position.toLocaleString("pt-BR")}`, // needs review
+  noResultsFound: "Nenhum resultado encontrado",
 }

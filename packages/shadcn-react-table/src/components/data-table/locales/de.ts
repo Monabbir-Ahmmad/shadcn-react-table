@@ -168,4 +168,5 @@ export const dataTableLocalizationDe: DataTableLocalization = {
   dragInstructions:
     "Zum Aufnehmen eines Elements die Leertaste oder Eingabetaste drücken. Beim Ziehen mit den Pfeiltasten bewegen. Zum Ablegen erneut Leertaste oder Eingabetaste drücken, zum Abbrechen die Escape-Taste.", // needs review
   dragRowLabel: (position) => `Zeile ${position.toLocaleString("de")}`, // needs review
+  noResultsFound: "Keine Ergebnisse gefunden",
 }

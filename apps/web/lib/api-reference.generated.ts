@@ -2698,6 +2698,14 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
+    name: "noResultsFound",
+    type: "string",
+    required: true,
+    default: "No results found",
+    description:
+      "Shown instead of `noRecordsToDisplay` when filters or the search hide every row.",
+  },
+  {
     name: "loading",
     type: "string",
     required: true,

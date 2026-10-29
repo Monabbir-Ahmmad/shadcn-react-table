@@ -167,4 +167,5 @@ export const dataTableLocalizationSv: DataTableLocalization = {
   dragInstructions:
     "Tryck på mellanslag eller Enter för att plocka upp ett objekt. Använd piltangenterna för att flytta det under dragningen. Tryck på mellanslag eller Enter igen för att släppa det, eller tryck på Escape för att avbryta.", // needs review
   dragRowLabel: (position) => `Rad ${position.toLocaleString("sv")}`, // needs review
+  noResultsFound: "Inga resultat funna",
 }

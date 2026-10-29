@@ -167,4 +167,5 @@ export const dataTableLocalizationAz: DataTableLocalization = {
   dragInstructions:
     "Elementi götürmək üçün Space və ya Enter düyməsini basın. Sürüşdürərkən onu hərəkət etdirmək üçün ox düymələrindən istifadə edin. Buraxmaq üçün yenidən Space və ya Enter, ləğv etmək üçün Escape basın.", // needs review
   dragRowLabel: (position) => `Sətir ${position.toLocaleString("az")}`, // needs review
+  noResultsFound: "Heç Bir Nəticə Tapılmadı",
 }

@@ -167,4 +167,5 @@ export const dataTableLocalizationHe: DataTableLocalization = {
   dragInstructions:
     "כדי להרים פריט, לחץ על רווח או על Enter. בזמן הגרירה, השתמש במקשי החצים כדי להזיז אותו. לחץ שוב על רווח או על Enter כדי לשחרר, או על Escape כדי לבטל.", // needs review
   dragRowLabel: (position) => `שורה ${position.toLocaleString("he")}`, // needs review
+  noResultsFound: "לא נמצאו תוצאות",
 }

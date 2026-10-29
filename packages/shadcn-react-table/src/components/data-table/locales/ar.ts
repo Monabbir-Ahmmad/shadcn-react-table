@@ -167,4 +167,5 @@ export const dataTableLocalizationAr: DataTableLocalization = {
   dragInstructions:
     "لالتقاط عنصر، اضغط على المسافة أو Enter. أثناء السحب، استخدم مفاتيح الأسهم لتحريكه. اضغط على المسافة أو Enter مرة أخرى لإفلاته، أو اضغط على Escape للإلغاء.", // needs review
   dragRowLabel: (position) => `الصف ${position.toLocaleString("ar")}`, // needs review
+  noResultsFound: "لم يتم العثور على نتائج",
 }

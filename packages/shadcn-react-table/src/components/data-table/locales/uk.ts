@@ -167,4 +167,5 @@ export const dataTableLocalizationUk: DataTableLocalization = {
   dragInstructions:
     "Щоб підняти елемент, натисніть пробіл або Enter. Під час перетягування переміщуйте його клавішами зі стрілками. Натисніть пробіл або Enter ще раз, щоб відпустити його, або Escape, щоб скасувати.", // needs review
   dragRowLabel: (position) => `Рядок ${position.toLocaleString("uk")}`, // needs review
+  noResultsFound: "Нічого не знайдено",
 }

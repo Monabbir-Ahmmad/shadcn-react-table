@@ -168,4 +168,5 @@ export const dataTableLocalizationRo: DataTableLocalization = {
   dragInstructions:
     "Pentru a ridica un element, apasă Spațiu sau Enter. În timpul tragerii, folosește tastele săgeți pentru a-l muta. Apasă din nou Spațiu sau Enter pentru a-l plasa sau apasă Escape pentru a anula.", // needs review
   dragRowLabel: (position) => `Linia ${position.toLocaleString("ro")}`, // needs review
+  noResultsFound: "Niciun rezultat găsit",
 }

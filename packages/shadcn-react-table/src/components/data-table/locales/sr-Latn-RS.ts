@@ -167,4 +167,5 @@ export const dataTableLocalizationSrLatnRS: DataTableLocalization = {
   dragInstructions:
     "Da podigneš stavku, pritisni razmaknicu ili Enter. Tokom prevlačenja koristi tastere sa strelicama da je pomeriš. Ponovo pritisni razmaknicu ili Enter da je pustiš, ili pritisni Escape da otkažeš.", // needs review
   dragRowLabel: (position) => `Red ${position.toLocaleString("sr-Latn-RS")}`, // needs review
+  noResultsFound: "Nema rezultata",
 }
