@@ -35,6 +35,14 @@ export const useDataTableOptions: ApiMember[] = [
       "Called with an updater over the `left` / `right` pinning state when the user pins or unpins a column.",
   },
   {
+    name: "stateSelector",
+    type: "(state: DataTableState) => unknown",
+    required: false,
+    default: null,
+    description:
+      'Re-render the component that calls `useDataTable` when the selected part of the table state changes (compared shallowly). By default it does not re-render on table state changes at all: `<DataTable>` subscribes to what it shows. Select what your own render reads, e.g. `(state) => state.rowSelection` for a "3 selected" label.',
+  },
+  {
     name: "localization",
     type: "Partial<DataTableLocalization>",
     required: false,
@@ -254,6 +262,54 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description: "Called whenever the global search mode changes.",
+  },
+  {
+    name: "onColumnFilterModesChange",
+    type: "(modes: Record<string, FilterMode>) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when a column's filter mode changes, with every column's mode. Control it with `state.columnFilterModes`.",
+  },
+  {
+    name: "onShowAdvancedFilterPanelChange",
+    type: "(open: boolean) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the advanced filter dialog opens or closes. Control it with `state.showAdvancedFilterPanel`.",
+  },
+  {
+    name: "onEditingCellChange",
+    type: "(cell: EditingCell | null) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when cell editing starts or ends (`null`). Control it with `state.editingCell`.",
+  },
+  {
+    name: "onEditingRowIdChange",
+    type: "(rowId: string | null) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when row editing starts or ends (`null`). Control it with `state.editingRowId`.",
+  },
+  {
+    name: "onIsCreatingChange",
+    type: "(isCreating: boolean) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the new-row editor opens or closes. Control it with `state.isCreating`.",
+  },
+  {
+    name: "onRowDraftChange",
+    type: "(draft: Record<string, unknown>) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the draft of the row being edited or created changes. Control it with `state.rowDraft`.",
   },
   {
     name: "enableColumnOrdering",

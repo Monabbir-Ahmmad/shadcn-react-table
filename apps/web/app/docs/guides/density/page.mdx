@@ -33,7 +33,7 @@ const density = table.tableInstance.density
 table.tableInstance.setDensity("compact")
 ```
 
-This is handy when you want to drive density from your own controls instead of the built-in toolbar button.
+This is handy when you want to drive density from your own controls instead of the built-in toolbar button. To show the current density in your component's render, add `stateSelector: (state) => state.density` (see [State management](/docs/guides/state#reading-state-in-your-component)).
 
 ## Hiding the toolbar button
 

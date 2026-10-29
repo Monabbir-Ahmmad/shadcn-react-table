@@ -2,7 +2,7 @@ export const metadata = { title: "State management" }
 
 # State management
 
-The data table has two layers of state, and both can be left uncontrolled, observed, or fully controlled.
+The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…). Every slice can be left uncontrolled, observed, or fully controlled, and parts of the table re-render only for the slices they show.
 
 ## TanStack table state
 
@@ -26,7 +26,22 @@ For server-side data, combine this with the `manual*` flags — see [Server-side
 
 ## Data table UI state
 
-The presentation state the table adds on top of TanStack lives on `table.tableInstance`: **density**, **full screen**, **filter-row visibility**, and the **global search mode**. Each is uncontrolled by default but accepts a controlled value and/or an `onChange` callback — so you can observe a change without taking ownership, or take full control.
+The state the table adds on top of TanStack is table state too: **density**, **full screen**, **filter-row visibility**, the **global search mode**, **column filter modes**, the **advanced filter** and its dialog, and **inline editing** (the cell or row being edited, the create form, the draft). It sits in `table.getState()` next to sorting, takes `initialState` and controlled `state` like any slice, and reports changes through `on…Change` callbacks with the new value.
+
+```tsx
+const [editingCell, setEditingCell] = React.useState<EditingCell | null>(null)
+
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  initialState: { density: "compact", showColumnFilters: true },
+  state: { editingCell },
+  onEditingCellChange: setEditingCell,
+})
+```
+
+The dedicated props below are shortcuts for the same slices:
 
 ```tsx
 const table = useDataTable({
@@ -62,8 +77,40 @@ const table = useDataTable({
     "defaultGlobalFilterMode",
     "globalFilterMode",
     "onGlobalFilterModeChange",
+    "onColumnFilterModesChange",
+    "onShowAdvancedFilterPanelChange",
+    "onEditingCellChange",
+    "onEditingRowIdChange",
+    "onIsCreatingChange",
+    "onRowDraftChange",
   ]}
 />
+
+## Reading state in your component
+
+`<DataTable>` subscribes to the state it shows. The component that calls `useDataTable` does **not** re-render when the table's state changes, so code there that reads the state during render would show an old value. Tell `useDataTable` what your render reads with `stateSelector`; the component then re-renders when that part changes (compared shallowly):
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowSelection: true,
+  stateSelector: (state) => state.rowSelection,
+})
+
+const selectedCount = Object.keys(table.getState().rowSelection).length
+```
+
+To re-render only a small part of your component, use `table.Subscribe` instead:
+
+```tsx
+<table.Subscribe selector={(state) => state.rowSelection}>
+  {(rowSelection) => <span>{Object.keys(rowSelection).length} selected</span>}
+</table.Subscribe>
+```
+
+Event handlers, effects and the table's own render props (`renderToolbarActions`, `renderBottomToolbarCustomActions`, …) always see the current state; only reads during your component's render need this.
 
 ## Reading and setting from the instance
 

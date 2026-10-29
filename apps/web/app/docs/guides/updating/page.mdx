@@ -33,9 +33,9 @@ lists what changed in each version.
    usage.
 
 <Callout variant="tip" title="Keep local edits separate">
-  The less you edit the copied files directly — prefer wrapping the
-  table or using the many `render*` slots — the closer step 3's diff is
-  to a pure upstream update.
+  The less you edit the copied files directly — prefer wrapping the table or
+  using the many `render*` slots — the closer step 3's diff is to a pure
+  upstream update.
 </Callout>
 
 ## Localization keys and installed locales
@@ -49,6 +49,14 @@ pnpm dlx shadcn@latest add --overwrite <registry-url>/r/data-table-locale-de.jso
 
 Do this after re-adding the table, and re-apply any edits you made to a locale
 file.
+
+## Re-renders after the state rework
+
+The component that calls `useDataTable` no longer re-renders when the table's
+state changes. If it reads the state while rendering (a selection count, the
+current density), add `stateSelector` for what it reads, or wrap that part in
+`table.Subscribe`. See
+[State management](/docs/guides/state#reading-state-in-your-component).
 
 ## Upgrading to 0.5.0 (TanStack Table v9)
 
@@ -100,13 +108,13 @@ file.
    `({ table }) => table.getState()` and `table.tableInstance` type-check and
    work as before. TanStack v9's own contexts don't include `getState`.
 10. **`table.options` is the options object you passed in** on the latest render
-   (TanStack v9's React adapter behavior), not TanStack's internally merged
-   options with feature defaults.
-11. **A small TanStack feature is registered by the block.** Its types add
-   `dataTableInstanceFeature` through TanStack's `Plugins` / `Table_FeatureMap`
-   interfaces, scoped to tables built with the block's feature set. Other
-   TanStack tables in your app are unaffected, except ones typed
-   `Table<any, …>`.
+    (TanStack v9's React adapter behavior), not TanStack's internally merged
+    options with feature defaults.
+11. **Two small TanStack features are registered by the block.** Their types
+    add `dataTableInstanceFeature` and `dataTableUiFeature` through TanStack's
+    `Plugins` / `Table_FeatureMap` / `TableState_FeatureMap` interfaces, scoped
+    to tables built with the block's feature set. Other TanStack tables in
+    your app are unaffected, except ones typed `Table<any, …>`.
 
 ## Related
 

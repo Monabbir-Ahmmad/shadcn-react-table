@@ -29,9 +29,15 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-Read the current selection at any time:
+Read the current selection at any time. To show it in your own component's render, subscribe to it with `stateSelector` (the component holding the table does not re-render on table changes by default; see [State management](/docs/guides/state#reading-state-in-your-component)):
 
 ```tsx
+const table = useDataTable({
+  // …
+  enableRowSelection: true,
+  stateSelector: (state) => state.rowSelection,
+})
+
 const selected = table.getState().rowSelection
 ```
 
@@ -89,7 +95,10 @@ const table = useDataTable({
 
 ## Relevant options
 
-<ApiTable of="useDataTableOptions" only={["enableSelectAll", "selectAllMode"]} />
+<ApiTable
+  of="useDataTableOptions"
+  only={["enableSelectAll", "selectAllMode"]}
+/>
 
 ## Related
 

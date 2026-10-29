@@ -6,6 +6,28 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 
 ## Unreleased
 
+- **Changed (breaking):** the component that calls `useDataTable` no longer
+  re-renders when the table's state changes; `<DataTable>` subscribes to what
+  it shows. Code that reads the state during that component's render (a
+  "3 selected" label) needs `stateSelector: (state) => state.rowSelection`, or
+  `table.Subscribe` around the part that shows it. Event handlers, effects and
+  the table's render props are unaffected.
+- **Added:** `stateSelector` option: re-render the component holding the table
+  when the selected part of the state changes.
+- **Added:** the table's UI state is TanStack table state: `density`,
+  `isFullscreen`, `showColumnFilters`, `columnFilterModes`,
+  `globalFilterMode`, `advancedFilter`, `showAdvancedFilterPanel`,
+  `editingCell`, `editingRowId`, `isCreating`, `rowDraft` and `direction` are
+  in `table.getState()`, take `initialState` and controlled `state`, and reset
+  with `table.reset()`. New callbacks `onColumnFilterModesChange`,
+  `onShowAdvancedFilterPanelChange`, `onEditingCellChange`,
+  `onEditingRowIdChange`, `onIsCreatingChange` and `onRowDraftChange`; the
+  existing props (`density`, `onDensityChange`, `defaultDensity`, …) still
+  work.
+- **Changed:** parts of the table re-render only for the state they show, and
+  each row for its own selection and editing state. On 1,000 rows: selecting a
+  row takes ~9 ms instead of ~57 ms, typing in a row editor ~4.5 ms instead of
+  ~56 ms; sorting is ~10% faster.
 - **Added:** 37 locales (38 languages with English), each its own registry
   item: `data-table-locale-<lang>`. Translations are adapted from Material
   React Table; lines marked "needs review" await a native speaker.

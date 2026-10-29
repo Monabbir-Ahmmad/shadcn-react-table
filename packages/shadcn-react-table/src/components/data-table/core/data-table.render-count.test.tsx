@@ -199,4 +199,34 @@ describe("body re-renders", () => {
     expect(toolbar.mock.calls.length).toBeGreaterThan(toolbarBefore)
     expect(header.mock.calls.length).toBeGreaterThan(headerBefore)
   })
+
+  it("updates a table.Subscribe part without re-rendering its holder", () => {
+    const onRender = vi.fn()
+    function Holder({ onRender }: { onRender: () => void }) {
+      onRender()
+      const table = useDataTable<Row>({
+        columns: makeColumns({ count: 0 }),
+        data,
+        getRowId: (row) => row.id,
+        enableRowSelection: true,
+      })
+      return (
+        <>
+          <table.Subscribe selector={(state) => state.rowSelection}>
+            {(rowSelection) => (
+              <output>{Object.keys(rowSelection).length} selected</output>
+            )}
+          </table.Subscribe>
+          <DataTable table={table} />
+        </>
+      )
+    }
+    render(<Holder onRender={onRender} />)
+    const before = onRender.mock.calls.length
+    fireEvent.click(
+      screen.getAllByRole("checkbox", { name: /select row/i })[2]!
+    )
+    expect(screen.getByText("1 selected")).toBeTruthy()
+    expect(onRender).toHaveBeenCalledTimes(before)
+  })
 })
