@@ -95,6 +95,23 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   `"left"` / `"right"` mean the start / end of the cell (`text-start` /
   `text-end`), and pinned columns use `inset-inline-start` / `-end`. Left-to-
   right tables look the same.
+- **Added:** with keyboard navigation on (the default) the table is an ARIA
+  grid: `role="grid"`, `aria-rowcount` / `aria-colcount`, `aria-rowindex` on
+  rows, `aria-colindex` on cells and `aria-selected` on selectable rows. Tests
+  that query `getByRole("table")` need `getByRole("grid")`.
+- **Added:** cell commands: Enter or F2 activates the focused cell's control
+  (opens its editor), PageUp / PageDown move a screen of rows, Ctrl+C / Cmd+C
+  copies the cell's text.
+- **Added:** focus stays in the table when the focused element goes away: an
+  inline editor closing, save / cancel buttons disappearing, or a deleted row.
+- **Added:** full screen is a modal dialog: Escape leaves, Tab stays inside,
+  the page behind stops scrolling, and focus returns afterwards.
+- **Added:** `aria-busy` on the table and a screen-reader status message while
+  loading.
+- **Changed:** body rows re-render only when their own state (selection,
+  expansion, pinning, editing) or something table-wide changes, so selecting a
+  row or editing a cell no longer re-renders every row. Row and cell click
+  handlers always call the latest callback.
 - **Added:** `direction` on the table instance (`"ltr"` or `"rtl"`, measured
   from the page).
 - **Changed:** the advanced filter sentence is one localization key,
