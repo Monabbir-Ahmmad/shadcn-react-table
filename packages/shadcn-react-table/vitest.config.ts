@@ -1,4 +1,5 @@
 import { playwright } from "@vitest/browser-playwright"
+import process from "node:process"
 import { fileURLToPath } from "node:url"
 import { defineConfig } from "vitest/config"
 
@@ -11,6 +12,10 @@ const uiPostcss = fileURLToPath(
 
 export default defineConfig({
   test: {
+    // Windows intermittently fails file reads ("UNKNOWN: unknown error,
+    // read") when every core imports the module graph at once; half the cores
+    // keeps local runs reliable. CI (Linux) uses the default.
+    maxWorkers: process.platform === "win32" ? "50%" : undefined,
     projects: [
       {
         extends: true,
