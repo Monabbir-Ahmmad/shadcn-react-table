@@ -44,12 +44,12 @@ export function renderBodyCell<TData extends RowData>(
         }}
         onDoubleClick={stopPropagation}
         style={{ paddingInlineStart: `${row.depth * 1}rem` }}
-        className="flex items-center gap-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+        className="flex items-center gap-1.5 text-start outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
       >
         {row.getIsExpanded() ? (
           <icons.expanded className="size-4 shrink-0 text-muted-foreground" />
         ) : (
-          <icons.collapsed className="size-4 shrink-0 text-muted-foreground" />
+          <icons.collapsed className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
         )}
         <span className="font-medium">
           {meta?.renderGroupedCell

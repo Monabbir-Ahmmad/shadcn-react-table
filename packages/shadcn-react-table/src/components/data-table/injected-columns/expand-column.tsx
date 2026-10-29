@@ -34,7 +34,7 @@ export function createExpandColumn<TData extends RowData>(
           {table.getIsAllRowsExpanded() ? (
             <icons.expanded className="size-4" />
           ) : (
-            <icons.collapsed className="size-4" />
+            <icons.collapsed className="size-4 rtl:rotate-180" />
           )}
         </button>
       ) : null,
@@ -55,7 +55,7 @@ export function createExpandColumn<TData extends RowData>(
           {row.getIsExpanded() ? (
             <icons.expanded className="size-4" />
           ) : (
-            <icons.collapsed className="size-4" />
+            <icons.collapsed className="size-4 rtl:rotate-180" />
           )}
         </button>
       )

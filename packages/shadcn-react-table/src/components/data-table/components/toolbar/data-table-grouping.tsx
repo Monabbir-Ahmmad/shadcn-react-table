@@ -44,7 +44,7 @@ export function DataTableDropToGroupZone<TData extends RowData>({
             <Badge
               key={columnId}
               variant="secondary"
-              className="gap-1 rounded-sm pr-1 normal-case"
+              className="gap-1 rounded-sm pe-1 normal-case"
             >
               {getColumnLabel(column)}
               <button

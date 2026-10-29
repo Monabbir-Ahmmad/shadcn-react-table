@@ -209,6 +209,8 @@ export function useDataTable<TData extends RowData>(
     false,
     onIsFullscreenChange
   )
+  // Measured from the rendered table by `DataTable` (see `direction`).
+  const [direction, setDirection] = React.useState<"ltr" | "rtl">("ltr")
   const [showColumnFilters, setShowColumnFilters] = useControllableState(
     showColumnFiltersProp,
     defaultShowColumnFilters,
@@ -453,6 +455,8 @@ export function useDataTable<TData extends RowData>(
     enableColumnPinning,
     enableColumnResizing,
     columnResizeMode: tableOptions.columnResizeMode ?? "onChange",
+    // Dragging a right-to-left column's edge to the left widens it.
+    columnResizeDirection: tableOptions.columnResizeDirection ?? direction,
     enableRowPinning,
     keepPinnedRows: tableOptions.keepPinnedRows ?? true,
     enableGrouping,
@@ -619,6 +623,8 @@ export function useDataTable<TData extends RowData>(
     setDensity,
     isFullscreen,
     setIsFullscreen,
+    direction,
+    setDirection,
     showColumnFilters,
     setShowColumnFilters,
     columnFilterModes,

@@ -158,14 +158,14 @@ export function ClearableInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        className={cn(FIELD_CLASS, value && "pr-7")}
+        className={cn(FIELD_CLASS, value && "pe-7")}
       />
       {value && (
         <button
           type="button"
           aria-label={clearLabel}
           onClick={() => onChange("")}
-          className="absolute inset-y-0 right-1.5 flex items-center text-muted-foreground transition-colors hover:text-foreground"
+          className="absolute inset-y-0 end-1.5 flex items-center text-muted-foreground transition-colors hover:text-foreground"
         >
           <ClearIcon className="size-3.5" />
         </button>

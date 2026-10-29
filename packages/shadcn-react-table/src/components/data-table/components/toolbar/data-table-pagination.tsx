@@ -81,7 +81,7 @@ export function DataTablePagination<TData extends RowData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <icons.pagePrev />
+            <icons.pagePrev className="rtl:rotate-180" />
           </PaginationButton>
           {getPageList(pageIndex + 1, table.getPageCount()).map((item, i) =>
             item === "ellipsis" ? (
@@ -111,7 +111,7 @@ export function DataTablePagination<TData extends RowData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <icons.pageNext />
+            <icons.pageNext className="rtl:rotate-180" />
           </PaginationButton>
         </div>
       ) : (
@@ -125,28 +125,28 @@ export function DataTablePagination<TData extends RowData>({
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <icons.pageFirst />
+              <icons.pageFirst className="rtl:rotate-180" />
             </PaginationButton>
             <PaginationButton
               label={localization.goToPreviousPage}
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <icons.pagePrev />
+              <icons.pagePrev className="rtl:rotate-180" />
             </PaginationButton>
             <PaginationButton
               label={localization.goToNextPage}
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <icons.pageNext />
+              <icons.pageNext className="rtl:rotate-180" />
             </PaginationButton>
             <PaginationButton
               label={localization.goToLastPage}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <icons.pageLast />
+              <icons.pageLast className="rtl:rotate-180" />
             </PaginationButton>
           </div>
         </div>

@@ -96,6 +96,8 @@ export function DataTable<TData extends RowData>({
     positionToolbarDropZone,
     enableTopToolbar,
     enableKeyboardNavigation,
+    direction,
+    setDirection,
     enableColumnVirtualization,
     localization,
     renderCaption,
@@ -123,6 +125,16 @@ export function DataTable<TData extends RowData>({
   )
 
   const gridRef = React.useRef<HTMLDivElement>(null)
+
+  // Read the direction the table actually renders in (`dir` on it or any
+  // ancestor), for the behaviour CSS cannot mirror: resizing, arrow keys and
+  // column virtualization.
+  React.useLayoutEffect(() => {
+    const el = gridRef.current
+    if (!el) return
+    const measured = getComputedStyle(el).direction === "rtl" ? "rtl" : "ltr"
+    if (measured !== direction) setDirection(measured)
+  })
   const { sensors, collisionDetection, handleDragEnd } = useTableDnd(table)
   const accessibility = useDragAnnouncements(table)
   const {
@@ -139,6 +151,7 @@ export function DataTable<TData extends RowData>({
   // scroll a cell that is not rendered into view.
   const { onKeyDown, onFocus } = useGridNavigation<HTMLDivElement>({
     enabled: enableKeyboardNavigation,
+    rtl: direction === "rtl",
     ref: gridRef,
     rowCount: () =>
       table.getTopRows().length +
@@ -349,22 +362,22 @@ export function DataTable<TData extends RowData>({
                 {/* Bottom sentinel: when it scrolls near the viewport (within
                     `infiniteScrollThreshold`px) the table asks for the next
                     chunk. Sits after the rendered window, so it works with or
-                    without row virtualization. `sticky left-0` keeps it within
+                    without row virtualization. `sticky start-0` keeps it within
                     the horizontal viewport so a wide (horizontally scrolled)
                     table still triggers — the IntersectionObserver checks both
-                    axes, and a left-anchored sentinel would otherwise scroll
+                    axes, and a start-anchored sentinel would otherwise scroll
                     out of the root rect. */}
                 <div
                   ref={sentinelRef}
                   data-slot="data-table-infinite-sentinel"
                   aria-hidden
-                  className="sticky left-0 h-px w-full"
+                  className="sticky start-0 h-px w-full"
                 />
                 {isFetchingNextPage && (
                   <div
                     data-slot="data-table-infinite-loader"
                     role="status"
-                    className="sticky left-0 flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground"
+                    className="sticky start-0 flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground"
                   >
                     <span
                       aria-hidden

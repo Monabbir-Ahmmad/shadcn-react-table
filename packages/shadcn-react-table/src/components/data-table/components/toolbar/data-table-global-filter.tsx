@@ -133,7 +133,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
   }
 
   return (
-    <div className="flex h-9 items-center gap-0.5 rounded-md border bg-background pr-1 pl-2 focus-within:border-ring">
+    <div className="flex h-9 items-center gap-0.5 rounded-md border bg-background ps-2 pe-1 focus-within:border-ring">
       <icons.search className="size-3.5 shrink-0 text-muted-foreground" />
       <Input
         ref={inputRef}

@@ -31,6 +31,8 @@ export interface UseGridNavigationOptions<T extends HTMLElement> {
   colCount: () => number
   /** Brings a cell that is not rendered (virtualized) into view. */
   scrollToCell: (cell: GridCell) => void
+  /** Right-to-left: ArrowLeft moves to the next column, ArrowRight back. */
+  rtl?: boolean
 }
 
 const findCell = (root: HTMLElement, { row, col }: GridCell) =>
@@ -53,6 +55,7 @@ export function useGridNavigation<T extends HTMLElement>({
   rowCount,
   colCount,
   scrollToCell,
+  rtl = false,
 }: UseGridNavigationOptions<T>) {
   const activeCellRef = React.useRef<GridCell>({ row: 0, col: 0 })
   const pendingFrameRef = React.useRef<number | null>(null)
@@ -156,10 +159,13 @@ export function useGridNavigation<T extends HTMLElement>({
         row = Math.min(maxRow, row + 1)
         break
       case "ArrowLeft":
-        col = Math.max(0, col - 1)
-        break
       case "ArrowRight":
-        col = Math.min(maxCol, col + 1)
+        // Columns run right to left in RTL, so the arrows swap meaning.
+        if ((event.key === "ArrowRight") !== rtl) {
+          col = Math.min(maxCol, col + 1)
+        } else {
+          col = Math.max(0, col - 1)
+        }
         break
       case "Home":
         col = 0

@@ -36,9 +36,9 @@ interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
 // Right alignment reverses the row so the label hugs the right edge with its
 // controls on the inside; a reversed main axis starts on the right.
 const ALIGN_CLASS = {
-  left: "justify-start text-left",
+  left: "justify-start text-start",
   center: "justify-center text-center",
-  right: "flex-row-reverse justify-start text-right",
+  right: "flex-row-reverse justify-start text-end",
 } as const
 
 /**
@@ -128,10 +128,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
 
   return (
     <div
-      className={cn(
-        "group/th flex items-center gap-0.5",
-        ALIGN_CLASS[align]
-      )}
+      className={cn("group/th flex items-center gap-0.5", ALIGN_CLASS[align])}
     >
       {canSort ? (
         <Tooltip>
@@ -148,7 +145,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
               {isMultiSort && (
                 <Badge
                   variant="secondary"
-                  className="ml-0.5 h-4 min-w-4 shrink-0 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
+                  className="ms-0.5 h-4 min-w-4 shrink-0 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
                 >
                   {sortIndex + 1}
                 </Badge>

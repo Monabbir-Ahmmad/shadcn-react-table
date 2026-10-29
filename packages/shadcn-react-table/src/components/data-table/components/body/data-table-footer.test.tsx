@@ -69,6 +69,6 @@ describe("footer cells", () => {
   it("follow the column's meta.align", () => {
     mount()
     const cell = screen.getByText("3").closest("td")!
-    expect(cell.className).toContain("text-right")
+    expect(cell.className).toContain("text-end")
   })
 })

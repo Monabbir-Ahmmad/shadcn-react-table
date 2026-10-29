@@ -19,9 +19,9 @@ export const DENSITY_CELL_PADDING: Record<Density, string> = {
 
 /** Horizontal alignment → text-align utility, applied to body cells. */
 export const ALIGN_CELL = {
-  left: "text-left",
+  left: "text-start",
   center: "text-center",
-  right: "text-right",
+  right: "text-end",
 } as const
 
 // All injected (non-user) columns, used to find the first real data column so

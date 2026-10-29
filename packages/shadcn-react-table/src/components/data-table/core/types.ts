@@ -282,6 +282,12 @@ export interface DataTableConfig<TData extends RowData> {
   setDensity: React.Dispatch<React.SetStateAction<Density>>
   isFullscreen: boolean
   setIsFullscreen: React.Dispatch<React.SetStateAction<boolean>>
+  /** Text direction the table renders in, read from the page (`dir="rtl"`
+   *  on the table or an ancestor). Drives column resizing, arrow keys and
+   *  column virtualization. */
+  direction: "ltr" | "rtl"
+  /** Set by `DataTable` when it measures its direction. */
+  setDirection: React.Dispatch<React.SetStateAction<"ltr" | "rtl">>
   showColumnFilters: boolean
   setShowColumnFilters: React.Dispatch<React.SetStateAction<boolean>>
   /** Active filter mode per column id. */

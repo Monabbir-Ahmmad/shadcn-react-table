@@ -18,7 +18,10 @@ export function getColumnPinningStyle<TData extends RowData, TValue>(
 ): CSSProperties {
   const side = getPinSide(column)
   if (!side) return {}
-  return { position: "sticky", zIndex: 2, [side]: getPinOffset(column, side) }
+  // Logical insets: a left (start) pinned column sticks to the right edge in a
+  // right-to-left table, matching where TanStack's column order puts it.
+  const inset = side === "left" ? "insetInlineStart" : "insetInlineEnd"
+  return { position: "sticky", zIndex: 2, [inset]: getPinOffset(column, side) }
 }
 
 /**
@@ -31,8 +34,8 @@ export function getColumnPinningClass<TData extends RowData, TValue>(
   const side = getPinSide(column)
   if (!side || !isPinnedEdgeColumn(column, side)) return ""
   return side === "left"
-    ? "after:pointer-events-none after:absolute after:inset-y-0 after:-right-px after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/60 after:to-transparent"
-    : "before:pointer-events-none before:absolute before:inset-y-0 before:-left-px before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/60 before:to-transparent"
+    ? "after:pointer-events-none after:absolute after:inset-y-0 after:-end-px after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/60 after:to-transparent rtl:after:-translate-x-full rtl:after:bg-gradient-to-l"
+    : "before:pointer-events-none before:absolute before:inset-y-0 before:-start-px before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/60 before:to-transparent rtl:before:translate-x-full rtl:before:bg-gradient-to-r"
 }
 
 /** Column ids go into CSS custom-property names; ASCII punctuation and spaces

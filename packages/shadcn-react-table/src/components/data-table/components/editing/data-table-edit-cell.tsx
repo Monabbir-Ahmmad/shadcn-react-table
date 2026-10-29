@@ -83,7 +83,7 @@ export function DataTableBodyCellContent<TData extends RowData>({
           cn.setEditingCell({ rowId: row.id, columnId: column.id })
         }}
         onDoubleClick={stopPropagation}
-        className="-mx-1 w-full rounded-sm px-1 text-left transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"
+        className="-mx-1 w-full rounded-sm px-1 text-start transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"
       >
         {node}
       </button>

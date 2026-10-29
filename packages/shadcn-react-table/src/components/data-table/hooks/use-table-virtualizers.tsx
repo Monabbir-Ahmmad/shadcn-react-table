@@ -61,6 +61,7 @@ export function useTableVirtualizers<TData extends RowData>(
     columnVirtualizerOptions,
     rowVirtualizerInstanceRef,
     columnVirtualizerInstanceRef,
+    direction,
   } = table.tableInstance
 
   // Flatten center rows (+ expanded detail panels) into a virtualization list.
@@ -124,6 +125,8 @@ export function useTableVirtualizers<TData extends RowData>(
     getItemKey: (index) => leafColumns[index]?.id ?? index,
     // Pinned columns are sticky, so they must render even when scrolled out.
     rangeExtractor: (range) => pinnedRangeExtractor(range, pinnedIndexes),
+    // Right-to-left scroll offsets run negative.
+    isRtl: direction === "rtl",
     overscan: virtualOverscan,
     ...columnVOptions,
   })

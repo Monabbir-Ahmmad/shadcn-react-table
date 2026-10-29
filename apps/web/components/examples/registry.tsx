@@ -17,6 +17,7 @@ import {
   type DataTableInstance,
   type EditDisplayMode,
 } from "@monabbir/shadcn-react-table/components/data-table"
+import { dataTableLocalizationAr } from "@monabbir/shadcn-react-table/components/data-table/locales/ar"
 import { Button } from "@workspace/ui/components/button"
 import { ContextMenuItem } from "@workspace/ui/components/context-menu"
 
@@ -680,6 +681,30 @@ function LocalizationExample() {
   return <DataTable table={table} />
 }
 
+function RtlExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    localization: dataTableLocalizationAr,
+    enableColumnPinning: true,
+    enableColumnResizing: true,
+    initialState: {
+      pagination: { pageSize: 10 },
+      columnPinning: { left: ["firstName"] },
+    },
+  })
+  // The table follows the direction it renders in; set `dir="rtl"` on it or
+  // any ancestor (usually <html>).
+  return (
+    <div dir="rtl">
+      <DataTable table={table} />
+    </div>
+  )
+}
+
 const PAGE_SIZE = 10
 
 function ServerSideExample() {
@@ -752,7 +777,7 @@ function InfiniteScrollExample() {
     isFetchingNextPage,
     onLoadMore: loadMore,
     renderToolbarActions: () => (
-      <span className="text-xs tabular-nums text-muted-foreground">
+      <span className="text-xs text-muted-foreground tabular-nums">
         Loaded {rows.length} of {all.length}
       </span>
     ),
@@ -1087,6 +1112,13 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Override the string table (Spanish).",
     category: "Data",
     Component: LocalizationExample,
+  },
+  {
+    slug: "rtl",
+    title: "Right-to-left",
+    description: "Arabic, laid out right to left with a pinned column.",
+    category: "Data",
+    Component: RtlExample,
   },
   {
     slug: "server-side",

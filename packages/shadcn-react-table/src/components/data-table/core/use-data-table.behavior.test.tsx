@@ -218,11 +218,11 @@ describe("useDataTable engine behaviour", () => {
     const table = result.current
     expect(getColumnPinningStyle(table.getColumn("name")!)).toMatchObject({
       position: "sticky",
-      left: 0,
+      insetInlineStart: 0,
     })
     expect(getColumnPinningStyle(table.getColumn("salary")!)).toMatchObject({
       position: "sticky",
-      right: 0,
+      insetInlineEnd: 0,
     })
     expect(table.getColumn("age")!.getIsPinned()).toBeFalsy()
     expect(table.getState().columnPinning).toEqual({
@@ -238,7 +238,7 @@ describe("useDataTable engine behaviour", () => {
     }).result.current
     expect(getColumnPinningStyle(table.getColumn("age")!)).toMatchObject({
       position: "sticky",
-      left: 0,
+      insetInlineStart: 0,
     })
   })
 
@@ -275,12 +275,12 @@ describe("useDataTable engine behaviour", () => {
     )
     expect(
       getColumnPinningStyle(result.current.getColumn("age")!)
-    ).toMatchObject({ position: "sticky", left: 0 })
+    ).toMatchObject({ position: "sticky", insetInlineStart: 0 })
 
     rerender({ state: { columnPinning: { left: ["name"], right: [] } } })
     expect(
       getColumnPinningStyle(result.current.getColumn("name")!)
-    ).toMatchObject({ position: "sticky", left: 0 })
+    ).toMatchObject({ position: "sticky", insetInlineStart: 0 })
     expect(getColumnPinningStyle(result.current.getColumn("age")!)).toEqual({})
   })
 
@@ -290,7 +290,7 @@ describe("useDataTable engine behaviour", () => {
     expect(result.current.getState().columnPinning.left).toEqual(["age"])
     expect(
       getColumnPinningStyle(result.current.getColumn("age")!)
-    ).toMatchObject({ position: "sticky", left: 0 })
+    ).toMatchObject({ position: "sticky", insetInlineStart: 0 })
   })
 
   it("returns a stable getState() snapshot while state is unchanged", () => {

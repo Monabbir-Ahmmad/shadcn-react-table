@@ -79,6 +79,7 @@ export const docsNav: DocsNavGroup[] = [
       { title: "Theming", href: "/docs/guides/theming" },
       { title: "Custom icons", href: "/docs/guides/custom-icons" },
       { title: "Localization", href: "/docs/guides/localization" },
+      { title: "Right-to-left", href: "/docs/guides/rtl" },
     ],
   },
   {
