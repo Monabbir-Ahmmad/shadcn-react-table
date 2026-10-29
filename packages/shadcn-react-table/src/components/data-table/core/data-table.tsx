@@ -5,7 +5,6 @@ import { type RowData } from "@tanstack/react-table"
 import * as React from "react"
 
 import { Table, TableCaption } from "@workspace/ui/components/table"
-import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { getSlotProps, mergeProps } from "../helpers/slot-props"
@@ -37,6 +36,7 @@ import { getDataRowCount, getHeaderRowCount } from "../helpers/grid-rows"
 import { getColumnSizeVars } from "../utils/column-styles"
 import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
+import { DataTableProvider } from "./table-context"
 
 /**
  * Body wrapper that freezes during an active column resize. With
@@ -254,16 +254,7 @@ export function DataTable<TData extends RowData>({
   )
 
   return (
-    // Radix names the open delay `delayDuration`; Base UI's provider names it
-    // `delay`. Both are context-only components that ignore foreign props, so
-    // passing both (via an assertion, since each flavor types only its own)
-    // keeps this file flavor-neutral for the registry's install-time transform.
-    <TooltipProvider
-      {...({
-        delayDuration: 300,
-        delay: 300,
-      } as Partial<React.ComponentProps<typeof TooltipProvider>>)}
-    >
+    <DataTableProvider table={table}>
       <div
         {...mergeProps(
           // The ref is forwarded to the element, not read during render.
@@ -495,6 +486,6 @@ export function DataTable<TData extends RowData>({
 
         <DataTableEditModal table={table} />
       </div>
-    </TooltipProvider>
+    </DataTableProvider>
   )
 }
