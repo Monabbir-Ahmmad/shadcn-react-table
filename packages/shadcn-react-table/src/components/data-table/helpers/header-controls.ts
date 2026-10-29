@@ -61,7 +61,6 @@ export function shouldShowColumnDragGrip<TData extends RowData, TValue>(
   return (
     (opts.enableColumnOrdering ||
       (opts.enableGrouping && column.getCanGroup())) &&
-    !opts.enableColumnVirtualization &&
     !getPinSide(column)
   )
 }
@@ -159,8 +158,7 @@ function getColumnDefControlsWidth<TData extends RowData>(
   const canPin = def.enablePinning !== false
 
   const showGrip =
-    (opts.enableColumnOrdering || (opts.enableGrouping && canGroup)) &&
-    !opts.enableColumnVirtualization
+    opts.enableColumnOrdering || (opts.enableGrouping && canGroup)
   const showActions =
     opts.enableColumnActions &&
     !def.meta?.disableColumnActions &&

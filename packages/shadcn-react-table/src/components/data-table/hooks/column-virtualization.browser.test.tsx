@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it } from "vitest"
 
-import { nextFrame } from "../../../../test/browser/pointer"
+import { dragPointer, nextFrame } from "../../../../test/browser/pointer"
 import { DataTable } from "../core/data-table"
 import type { DataTableColumnDef } from "../core/table-types"
 import { useDataTable } from "../core/use-data-table"
@@ -98,5 +98,43 @@ describe("column virtualization with pinned columns", () => {
     s.scrollLeft = 2000
     await settle()
     expect(s.scrollWidth).toBeGreaterThanOrEqual(COLUMN_COUNT * 120 - 2)
+  })
+})
+
+function OrderingTable() {
+  const table = useDataTable<Row>({
+    columns: columns.slice(0, 20),
+    data,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    enableColumnVirtualization: true,
+    enableColumnOrdering: true,
+  })
+  return (
+    <div style={{ width: 600 }}>
+      <DataTable table={table} surfaceClassName="max-h-[400px]" />
+    </div>
+  )
+}
+
+describe("column virtualization with column ordering", () => {
+  it("moves a column with a pointer drag", async () => {
+    render(<OrderingTable />)
+    await settle()
+    const left = (text: string) =>
+      screen.getByText(text).closest("th")!.getBoundingClientRect().left
+    expect(left("H0")).toBeLessThan(left("H1"))
+
+    const grip = screen.getAllByRole("button", { name: /reorder column/i })[0]!
+    const width = screen.getByText("H0").closest("th")!.offsetWidth
+    await dragPointer(grip, { dx: width * 1.5 })
+    await settle()
+
+    expect(left("H1")).toBeLessThan(left("H0"))
+    expect(left("H0")).toBeLessThan(left("H2"))
+    // The body follows the new order.
+    const cell = (text: string) =>
+      screen.getByText(text).closest("td")!.getBoundingClientRect().left
+    expect(cell("r0c1")).toBeLessThan(cell("r0c0"))
   })
 })

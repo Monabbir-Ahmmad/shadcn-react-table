@@ -690,7 +690,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. */
   enableRowVirtualization?: boolean
   /** Virtualize columns for very wide tables. Applies fixed column widths;
-   *  pinned columns stay rendered. Column drag-ordering is not available. */
+   *  works with column pinning (pinned columns stay rendered), column
+   *  ordering and grouped headers. */
   enableColumnVirtualization?: boolean
   /** Estimated row height (px) for the virtualizer. Default 52. */
   estimateRowHeight?: number

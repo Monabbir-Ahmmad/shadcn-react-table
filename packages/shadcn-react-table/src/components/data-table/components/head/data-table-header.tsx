@@ -126,20 +126,18 @@ export function DataTableHeader<TData extends RowData>({
           key={headerGroup.id}
           className="group/th hover:bg-transparent"
         >
-          {enableColumnVirtualization ? (
-            withHeaderSpacers(
-              headerGroup.headers,
-              renderHeadCell,
-              `head-${headerGroup.id}`
-            )
-          ) : (
-            <SortableContext
-              items={leafColumnIds}
-              strategy={horizontalListSortingStrategy}
-            >
-              {headerGroup.headers.map((header) => renderHeadCell(header))}
-            </SortableContext>
-          )}
+          <SortableContext
+            items={leafColumnIds}
+            strategy={horizontalListSortingStrategy}
+          >
+            {enableColumnVirtualization
+              ? withHeaderSpacers(
+                  headerGroup.headers,
+                  renderHeadCell,
+                  `head-${headerGroup.id}`
+                )
+              : headerGroup.headers.map((header) => renderHeadCell(header))}
+          </SortableContext>
         </TableRow>
       ))}
 
