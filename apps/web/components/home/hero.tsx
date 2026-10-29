@@ -40,7 +40,7 @@ export function Hero() {
             href="/docs/guides/updating"
             className="inline-flex items-center gap-2 border bg-card px-3 py-1 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase transition-colors hover:border-primary/50 hover:text-foreground"
           >
-            <span className="size-1.5 bg-primary" />
+            <span className="size-1.5 shrink-0 bg-primary" />
             New in 1.0 · TanStack Table v9, slotProps, row dragging
           </Link>
 

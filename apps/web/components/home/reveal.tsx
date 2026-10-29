@@ -11,6 +11,6 @@ export function Reveal({
 }: React.ComponentProps<"section">) {
   const ref = useReveal<HTMLElement>()
   return (
-    <section ref={ref} className={cn(REVEAL_CLASS, className)} {...props} />
+    <section {...props} ref={ref} className={cn(REVEAL_CLASS, className)} />
   )
 }

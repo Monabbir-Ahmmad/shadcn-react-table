@@ -42,7 +42,7 @@ export function SiteHeader() {
         <Link href="/" className="text-base font-semibold tracking-tight">
           Shadcn React Table
         </Link>
-        <span className="rounded-full border bg-card px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+        <span className="hidden rounded-full border bg-card px-2 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline-flex">
           v{VERSION}
         </span>
         <nav className="hidden items-center gap-4 text-sm md:flex">
