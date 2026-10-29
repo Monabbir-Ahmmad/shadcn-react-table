@@ -30,6 +30,10 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+## Keyboard
+
+Each resize handle is focusable. With it focused, the arrow keys widen or narrow the column by 10px (50px with Shift) — mirrored in right-to-left tables — Home and End jump to the column's `minSize` and `maxSize`, and Enter fits the column to its content (or resets it when auto-size is off). Screen readers hear it as a separator with the column's current width.
+
 ## Resize mode
 
 The resize mode defaults to `"onChange"`, so columns resize live as the handle moves. Pass TanStack's `columnResizeMode: "onEnd"` to defer the resize until the handle is released.

@@ -86,6 +86,9 @@ for every rename.
 
 ### New
 
+- **New:** columns resize from the keyboard: the resize handle is a focusable
+  separator (arrow keys ±10px, Shift ±50px, Home/End to the limits, Enter to
+  fit) that reports its width to screen readers.
 - **New:** a column with several aggregations (`aggregationFn: ["sum",
   "mean"]`) shows each labelled, formatted result in grouped rows; labels come
   from the new optional `localization.aggregationFns`.
