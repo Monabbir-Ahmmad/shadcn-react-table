@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react"
+import { memo, type CSSProperties, type ReactNode } from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -18,6 +18,11 @@ const TILT_Z = -32
 const STEP = 62
 /** Depth of the blueprint mat under the stack. */
 const GROUND = 40
+/** How far the active plane lifts out of the stack. Registered so it can
+ *  transition on its own: the scroll-driven `--spread` / `--flat` must not
+ *  (a transition would make them trail the scroll). */
+const LIFT_PROPERTY =
+  "@property --lift{syntax:'<length>';inherits:true;initial-value:0px}"
 
 /** Rotation of the stack (shared with the upright callouts, which undo it). */
 const STACK_TRANSFORM = `translateY(calc(var(--spread) * 13%)) rotateX(calc((1 - var(--flat)) * ${TILT_X}deg)) rotateZ(calc((1 - var(--flat)) * ${TILT_Z}deg)) rotateY(calc(var(--tilt-x, 0) * 6deg)) rotateX(calc(var(--tilt-y, 0) * -6deg))`
@@ -74,9 +79,12 @@ export function AnatomyLayers({
       className={cn("@container w-full select-none", className)}
       data-anatomy-layers=""
     >
+      <style href="anatomy-lift" precedence="default">
+        {LIFT_PROPERTY}
+      </style>
       <div className="relative aspect-[4/3] w-full [perspective:2000px]">
         <div
-          className="absolute inset-0 transition-transform duration-300 [transform-style:preserve-3d] motion-reduce:transition-none"
+          className="absolute inset-0 [transform-style:preserve-3d]"
           style={
             {
               "--spread": spread,
@@ -103,7 +111,7 @@ export function AnatomyLayers({
 }
 
 /** The blueprint mat the stack stands on; fades as the table lies flat. */
-function Ground() {
+const Ground = memo(function Ground() {
   return (
     <div
       className="absolute -inset-x-[4%] -top-[6%] -bottom-[3%] border border-dashed border-muted-foreground/30"
@@ -119,9 +127,10 @@ function Ground() {
       <div className="absolute inset-x-[3.70%] inset-y-[5.5%] border border-muted-foreground/30 bg-foreground/[0.02]" />
     </div>
   )
-}
+})
 
-function Plane({
+/** One layer. Memoized: scroll only moves the CSS variables above it. */
+const Plane = memo(function Plane({
   index,
   id,
   slot,
@@ -141,8 +150,10 @@ function Plane({
     <div
       data-layer={index}
       data-active={active ? "" : undefined}
-      className="group/plane absolute inset-x-0 transition-transform duration-300 [--lift:0px] [transform-style:preserve-3d] data-[active]:[--lift:34px] motion-reduce:transition-none"
+      className="group/plane absolute inset-x-0 [--lift:0px] [transform-style:preserve-3d] data-[active]:[--lift:34px]"
       style={{
+        transitionProperty: "--lift",
+        transitionDuration: "300ms",
         top: `${g.top}%`,
         height: `${g.height}%`,
         transform: `translateZ(calc(var(--spread) * ${z}px + var(--lift))) translateY(calc(var(--spread) * ${g.shift * 14}px))`,
@@ -153,7 +164,7 @@ function Plane({
         <span
           key={edge}
           className={cn(
-            "absolute -left-px w-px origin-top transition-[height] duration-300 motion-reduce:transition-none",
+            "absolute -left-px w-px origin-top",
             edge === "top-0" ? "-top-px" : "top-full"
           )}
           style={{
@@ -185,7 +196,7 @@ function Plane({
       <Callout index={index} slot={slot} at={g.callout} />
     </div>
   )
-}
+})
 
 /** An upright mono callout with a leader line, pinned to the plane's right
  *  edge, naming the part's `slotProps` key. It undoes the stack's rotation so
@@ -213,7 +224,7 @@ function Callout({
       <span className="size-[6px] shrink-0 rounded-full border border-current bg-background group-data-[active]/plane:border-primary group-data-[active]/plane:bg-primary" />
       <span className="h-px w-[clamp(14px,5cqw,40px)] bg-current opacity-50 group-data-[active]/plane:bg-primary group-data-[active]/plane:opacity-100" />
       <span className="ml-1.5 font-mono text-[clamp(9px,2cqw,12px)] leading-none group-data-[active]/plane:font-medium">
-        <span className="text-muted-foreground group-data-[active]/plane:text-primary">
+        <span className="text-foreground">
           {String(index + 1).padStart(2, "0")}
         </span>{" "}
         {slot.replace(/^slotProps\./, "")}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { anatomyFrame } from "./anatomy"
+import { anatomyFrame, anatomyLayerProgress } from "./anatomy"
 
 describe("anatomyFrame", () => {
   it("starts as a slightly separated stack with the hero copy", () => {
@@ -37,5 +37,12 @@ describe("anatomyFrame", () => {
   it("clamps out-of-range progress", () => {
     expect(anatomyFrame(-1)).toEqual(anatomyFrame(0))
     expect(anatomyFrame(2)).toEqual(anatomyFrame(1))
+  })
+
+  it("maps each layer to the middle of its slice", () => {
+    for (let i = 0; i < 5; i++) {
+      expect(anatomyFrame(anatomyLayerProgress(i)).active).toBe(i)
+    }
+    expect(anatomyLayerProgress(0)).toBeCloseTo(0.155, 5)
   })
 })

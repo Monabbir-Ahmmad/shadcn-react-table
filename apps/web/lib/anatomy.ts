@@ -39,3 +39,10 @@ export function anatomyFrame(progress: number): AnatomyFrame {
   const t = (p - LAYERS_END) / (1 - LAYERS_END)
   return { spread: round(1 - t), flat: round(t), active: null, intro: 0 }
 }
+
+/** The progress at the middle of layer `index`'s slice: where the stage shows
+ *  that layer at rest (used to scroll a focused panel into view). */
+export function anatomyLayerProgress(index: number): number {
+  const slice = (LAYERS_END - INTRO_END) / COUNT
+  return INTRO_END + slice * index + slice / 2
+}

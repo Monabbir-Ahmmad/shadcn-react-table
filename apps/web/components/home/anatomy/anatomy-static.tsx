@@ -2,7 +2,7 @@ import { AnatomyLayers } from "@/components/home/anatomy/anatomy-layers"
 import {
   AnatomyHeroCopy,
   AnatomyPart,
-} from "@/components/home/anatomy/anatomy-stage"
+} from "@/components/home/anatomy/anatomy-parts"
 import { ANATOMY } from "@/lib/anatomy-content"
 
 /**
