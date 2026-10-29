@@ -5,7 +5,7 @@
   "title": "Data Table locale: Hebrew (he)",
   "description": "The data table's interface text in Hebrew. Add the data-table item first.",
   "meta": {
-    "version": "0.5.0"
+    "version": "1.0.0"
   },
   "files": [
     {

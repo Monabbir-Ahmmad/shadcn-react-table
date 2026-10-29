@@ -5,7 +5,7 @@
   "title": "Data Table locale: Danish (da)",
   "description": "The data table's interface text in Danish. Add the data-table item first.",
   "meta": {
-    "version": "0.5.0"
+    "version": "1.0.0"
   },
   "files": [
     {

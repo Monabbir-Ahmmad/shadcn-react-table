@@ -4,8 +4,33 @@ The version applies to the registry block: `/r/data-table.json` carries it
 in `meta.version`. After installing, record the version you received —
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
 
-## 0.5.0
+## 1.0.0
 
+The first stable release. The API below is what 1.x keeps; see the
+[updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating)
+for every rename.
+
+- **Changed (breaking):** the table's methods are on `table`
+  (`table.setDensity`, `table.beginRowEdit`, `table.autoSizeColumn`…), its UI
+  state is in `table.getState()`, and its resolved options and refs are on
+  `table.dataTable` (type `DataTableOptionsResolved`). `table.tableInstance`
+  and the `DataTableConfig` type are gone.
+- **Changed (breaking):** UI state is set and controlled only through
+  `initialState` / `state` (with the `on…Change` callbacks). Removed:
+  `density`, `isFullscreen`, `showColumnFilters`, `advancedFilter`,
+  `globalFilterMode`, `defaultDensity`, `defaultShowColumnFilters`,
+  `defaultGlobalFilterMode`, `defaultAdvancedFilter`.
+- **Changed (breaking):** renamed `onEditCellSave` → `onEditingCellSave`,
+  `onSaveRow` → `onEditingRowSave`, `onCreateRow` → `onCreatingRowSave`,
+  `renderToolbarActions` → `renderTopToolbarCustomActions`.
+- **Changed (breaking):** column `meta` renamed `variant` → `filterVariant`,
+  `options` → `filterSelectOptions`, `disableHighlight: true` →
+  `enableFilterMatchHighlighting: false`, `disableColumnActions: true` →
+  `enableColumnActions: false`.
+- **Changed (breaking):** `pageSizeOptions` is a `useDataTable` option, no
+  longer a `<DataTable>` prop.
+- **Removed:** the deprecated localization keys `advancedFiltersMatchLabel`
+  and `advancedFiltersOf`.
 - **Breaking — TanStack Table v9:** the engine now runs on
   `@tanstack/react-table` v9 (native `useTable` with every built-in feature,
   row model, and sort/filter/aggregation function registered, so behaviour
