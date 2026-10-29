@@ -21,6 +21,10 @@ export const docsNav: DocsNavGroup[] = [
       { title: "Quick start", href: "/docs/quick-start" },
       { title: "Usage", href: "/docs/usage" },
       { title: "Updating", href: "/docs/guides/updating" },
+      {
+        title: "Migrating from MRT",
+        href: "/docs/guides/migrating-from-mrt",
+      },
     ],
   },
   {
