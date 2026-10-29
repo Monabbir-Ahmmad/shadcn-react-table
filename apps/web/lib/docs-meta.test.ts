@@ -53,7 +53,7 @@ describe("page links", () => {
       "https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sorting.md"
     )
     expect(links.github).toBe(
-      "https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/apps/web/app/docs/guides/sorting/page.mdx"
+      "https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/apps/web/app/(site)/docs/guides/sorting/page.mdx"
     )
     expect(links.chatgpt).toContain(encodeURIComponent(links.markdown))
     expect(links.claude).toContain(encodeURIComponent(links.markdown))
@@ -74,7 +74,7 @@ describe("page links", () => {
       "https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides.md"
     )
     expect(links.github).toBe(
-      "https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/apps/web/app/docs/guides/page.tsx"
+      "https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/apps/web/app/(site)/docs/guides/page.tsx"
     )
     expect(breadcrumbFor("/docs/guides")).toEqual([
       { title: "Docs", href: "/docs" },

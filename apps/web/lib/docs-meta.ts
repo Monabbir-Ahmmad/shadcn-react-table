@@ -24,11 +24,11 @@ export function pageMarkdownUrl(pathname: string, basePath = ""): string {
 }
 
 /**
- * Docs pages whose source is not `app<path>/page.mdx` (React index pages),
+ * Docs pages whose source is not `app/(site)<path>/page.mdx` (React index pages),
  * as their path in the repo.
  */
 const PAGE_SOURCE: Record<string, string> = {
-  "/docs/guides": "apps/web/app/docs/guides/page.tsx",
+  "/docs/guides": "apps/web/app/(site)/docs/guides/page.tsx",
 }
 
 /** Index pages outside the sidebar nav, by path, for the breadcrumb. */
@@ -43,7 +43,7 @@ export function pageLinks(pathname: string) {
   const prompt = encodeURIComponent(
     `Read ${markdown} and help me use it in my project.`
   )
-  const source = PAGE_SOURCE[path] ?? `apps/web/app${path}/page.mdx`
+  const source = PAGE_SOURCE[path] ?? `apps/web/app/(site)${path}/page.mdx`
   return {
     markdown,
     github: `${GITHUB_URL}/blob/main/${source}`,

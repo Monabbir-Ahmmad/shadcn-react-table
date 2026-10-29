@@ -27,7 +27,7 @@ export interface DocsNavGroup {
 
 /**
  * Single source of truth for the docs sidebar + ordering. Each `href` maps to
- * an `app/docs/.../page.mdx` route.
+ * an `app/(site)/docs/.../page.mdx` route.
  */
 export const docsNav: DocsNavGroup[] = [
   {

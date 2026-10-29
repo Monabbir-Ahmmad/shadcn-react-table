@@ -41,6 +41,8 @@ const MIN_SCALE = 0.55
 const FALLBACK_HEIGHT = 384
 /** The card's label bar (h-9) plus its top and bottom borders. */
 const CHROME = 38
+/** Load the other three frames after this long even if the first three stall. */
+const SECOND_WAVE_DELAY = 5000
 
 /** 3D rotation only on md+ screens for people who have not asked for less motion. */
 const QUERY = "(min-width: 48rem) and (prefers-reduced-motion: no-preference)"
@@ -71,6 +73,8 @@ function useHydrated() {
 }
 
 const mod = (n: number) => ((n % COUNT) + COUNT) % COUNT
+/** Steps between two cards around the ring. */
+const ringDistance = (a: number, b: number) => Math.min(mod(a - b), mod(b - a))
 
 type Drag = { x: number; start: number; moved: boolean }
 
@@ -95,6 +99,10 @@ export function StyleDeck() {
   const [heights, setHeights] = React.useState<Record<string, number>>({})
   const [cardWidth, setCardWidth] = React.useState(0)
   const [near, setNear] = React.useState(false)
+  // The front card when the frames started loading: it and its neighbours
+  // load first, the other three once those have booted.
+  const [firstWave, setFirstWave] = React.useState<number | null>(null)
+  const [waveTimedOut, setWaveTimedOut] = React.useState(false)
   const [flatFront, setFlatFront] = React.useState(0)
 
   const sectionRef = React.useRef<HTMLElement>(null)
@@ -171,6 +179,16 @@ export function StyleDeck() {
     return () => observer.disconnect()
   }, [])
 
+  // Never leave the second wave waiting on a frame that fails to boot.
+  React.useEffect(() => {
+    if (!near) return
+    const timer = window.setTimeout(
+      () => setWaveTimedOut(true),
+      SECOND_WAVE_DELAY
+    )
+    return () => window.clearTimeout(timer)
+  }, [near])
+
   // Cards are sized by CSS; the frames inside scale to fit them.
   React.useEffect(() => {
     const card = cards.current[0]
@@ -199,6 +217,19 @@ export function StyleDeck() {
       ? mod(Math.round(rotation))
       : slotFront
     : flatFront
+  if (near && firstWave === null) setFirstWave(front)
+  const firstWaveReady =
+    firstWave !== null &&
+    [-1, 0, 1].every(
+      (d) => heights[STYLES[mod(firstWave + d)]?.name ?? ""] !== undefined
+    )
+  /** Whether a card's frame should be mounted yet. */
+  const loads = (index: number) =>
+    near &&
+    (firstWaveReady ||
+      waveTimedOut ||
+      ringDistance(index, firstWave ?? front) <= 1)
+
   // What screen readers hear: the settled front card, not every drag frame.
   const settled = is3d && dragFrom !== null ? mod(dragFrom) : front
   const go = (delta: number) => setRotation((r) => Math.round(r) + delta)
@@ -436,9 +467,9 @@ export function StyleDeck() {
                     aria-hidden
                     className="absolute inset-0 flex items-center justify-center font-mono text-xs text-muted-foreground"
                   >
-                    {near ? `Loading ${style.label}…` : style.label}
+                    {loads(i) ? `Loading ${style.label}…` : style.label}
                   </p>
-                  {near && (
+                  {loads(i) && (
                     <iframe
                       ref={(node) => {
                         if (node) frames.current.set(style.name, node)

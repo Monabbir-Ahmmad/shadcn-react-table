@@ -130,7 +130,10 @@ const groups = readNav()
 const pages = []
 for (const group of groups) {
   for (const item of group.items) {
-    const mdx = readFileSync(join(WEB, "app", item.href, "page.mdx"), "utf8")
+    const mdx = readFileSync(
+      join(WEB, "app/(site)", item.href, "page.mdx"),
+      "utf8"
+    )
     pages.push({ ...item, group: group.title, mdx, mdPath: `${item.href}.md` })
   }
 }
@@ -175,7 +178,7 @@ npx shadcn@latest add ${SITE}/r/data-table.json
 
 Then \`import { DataTable, useDataTable } from "@/components/ui/data-table"\`: build the table with \`const table = useDataTable({ data, columns, getRowId })\` and render \`<DataTable table={table} />\`.`
 
-// The guides index (`app/docs/guides/page.tsx`) is a React page, not MDX, so
+// The guides index (`app/(site)/docs/guides/page.tsx`) is a React page, not MDX, so
 // its Markdown copy is built from the nav: every group that has guide pages,
 // with the same card links and summaries as the page.
 const guidesIndex = [
