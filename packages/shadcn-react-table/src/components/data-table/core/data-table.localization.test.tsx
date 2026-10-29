@@ -141,12 +141,12 @@ describe("localization language", () => {
     const trigger = screen.getByRole("button", { name: "Filter by Born" })
     fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false })
     fireEvent.click(trigger)
-    // The popup opens on the current month, whatever the selected value is.
+    // The popup opens on the selected date's month.
     const caption = new Intl.DateTimeFormat("de", {
       month: "long",
       year: "numeric",
       calendar: "gregory",
-    }).format(new Date())
+    }).format(born)
     const wednesday = new Intl.DateTimeFormat("de", {
       weekday: "short",
       calendar: "gregory",

@@ -14,6 +14,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { VALUELESS_MODES } from "../../../fns/filter-fns"
 import { getColumnLabel } from "../../../helpers/column-label"
 import { getEffectiveMode } from "../../../helpers/effective-filter-mode"
+import { parseDate } from "../../../helpers/parse-date"
 import { DateRangeFilterField } from "./date-range"
 import {
   calendarFormatters,
@@ -69,6 +70,8 @@ export function DateFilterField<TData extends RowData, TValue>({
         <Calendar
           mode="single"
           selected={value}
+          // Open on the picked date's month, not today's.
+          defaultMonth={parseDate(value) ?? undefined}
           onSelect={(date) => column.setFilterValue(date ?? undefined)}
           autoFocus
           formatters={calendarFormatters(localization.language)}

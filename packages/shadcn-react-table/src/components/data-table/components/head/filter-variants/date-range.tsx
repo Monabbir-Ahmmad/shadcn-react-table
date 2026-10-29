@@ -12,6 +12,7 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import { getColumnLabel } from "../../../helpers/column-label"
+import { parseDate } from "../../../helpers/parse-date"
 import {
   calendarFormatters,
   CALENDAR_NAV_PROPS,
@@ -60,6 +61,8 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
         <Calendar
           mode="range"
           selected={{ from, to }}
+          // Open on the range's month, not today's.
+          defaultMonth={parseDate(from) ?? parseDate(to) ?? undefined}
           onSelect={(range) =>
             column.setFilterValue(
               range?.from || range?.to ? [range?.from, range?.to] : undefined
