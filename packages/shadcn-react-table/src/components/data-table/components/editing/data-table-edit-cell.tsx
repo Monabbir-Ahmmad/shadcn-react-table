@@ -16,6 +16,7 @@ import { stopPropagation } from "../../helpers/stop-propagation"
 import { ClickToCopy } from "../body/click-to-copy"
 import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableCell } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 /**
  * Resolves a leaf data cell's interactive content: an inline editor when this
@@ -32,7 +33,7 @@ export function DataTableBodyCellContent<TData extends RowData>({
   table: DataTableInstance<TData>
   fallback: React.ReactNode
 }) {
-  const cn = table.tableInstance
+  const cn = dt(table)
   const { row, column } = cell
   const editable = cn.enableEditing && isColumnEditable(column)
   const mode = cn.editDisplayMode
@@ -117,7 +118,7 @@ function RowDraftEditor<TData extends RowData>({
   cell: DataTableCell<TData, unknown>
   table: DataTableInstance<TData>
 }) {
-  const cn = table.tableInstance
+  const cn = dt(table)
   const { column } = cell
   const meta = column.columnDef.meta
   const value =
@@ -145,7 +146,7 @@ function LocalDraftEditor<TData extends RowData>({
   table: DataTableInstance<TData>
   exitOnCommit: boolean
 }) {
-  const cn = table.tableInstance
+  const cn = dt(table)
   const { row, column } = cell
   const meta = column.columnDef.meta
   const [draft, setDraft] = React.useState<unknown>(() => cell.getValue())

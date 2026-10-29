@@ -5,6 +5,7 @@ import type { RowData } from "@tanstack/react-table"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
+import { dt } from "../../core/internal"
 
 /**
  * Selection alert banner shown between the toolbar and the table when any rows
@@ -15,7 +16,7 @@ export function DataTableAlertBanner<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, enableRowSelection } = table.tableInstance
+  const { localization, enableRowSelection } = dt(table)
   if (!enableRowSelection) return null
 
   const selectedCount = table.getSelectedRowModel().rows.length

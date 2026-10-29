@@ -40,7 +40,7 @@ Add your own buttons without replacing anything. `renderTopToolbarCustomActions`
 ```tsx
 useDataTable({
   renderTopToolbarCustomActions: ({ table }) => (
-    <Button size="sm" onClick={() => table.tableInstance.beginCreate()}>
+    <Button size="sm" onClick={() => table.beginCreate()}>
       Add row
     </Button>
   ),

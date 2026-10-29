@@ -89,12 +89,12 @@ describe("select cell editor", () => {
       onEditingCellSave,
     })
     act(() =>
-      table().tableInstance.setEditingCell({ rowId: "1", columnId: "status" })
+      table().setEditingCell({ rowId: "1", columnId: "status" })
     )
     await pickOption("b")
     expect(onEditingCellSave).toHaveBeenCalledTimes(1)
     expect(onEditingCellSave.mock.calls[0]![0].value).toBe("b")
-    expect(table().tableInstance.editingCell).toBeNull()
+    expect(table().getState().editingCell).toBeNull()
   })
 
   it("saves the picked value, not the previous one, in table mode", async () => {

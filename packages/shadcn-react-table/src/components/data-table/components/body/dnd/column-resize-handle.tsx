@@ -6,6 +6,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../../core/types"
 import type { DataTableHeader } from "../../../core/table-types"
+import { dt } from "../../../core/internal"
 
 /** Drag handle to grab the resize edge of a column header. */
 export function ColumnResizeHandle<TData extends RowData, TValue>({
@@ -19,12 +20,12 @@ export function ColumnResizeHandle<TData extends RowData, TValue>({
   return (
     <span
       role="separator"
-      aria-label={table.tableInstance.localization.resizeColumn}
+      aria-label={dt(table).localization.resizeColumn}
       onMouseDown={header.getResizeHandler()}
       onTouchStart={header.getResizeHandler()}
       onDoubleClick={() =>
-        table.tableInstance.enableColumnAutosize
-          ? table.tableInstance.autoSizeColumn(header.column.id)
+        dt(table).enableColumnAutosize
+          ? dt(table).autoSizeColumn(header.column.id)
           : header.column.resetSize()
       }
       className={cn(

@@ -34,6 +34,7 @@ import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { useDataTableConfigContext } from "./config-context"
 import {
   createDataTableFeatures,
+  DATA_TABLE_METHODS,
   type DataTableFeatures,
   type RowModelGates,
 } from "./features"
@@ -65,7 +66,8 @@ const selectNothing = () => null
 /**
  * Core hook. Wraps `useTable` with MRT-flavoured defaults (row models,
  * auto-injected selection column, localization) and attaches our presentation
- * state + feature flags to the instance as `table.tableInstance`. Returns the
+ * feature flags to the instance as `table.dataTable` (with the UI state in
+ * `table.getState()` and its setters on `table`). Returns the
  * enriched instance to hand to `<DataTable table={table} />`.
  *
  * Controlled data state (sorting/filtering/pagination/selection/visibility),
@@ -314,7 +316,7 @@ export function useDataTable<TData extends RowData>(
   const [features] = React.useState(() =>
     createDataTableFeatures({
       gates: () => gatesRef.current,
-      getTableInstance: () => tableRef.current?.tableInstance,
+      getTableInstance: () => tableRef.current?.dataTable,
       // Typed for this hook's `TData`; the slots take TanStack's own
       // custom-row-model type, which any `TData` fits (see `features.ts`).
       filteredRowModel: advancedFilteredRowModel,
@@ -607,7 +609,7 @@ export function useDataTable<TData extends RowData>(
     [table, uiActions]
   )
 
-  // Structural DOM refs, exposed on `table.tableInstance.refs` and attached to the
+  // Structural DOM refs, exposed on `table.dataTable.refs` and attached to the
   // corresponding elements in DataTable / toolbar / global-filter.
   const tablePaperRef = React.useRef<HTMLDivElement>(null)
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
@@ -811,10 +813,14 @@ export function useDataTable<TData extends RowData>(
   // eslint-disable-next-line react-hooks/refs
   withLiveUiState(config, reactTable.store)
 
-  // The instance is TanStack's mutable object; attaching our config is the
-  // contract (`table.tableInstance`).
+  // The instance is TanStack's mutable object; attaching our config and
+  // methods is the contract (`table.dataTable`, `table.setDensity`…).
   // eslint-disable-next-line react-hooks/immutability
-  table.tableInstance = config
+  table.dataTable = config
+  for (const key of DATA_TABLE_METHODS) {
+    // eslint-disable-next-line react-hooks/immutability, react-hooks/refs
+    ;(table as unknown as Record<string, unknown>)[key] = config[key]
+  }
 
   return table
 }

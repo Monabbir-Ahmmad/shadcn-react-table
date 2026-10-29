@@ -444,7 +444,7 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => table.tableInstance.beginCreate()}
+        onClick={() => table.beginCreate()}
       >
         <RiAddLine />
         New

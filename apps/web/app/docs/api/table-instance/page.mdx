@@ -1,16 +1,24 @@
 export const metadata = { title: "Table instance" }
 
-# Table instance (`table.tableInstance`)
+# Table instance
 
-`useDataTable` returns the standard TanStack table instance with one addition: a **`tableInstance`** object holding the table's resolved configuration and UI state. Components read from it instead of prop drilling; you can read and call into it too.
+`useDataTable` returns the standard TanStack table instance with three additions: the table's UI state in `table.getState()` (density, editing, filter modes…), methods to change it on `table` itself, and the resolved options and DOM refs on **`table.dataTable`**.
 
 ```tsx
-table.tableInstance.beginCreate()       // open the create-row form
-table.tableInstance.setDensity("compact")
-const isLoading = table.tableInstance.isLoading
+table.beginCreate() // open the create-row form
+table.setDensity("compact")
+const density = table.getState().density
+const isLoading = table.dataTable.isLoading
+table.dataTable.refs.searchInputRef.current?.focus()
 ```
 
-<ApiTable of="tableInstance" propLabel="Member" />
+## Methods
+
+<ApiTable of="tableMethods" propLabel="Method" />
+
+## `table.dataTable`
+
+<ApiTable of="dataTableOptions" propLabel="Member" />
 
 <Callout variant="note" title="Everything else is TanStack">
   All standard instance methods — `getState`, `getRowModel`, `getColumn`,

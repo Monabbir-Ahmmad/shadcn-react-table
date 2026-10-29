@@ -6,12 +6,13 @@ import { VALUELESS_MODES } from "../../../fns/filter-fns"
 import { getColumnLabel } from "../../../helpers/column-label"
 import { getEffectiveMode } from "../../../helpers/effective-filter-mode"
 import { ClearableInput, ValuelessLabel, type FilterFieldProps } from "./shared"
+import { dt } from "../../../core/internal"
 
 export function TextFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const mode = getEffectiveMode(column, table)
   if (VALUELESS_MODES.has(mode)) {
     return <ValuelessLabel label={localization.filterModes[mode] ?? mode} />

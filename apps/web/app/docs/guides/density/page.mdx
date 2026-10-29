@@ -27,10 +27,10 @@ You can read or change the current density at any time through the table instanc
 
 ```tsx
 // current density: "comfortable" | "compact" | "spacious"
-const density = table.tableInstance.density
+const density = table.getState().density
 
 // switch to compact programmatically
-table.tableInstance.setDensity("compact")
+table.setDensity("compact")
 ```
 
 This is handy when you want to drive density from your own controls instead of the built-in toolbar button. To show the current density in your component's render, add `stateSelector: (state) => state.density` (see [State management](/docs/guides/state#reading-state-in-your-component)).

@@ -16,7 +16,7 @@ return <DataTable table={table} /> // renders it
 - supplies default row models (core, sorted, filtered, faceted, grouped, expanded, paginated) — TanStack v9 no longer accepts row-model options, so the table wires them itself;
 - injects display columns when needed (selection, row numbers, drag handle, expand, row actions);
 - merges localization and icons (built-in defaults → [`DataTableConfigProvider`](/docs/guides/custom-icons) → per-call options);
-- attaches all presentation state + feature flags to the instance as **`table.tableInstance`**.
+- adds to the instance: UI state in **`table.getState()`**, methods such as **`table.setDensity`**, and the resolved options on **`table.dataTable`**.
 
 Because it extends TanStack's `TableOptions`, **anything TanStack accepts passes through**: controlled `state`, `on*Change` handlers, `manual*` server-side flags, `getRowId`, `getSubRows`, `initialState`, and so on.
 
@@ -37,7 +37,7 @@ const table = useDataTable({
 
 ## The component
 
-`<DataTable table={table} />` reads `table.tableInstance` and renders the full layout: top toolbar → alert banner → drop-to-group zone → bordered scroll surface (sticky header, optional filter row, body, optional sticky footer) → pagination.
+`<DataTable table={table} />` reads `table.dataTable` and renders the full layout: top toolbar → alert banner → drop-to-group zone → bordered scroll surface (sticky header, optional filter row, body, optional sticky footer) → pagination.
 
 It takes a few presentational props — see [DataTable props](/docs/api/data-table-props). The most common is `surfaceClassName`, used to bound the scroll surface for sticky headers or virtualization:
 
@@ -45,17 +45,17 @@ It takes a few presentational props — see [DataTable props](/docs/api/data-tab
 <DataTable table={table} surfaceClassName="max-h-[600px]" />
 ```
 
-## The instance: `table.tableInstance`
+## The instance
 
-Sub-components read configuration and UI state from `table.tableInstance` rather than via props. You can use it too — for toolbar actions, custom layouts, or programmatic control:
+The table's parts read their configuration from the instance rather than via props. You can use it too — for toolbar actions, custom layouts, or programmatic control:
 
 ```tsx
 renderTopToolbarCustomActions: ({ table }) => (
-  <Button onClick={() => table.tableInstance.beginCreate()}>New row</Button>
+  <Button onClick={() => table.beginCreate()}>New row</Button>
 )
 ```
 
-It also exposes density (`density`, `setDensity`), fullscreen, filter visibility, editing state (`beginRowEdit`, `cancelEdit`, …), and every feature flag. See the full [Table instance](/docs/api/table-instance) reference.
+The UI state (density, full screen, filter visibility, editing…) is in `table.getState()`, its methods are on `table` (`setDensity`, `beginRowEdit`, `cancelEdit`, …), and every resolved option and DOM ref is on `table.dataTable`. See the full [Table instance](/docs/api/table-instance) reference.
 
 ## Columns
 

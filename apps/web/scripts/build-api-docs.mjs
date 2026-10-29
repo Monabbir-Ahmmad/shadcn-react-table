@@ -97,13 +97,27 @@ const colMetaModule = typesSf
   .find((m) => m.getName().includes("@tanstack/react-table"))
 const columnOptions = membersOf(colMetaModule.getInterfaceOrThrow("ColumnMeta"))
 
-// --- Table instance API (table.tableInstance = DataTableConfig). Most members
-// are the resolved form of a same-named option, so an undocumented member
-// borrows that option's description; `setX` setters describe themselves.
+// --- `table.dataTable` (resolved options) and the methods on `table`, both
+// from `DataTableConfig`: its key unions in types.ts say which members are
+// methods, UI state (read with `getState()`) or internal. Most members are the
+// resolved form of a same-named option, so an undocumented member borrows
+// that option's description; `setX` setters describe themselves.
+const keyUnion = (name) =>
+  typesSf
+    .getTypeAliasOrThrow(name)
+    .getTypeNodeOrThrow()
+    .getText()
+    .match(/"(\w+)"/g)
+    .map((s) => s.slice(1, -1))
+const methodKeys = new Set(keyUnion("DataTableMethodKey"))
+const hiddenKeys = new Set([
+  ...keyUnion("DataTableUiStateKey"),
+  ...keyUnion("DataTableInternalKey"),
+])
 const optionDescriptions = Object.fromEntries(
   useDataTableOptions.map((o) => [o.name, o.description])
 )
-const tableInstance = membersOf(
+const configMembers = membersOf(
   typesSf.getInterfaceOrThrow("DataTableConfig")
 ).map((member) => {
   if (member.description) return member
@@ -113,6 +127,10 @@ const tableInstance = membersOf(
     : (optionDescriptions[member.name] ?? "")
   return { ...member, description }
 })
+const dataTableOptions = configMembers.filter(
+  (m) => !methodKeys.has(m.name) && !hiddenKeys.has(m.name)
+)
+const tableMethods = configMembers.filter((m) => methodKeys.has(m.name))
 
 // --- <DataTable /> component props
 const dataTableProps = membersOf(
@@ -155,7 +173,7 @@ const iconSlots = iconsSf
     description: describe(p),
   }))
 
-// --- Instance refs (table.tableInstance.refs = DataTableRefs)
+// --- Instance refs (table.dataTable.refs = DataTableRefs)
 const tableRefs = membersOf(typesSf.getInterfaceOrThrow("DataTableRefs"))
 
 // --- Structural `data-slot` attributes (scanned from the component source so
@@ -221,7 +239,8 @@ const body =
   [
     ["useDataTableOptions", useDataTableOptions],
     ["columnOptions", columnOptions],
-    ["tableInstance", tableInstance],
+    ["dataTableOptions", dataTableOptions],
+    ["tableMethods", tableMethods],
     ["dataTableProps", dataTableProps],
     ["localizationKeys", localizationKeys],
     ["iconSlots", iconSlots],
@@ -240,7 +259,8 @@ const body =
 const undocumented = [
   ["useDataTable option", useDataTableOptions],
   ["column option", columnOptions],
-  ["instance member", tableInstance],
+  ["dataTable member", dataTableOptions],
+  ["table method", tableMethods],
   ["DataTable prop", dataTableProps],
   ["icon slot", iconSlots],
   ["ref", tableRefs],
@@ -274,7 +294,8 @@ writeFileSync(OUT, formatted)
 console.log(
   `api reference built → apps/web/lib/api-reference.generated.ts ` +
     `(options ${useDataTableOptions.length}, column ${columnOptions.length}, ` +
-    `instance ${tableInstance.length}, props ${dataTableProps.length}, ` +
+    `dataTable ${dataTableOptions.length}, methods ${tableMethods.length}, ` +
+    `props ${dataTableProps.length}, ` +
     `localization ${localizationKeys.length}, icons ${iconSlots.length}, ` +
     `refs ${tableRefs.length}, slots ${slots.length})`
 )

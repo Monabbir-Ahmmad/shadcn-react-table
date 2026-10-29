@@ -18,6 +18,7 @@ import { useTableState } from "../../hooks/use-table-state"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
+import { dt } from "../../core/internal"
 
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any
@@ -40,7 +41,7 @@ export function DataTableEditModal<TData extends RowData>({
     cancelEdit,
     onEditingRowSave,
     onCreatingRowSave,
-  } = table.tableInstance
+  } = dt(table)
   // The table around this dialog does not re-render for the edit draft.
   useTableState(table, (state) => [
     state.rowDraft,

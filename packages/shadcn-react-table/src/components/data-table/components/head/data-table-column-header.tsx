@@ -27,6 +27,7 @@ import { ColumnDragHandle } from "../body/dnd"
 import { DataTableColumnActions } from "../menus/data-table-column-actions"
 import { DataTableColumnFilter } from "./data-table-column-filter"
 import type { DataTableHeader } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
   header: DataTableHeader<TData, TValue>
@@ -52,7 +53,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   table,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   const { column } = header
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const controls = headerControlsOptionsFromTable(table)
   const align = column.columnDef.meta?.align ?? "left"
 
@@ -178,7 +179,7 @@ function SortIndicator({
   icons,
 }: {
   sorted: false | "asc" | "desc"
-  icons: DataTableInstance["tableInstance"]["icons"]
+  icons: DataTableInstance["dataTable"]["icons"]
 }) {
   if (sorted === "asc")
     return <icons.sortAscending className="size-3.5 shrink-0" />

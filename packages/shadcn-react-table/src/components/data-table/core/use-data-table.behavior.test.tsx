@@ -68,7 +68,7 @@ describe("useDataTable engine behaviour", () => {
 
     // Switching mode clears the value, then the new mode applies.
     act(() =>
-      result.current.tableInstance.setColumnFilterMode("name", "startsWith")
+      result.current.setColumnFilterMode("name", "startsWith")
     )
     expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
     act(() => result.current.getColumn("name")!.setFilterValue("ann"))
@@ -93,7 +93,7 @@ describe("useDataTable engine behaviour", () => {
     act(() => result.current.setGlobalFilter("ann"))
     // Warm the cache the way a rendered body does, then switch modes.
     expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3"])
-    act(() => result.current.tableInstance.setGlobalFilterMode("startsWith"))
+    act(() => result.current.setGlobalFilterMode("startsWith"))
     expect(ids(result.current.getRowModel().rows)).toEqual(["2", "3"])
   })
 
@@ -120,7 +120,7 @@ describe("useDataTable engine behaviour", () => {
   it("applies the advanced filter group", () => {
     const { result } = setup({ enableAdvancedFilter: true })
     act(() =>
-      result.current.tableInstance.setAdvancedFilter({
+      result.current.setAdvancedFilter({
         logic: "and",
         rules: [
           { id: "r1", columnId: "age", operator: "greaterThan", value: 40 },
@@ -417,12 +417,12 @@ describe("useDataTable engine behaviour", () => {
     const onColumnFiltersChange = vi.fn()
     const { result } = setup({ onColumnFiltersChange })
     act(() =>
-      result.current.tableInstance.setColumnFilterMode("name", "startsWith")
+      result.current.setColumnFilterMode("name", "startsWith")
     )
     expect(onColumnFiltersChange).not.toHaveBeenCalled()
 
     // A valueless mode still activates (it needs a sentinel value).
-    act(() => result.current.tableInstance.setColumnFilterMode("name", "empty"))
+    act(() => result.current.setColumnFilterMode("name", "empty"))
     expect(onColumnFiltersChange).toHaveBeenCalledTimes(1)
   })
 

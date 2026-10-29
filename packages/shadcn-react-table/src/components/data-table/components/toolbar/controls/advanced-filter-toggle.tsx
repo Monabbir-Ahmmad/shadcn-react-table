@@ -12,6 +12,7 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../../core/types"
+import { dt } from "../../../core/internal"
 
 /** Toolbar button that opens the advanced filter panel; badges the active-rule
  *  count when any rules are set. */
@@ -26,7 +27,7 @@ export function DataTableAdvancedFilterToggle<TData extends RowData>({
     advancedFilter,
     showAdvancedFilterPanel,
     setShowAdvancedFilterPanel,
-  } = table.tableInstance
+  } = dt(table)
   const count = advancedFilter.rules.length
 
   return (

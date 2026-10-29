@@ -97,8 +97,8 @@ file.
    with no type argument now defaults to `RowData`.
 9. **Render contexts are unchanged.** Column renderers (`cell`, `header`,
    `footer`, `aggregatedCell`) still receive the enriched instance, so
-   `({ table }) => table.getState()` and `table.tableInstance` type-check and
-   work as before. TanStack v9's own contexts don't include `getState`.
+   `({ table }) => table.getState()`, `table.dataTable` and the table's
+   methods type-check. TanStack v9's own contexts don't include `getState`.
 10. **`table.options` is the options object you passed in** on the latest render
     (TanStack v9's React adapter behavior), not TanStack's internally merged
     options with feature defaults.

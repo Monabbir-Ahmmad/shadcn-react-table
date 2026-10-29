@@ -46,7 +46,7 @@ describe("usePageResetOnFilterChange", () => {
   it("resets to the first page when the advanced filter changes", () => {
     const result = setup({ enableAdvancedFilter: true })
     act(() =>
-      result.current.tableInstance.setAdvancedFilter({
+      result.current.setAdvancedFilter({
         logic: "and",
         rules: [
           { id: "r", columnId: "name", operator: "contains", value: "1" },

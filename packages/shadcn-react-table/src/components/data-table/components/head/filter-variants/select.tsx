@@ -14,12 +14,13 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { getColumnLabel } from "../../../helpers/column-label"
 import { FIELD_CLASS, useSelectOptions, type FilterFieldProps } from "./shared"
+import { dt } from "../../../core/internal"
 
 export function SelectFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const { options } = useSelectOptions(column)
   const value = (column.getFilterValue() as string) || ""
   return (

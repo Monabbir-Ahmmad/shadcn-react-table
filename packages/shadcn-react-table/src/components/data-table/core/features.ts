@@ -22,6 +22,7 @@ import {
 
 import { toDataTableState } from "../helpers/table-state"
 import type { DataTableCoreTable } from "./table-types"
+import type { DataTableMethodKey } from "./types"
 import { createUiStateFeature, type DataTableUiState } from "./ui-state"
 
 // TanStack types `aggregationFns` with a type alias it doesn't export, which
@@ -34,7 +35,7 @@ interface BuiltInAggregationFns extends Pick<
 > {}
 const builtInAggregationFns: BuiltInAggregationFns = aggregationFns
 
-// Our instance members (`getState()` in our state shape, `tableInstance`) as a
+// Our instance members (`getState()` in our state shape, `dataTable`, the methods) as a
 // TanStack feature, so TanStack's own types for tables built with this feature
 // set carry them (see the `Table_FeatureMap` augmentation in `types.ts`). The
 // base entry is a placeholder that puts the key on `DataTableFeatures`; each
@@ -90,6 +91,24 @@ export interface RowModelGates {
 
 const EMPTY_FACETS = new Map<unknown, number>()
 
+/** Every method the table adds to the TanStack instance. */
+export const DATA_TABLE_METHODS = [
+  "setDensity",
+  "setIsFullscreen",
+  "setShowColumnFilters",
+  "setColumnFilterMode",
+  "setGlobalFilterMode",
+  "setAdvancedFilter",
+  "setShowAdvancedFilterPanel",
+  "setEditingCell",
+  "setRowDraftValue",
+  "beginRowEdit",
+  "beginCreate",
+  "cancelEdit",
+  "autoSizeColumn",
+  "autoSizeAllColumns",
+] as const satisfies readonly DataTableMethodKey[]
+
 /**
  * The per-table feature set. TanStack builds each row model once, on first
  * use, from whatever is on `features` at that moment, so stages that our
@@ -107,7 +126,7 @@ export function createDataTableFeatures({
   gates: () => RowModelGates
   /** Starting values of the UI state slices (see `ui-state.ts`). */
   uiDefaults: () => DataTableUiState
-  /** The hook's `tableInstance` config, read lazily. */
+  /** The hook's `dataTable` config, read lazily. */
   getTableInstance: () => unknown
   filteredRowModel: DataTableFeatures["filteredRowModel"]
   sortedRowModel: DataTableFeatures["sortedRowModel"]
@@ -123,7 +142,20 @@ export function createDataTableFeatures({
         const core = table as unknown as DataTableCoreTable<RowData>
         Object.defineProperties(core, {
           getState: { value: () => toDataTableState(core.store.state) },
-          tableInstance: { get: getTableInstance },
+          dataTable: { get: getTableInstance },
+          // The methods, for render contexts (`cell: ({ table }) => …`),
+          // which hold TanStack's own instance.
+          ...Object.fromEntries(
+            DATA_TABLE_METHODS.map((key) => [
+              key,
+              {
+                get: () =>
+                  (getTableInstance() as Record<string, unknown> | undefined)?.[
+                    key
+                  ],
+              },
+            ])
+          ),
         })
       },
     },

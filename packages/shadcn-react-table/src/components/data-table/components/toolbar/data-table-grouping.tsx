@@ -8,6 +8,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
+import { dt } from "../../core/internal"
 
 export const GROUP_DROPZONE_ID = "cn-group-dropzone"
 
@@ -21,7 +22,7 @@ export function DataTableDropToGroupZone<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const grouping = table.getState().grouping
   const { setNodeRef, isOver } = useDroppable({ id: GROUP_DROPZONE_ID })
 

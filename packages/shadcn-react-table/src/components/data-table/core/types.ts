@@ -60,7 +60,7 @@ export type ColumnVirtualizerOptions<TData extends RowData> = ValueOrFunc<
 
 /**
  * DOM refs to the table's structural elements, exposed on
- * `table.tableInstance.refs` for imperative access (focus, measure, scroll). Each is
+ * `table.dataTable.refs` for imperative access (focus, measure, scroll). Each is
  * populated after mount and may be `null` when its element isn't rendered
  * (e.g. `bottomToolbarRef` with no bottom toolbar, `tableFooterRef` with no
  * footer, `searchInputRef` before the search box is expanded).
@@ -190,8 +190,9 @@ declare module "@tanstack/react-table" {
     /** Options for the "select" edit variant. */
     editSelectOptions?: DataTableFilterOption[]
     /** Custom inline editor for this column (escape hatch). Replaces the built-in
-     *  editor while the cell/row is editing; drive the value via `table.tableInstance`
-     *  (`rowDraft`/`setRowDraftValue` or `onEditingCellSave`). */
+     *  editor while the cell/row is editing; read the draft from
+     *  `table.getState().rowDraft` and write it with `table.setRowDraftValue`
+     *  (row editing), or save with `onEditingCellSave` (cell editing). */
     renderEditCell?: (props: CellRenderProps<TData, TValue>) => React.ReactNode
     /** Custom render for this column's group header cell (when grouped). */
     renderGroupedCell?: (
@@ -248,9 +249,10 @@ declare module "@tanstack/react-table" {
     dataTableInstanceFeature: {
       /** Table state in our stable shape (left/right column pinning). */
       getState: () => DataTableState
-      /** Our configuration + UI state. */
-      tableInstance: DataTableConfig<TData>
-    }
+      /** The table's resolved options (localization, icons, flags, render
+       *  props) and DOM refs. */
+      dataTable: DataTableOptionsResolved<TData>
+    } & DataTableMethods<TData>
   }
 }
 
@@ -279,10 +281,58 @@ export interface CellRenderProps<TData extends RowData, TValue = unknown> {
   table: DataTableInstance<TData>
 }
 
+/** UI state slices: read them with `table.getState()`. */
+type DataTableUiStateKey =
+  | "density"
+  | "isFullscreen"
+  | "direction"
+  | "showColumnFilters"
+  | "columnFilterModes"
+  | "globalFilterMode"
+  | "advancedFilter"
+  | "showAdvancedFilterPanel"
+  | "editingCell"
+  | "editingRowId"
+  | "isCreating"
+  | "rowDraft"
+
+/** Methods the table adds to the TanStack instance (`table.setDensity`…). */
+export type DataTableMethodKey =
+  | "setDensity"
+  | "setIsFullscreen"
+  | "setShowColumnFilters"
+  | "setColumnFilterMode"
+  | "setGlobalFilterMode"
+  | "setAdvancedFilter"
+  | "setShowAdvancedFilterPanel"
+  | "setEditingCell"
+  | "setRowDraftValue"
+  | "beginRowEdit"
+  | "beginCreate"
+  | "cancelEdit"
+  | "autoSizeColumn"
+  | "autoSizeAllColumns"
+
+/** Members for the table's own parts only. */
+type DataTableInternalKey = "setDirection" | "columnsWithCustomCell"
+
+/** The table's resolved options and refs: `table.dataTable`. */
+export type DataTableOptionsResolved<TData extends RowData> = Omit<
+  DataTableConfig<TData>,
+  DataTableUiStateKey | DataTableMethodKey | DataTableInternalKey
+>
+
+/** The methods the table adds to the TanStack instance. */
+export type DataTableMethods<TData extends RowData> = Pick<
+  DataTableConfig<TData>,
+  DataTableMethodKey
+>
+
 /**
- * Our configuration + UI state, attached to the TanStack table instance under
- * `table.tableInstance`. Sub-components read it from the instance rather than via
- * prop drilling (mirrors Material React Table's `table.options` pattern).
+ * The full configuration the table's parts read (through `dt(table)`): the
+ * resolved options, live UI state, methods and internals. Consumers see the
+ * public parts as `table.dataTable` (options), `table.getState()` (state) and
+ * the methods on `table`.
  */
 export interface DataTableConfig<TData extends RowData> {
   localization: DataTableLocalization
@@ -492,9 +542,11 @@ export type DataTableInstance<TData extends RowData = RowData> = ReactTable<
   DataTableFeatures,
   TData
 > & {
-  tableInstance: DataTableConfig<TData>
+  /** The table's resolved options (localization, icons, flags, render props)
+   *  and DOM refs. */
+  dataTable: DataTableOptionsResolved<TData>
   getState: () => DataTableState
-}
+} & DataTableMethods<TData>
 
 type CoreTableOptions<TData extends RowData> = TableOptions<
   DataTableFeatures,

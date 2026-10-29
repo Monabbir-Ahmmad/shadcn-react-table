@@ -34,6 +34,7 @@ import { useFullscreenModal } from "../hooks/use-fullscreen-modal"
 import { getDataRowCount, getHeaderRowCount } from "../helpers/grid-rows"
 import { getColumnSizeVars } from "../utils/column-styles"
 import { type DataTableInstance } from "./types"
+import { dt } from "./internal"
 
 /**
  * Body wrapper that freezes during an active column resize. With
@@ -134,8 +135,8 @@ export function DataTable<TData extends RowData>({
     localization,
     renderCaption,
     renderTopToolbar,
-    refs,
-  } = table.tableInstance
+  } = dt(table)
+  const { refs } = table.dataTable
 
   // The paper div feeds `refs.tablePaperRef` and, when given, the consumer's
   // own ref; a plain `ref={refs.tablePaperRef}` would be overwritten by the
@@ -295,7 +296,7 @@ export function DataTable<TData extends RowData>({
           : enableTopToolbar && (
               <ToolbarRegion
                 table={table}
-                config={table.tableInstance}
+                config={dt(table)}
                 // Forwarding the exposed ref objects as props (not reading
                 // .current during render).
                 toolbarRef={refs.topToolbarRef}
@@ -303,14 +304,14 @@ export function DataTable<TData extends RowData>({
               />
             )}
         {positionToolbarAlertBanner === "top" && (
-          <AlertBannerRegion table={table} config={table.tableInstance} />
+          <AlertBannerRegion table={table} config={dt(table)} />
         )}
 
         {enablePagination &&
           (positionPagination === "top" || positionPagination === "both") && (
             <PaginationRegion
               table={table}
-              config={table.tableInstance}
+              config={dt(table)}
               pageSizeOptions={pageSizeOptions}
             />
           )}
@@ -324,10 +325,7 @@ export function DataTable<TData extends RowData>({
           {enableGrouping &&
             (positionToolbarDropZone === "top" ||
               positionToolbarDropZone === "both") && (
-              <DropToGroupZoneRegion
-                table={table}
-                config={table.tableInstance}
-              />
+              <DropToGroupZoneRegion table={table} config={dt(table)} />
             )}
 
           <div
@@ -418,7 +416,7 @@ export function DataTable<TData extends RowData>({
               )}
               <HeaderRegion
                 table={table}
-                config={table.tableInstance}
+                config={dt(table)}
                 withHeaderSpacers={withHeaderSpacers}
               />
               <GridSyncContext.Provider value={scheduleSync}>
@@ -433,7 +431,7 @@ export function DataTable<TData extends RowData>({
               {showFooter && (
                 <FooterRegion
                   table={table}
-                  config={table.tableInstance}
+                  config={dt(table)}
                   withHeaderSpacers={withHeaderSpacers}
                 />
               )}
@@ -479,20 +477,17 @@ export function DataTable<TData extends RowData>({
           {enableGrouping &&
             (positionToolbarDropZone === "bottom" ||
               positionToolbarDropZone === "both") && (
-              <DropToGroupZoneRegion
-                table={table}
-                config={table.tableInstance}
-              />
+              <DropToGroupZoneRegion table={table} config={dt(table)} />
             )}
         </DndContext>
 
         {positionToolbarAlertBanner === "bottom" && (
-          <AlertBannerRegion table={table} config={table.tableInstance} />
+          <AlertBannerRegion table={table} config={dt(table)} />
         )}
 
         <BottomToolbarRegion
           table={table}
-          config={table.tableInstance}
+          config={dt(table)}
           pageSizeOptions={pageSizeOptions}
         />
 

@@ -10,6 +10,7 @@ import { pinnedRangeExtractor } from "../helpers/pinned-range-extractor"
 import { resolveRowHeight } from "../helpers/resolve-row-height"
 import { getVirtualHeaderRuns } from "../helpers/virtual-header-runs"
 import type { DataTableRow } from "../core/table-types"
+import { dt } from "../core/internal"
 
 export interface VirtualRowItem<TData extends RowData> {
   row: DataTableRow<TData>
@@ -62,7 +63,7 @@ export function useTableVirtualizers<TData extends RowData>(
     rowVirtualizerInstanceRef,
     columnVirtualizerInstanceRef,
     direction,
-  } = table.tableInstance
+  } = dt(table)
 
   // Flatten center rows (+ expanded detail panels) into a virtualization list.
   const virtualItems: VirtualRowItem<TData>[] = []

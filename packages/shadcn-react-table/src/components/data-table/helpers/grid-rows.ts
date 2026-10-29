@@ -1,13 +1,14 @@
 import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableInstance } from "../core/types"
+import { dt } from "../core/internal"
 
 /** Whether the per-column filter row renders under the headers. */
 export function isFilterRowVisible<TData extends RowData>(
   table: DataTableInstance<TData>
 ): boolean {
   const { enableColumnFilters, showColumnFilters, columnFilterDisplayMode } =
-    table.tableInstance
+    dt(table)
   return (
     enableColumnFilters &&
     showColumnFilters &&

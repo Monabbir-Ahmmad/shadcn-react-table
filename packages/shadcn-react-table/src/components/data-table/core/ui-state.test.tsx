@@ -30,7 +30,7 @@ describe("UI state as table state", () => {
     expect(state.density).toBe("compact")
     expect(state.showColumnFilters).toBe(true)
     expect(state.editingCell).toBeNull()
-    expect(result.current.tableInstance.density).toBe("compact")
+    expect(result.current.getState().density).toBe("compact")
   })
 
   it("defaults to comfortable density, filters hidden, fuzzy search", () => {
@@ -44,12 +44,12 @@ describe("UI state as table state", () => {
     const onDensityChange = vi.fn()
     const onEditingCellChange = vi.fn()
     const { result } = setup({ onDensityChange, onEditingCellChange })
-    act(() => result.current.tableInstance.setDensity("compact"))
+    act(() => result.current.setDensity("compact"))
     expect(result.current.getState().density).toBe("compact")
     expect(onDensityChange).toHaveBeenCalledWith("compact")
 
     const cell = { rowId: "1", columnId: "name" }
-    act(() => result.current.tableInstance.setEditingCell(cell))
+    act(() => result.current.setEditingCell(cell))
     expect(result.current.getState().editingCell).toEqual(cell)
     expect(onEditingCellChange).toHaveBeenCalledWith(cell)
   })
@@ -61,19 +61,19 @@ describe("UI state as table state", () => {
       onEditingCellChange,
     })
     const cell = { rowId: "1", columnId: "name" }
-    act(() => result.current.tableInstance.setEditingCell(cell))
+    act(() => result.current.setEditingCell(cell))
     expect(onEditingCellChange).toHaveBeenCalledWith(cell)
     // The owner has not applied it yet.
     expect(result.current.getState().editingCell).toBeNull()
 
     rerender({ state: { editingCell: cell }, onEditingCellChange })
     expect(result.current.getState().editingCell).toEqual(cell)
-    expect(result.current.tableInstance.editingCell).toEqual(cell)
+    expect(result.current.getState().editingCell).toEqual(cell)
   })
 
   it("follows controlled density through state", () => {
     const { result, rerender } = setup({ state: { density: "compact" } })
-    act(() => result.current.tableInstance.setDensity("spacious"))
+    act(() => result.current.setDensity("spacious"))
     expect(result.current.getState().density).toBe("compact")
     rerender({ state: { density: "spacious" } })
     expect(result.current.getState().density).toBe("spacious")
@@ -81,7 +81,7 @@ describe("UI state as table state", () => {
 
   it("resets with the rest of the table", () => {
     const { result } = setup()
-    act(() => result.current.tableInstance.setIsFullscreen(true))
+    act(() => result.current.setIsFullscreen(true))
     expect(result.current.getState().isFullscreen).toBe(true)
     act(() => result.current.reset())
     expect(result.current.getState().isFullscreen).toBe(false)

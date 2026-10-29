@@ -7,6 +7,7 @@ import * as React from "react"
 import { GROUP_DROPZONE_ID } from "../components/toolbar/data-table-grouping"
 import type { DataTableInstance } from "../core/types"
 import { getColumnLabel } from "../helpers/column-label"
+import { dt } from "../core/internal"
 
 /** dnd-kit screen-reader text in the table's language, naming columns by
  *  their label, rows by their position (counting earlier pages) and the group
@@ -17,7 +18,7 @@ export function useDragAnnouncements<TData extends RowData>(
   announcements: Announcements
   screenReaderInstructions: ScreenReaderInstructions
 } {
-  const { localization } = table.tableInstance
+  const { localization } = dt(table)
   return React.useMemo(() => {
     const label = (
       id: string | number,
@@ -32,9 +33,7 @@ export function useDragAnnouncements<TData extends RowData>(
         const index = table.getRowModel().rows.findIndex((r) => r.id === key)
         if (index >= 0) {
           const { pageIndex, pageSize } = table.getState().pagination
-          const offset = table.tableInstance.enablePagination
-            ? pageIndex * pageSize
-            : 0
+          const offset = dt(table).enablePagination ? pageIndex * pageSize : 0
           return localization.dragRowLabel(offset + index + 1)
         }
       }

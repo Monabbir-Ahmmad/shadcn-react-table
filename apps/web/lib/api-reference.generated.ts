@@ -883,7 +883,7 @@ export const columnOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; drive the value via `table.tableInstance` (`rowDraft`/`setRowDraftValue` or `onEditingCellSave`).",
+      "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; read the draft from `table.getState().rowDraft` and write it with `table.setRowDraftValue` (row editing), or save with `onEditingCellSave` (cell editing).",
   },
   {
     name: "renderGroupedCell",
@@ -957,7 +957,7 @@ export const columnOptions: ApiMember[] = [
   },
 ]
 
-export const tableInstance: ApiMember[] = [
+export const dataTableOptions: ApiMember[] = [
   {
     name: "localization",
     type: "DataTableLocalization",
@@ -972,92 +972,6 @@ export const tableInstance: ApiMember[] = [
     required: true,
     default: null,
     description: "Override any subset of the table's icons.",
-  },
-  {
-    name: "density",
-    type: "Density",
-    required: true,
-    default: null,
-    description: "Current density (table state).",
-  },
-  {
-    name: "setDensity",
-    type: "React.Dispatch<React.SetStateAction<Density>>",
-    required: true,
-    default: null,
-    description: "Updates `density`.",
-  },
-  {
-    name: "isFullscreen",
-    type: "boolean",
-    required: true,
-    default: null,
-    description: "Whether the table is full screen (table state).",
-  },
-  {
-    name: "setIsFullscreen",
-    type: "React.Dispatch<React.SetStateAction<boolean>>",
-    required: true,
-    default: null,
-    description: "Updates `isFullscreen`.",
-  },
-  {
-    name: "direction",
-    type: '"ltr" | "rtl"',
-    required: true,
-    default: null,
-    description:
-      'Text direction the table renders in, read from the page (`dir="rtl"` on the table or an ancestor). Drives column resizing, arrow keys and column virtualization.',
-  },
-  {
-    name: "setDirection",
-    type: 'React.Dispatch<React.SetStateAction<"ltr" | "rtl">>',
-    required: true,
-    default: null,
-    description: "Set by `DataTable` when it measures its direction.",
-  },
-  {
-    name: "showColumnFilters",
-    type: "boolean",
-    required: true,
-    default: null,
-    description: "Whether the filter row shows (table state).",
-  },
-  {
-    name: "setShowColumnFilters",
-    type: "React.Dispatch<React.SetStateAction<boolean>>",
-    required: true,
-    default: null,
-    description: "Updates `showColumnFilters`.",
-  },
-  {
-    name: "columnFilterModes",
-    type: "Record<string, FilterMode>",
-    required: true,
-    default: null,
-    description: "Active filter mode per column id.",
-  },
-  {
-    name: "setColumnFilterMode",
-    type: "(columnId: string, mode: FilterMode) => void",
-    required: true,
-    default: null,
-    description:
-      "Switch a column's filter mode (resets the value when it becomes invalid).",
-  },
-  {
-    name: "globalFilterMode",
-    type: "GlobalFilterMode",
-    required: true,
-    default: null,
-    description: "Current global search mode (table state).",
-  },
-  {
-    name: "setGlobalFilterMode",
-    type: "(mode: GlobalFilterMode) => void",
-    required: true,
-    default: null,
-    description: "Updates `globalFilterMode`.",
   },
   {
     name: "enableGlobalFilter",
@@ -1082,34 +996,6 @@ export const tableInstance: ApiMember[] = [
     default: null,
     description:
       "Compound AND/OR filter panel (independent of, and additive to, the per-column filters and global search).",
-  },
-  {
-    name: "advancedFilter",
-    type: "AdvancedFilterGroup",
-    required: true,
-    default: null,
-    description: "Current advanced filter (table state).",
-  },
-  {
-    name: "setAdvancedFilter",
-    type: "React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>",
-    required: true,
-    default: null,
-    description: "Updates `advancedFilter`.",
-  },
-  {
-    name: "showAdvancedFilterPanel",
-    type: "boolean",
-    required: true,
-    default: null,
-    description: "Whether the advanced filter dialog is open.",
-  },
-  {
-    name: "setShowAdvancedFilterPanel",
-    type: "React.Dispatch<React.SetStateAction<boolean>>",
-    required: true,
-    default: null,
-    description: "Updates `showAdvancedFilterPanel`.",
   },
   {
     name: "isLoading",
@@ -1189,14 +1075,6 @@ export const tableInstance: ApiMember[] = [
     description: "Highlight matched substrings in cells. Default true.",
   },
   {
-    name: "columnsWithCustomCell",
-    type: "ReadonlySet<string>",
-    required: true,
-    default: null,
-    description:
-      "Column ids that supply a custom cell renderer (skipped by auto-highlight).",
-  },
-  {
     name: "enableColumnOrdering",
     type: "boolean",
     required: true,
@@ -1226,21 +1104,6 @@ export const tableInstance: ApiMember[] = [
     default: null,
     description:
       "Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead.",
-  },
-  {
-    name: "autoSizeColumn",
-    type: "(columnId: string) => void",
-    required: true,
-    default: null,
-    description:
-      "Resize a single column to fit its widest visible value (header + data).",
-  },
-  {
-    name: "autoSizeAllColumns",
-    type: "() => void",
-    required: true,
-    default: null,
-    description: "Auto-size every resizable visible column.",
   },
   {
     name: "enableRowOrdering",
@@ -1331,73 +1194,6 @@ export const tableInstance: ApiMember[] = [
     default: null,
     description:
       'How the create form is surfaced, independent of `editDisplayMode`: `"modal"` (dialog, default), `"row"` (an inline editable row at the top of the table), or `"custom"` (you render it from `isCreating` + `rowDraft`).',
-  },
-  {
-    name: "editingCell",
-    type: "EditingCell | null",
-    required: true,
-    default: null,
-    description:
-      "The cell being edited in cell mode (`{ rowId, columnId }`), or `null`.",
-  },
-  {
-    name: "setEditingCell",
-    type: "React.Dispatch<React.SetStateAction<EditingCell | null>>",
-    required: true,
-    default: null,
-    description: "Updates `editingCell`.",
-  },
-  {
-    name: "editingRowId",
-    type: "string | null",
-    required: true,
-    default: null,
-    description: "Id of the row being edited in row or modal mode, or `null`.",
-  },
-  {
-    name: "isCreating",
-    type: "boolean",
-    required: true,
-    default: null,
-    description: "Whether a new row is being created.",
-  },
-  {
-    name: "rowDraft",
-    type: "Record<string, unknown>",
-    required: true,
-    default: null,
-    description:
-      "Draft values for the row/modal editor + create form, keyed by column id.",
-  },
-  {
-    name: "setRowDraftValue",
-    type: "(columnId: string, value: unknown) => void",
-    required: true,
-    default: null,
-    description: "Updates `rowDraftValue`.",
-  },
-  {
-    name: "beginRowEdit",
-    type: "(row: DataTableRow<TData>) => void",
-    required: true,
-    default: null,
-    description:
-      "Enter row/modal editing for a row, seeding the draft from its values.",
-  },
-  {
-    name: "beginCreate",
-    type: "() => void",
-    required: true,
-    default: null,
-    description:
-      "Open the create form, seeding the draft from `createRowDefaults`.",
-  },
-  {
-    name: "cancelEdit",
-    type: "() => void",
-    required: true,
-    default: null,
-    description: "Exit any editing/creating state, discarding the draft.",
   },
   {
     name: "enableClickToCopy",
@@ -1807,6 +1603,111 @@ export const tableInstance: ApiMember[] = [
     default: null,
     description:
       "Content shown when there are no rows. Defaults to `localization.noRecordsToDisplay`.",
+  },
+]
+
+export const tableMethods: ApiMember[] = [
+  {
+    name: "setDensity",
+    type: "React.Dispatch<React.SetStateAction<Density>>",
+    required: true,
+    default: null,
+    description: "Updates `density`.",
+  },
+  {
+    name: "setIsFullscreen",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Updates `isFullscreen`.",
+  },
+  {
+    name: "setShowColumnFilters",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Updates `showColumnFilters`.",
+  },
+  {
+    name: "setColumnFilterMode",
+    type: "(columnId: string, mode: FilterMode) => void",
+    required: true,
+    default: null,
+    description:
+      "Switch a column's filter mode (resets the value when it becomes invalid).",
+  },
+  {
+    name: "setGlobalFilterMode",
+    type: "(mode: GlobalFilterMode) => void",
+    required: true,
+    default: null,
+    description: "Updates `globalFilterMode`.",
+  },
+  {
+    name: "setAdvancedFilter",
+    type: "React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>",
+    required: true,
+    default: null,
+    description: "Updates `advancedFilter`.",
+  },
+  {
+    name: "setShowAdvancedFilterPanel",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Updates `showAdvancedFilterPanel`.",
+  },
+  {
+    name: "autoSizeColumn",
+    type: "(columnId: string) => void",
+    required: true,
+    default: null,
+    description:
+      "Resize a single column to fit its widest visible value (header + data).",
+  },
+  {
+    name: "autoSizeAllColumns",
+    type: "() => void",
+    required: true,
+    default: null,
+    description: "Auto-size every resizable visible column.",
+  },
+  {
+    name: "setEditingCell",
+    type: "React.Dispatch<React.SetStateAction<EditingCell | null>>",
+    required: true,
+    default: null,
+    description: "Updates `editingCell`.",
+  },
+  {
+    name: "setRowDraftValue",
+    type: "(columnId: string, value: unknown) => void",
+    required: true,
+    default: null,
+    description: "Updates `rowDraftValue`.",
+  },
+  {
+    name: "beginRowEdit",
+    type: "(row: DataTableRow<TData>) => void",
+    required: true,
+    default: null,
+    description:
+      "Enter row/modal editing for a row, seeding the draft from its values.",
+  },
+  {
+    name: "beginCreate",
+    type: "() => void",
+    required: true,
+    default: null,
+    description:
+      "Open the create form, seeding the draft from `createRowDefaults`.",
+  },
+  {
+    name: "cancelEdit",
+    type: "() => void",
+    required: true,
+    default: null,
+    description: "Exit any editing/creating state, discarding the draft.",
   },
 ]
 

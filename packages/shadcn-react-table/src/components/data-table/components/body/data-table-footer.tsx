@@ -26,6 +26,7 @@ import {
   getWidthStyle,
 } from "../../utils/column-styles"
 import type { DataTableHeader } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 interface DataTableFooterProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -53,7 +54,7 @@ export function DataTableFooter<TData extends RowData>({
     enableStickyFooter,
     enableKeyboardNavigation,
     refs,
-  } = table.tableInstance
+  } = dt(table)
   const padding = DENSITY_CELL_PADDING[density]
 
   return (

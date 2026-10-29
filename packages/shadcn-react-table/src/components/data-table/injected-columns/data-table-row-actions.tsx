@@ -12,6 +12,7 @@ import {
 import type { DataTableInstance } from "../core/types"
 import type { DataTableColumnDef, DataTableRow } from "../core/table-types"
 import { stopPropagation } from "../helpers/stop-propagation"
+import { dt } from "../core/internal"
 
 export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
 
@@ -65,7 +66,7 @@ function RowActionsCell<TData extends RowData>({
     cancelEdit,
     renderRowActions,
     renderRowActionMenuItems,
-  } = table.tableInstance
+  } = dt(table)
 
   const isEditingThisRow = editDisplayMode === "row" && editingRowId === row.id
 
@@ -82,7 +83,12 @@ function RowActionsCell<TData extends RowData>({
           aria-label={localization.save}
           className="size-7"
           onClick={() =>
-            onEditingRowSave?.({ row, values: rowDraft, table, exit: cancelEdit })
+            onEditingRowSave?.({
+              row,
+              values: rowDraft,
+              table,
+              exit: cancelEdit,
+            })
           }
         >
           <icons.save />

@@ -19,6 +19,7 @@ import {
 
 import type { DataTableInstance } from "../../core/types"
 import { formatInteger } from "../../helpers/format-integer"
+import { dt } from "../../core/internal"
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -34,7 +35,7 @@ export function DataTablePagination<TData extends RowData>({
   table,
   pageSizeOptions = [5, 10, 25, 50, 100],
 }: DataTablePaginationProps<TData>) {
-  const { localization, icons, paginationDisplayMode } = table.tableInstance
+  const { localization, icons, paginationDisplayMode } = dt(table)
   if (paginationDisplayMode === "custom") return null
 
   const { pageIndex, pageSize } = table.getState().pagination

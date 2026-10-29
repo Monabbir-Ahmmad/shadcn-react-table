@@ -11,6 +11,7 @@ import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableColumn } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 /**
  * Inline create row for `createDisplayMode: "row"`. Renders an editor per
@@ -22,8 +23,13 @@ export function DataTableCreateRow<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { enableEditing, rowDraft, onCreatingRowSave, cancelEdit, localization } =
-    table.tableInstance
+  const {
+    enableEditing,
+    rowDraft,
+    onCreatingRowSave,
+    cancelEdit,
+    localization,
+  } = dt(table)
   // The body does not re-render for the edit draft.
   useTableState(table, (state) => state.rowDraft)
 
@@ -79,7 +85,7 @@ function CreateField<TData extends RowData>({
   column: DataTableColumn<TData, unknown>
   table: DataTableInstance<TData>
 }) {
-  const cn = table.tableInstance
+  const cn = dt(table)
   const meta = column.columnDef.meta
   const value = cn.rowDraft[column.id]
   return (

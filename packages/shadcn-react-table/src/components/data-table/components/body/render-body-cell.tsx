@@ -10,6 +10,7 @@ import { stopPropagation } from "../../helpers/stop-propagation"
 import { DataTableBodyCellContent } from "../editing/data-table-edit-cell"
 import { Highlight } from "./highlight"
 import type { DataTableCell } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 /** Table state every cell reads, taken once per body render rather than per
  *  cell (reading the state costs a few microseconds, times every cell). */
@@ -34,11 +35,11 @@ export function renderBodyCell<TData extends RowData>(
   table: DataTableInstance<TData>,
   enableHighlight: boolean,
   columnsWithCustomCell: ReadonlySet<string>,
-  localization: DataTableInstance<TData>["tableInstance"]["localization"],
+  localization: DataTableInstance<TData>["dataTable"]["localization"],
   shared: CellRenderState = getCellRenderState(table)
 ): React.ReactNode {
   const { row, column } = cell
-  const icons = table.tableInstance.icons
+  const icons = dt(table).icons
   const meta = column.columnDef.meta
 
   // Grouped/aggregated/placeholder cells are a grouping concept. Tree data
@@ -158,7 +159,7 @@ function resolveHighlightQuery<TData extends RowData>(
   if (
     typeof globalFilter === "string" &&
     globalFilter.length > 0 &&
-    SUBSTRING_MODES.has(table.tableInstance.globalFilterMode)
+    SUBSTRING_MODES.has(dt(table).globalFilterMode)
   ) {
     return globalFilter
   }

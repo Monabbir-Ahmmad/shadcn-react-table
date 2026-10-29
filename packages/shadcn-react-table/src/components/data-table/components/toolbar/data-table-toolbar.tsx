@@ -13,6 +13,7 @@ import {
 } from "./controls"
 import { DataTableGlobalFilter } from "./data-table-global-filter"
 import { DataTableViewOptions } from "./data-table-view-options"
+import { dt } from "../../core/internal"
 
 /**
  * Top toolbar. Left region: title slot + consumer toolbar actions. Right
@@ -45,7 +46,7 @@ export function DataTableToolbar<TData extends RowData>({
     enableColumnActions,
     enableDensityToggle,
     enableFullscreenToggle,
-  } = table.tableInstance
+  } = dt(table)
 
   const anyFilterable = table
     .getAllColumns()

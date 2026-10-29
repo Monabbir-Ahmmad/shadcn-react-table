@@ -4,6 +4,7 @@ import { DISPLAY_COLUMN_IDS } from "../core/constants"
 import type { ColumnFilterDisplayMode, DataTableInstance } from "../core/types"
 import type { DataTableColumn, DataTableColumnDef } from "../core/table-types"
 import { getPinSide } from "./column-pinning"
+import { dt } from "../core/internal"
 
 /**
  * Feature flags that decide which affordances a column header renders. Single
@@ -41,7 +42,7 @@ const HEADER_LABEL_MAX = 260
 export function headerControlsOptionsFromTable<TData extends RowData>(
   table: DataTableInstance<TData>
 ): HeaderControlsOptions {
-  const config = table.tableInstance
+  const config = dt(table)
   return {
     enableColumnActions: config.enableColumnActions,
     enableColumnOrdering: config.enableColumnOrdering,

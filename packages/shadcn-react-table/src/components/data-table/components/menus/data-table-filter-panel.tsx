@@ -34,6 +34,7 @@ import {
 } from "../../fns/advanced-filter"
 import { getColumnLabel } from "../../helpers/column-label"
 import type { DataTableColumn } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 // Stands in for the All/Any picker when splitting the localized sentence.
 const LOGIC_SLOT = "\u0000"
@@ -56,7 +57,7 @@ function valueInputType(variant: FilterVariant): "text" | "number" | "date" {
 }
 
 type Localization<TData extends RowData> =
-  DataTableInstance<TData>["tableInstance"]["localization"]
+  DataTableInstance<TData>["dataTable"]["localization"]
 
 /**
  * Modal dialog for building compound AND/OR filter rules. Edits accumulate in a
@@ -69,8 +70,7 @@ export function DataTableFilterPanel<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { showAdvancedFilterPanel, setShowAdvancedFilterPanel } =
-    table.tableInstance
+  const { showAdvancedFilterPanel, setShowAdvancedFilterPanel } = dt(table)
   return (
     <Dialog
       open={showAdvancedFilterPanel}
@@ -92,7 +92,7 @@ function FilterPanelContent<TData extends RowData>({
     advancedFilter,
     setAdvancedFilter,
     setShowAdvancedFilterPanel,
-  } = table.tableInstance
+  } = dt(table)
 
   // Seeded once on mount (the dialog body remounts each open).
   const [draft, setDraft] = React.useState<AdvancedFilterGroup>(advancedFilter)

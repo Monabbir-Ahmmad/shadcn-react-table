@@ -24,6 +24,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
 import type { GlobalFilterMode } from "../../fns/filter-fns"
+import { dt } from "../../core/internal"
 
 const GLOBAL_MODES: GlobalFilterMode[] = [
   "fuzzy",
@@ -56,7 +57,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
     globalFilterMode,
     setGlobalFilterMode,
     renderGlobalFilterModeMenuItems,
-  } = table.tableInstance
+  } = dt(table)
 
   const external = (table.getState().globalFilter ?? "") as string
   const [expanded, setExpanded] = React.useState(external.length > 0)

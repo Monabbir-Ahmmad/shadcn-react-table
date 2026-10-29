@@ -80,7 +80,7 @@ describe("body re-renders", () => {
     )
     renders.count = 0
     act(() =>
-      table.tableInstance.setEditingCell({ rowId: "5", columnId: "city" })
+      table.setEditingCell({ rowId: "5", columnId: "city" })
     )
     expect(renders.count).toBeLessThanOrEqual(4)
     expect(screen.getByRole("textbox")).toBeTruthy()
@@ -91,7 +91,7 @@ describe("body re-renders", () => {
     let table!: DataTableInstance<Row>
     render(<Table renders={renders} onTable={(t) => (table = t)} />)
     renders.count = 0
-    act(() => table.tableInstance.setDensity("compact"))
+    act(() => table.setDensity("compact"))
     expect(renders.count).toBeGreaterThanOrEqual(ROWS * 2)
   })
 
@@ -186,11 +186,11 @@ describe("body re-renders", () => {
       return <DataTable table={instance} />
     }
     render(<Holder onTable={(t) => (table = t)} />)
-    act(() => table.tableInstance.beginRowEdit(table.getRow("3")))
+    act(() => table.beginRowEdit(table.getRow("3")))
     const toolbarBefore = toolbar.mock.calls.length
     const headerBefore = header.mock.calls.length
-    act(() => table.tableInstance.setRowDraftValue("name", "typed"))
-    act(() => table.tableInstance.setRowDraftValue("name", "typed more"))
+    act(() => table.setRowDraftValue("name", "typed"))
+    act(() => table.setRowDraftValue("name", "typed more"))
     expect(toolbar).toHaveBeenCalledTimes(toolbarBefore)
     expect(header).toHaveBeenCalledTimes(headerBefore)
 

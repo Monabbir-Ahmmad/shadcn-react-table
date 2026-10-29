@@ -6,6 +6,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
 import { DataTablePagination } from "./data-table-pagination"
+import { dt } from "../../core/internal"
 
 interface DataTableBottomToolbarProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -28,7 +29,7 @@ export function DataTableBottomToolbar<TData extends RowData>({
     renderBottomToolbar,
     renderBottomToolbarCustomActions,
     refs,
-  } = table.tableInstance
+  } = dt(table)
 
   if (renderBottomToolbar) return <>{renderBottomToolbar({ table })}</>
   if (!enableBottomToolbar) return null

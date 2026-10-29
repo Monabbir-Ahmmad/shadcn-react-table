@@ -23,6 +23,7 @@ import type { DataTableInstance } from "../../core/types"
 import { modeOptionsForVariant, type FilterMode } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
 import type { DataTableColumn } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 /**
  * The `Filter` adornment that opens a mode menu (contains/equals/…; numeric and
@@ -43,7 +44,7 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
     setColumnFilterMode,
     enableColumnFilterModes,
     renderColumnFilterModeMenuItems,
-  } = table.tableInstance
+  } = dt(table)
   const variant = column.columnDef.meta?.filterVariant ?? "text"
   const perColumn = column.columnDef.meta?.enableColumnFilterModes
   const enabled = perColumn ?? enableColumnFilterModes

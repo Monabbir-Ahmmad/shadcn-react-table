@@ -36,6 +36,7 @@ import { getUiState } from "../../core/ui-state"
 import { getCellRenderState, renderBodyCell } from "./render-body-cell"
 import { SkeletonRows } from "./skeleton-rows"
 import type { DataTableCell, DataTableRow } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 // Table-instance members scoped to single rows (handled by `rowDeps`), event
 // handlers (read through a ref), and the refs object (new every render).
@@ -104,7 +105,7 @@ export function DataTableBody<TData extends RowData>({
     rowHeight,
     getRowHeight,
     enableRowSelection,
-  } = table.tableInstance
+  } = dt(table)
   const isGrid = enableKeyboardNavigation
   const rowStateHub = useRowStateHub(table.store, () => {
     const { rowSelection, rowDraft, editingCell, editingRowId } =
@@ -115,16 +116,16 @@ export function DataTableBody<TData extends RowData>({
 
   // Event handlers read the latest options, so a row that skipped re-rendering
   // still calls the consumer's current (often inline) callback.
-  const latest = React.useRef(table.tableInstance)
+  const latest = React.useRef(dt(table))
   React.useLayoutEffect(() => {
-    latest.current = table.tableInstance
+    latest.current = dt(table)
   })
 
   // What every row reads: table options and state, except the parts scoped to
   // single rows (selection, editing) and the click handlers read through
   // `latest`. A change here re-renders every row (see MemoRow).
   const tableDeps = [
-    ...Object.entries(table.tableInstance)
+    ...Object.entries(dt(table))
       .filter(([key]) => !ROW_SCOPED_KEYS.has(key))
       .map(([, value]) => value),
     ...Object.entries(table.getState())
@@ -362,9 +363,9 @@ export function DataTableBody<TData extends RowData>({
   return (
     <RowStateHubContext.Provider value={rowStateHub}>
       <TableBody>
-        {table.tableInstance.enableEditing &&
-          table.tableInstance.isCreating &&
-          table.tableInstance.createDisplayMode === "row" && (
+        {dt(table).enableEditing &&
+          dt(table).isCreating &&
+          dt(table).createDisplayMode === "row" && (
             <DataTableCreateRow table={table} />
           )}
         {showSkeletons && !hasRows ? (

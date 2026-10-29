@@ -15,6 +15,7 @@ import type { RowData } from "@tanstack/react-table"
 
 import { GROUP_DROPZONE_ID } from "../components/toolbar/data-table-grouping"
 import type { DataTableInstance } from "../core/types"
+import { dt } from "../core/internal"
 
 /**
  * Sensors + drag-end handler for the single `DndContext` that drives both
@@ -53,7 +54,7 @@ export function useTableDnd<TData extends RowData>(
     return closestCenter({ ...args, droppableContainers: sameType })
   }
 
-  const onRowOrderChange = table.tableInstance.onRowOrderChange
+  const onRowOrderChange = dt(table).onRowOrderChange
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -75,7 +76,7 @@ export function useTableDnd<TData extends RowData>(
     }
     // Otherwise it's a reorder, which only applies when ordering is enabled
     // (a column may be draggable solely to support drag-to-group).
-    if (!table.tableInstance.enableColumnOrdering) return
+    if (!dt(table).enableColumnOrdering) return
     if (active.id === over.id) return
     const base =
       table.getState().columnOrder.length > 0

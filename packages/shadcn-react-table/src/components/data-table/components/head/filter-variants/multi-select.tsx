@@ -22,12 +22,13 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { getColumnLabel } from "../../../helpers/column-label"
 import { FIELD_CLASS, useSelectOptions, type FilterFieldProps } from "./shared"
+import { dt } from "../../../core/internal"
 
 export function MultiSelectFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization } = table.tableInstance
+  const { localization } = dt(table)
   const { options, counts } = useSelectOptions(column)
   const selected = (column.getFilterValue() as string[]) ?? []
 

@@ -10,7 +10,8 @@ return <DataTable table={table} />
 
 `useDataTable` extends the full TanStack `TableOptions`, so anything TanStack
 accepts (state, `getRowId`, `manual*` flags, row models) passes straight
-through. Our presentation/feature options and UI state live on `table.tableInstance`.
+through. The UI state is in `table.getState()`, its setters are methods on
+`table` (`table.setDensity`…), and the resolved options live on `table.dataTable`.
 
 ## Feature flags (all opt-in unless noted)
 

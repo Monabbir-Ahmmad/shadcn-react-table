@@ -21,6 +21,7 @@ import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import { getPinSide, pinColumn } from "../../helpers/column-pinning"
 import type { DataTableColumn } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 interface DataTableColumnActionsProps<TData extends RowData, TValue> {
   column: DataTableColumn<TData, TValue>
@@ -47,7 +48,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
     enableColumnPinning,
     enableGrouping,
     renderColumnActionsMenuItems,
-  } = table.tableInstance
+  } = dt(table)
   const canSort = column.getCanSort()
   const canHide = column.getCanHide()
   const canFilter = column.getCanFilter()

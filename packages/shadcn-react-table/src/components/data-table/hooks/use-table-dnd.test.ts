@@ -59,7 +59,7 @@ const detect = (
   } as Parameters<CollisionDetection>[0]).map((c) => c.id)
 
 const setup = () =>
-  renderHook(() => useTableDnd({ tableInstance: {} } as DataTableInstance))
+  renderHook(() => useTableDnd({ dataTable: {} } as unknown as DataTableInstance))
     .result.current.collisionDetection
 
 describe("useTableDnd collisionDetection", () => {

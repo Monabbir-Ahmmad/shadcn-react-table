@@ -58,7 +58,7 @@ describe("DataTable ref", () => {
     }
     render(<Consumer />)
     expect(consumerRef.current).toBeInstanceOf(HTMLDivElement)
-    expect(instance.tableInstance.refs.tablePaperRef.current).toBe(
+    expect(instance.dataTable.refs.tablePaperRef.current).toBe(
       consumerRef.current
     )
   })

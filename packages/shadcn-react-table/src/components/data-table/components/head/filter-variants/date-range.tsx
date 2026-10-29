@@ -20,12 +20,13 @@ import {
   formatDate,
   type FilterFieldProps,
 } from "./shared"
+import { dt } from "../../../core/internal"
 
 export function DateRangeFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const value = (column.getFilterValue() as [Date?, Date?]) ?? [
     undefined,
     undefined,

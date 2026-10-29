@@ -34,6 +34,7 @@ import { DataTableColumnFilter } from "./data-table-column-filter"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { isFilterRowVisible } from "../../helpers/grid-rows"
 import type { DataTableHeader } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 interface DataTableHeaderProps<TData extends RowData> {
   table: DataTableInstance<TData>
@@ -56,7 +57,7 @@ export function DataTableHeader<TData extends RowData>({
     enableStickyHeader,
     enableKeyboardNavigation,
     refs,
-  } = table.tableInstance
+  } = dt(table)
 
   const controls = headerControlsOptionsFromTable(table)
   const padding = DENSITY_CELL_PADDING[density]

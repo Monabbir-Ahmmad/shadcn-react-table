@@ -13,12 +13,13 @@ import {
   ValuelessLabel,
   type FilterFieldProps,
 } from "./shared"
+import { dt } from "../../../core/internal"
 
 export function NumberFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization } = table.tableInstance
+  const { localization } = dt(table)
   const mode = getEffectiveMode(column, table)
 
   if (VALUELESS_MODES.has(mode)) {

@@ -8,6 +8,7 @@ import {
   getPinSide,
   isPinnedEdgeColumn,
 } from "../helpers/column-pinning"
+import { dt } from "../core/internal"
 
 /**
  * Sticky positioning for a pinned column. Offsets come from TanStack
@@ -78,8 +79,7 @@ export function getWidthStyle<TData extends RowData>(
   column: DataTableColumn<TData, unknown>,
   table: DataTableInstance<TData>
 ): CSSProperties {
-  const { enableColumnResizing, enableColumnVirtualization } =
-    table.tableInstance
+  const { enableColumnResizing, enableColumnVirtualization } = dt(table)
   if (enableColumnResizing) return getColumnWidthStyle(column.id)
   if (enableColumnVirtualization || column.columnDef.size != null) {
     const size = column.getSize()

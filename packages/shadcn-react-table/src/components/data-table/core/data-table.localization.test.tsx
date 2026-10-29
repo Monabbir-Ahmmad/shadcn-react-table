@@ -117,7 +117,7 @@ describe("localization language", () => {
         },
       },
     })
-    act(() => table().tableInstance.setShowAdvancedFilterPanel(true))
+    act(() => table().setShowAdvancedFilterPanel(true))
     const triggers = await screen.findAllByRole("combobox")
     const valueTrigger = triggers[triggers.length - 1]!
     fireEvent.pointerDown(valueTrigger, { button: 0, ctrlKey: false })
@@ -135,7 +135,7 @@ describe("localization language", () => {
         advancedFiltersMatch: (logic) => `${logic} rules must match`,
       },
     })
-    act(() => table().tableInstance.setShowAdvancedFilterPanel(true))
+    act(() => table().setShowAdvancedFilterPanel(true))
     const after = await screen.findByText("rules must match")
     const picker = screen
       .getAllByRole("combobox")
@@ -205,7 +205,7 @@ describe("localization language", () => {
     expect(
       screen.getAllByText(dataTableLocalizationDe.rowsPerPage).length
     ).toBeGreaterThan(0)
-    act(() => table().tableInstance.setShowAdvancedFilterPanel(true))
+    act(() => table().setShowAdvancedFilterPanel(true))
     const triggers = await screen.findAllByRole("combobox")
     const valueTrigger = triggers[triggers.length - 1]!
     fireEvent.pointerDown(valueTrigger, { button: 0, ctrlKey: false })

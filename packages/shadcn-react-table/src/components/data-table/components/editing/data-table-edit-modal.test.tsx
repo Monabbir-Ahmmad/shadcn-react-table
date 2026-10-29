@@ -55,13 +55,13 @@ describe("edit modal", () => {
       return <DataTable table={table} />
     }
     const view = render(<Consumer data={people} />)
-    act(() => instance.tableInstance.beginRowEdit(instance.getRow("1")))
+    act(() => instance.beginRowEdit(instance.getRow("1")))
     expect(screen.getByRole("dialog")).toBeTruthy()
 
     expect(() =>
       view.rerender(<Consumer data={people.slice(1)} />)
     ).not.toThrow()
     expect(screen.queryByRole("dialog")).toBeNull()
-    expect(instance.tableInstance.editingRowId).toBeNull()
+    expect(instance.getState().editingRowId).toBeNull()
   })
 })

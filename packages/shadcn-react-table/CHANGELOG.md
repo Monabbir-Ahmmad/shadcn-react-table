@@ -23,7 +23,7 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   stable identity across renders, and render contexts
   (`cell: ({ table }) => …`, likewise `header`, `footer`, `aggregatedCell`)
   still receive the enriched instance and are typed as such, so
-  `table.getState()` and `table.tableInstance` type-check and work as before.
+  `table.getState()`, `table.dataTable` and the table's methods type-check.
 - **Removed options:** `getCoreRowModel` and the other `get*RowModel` options;
   the table wires every row model itself.
 - **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
