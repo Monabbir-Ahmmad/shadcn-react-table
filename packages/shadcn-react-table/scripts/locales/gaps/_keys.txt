@@ -25,10 +25,9 @@ filterModes.before	Before
 filterModes.after	After
 filterModes.betweenDates	Between
 advancedFilters	Advanced filters
-advancedFiltersMatchLabel	Match
+advancedFiltersMatch	logic => `Match ${logic} of the following rules`
 advancedFiltersMatchAll	All
 advancedFiltersMatchAny	Any
-advancedFiltersOf	of the following rules
 advancedFiltersAddRule	Add filter
 advancedFiltersApply	Apply
 advancedFiltersClearAll	Clear all

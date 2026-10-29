@@ -80,10 +80,6 @@ export interface DataTableLocalization {
   advancedFiltersMatch: (logic: string) => string
   advancedFiltersMatchAll: string
   advancedFiltersMatchAny: string
-  /** @deprecated Unused; the sentence is `advancedFiltersMatch`. */
-  advancedFiltersMatchLabel?: string
-  /** @deprecated Unused; the sentence is `advancedFiltersMatch`. */
-  advancedFiltersOf?: string
   advancedFiltersAddRule: string
   advancedFiltersApply: string
   advancedFiltersClearAll: string
