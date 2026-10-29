@@ -29,6 +29,7 @@ From repo root:
 - `pnpm typecheck` — `tsc --noEmit` across workspaces
 - `pnpm format` — Prettier `--write` across workspaces
 - `pnpm test` — Vitest across workspaces (currently only `packages/shadcn-react-table` has tests, colocated as `*.test.ts(x)` next to the source; jsdom + Testing Library)
+- `pnpm test:browser` — Vitest browser mode (headless Chromium via Playwright) for `*.browser.test.tsx` (layout, drag-and-drop, resizing, virtualization, keyboard navigation). First run needs `pnpm --filter @monabbir/shadcn-react-table exec playwright install chromium`
 
 Per-package: the same scripts exist in each workspace's `package.json` and can be run directly, e.g. `pnpm --filter shadcn-react-table-web <script>`, `pnpm --filter @monabbir/shadcn-react-table <script>`, or `pnpm --filter @workspace/ui <script>`.
 

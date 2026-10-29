@@ -53,6 +53,14 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 - **Fixed:** changing the global filter mode re-filters the rows.
 - **Fixed:** the block compiles on `@tanstack/react-table` 9.3 (two row-model
   casts failed `tsc` in fresh installs). The registry now asks for `^9.3.1`.
+- **Fixed:** pinned columns stay visible while scrolling sideways with column
+  virtualization on, and the table can scroll all the way to its last column.
+- **Fixed:** keyboard navigation reaches every row and column with
+  virtualization on, skips over open detail panels, and keeps a single Tab stop.
+- **Fixed:** `rowHeight` / `getRowHeight` set the whole row's height (the cell
+  padding was added on top).
+- **Fixed:** infinite scroll no longer misses the bottom when the browser
+  reports several visibility changes at once.
 
 ## 0.5.0
 

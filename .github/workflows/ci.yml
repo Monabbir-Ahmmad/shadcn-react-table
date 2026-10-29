@@ -56,6 +56,35 @@ jobs:
       - name: Registry output compiles for consumers
         run: pnpm --filter shadcn-react-table-web registry:verify
 
+  # Runs the *.browser.test.tsx files in headless Chromium: real layout,
+  # pointer and keyboard behaviour (sticky/pinned columns, drag-and-drop,
+  # resizing, virtualization, keyboard navigation) that jsdom cannot test.
+  browser-tests:
+    name: browser tests (chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm --filter @monabbir/shadcn-react-table exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: pnpm --filter @monabbir/shadcn-react-table test:browser
+
   # Installs the PR's own registry block into a fresh shadcn Next.js app for
   # each base and proves the app typechecks and builds. Catches breakage that
   # only shows up through the CLI: upstream primitive differences (Radix vs

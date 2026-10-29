@@ -498,7 +498,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "false",
     description:
-      "Virtualize columns for very wide tables. Applies fixed column widths and is not combined with column pinning/ordering.",
+      "Virtualize columns for very wide tables. Applies fixed column widths; pinned columns stay rendered. Column drag-ordering is not available.",
   },
   {
     name: "estimateRowHeight",

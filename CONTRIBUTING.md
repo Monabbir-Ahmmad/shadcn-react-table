@@ -32,15 +32,19 @@ pnpm install
    pnpm lint
    pnpm typecheck
    pnpm test
+   pnpm test:browser
    pnpm build
    ```
+   `pnpm test:browser` runs the `*.browser.test.tsx` files in headless
+   Chromium. Install it once with
+   `pnpm --filter @monabbir/shadcn-react-table exec playwright install chromium`.
 4. Push your branch and open a pull request against `main`.
 
 ## Pull requests
 
 - CI runs automatically on every PR and must pass: lint, typecheck, test,
-  build, generated-artifact freshness, `registry:verify`, and the install smoke
-  test (fresh Radix and Base UI apps).
+  browser tests (Chromium), build, generated-artifact freshness,
+  `registry:verify`, and the install smoke test (fresh Radix and Base UI apps).
 - At least one approving review is required before merging.
 - Keep PRs focused — smaller PRs are reviewed faster.
 
