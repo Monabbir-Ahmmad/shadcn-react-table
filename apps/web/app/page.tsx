@@ -5,12 +5,9 @@ import { AnatomyStage } from "@/components/home/anatomy/anatomy-stage"
 import { AnatomyStatic } from "@/components/home/anatomy/anatomy-static"
 import { LiveTableSection } from "@/components/home/live/live-table-section"
 import { StyleDeck } from "@/components/home/deck/style-deck"
-import { FeatureGrid } from "@/components/home/feature-grid"
-import { TechStrip } from "@/components/home/tech-strip"
-import { StatsBand } from "@/components/home/stats-band"
-import { FeaturePlayground } from "@/components/home/feature-playground"
-import { ExampleCategories } from "@/components/home/example-categories"
-import { ClosingBanner } from "@/components/home/closing-banner"
+import { Compared } from "@/components/home/proof/compared"
+import { ExamplesIndex } from "@/components/home/proof/examples-index"
+import { ForAgents } from "@/components/home/proof/for-agents"
 import { InstallSection } from "@/components/home/install-section"
 import { SiteFooter } from "@/components/home/site-footer"
 
@@ -24,18 +21,15 @@ export default function HomePage() {
   return (
     <div className="flex min-h-svh flex-col">
       <SiteHeader />
-      <main className="flex-1">
+      <main className="flex-1 [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px)] [background-size:calc(100%/6)_100%] [background-position:center] md:[background-size:calc(100%/12)_100%] dark:[background-image:linear-gradient(to_right,color-mix(in_oklch,var(--border),transparent_40%)_1px,transparent_1px)]">
         <AnatomyStage />
         <AnatomyStatic />
         <LiveTableSection />
         <StyleDeck />
-        <TechStrip />
-        <StatsBand />
-        <FeaturePlayground />
-        <FeatureGrid />
-        <ExampleCategories />
+        <Compared />
+        <ExamplesIndex />
+        <ForAgents />
         <InstallSection />
-        <ClosingBanner />
       </main>
       <SiteFooter />
     </div>

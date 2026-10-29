@@ -56,7 +56,7 @@ export function LiveTableSection() {
       ref={ref}
       id="try"
       aria-labelledby="try-title"
-      className="-mt-px scroll-mt-14 border-t"
+      className="-mt-px scroll-mt-14 border-t bg-background"
     >
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
         <div className="grid gap-x-12 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">

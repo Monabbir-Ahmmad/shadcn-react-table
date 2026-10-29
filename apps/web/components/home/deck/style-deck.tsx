@@ -297,7 +297,7 @@ export function StyleDeck() {
       ref={sectionRef}
       id="styles"
       aria-labelledby="styles-title"
-      className="-mt-px scroll-mt-14 overflow-x-clip border-t"
+      className="-mt-px scroll-mt-14 overflow-x-clip border-t bg-background"
     >
       <div className="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-24 lg:px-8">
         <div className="grid gap-x-12 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
