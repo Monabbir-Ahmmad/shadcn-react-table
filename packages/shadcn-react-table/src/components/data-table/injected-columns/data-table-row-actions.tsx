@@ -67,6 +67,7 @@ function RowActionsCell<TData extends RowData>({
     onEditingRowSave,
     beginRowEdit,
     cancelEdit,
+    cancelEditing,
     renderRowActions,
     renderRowActionMenuItems,
   } = dt(table)
@@ -102,7 +103,7 @@ function RowActionsCell<TData extends RowData>({
           size="icon"
           aria-label={localization.cancel}
           className="size-7"
-          onClick={cancelEdit}
+          onClick={cancelEditing}
         >
           <icons.cancel />
         </Button>

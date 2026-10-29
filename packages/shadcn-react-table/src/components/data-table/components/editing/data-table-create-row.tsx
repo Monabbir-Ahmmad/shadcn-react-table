@@ -13,6 +13,7 @@ import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableColumn } from "../../core/table-types"
 import { dt } from "../../core/internal"
 import { getSlotProps } from "../../helpers/slot-props"
+import { getEditSelectOptions } from "../../helpers/edit-select-options"
 
 /**
  * Inline create row for `createDisplayMode: "row"`. Renders an editor per
@@ -29,6 +30,7 @@ export function DataTableCreateRow<TData extends RowData>({
     rowDraft,
     onCreatingRowSave,
     cancelEdit,
+    cancelEditing,
     localization,
   } = dt(table)
   // The body does not re-render for the edit draft.
@@ -65,7 +67,7 @@ export function DataTableCreateRow<TData extends RowData>({
       <TableRow className="border-b-2 bg-muted/30 hover:bg-muted/30">
         <TableCell colSpan={leafColumns.length} className="p-2">
           <div className="flex items-center justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={cancelEdit}>
+            <Button variant="outline" size="sm" onClick={cancelEditing}>
               {localization.cancel}
             </Button>
             <Button size="sm" onClick={submit} disabled={hasErrors}>
@@ -93,7 +95,7 @@ function CreateField<TData extends RowData>({
     <DataTableEditField
       value={value}
       variant={meta?.editVariant}
-      options={meta?.editSelectOptions ?? meta?.filterSelectOptions}
+      options={getEditSelectOptions(column, table)}
       error={meta?.validate?.(value)}
       ariaLabel={getColumnLabel(column)}
       onChange={(next) => cn.setRowDraftValue(column.id, next)}

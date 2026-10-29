@@ -113,6 +113,11 @@ export function useDataTable<TData extends RowData>(
     displayColumnDefOptions,
     defaultDisplayColumn,
     enableBatchRowSelection = true,
+    onEditingRowCancel,
+    onCreatingRowCancel,
+    renderEditRowDialogContent,
+    renderCreateRowDialogContent,
+    positionCreatingRow = "top",
     columnFilterDisplayMode = "subheader",
     positionGlobalFilter = "right",
     positionToolbarAlertBanner = "top",
@@ -799,6 +804,21 @@ export function useDataTable<TData extends RowData>(
     beginRowEdit: uiActions.beginRowEdit,
     beginCreate: uiActions.beginCreate,
     cancelEdit: uiActions.cancelEdit,
+    cancelEditing: () => {
+      const { isCreating, editingRowId } = table.getState()
+      if (isCreating) {
+        onCreatingRowCancel?.({ table })
+      } else if (editingRowId != null) {
+        const row = table.getCoreRowModel().rowsById[editingRowId]
+        if (row) onEditingRowCancel?.({ row, table })
+      }
+      uiActions.cancelEdit()
+    },
+    onEditingRowCancel,
+    onCreatingRowCancel,
+    renderEditRowDialogContent,
+    renderCreateRowDialogContent,
+    positionCreatingRow,
     enableClickToCopy,
     enableCellActions,
     onEditingCellSave,

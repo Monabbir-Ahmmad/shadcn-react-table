@@ -387,14 +387,17 @@ export function DataTableBody<TData extends RowData>({
     )
   }
 
+  const showCreateRow =
+    dt(table).enableEditing &&
+    dt(table).isCreating &&
+    dt(table).createDisplayMode === "row"
+
   return (
     <RowStateHubContext.Provider value={rowStateHub}>
       <TableBody {...getSlotProps(table, "body", {})}>
-        {dt(table).enableEditing &&
-          dt(table).isCreating &&
-          dt(table).createDisplayMode === "row" && (
-            <DataTableCreateRow table={table} />
-          )}
+        {showCreateRow && dt(table).positionCreatingRow === "top" && (
+          <DataTableCreateRow table={table} />
+        )}
         {showSkeletons && !hasRows ? (
           <SkeletonRows
             rowCount={
@@ -508,6 +511,9 @@ export function DataTableBody<TData extends RowData>({
               {renderEmpty?.({ table }) ?? localization.noRecordsToDisplay}
             </TableCell>
           </TableRow>
+        )}
+        {showCreateRow && dt(table).positionCreatingRow === "bottom" && (
+          <DataTableCreateRow table={table} />
         )}
       </TableBody>
     </RowStateHubContext.Provider>

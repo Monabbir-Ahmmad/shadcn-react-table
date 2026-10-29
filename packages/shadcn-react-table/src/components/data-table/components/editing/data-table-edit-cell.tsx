@@ -19,6 +19,7 @@ import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableCell } from "../../core/table-types"
 import { dt } from "../../core/internal"
 import { getSlotProps } from "../../helpers/slot-props"
+import { getEditSelectOptions } from "../../helpers/edit-select-options"
 
 /**
  * Resolves a leaf data cell's interactive content: an inline editor when this
@@ -206,7 +207,7 @@ function RowDraftEditor<TData extends RowData>({
     <DataTableEditField
       value={value}
       variant={meta?.editVariant}
-      options={meta?.editSelectOptions ?? meta?.filterSelectOptions}
+      options={getEditSelectOptions(column, table, cell.row)}
       error={error}
       ariaLabel={getColumnLabel(column)}
       onChange={(next) => cn.setRowDraftValue(column.id, next)}
@@ -253,7 +254,7 @@ function LocalDraftEditor<TData extends RowData>({
     <DataTableEditField
       value={draft}
       variant={meta?.editVariant}
-      options={meta?.editSelectOptions ?? meta?.filterSelectOptions}
+      options={getEditSelectOptions(column, table, row)}
       error={error}
       ariaLabel={getColumnLabel(column)}
       autoFocus={exitOnCommit}

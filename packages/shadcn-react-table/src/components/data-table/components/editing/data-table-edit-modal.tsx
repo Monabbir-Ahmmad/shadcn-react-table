@@ -20,6 +20,7 @@ import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
 import { dt } from "../../core/internal"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
+import { getEditSelectOptions } from "../../helpers/edit-select-options"
 
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any
@@ -40,8 +41,11 @@ export function DataTableEditModal<TData extends RowData>({
     rowDraft,
     setRowDraftValue,
     cancelEdit,
+    cancelEditing,
     onEditingRowSave,
     onCreatingRowSave,
+    renderEditRowDialogContent,
+    renderCreateRowDialogContent,
   } = dt(table)
   // The table around this dialog does not re-render for the edit draft.
   useTableState(table, (state) => [
@@ -92,8 +96,50 @@ export function DataTableEditModal<TData extends RowData>({
     }
   }
 
+  const internalEditComponents = editableColumns.map((column) => {
+    const meta = column.columnDef.meta
+    const value =
+      column.id in rowDraft
+        ? rowDraft[column.id]
+        : editingRow?.getValue(column.id)
+    return (
+      <div key={column.id} className="flex flex-col gap-1.5">
+        <Label className="text-xs">{getColumnLabel(column)}</Label>
+        <DataTableEditField
+          value={value}
+          variant={meta?.editVariant}
+          options={getEditSelectOptions(column, table, editingRow)}
+          error={meta?.validate?.(value)}
+          ariaLabel={getColumnLabel(column)}
+          onChange={(next) => setRowDraftValue(column.id, next)}
+          fieldProps={getSlotProps(
+            table,
+            "editField",
+            { column, row: editingRow ?? undefined },
+            meta?.slotProps?.editField
+          )}
+        />
+      </div>
+    )
+  })
+
+  const contentProps = {
+    table,
+    internalEditComponents,
+    save: submit,
+    cancel: cancelEditing,
+    hasErrors,
+  }
+  const custom = isCreating
+    ? renderCreateRowDialogContent?.(contentProps)
+    : editingRow &&
+      renderEditRowDialogContent?.({
+        ...contentProps,
+        row: editingRow,
+      })
+
   return (
-    <Dialog open onOpenChange={(next) => !next && cancelEdit()}>
+    <Dialog open onOpenChange={(next) => !next && cancelEditing()}>
       <DialogContent
         {...mergeProps(
           { className: "sm:max-w-lg" } as React.ComponentProps<"div">,
@@ -103,47 +149,26 @@ export function DataTableEditModal<TData extends RowData>({
           })
         )}
       >
-        <DialogHeader>
-          <DialogTitle>
-            {isCreating ? localization.createNewRow : localization.editRow}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-3 py-2">
-          {editableColumns.map((column) => {
-            const meta = column.columnDef.meta
-            const value =
-              column.id in rowDraft
-                ? rowDraft[column.id]
-                : editingRow?.getValue(column.id)
-            return (
-              <div key={column.id} className="flex flex-col gap-1.5">
-                <Label className="text-xs">{getColumnLabel(column)}</Label>
-                <DataTableEditField
-                  value={value}
-                  variant={meta?.editVariant}
-                  options={meta?.editSelectOptions ?? meta?.filterSelectOptions}
-                  error={meta?.validate?.(value)}
-                  ariaLabel={getColumnLabel(column)}
-                  onChange={(next) => setRowDraftValue(column.id, next)}
-                  fieldProps={getSlotProps(
-                    table,
-                    "editField",
-                    { column, row: editingRow ?? undefined },
-                    meta?.slotProps?.editField
-                  )}
-                />
-              </div>
-            )
-          })}
-        </div>
-        <DialogFooter>
-          <Button variant="outline" size="sm" onClick={cancelEdit}>
-            {localization.cancel}
-          </Button>
-          <Button size="sm" onClick={submit} disabled={hasErrors}>
-            {localization.save}
-          </Button>
-        </DialogFooter>
+        {custom ?? (
+          <>
+            <DialogHeader>
+              <DialogTitle>
+                {isCreating ? localization.createNewRow : localization.editRow}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-3 py-2">
+              {internalEditComponents}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" size="sm" onClick={cancelEditing}>
+                {localization.cancel}
+              </Button>
+              <Button size="sm" onClick={submit} disabled={hasErrors}>
+                {localization.save}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

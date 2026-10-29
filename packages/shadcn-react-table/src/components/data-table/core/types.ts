@@ -203,8 +203,15 @@ declare module "@tanstack/react-table" {
     enableEditing?: boolean | ((row: DataTableRow<TData>) => boolean)
     /** Inline editor variant. Defaults to "text". */
     editVariant?: EditVariant
-    /** Options for the "select" edit variant. */
-    editSelectOptions?: DataTableFilterOption[]
+    /** Options for the "select" edit variant, or a function returning them
+     *  for the row being edited (`row` is undefined in the create form). */
+    editSelectOptions?:
+      | DataTableFilterOption[]
+      | ((props: {
+          row?: DataTableRow<TData>
+          column: DataTableColumn<TData, unknown>
+          table: DataTableInstance<TData>
+        }) => DataTableFilterOption[])
     /** Custom inline editor for this column (escape hatch). Replaces the built-in
      *  editor while the cell/row is editing; read the draft from
      *  `table.getState().rowDraft` and write it with `table.setRowDraftValue`
@@ -277,6 +284,19 @@ declare module "@tanstack/react-table" {
       dataTable: DataTableOptionsResolved<TData>
     } & DataTableMethods<TData>
   }
+}
+
+/** What the edit / create dialog content overrides receive. */
+export interface EditDialogContentProps<TData extends RowData> {
+  table: DataTableInstance<TData>
+  /** The built-in field (label and input) for each editable column. */
+  internalEditComponents: React.ReactNode[]
+  /** Save, as the dialog's Save button does (blocked while `hasErrors`). */
+  save: () => void
+  /** Cancel, as the dialog's Cancel button does. */
+  cancel: () => void
+  /** Whether a field fails its `meta.validate`. */
+  hasErrors: boolean
 }
 
 /** The ids of the columns the table adds itself, for
@@ -597,6 +617,21 @@ export interface DataTableConfig<TData extends RowData> {
   beginCreate: () => void
   /** Exit any editing/creating state, discarding the draft. */
   cancelEdit: () => void
+  /** Cancel as the user does: calls `onEditingRowCancel` /
+   *  `onCreatingRowCancel`, then `cancelEdit`. */
+  cancelEditing: () => void
+  onEditingRowCancel?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+  }) => void
+  onCreatingRowCancel?: (props: { table: DataTableInstance<TData> }) => void
+  renderEditRowDialogContent?: (
+    props: EditDialogContentProps<TData> & { row: DataTableRow<TData> }
+  ) => React.ReactNode
+  renderCreateRowDialogContent?: (
+    props: EditDialogContentProps<TData>
+  ) => React.ReactNode
+  positionCreatingRow: "top" | "bottom"
   enableClickToCopy: ClickToCopyOption<TData>
   enableCellActions:
     boolean | ((cell: DataTableCell<TData, unknown>) => boolean)
@@ -974,6 +1009,25 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
+  /** Called when the user cancels a row edit (Cancel, closing the dialog). */
+  onEditingRowCancel?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+  }) => void
+  /** Called when the user cancels the create form. */
+  onCreatingRowCancel?: (props: { table: DataTableInstance<TData> }) => void
+  /** Replace the edit dialog's content. You get the built-in fields as
+   *  `internalEditComponents`, plus `save()` / `cancel()`. */
+  renderEditRowDialogContent?: (
+    props: EditDialogContentProps<TData> & { row: DataTableRow<TData> }
+  ) => React.ReactNode
+  /** Replace the create dialog's content (same props, without `row`). */
+  renderCreateRowDialogContent?: (
+    props: EditDialogContentProps<TData>
+  ) => React.ReactNode
+  /** Where the inline create row (`createDisplayMode: "row"`) appears.
+   *  Default "top". */
+  positionCreatingRow?: "top" | "bottom"
   /** Content of the row-actions column, replacing the default edit and menu
    *  buttons. */
   renderRowActions?: (props: {

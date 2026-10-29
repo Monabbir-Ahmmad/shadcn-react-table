@@ -104,12 +104,47 @@ const table = useDataTable({
 })
 ```
 
+### Cancelling
+
+`onEditingRowCancel({ row, table })` and `onCreatingRowCancel({ table })` run when the user cancels — the Cancel button, closing the dialog, or the row's cancel button. They don't run after a save calls `exit()`.
+
+### Custom dialog content
+
+`renderEditRowDialogContent` and `renderCreateRowDialogContent` replace what's inside the dialog. They receive the built-in fields as `internalEditComponents`, plus `save()`, `cancel()` and `hasErrors`. Include a `DialogTitle` so the dialog keeps its accessible name.
+
+```tsx
+import { DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+useDataTable({
+  data,
+  columns,
+  enableEditing: true,
+  editDisplayMode: "modal",
+  renderEditRowDialogContent: ({ row, internalEditComponents, save, cancel, hasErrors }) => (
+    <>
+      <DialogHeader>
+        <DialogTitle>Edit {row.original.name}</DialogTitle>
+      </DialogHeader>
+      <div className="grid grid-cols-2 gap-3">{internalEditComponents}</div>
+      <DialogFooter>
+        <Button variant="outline" onClick={cancel}>Discard</Button>
+        <Button onClick={save} disabled={hasErrors}>Save changes</Button>
+      </DialogFooter>
+    </>
+  ),
+})
+```
+
+### Inline create row position
+
+With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below.
+
 ## Per-column editing config
 
 Configure editors on each column's `meta`:
 
 - `editVariant: "text" | "number" | "select"` — the input type.
-- `editSelectOptions` — options for the `"select"` variant.
+- `editSelectOptions` — options for the `"select"` variant, or `({ row, column, table }) => options` to vary them by row (`row` is undefined when creating).
 - `validate: (value) => string | undefined` — return a message to block the save.
 - `enableEditing: false` — lock a single column, or `(row) => boolean` to lock it on some rows.
 

@@ -34,6 +34,10 @@ for every rename.
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **New editing options:** `onEditingRowCancel` / `onCreatingRowCancel`,
+  `renderEditRowDialogContent` / `renderCreateRowDialogContent` (with
+  `internalEditComponents`, `save`, `cancel`), `positionCreatingRow`, and
+  column `editSelectOptions` as a per-row function.
 - **New filter variants:** `autocomplete` (text with suggestions),
   `datetime` / `datetime-range` (compared to the minute) and `time` /
   `time-range` (compared by time of day), also in the advanced filter panel.

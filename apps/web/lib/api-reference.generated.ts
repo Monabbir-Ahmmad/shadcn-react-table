@@ -497,6 +497,45 @@ export const useDataTableOptions: ApiMember[] = [
       "Called when the new-row editor is saved with the row's `values`. Call `exit()` to close it.",
   },
   {
+    name: "onEditingRowCancel",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the user cancels a row edit (Cancel, closing the dialog).",
+  },
+  {
+    name: "onCreatingRowCancel",
+    type: "(props: { table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description: "Called when the user cancels the create form.",
+  },
+  {
+    name: "renderEditRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> & { row: DataTableRow<TData> } ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the edit dialog's content. You get the built-in fields as `internalEditComponents`, plus `save()` / `cancel()`.",
+  },
+  {
+    name: "renderCreateRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the create dialog's content (same props, without `row`).",
+  },
+  {
+    name: "positionCreatingRow",
+    type: '"top" | "bottom"',
+    required: false,
+    default: '"top"',
+    description:
+      'Where the inline create row (`createDisplayMode: "row"`) appears. Default "top".',
+  },
+  {
     name: "renderRowActions",
     type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
@@ -962,10 +1001,11 @@ export const columnOptions: ApiMember[] = [
   },
   {
     name: "editSelectOptions",
-    type: "DataTableFilterOption[]",
+    type: "| DataTableFilterOption[] | ((props: { row?: DataTableRow<TData> column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> }) => DataTableFilterOption[])",
     required: false,
     default: null,
-    description: 'Options for the "select" edit variant.',
+    description:
+      'Options for the "select" edit variant, or a function returning them for the row being edited (`row` is undefined in the create form).',
   },
   {
     name: "renderEditCell",
@@ -1323,6 +1363,53 @@ export const dataTableOptions: ApiMember[] = [
     default: null,
     description:
       'How the create form is surfaced, independent of `editDisplayMode`: `"modal"` (dialog, default), `"row"` (an inline editable row at the top of the table), or `"custom"` (you render it from `isCreating` + `rowDraft`).',
+  },
+  {
+    name: "cancelEditing",
+    type: "() => void",
+    required: true,
+    default: null,
+    description:
+      "Cancel as the user does: calls `onEditingRowCancel` / `onCreatingRowCancel`, then `cancelEdit`.",
+  },
+  {
+    name: "onEditingRowCancel",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the user cancels a row edit (Cancel, closing the dialog).",
+  },
+  {
+    name: "onCreatingRowCancel",
+    type: "(props: { table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description: "Called when the user cancels the create form.",
+  },
+  {
+    name: "renderEditRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> & { row: DataTableRow<TData> } ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the edit dialog's content. You get the built-in fields as `internalEditComponents`, plus `save()` / `cancel()`.",
+  },
+  {
+    name: "renderCreateRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the create dialog's content (same props, without `row`).",
+  },
+  {
+    name: "positionCreatingRow",
+    type: '"top" | "bottom"',
+    required: true,
+    default: null,
+    description:
+      'Where the inline create row (`createDisplayMode: "row"`) appears. Default "top".',
   },
   {
     name: "enableClickToCopy",

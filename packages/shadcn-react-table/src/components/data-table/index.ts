@@ -68,6 +68,7 @@ export type {
   ColumnVirtualizerOptions,
   ClickToCopyOption,
   DisplayColumnId,
+  EditDialogContentProps,
 } from "./core/types"
 
 export type {
