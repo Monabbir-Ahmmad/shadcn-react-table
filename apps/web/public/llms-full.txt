@@ -126,6 +126,26 @@ This single command:
 3. **Writes the table** to `components/ui/data-table/`.
 4. **Injects design tokens** (`--highlight`, `--highlight-foreground`) into your `globals.css`.
 
+## Use a namespace (optional)
+
+To install by name instead of URL, add the registry to your `components.json`:
+
+```json
+{
+  "registries": {
+    "@shadcn-react-table": "https://monabbir-ahmmad.github.io/shadcn-react-table/r/{name}.json"
+  }
+}
+```
+
+Then:
+
+```bash
+pnpm dlx shadcn@latest add @shadcn-react-table/data-table
+# a language, e.g. German
+pnpm dlx shadcn@latest add @shadcn-react-table/data-table-locale-de
+```
+
 ## Verify
 
 Import the public API from your `@/components/ui/data-table` alias:

@@ -14,6 +14,7 @@ import {
   rmSync,
 } from "node:fs"
 import { join, dirname, relative } from "node:path"
+import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 // Anchor to the repo root from this file (apps/web/scripts/), so the script
@@ -31,50 +32,23 @@ const PKG = JSON.parse(
 const UI_SRC = join(REPO, "packages/shadcn-react-table/src")
 const OUT = join(REPO, "apps/web/public/r")
 
-// npm packages the data-table source imports directly. The shadcn primitives
-// (below) bring their own deps (radix, cmdk, react-day-picker, cva, …) when the
-// consumer's CLI installs them, so those are intentionally NOT listed here.
-const NPM_DEPENDENCIES = [
-  "@tanstack/react-table@^9.3.1",
-  "@tanstack/match-sorter-utils@^9.2.6",
-  "@tanstack/react-virtual",
-  "@dnd-kit/core",
-  "@dnd-kit/sortable",
-  "@dnd-kit/utilities",
-  "date-fns",
-  // NOT radix-ui: the module has no direct radix import. The primitive blocks
-  // in registryDependencies bring the right headless library for the
-  // consumer's flavor (radix-ui or @base-ui/react) on their own.
-  "lucide-react",
-]
+// npm packages and shadcn primitives the shipped source imports are derived
+// from an import scan (see `scanImports` below), so a new import can't ship
+// without its dependency. Versions come from this package's own
+// package.json — the ranges the tests run against. The shadcn primitives
+// bring their own deps (radix-ui or @base-ui/react, cmdk, react-day-picker,
+// cva, …) when the consumer's CLI installs them, so those are not listed.
+const PROVIDED_BY_CONSUMER = new Set(["react", "react-dom"])
 
 // Type-only packages for deps that don't ship their own declarations. Without
 // these the consumer's `tsc --noEmit` fails. shadcn installs these into the
 // consumer's devDependencies.
 const DEV_DEPENDENCIES = []
 
-// shadcn primitives the table imports. Declared as registryDependencies (bare
-// names) so the consumer's `shadcn add` installs them from the shadcn registry
-// in THEIR configured style/baseColor — and skips any they already have. The
-// table only uses standard primitive APIs, so it adapts to any style.
-const REGISTRY_DEPENDENCIES = [
-  "badge",
-  "button",
-  "calendar",
-  "checkbox",
-  "command",
-  "context-menu",
-  "dialog",
-  "dropdown-menu",
-  "input",
-  "label",
-  "popover",
-  "select",
-  "skeleton",
-  "slider",
-  "table",
-  "tooltip",
-]
+// The shadcn primitives the table imports become registryDependencies (bare
+// names), so the consumer's `shadcn add` installs them from the shadcn
+// registry in THEIR configured style/baseColor — and skips any they already
+// have. The table only uses standard primitive APIs, so it adapts to any style.
 
 // New design tokens this component introduces (shipped via cssVars so the CLI
 // injects them into the consumer's globals.css; fall back to --accent).
@@ -150,6 +124,50 @@ for (const abs of walk(DT_DIR).sort()) {
     content: read(`components/data-table/${sub}`),
   })
 }
+
+/**
+ * The npm packages and shadcn primitives the shipped files import. Fails the
+ * build for a package the block's package.json doesn't declare, since the
+ * registry could not give it a version.
+ */
+function scanImports(contents) {
+  const packages = new Set()
+  const primitives = new Set()
+  for (const content of contents) {
+    for (const [, spec] of content.matchAll(
+      /(?:^|\n)\s*(?:import|export)\s[^"']*?from\s+["']([^"']+)["']/g
+    )) {
+      if (spec.startsWith(".")) continue
+      const primitive = /^@\/components\/ui\/([\w-]+)$/.exec(spec)
+      if (primitive) {
+        primitives.add(primitive[1])
+        continue
+      }
+      if (spec.startsWith("@/")) continue
+      const parts = spec.split("/")
+      const name = spec.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]
+      if (!PROVIDED_BY_CONSUMER.has(name)) packages.add(name)
+    }
+  }
+  const missing = [...packages].filter((name) => !PKG.dependencies?.[name])
+  if (missing.length > 0) {
+    console.error(
+      `registry: imported but not in packages/shadcn-react-table/package.json dependencies: ${missing.join(", ")}`
+    )
+    process.exit(1)
+  }
+  return {
+    dependencies: [...packages]
+      .sort()
+      .map((name) => `${name}@${PKG.dependencies[name]}`),
+    registryDependencies: [...primitives].sort(),
+  }
+}
+
+const {
+  dependencies: NPM_DEPENDENCIES,
+  registryDependencies: REGISTRY_DEPENDENCIES,
+} = scanImports(files.map((file) => file.content))
 
 const item = {
   $schema: "https://ui.shadcn.com/schema/registry-item.json",

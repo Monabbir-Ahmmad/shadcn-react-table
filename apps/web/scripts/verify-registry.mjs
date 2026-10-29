@@ -33,6 +33,40 @@ if (LOCALE_ITEMS.length !== EXPECTED_LOCALES) {
   )
   process.exit(1)
 }
+// The shape the shadcn CLI reads (registry-item.json): every item has a name,
+// type and version, every file a path, type, target and content, and every
+// npm dependency a version range.
+const VERSION = JSON.parse(
+  readFileSync(join(REPO, "packages/shadcn-react-table/package.json"), "utf8")
+).version
+const problems = []
+for (const item of [ITEM, ...LOCALE_ITEMS]) {
+  if (!item.name || !item.type || !item.$schema) {
+    problems.push(`${item.name ?? "?"}: missing name, type or $schema`)
+  }
+  if (item.meta?.version !== VERSION) {
+    problems.push(`${item.name}: meta.version is not ${VERSION}`)
+  }
+  for (const file of item.files ?? []) {
+    if (!file.path || !file.type || !file.target || !file.content) {
+      problems.push(`${item.name}: incomplete file ${file.path ?? "?"}`)
+    }
+  }
+  for (const dep of item.dependencies ?? []) {
+    if (!/^(@[^/@]+\/)?[^/@]+@\S+$/.test(dep)) {
+      problems.push(`${item.name}: dependency without a version: ${dep}`)
+    }
+  }
+}
+const targets = ITEM.files.map((f) => f.target)
+if (new Set(targets).size !== targets.length) {
+  problems.push("data-table: duplicate file targets")
+}
+if (problems.length > 0) {
+  console.error(`registry verify FAILED:\n  ${problems.join("\n  ")}`)
+  process.exit(1)
+}
+
 const leaked = ITEM.files.filter((f) => f.path.includes("/locales/"))
 if (leaked.length > 0) {
   console.error(
