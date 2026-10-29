@@ -256,6 +256,14 @@ export const useDataTableOptions: ApiMember[] = [
       "Called whenever the filter row is shown or hidden. Set it with `initialState.showColumnFilters`, control it with `state.showColumnFilters`.",
   },
   {
+    name: "onShowGlobalFilterChange",
+    type: "(showGlobalFilter: boolean) => void",
+    required: false,
+    default: null,
+    description:
+      "Called whenever the global search box opens or closes. Set it with `initialState.showGlobalFilter`, control it with `state.showGlobalFilter`.",
+  },
+  {
     name: "enableAdvancedFilter",
     type: "boolean",
     required: false,
@@ -1943,6 +1951,13 @@ export const tableMethods: ApiMember[] = [
     required: true,
     default: null,
     description: "Updates `showColumnFilters`.",
+  },
+  {
+    name: "setShowGlobalFilter",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Open or close the global search box.",
   },
   {
     name: "setColumnFilterMode",

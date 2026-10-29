@@ -471,6 +471,7 @@ type DataTableUiStateKey =
   | "isFullscreen"
   | "direction"
   | "showColumnFilters"
+  | "showGlobalFilter"
   | "columnFilterModes"
   | "globalFilterMode"
   | "advancedFilter"
@@ -485,6 +486,7 @@ export type DataTableMethodKey =
   | "setDensity"
   | "setIsFullscreen"
   | "setShowColumnFilters"
+  | "setShowGlobalFilter"
   | "setColumnFilterMode"
   | "setGlobalFilterMode"
   | "setAdvancedFilter"
@@ -536,6 +538,10 @@ export interface DataTableConfig<TData extends RowData> {
   /** Whether the filter row shows (table state). */
   showColumnFilters: boolean
   setShowColumnFilters: React.Dispatch<React.SetStateAction<boolean>>
+  /** Whether the global search box is open (table state). */
+  showGlobalFilter: boolean
+  /** Open or close the global search box. */
+  setShowGlobalFilter: React.Dispatch<React.SetStateAction<boolean>>
   /** Active filter mode per column id. */
   columnFilterModes: Record<string, FilterMode>
   /** Switch a column's filter mode (resets the value when it becomes invalid). */
@@ -920,6 +926,10 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Called whenever the filter row is shown or hidden. Set it with
    *  `initialState.showColumnFilters`, control it with `state.showColumnFilters`. */
   onShowColumnFiltersChange?: (showColumnFilters: boolean) => void
+  /** Called whenever the global search box opens or closes. Set it with
+   *  `initialState.showGlobalFilter`, control it with
+   *  `state.showGlobalFilter`. */
+  onShowGlobalFilterChange?: (showGlobalFilter: boolean) => void
   /** Enable the advanced filter panel: compound rules joined by AND/OR, applied
    *  on top of the per-column filters. A toolbar button opens the panel and
    *  shows the active-rule count. Default false. */

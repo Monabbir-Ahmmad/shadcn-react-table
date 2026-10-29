@@ -17,6 +17,8 @@ export interface DataTableUiState {
   density: Density
   isFullscreen: boolean
   showColumnFilters: boolean
+  /** Whether the global search box is open. */
+  showGlobalFilter: boolean
   /** Active filter mode per column id (columns not listed use their default). */
   columnFilterModes: Record<string, FilterMode>
   globalFilterMode: GlobalFilterMode
@@ -40,6 +42,7 @@ export const UI_STATE_KEYS = [
   "density",
   "isFullscreen",
   "showColumnFilters",
+  "showGlobalFilter",
   "columnFilterModes",
   "globalFilterMode",
   "advancedFilter",
@@ -155,6 +158,10 @@ export function withLiveUiState<T extends object>(
   store: ReadableStore
 ): T {
   const latest = latestState(store)
+  // Controlled values from `state` reach the store during the holder's
+  // render, before any store notification; refresh the copy now so the parts
+  // rendering in this pass read them.
+  latest.state = store.state
   for (const key of UI_STATE_KEYS) {
     Object.defineProperty(config, key, {
       get: () => (latest.state as DataTableUiState)[key],

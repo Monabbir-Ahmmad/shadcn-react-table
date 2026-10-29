@@ -17,6 +17,7 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `setDensity` | `React.Dispatch<React.SetStateAction<Density>>` |  | Updates `density`. |
 | `setIsFullscreen` | `React.Dispatch<React.SetStateAction<boolean>>` |  | Updates `isFullscreen`. |
 | `setShowColumnFilters` | `React.Dispatch<React.SetStateAction<boolean>>` |  | Updates `showColumnFilters`. |
+| `setShowGlobalFilter` | `React.Dispatch<React.SetStateAction<boolean>>` |  | Open or close the global search box. |
 | `setColumnFilterMode` | `(columnId: string, mode: FilterMode) => void` |  | Switch a column's filter mode (resets the value when it becomes invalid). |
 | `setGlobalFilterMode` | `(mode: GlobalFilterMode) => void` |  | Updates `globalFilterMode`. |
 | `setAdvancedFilter` | `React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>` |  | Updates `advancedFilter`. |

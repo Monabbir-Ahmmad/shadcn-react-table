@@ -161,6 +161,7 @@ export const DATA_TABLE_METHODS = [
   "setDensity",
   "setIsFullscreen",
   "setShowColumnFilters",
+  "setShowGlobalFilter",
   "setColumnFilterMode",
   "setGlobalFilterMode",
   "setAdvancedFilter",

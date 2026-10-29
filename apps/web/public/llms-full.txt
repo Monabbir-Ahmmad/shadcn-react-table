@@ -1014,6 +1014,10 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+## Opening the search box
+
+The search box starts closed (a search button) unless a search is set. Its open state is table state, `showGlobalFilter`: start it open with `initialState: { showGlobalFilter: true }`, control it with `state.showGlobalFilter` and `onShowGlobalFilterChange`, or open it from code with `table.setShowGlobalFilter(true)`. Setting a search value from outside opens it too.
+
 ## Custom search modes
 
 Limit or reorder the search mode menu with `globalFilterModeOptions`. It can also list your own [custom filter functions](/docs/guides/filter-modes#custom-filter-functions) by name; the search runs them on each searchable column, and a row matches when any column passes.
@@ -1095,6 +1099,7 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` �
 | --- | --- | --- | --- |
 | `enableGlobalFilter` | `boolean` | `true` | Show the expandable global search in the toolbar. Default true. |
 | `enableGlobalFilterModes` | `boolean` | `true` | Show the global search mode menu (fuzzy/contains/…). Default true. |
+| `onShowGlobalFilterChange` | `(showGlobalFilter: boolean) => void` |  | Called whenever the global search box opens or closes. Set it with `initialState.showGlobalFilter`, control it with `state.showGlobalFilter`. |
 | `globalFilterModeOptions` | `GlobalFilterMode[]` | `GLOBAL_FILTER_MODES as GlobalFilterMode[]` | Restrict (and order) the global search mode menu: built-in modes and custom `filterFns` names. |
 | `enableGlobalFilterRankedResults` | `boolean` | `false` | While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering. |
 | `onGlobalFilterModeChange` | `(mode: GlobalFilterMode) => void` |  | Called whenever the global search mode changes (default `"fuzzy"`). Set it with `initialState.globalFilterMode`, control it with `state.globalFilterMode`. |
@@ -5185,7 +5190,7 @@ For server-side data, combine this with the `manual*` flags — see [Server-side
 
 ## Data table UI state
 
-The state the table adds on top of TanStack is table state too: **density**, **full screen**, **filter-row visibility**, the **global search mode**, **column filter modes**, the **advanced filter** and its dialog, and **inline editing** (the cell or row being edited, the create form, the draft). It sits in `table.getState()` next to sorting, takes `initialState` and controlled `state` like any slice, and reports changes through `on…Change` callbacks with the new value.
+The state the table adds on top of TanStack is table state too: **density**, **full screen**, **filter-row visibility**, whether the **search box** is open, the **global search mode**, **column filter modes**, the **advanced filter** and its dialog, and **inline editing** (the cell or row being edited, the create form, the draft). It sits in `table.getState()` next to sorting, takes `initialState` and controlled `state` like any slice, and reports changes through `on…Change` callbacks with the new value.
 
 ```tsx
 const [editingCell, setEditingCell] = React.useState<EditingCell | null>(null)
@@ -5364,6 +5369,7 @@ The table is styled with Tailwind, not per-component style props. Structural slo
 | `onDensityChange` | `(density: Density) => void` |  | Called whenever the density changes (toolbar toggle or programmatic). Set it with `initialState.density`, control it with `state.density`. |
 | `onIsFullscreenChange` | `(isFullscreen: boolean) => void` |  | Called whenever the full-screen state is toggled. Control it with `state.isFullscreen`. |
 | `onShowColumnFiltersChange` | `(showColumnFilters: boolean) => void` |  | Called whenever the filter row is shown or hidden. Set it with `initialState.showColumnFilters`, control it with `state.showColumnFilters`. |
+| `onShowGlobalFilterChange` | `(showGlobalFilter: boolean) => void` |  | Called whenever the global search box opens or closes. Set it with `initialState.showGlobalFilter`, control it with `state.showGlobalFilter`. |
 | `enableAdvancedFilter` | `boolean` | `false` | Enable the advanced filter panel: compound rules joined by AND/OR, applied on top of the per-column filters. A toolbar button opens the panel and shows the active-rule count. Default false. |
 | `onAdvancedFilterChange` | `(filter: AdvancedFilterGroup) => void` |  | Called whenever the advanced filter changes. Set it with `initialState.advancedFilter`, control it with `state.advancedFilter`. |
 | `onGlobalFilterModeChange` | `(mode: GlobalFilterMode) => void` |  | Called whenever the global search mode changes (default `"fuzzy"`). Set it with `initialState.globalFilterMode`, control it with `state.globalFilterMode`. |
@@ -5549,6 +5555,7 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `setDensity` | `React.Dispatch<React.SetStateAction<Density>>` |  | Updates `density`. |
 | `setIsFullscreen` | `React.Dispatch<React.SetStateAction<boolean>>` |  | Updates `isFullscreen`. |
 | `setShowColumnFilters` | `React.Dispatch<React.SetStateAction<boolean>>` |  | Updates `showColumnFilters`. |
+| `setShowGlobalFilter` | `React.Dispatch<React.SetStateAction<boolean>>` |  | Open or close the global search box. |
 | `setColumnFilterMode` | `(columnId: string, mode: FilterMode) => void` |  | Switch a column's filter mode (resets the value when it becomes invalid). |
 | `setGlobalFilterMode` | `(mode: GlobalFilterMode) => void` |  | Updates `globalFilterMode`. |
 | `setAdvancedFilter` | `React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>` |  | Updates `advancedFilter`. |

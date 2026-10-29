@@ -86,6 +86,9 @@ for every rename.
 
 ### New
 
+- **New:** the global search box's open state is table state,
+  `showGlobalFilter` (`initialState`, `state`, `onShowGlobalFilterChange`,
+  `table.setShowGlobalFilter`).
 - **New `slotProps` option:** extra props (classes, styles, `data-*`,
   handlers, refs) for every part of the table — surface, rows, cells,
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
@@ -216,6 +219,9 @@ for every rename.
 
 ### Fixed
 
+- **Fixed:** a change to controlled UI state (`state.density`,
+  `state.showColumnFilters`, …) shows on the next render; parts of the table
+  could keep the previous value until another change.
 - **Fixed (accessibility):** the columns the table adds itself (row actions,
   drag handle, row pin, single-select, expand) name their headers for screen
   readers; filter-row cells are cells, not column headers; the date filters'

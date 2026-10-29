@@ -37,6 +37,10 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+## Opening the search box
+
+The search box starts closed (a search button) unless a search is set. Its open state is table state, `showGlobalFilter`: start it open with `initialState: { showGlobalFilter: true }`, control it with `state.showGlobalFilter` and `onShowGlobalFilterChange`, or open it from code with `table.setShowGlobalFilter(true)`. Setting a search value from outside opens it too.
+
 ## Custom search modes
 
 Limit or reorder the search mode menu with `globalFilterModeOptions`. It can also list your own [custom filter functions](/docs/guides/filter-modes#custom-filter-functions) by name; the search runs them on each searchable column, and a row matches when any column passes.
@@ -118,6 +122,7 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` �
 | --- | --- | --- | --- |
 | `enableGlobalFilter` | `boolean` | `true` | Show the expandable global search in the toolbar. Default true. |
 | `enableGlobalFilterModes` | `boolean` | `true` | Show the global search mode menu (fuzzy/contains/…). Default true. |
+| `onShowGlobalFilterChange` | `(showGlobalFilter: boolean) => void` |  | Called whenever the global search box opens or closes. Set it with `initialState.showGlobalFilter`, control it with `state.showGlobalFilter`. |
 | `globalFilterModeOptions` | `GlobalFilterMode[]` | `GLOBAL_FILTER_MODES as GlobalFilterMode[]` | Restrict (and order) the global search mode menu: built-in modes and custom `filterFns` names. |
 | `enableGlobalFilterRankedResults` | `boolean` | `false` | While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering. |
 | `onGlobalFilterModeChange` | `(mode: GlobalFilterMode) => void` |  | Called whenever the global search mode changes (default `"fuzzy"`). Set it with `initialState.globalFilterMode`, control it with `state.globalFilterMode`. |

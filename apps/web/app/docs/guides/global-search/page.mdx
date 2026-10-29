@@ -24,6 +24,10 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
+## Opening the search box
+
+The search box starts closed (a search button) unless a search is set. Its open state is table state, `showGlobalFilter`: start it open with `initialState: { showGlobalFilter: true }`, control it with `state.showGlobalFilter` and `onShowGlobalFilterChange`, or open it from code with `table.setShowGlobalFilter(true)`. Setting a search value from outside opens it too.
+
 ## Custom search modes
 
 Limit or reorder the search mode menu with `globalFilterModeOptions`. It can also list your own [custom filter functions](/docs/guides/filter-modes#custom-filter-functions) by name; the search runs them on each searchable column, and a row matches when any column passes.
@@ -103,7 +107,7 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` â
 
 ## Relevant options
 
-<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "globalFilterModeOptions", "enableGlobalFilterRankedResults", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
+<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "onShowGlobalFilterChange", "globalFilterModeOptions", "enableGlobalFilterRankedResults", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
 
 ## Related
 

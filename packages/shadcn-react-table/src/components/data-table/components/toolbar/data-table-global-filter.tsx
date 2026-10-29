@@ -49,10 +49,18 @@ export function DataTableGlobalFilter<TData extends RowData>({
     setGlobalFilterMode,
     renderGlobalFilterModeMenuItems,
     globalFilterModeOptions: modes,
+    showGlobalFilter: expanded,
+    setShowGlobalFilter: setExpanded,
   } = dt(table)
 
   const external = (table.getState().globalFilter ?? "") as string
-  const [expanded, setExpanded] = React.useState(external.length > 0)
+  // A value set from outside opens the box (also when the table starts with
+  // a search in `initialState`).
+  const [openedFor, setOpenedFor] = React.useState("")
+  if (external.length > 0 && !expanded && external !== openedFor) {
+    setOpenedFor(external)
+    setExpanded(true)
+  }
   const [value, setValue] = React.useState(external)
 
   // Values this box committed that the table state has not reflected yet.

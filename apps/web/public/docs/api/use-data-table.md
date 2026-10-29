@@ -35,6 +35,7 @@
 | `onDensityChange` | `(density: Density) => void` |  | Called whenever the density changes (toolbar toggle or programmatic). Set it with `initialState.density`, control it with `state.density`. |
 | `onIsFullscreenChange` | `(isFullscreen: boolean) => void` |  | Called whenever the full-screen state is toggled. Control it with `state.isFullscreen`. |
 | `onShowColumnFiltersChange` | `(showColumnFilters: boolean) => void` |  | Called whenever the filter row is shown or hidden. Set it with `initialState.showColumnFilters`, control it with `state.showColumnFilters`. |
+| `onShowGlobalFilterChange` | `(showGlobalFilter: boolean) => void` |  | Called whenever the global search box opens or closes. Set it with `initialState.showGlobalFilter`, control it with `state.showGlobalFilter`. |
 | `enableAdvancedFilter` | `boolean` | `false` | Enable the advanced filter panel: compound rules joined by AND/OR, applied on top of the per-column filters. A toolbar button opens the panel and shows the active-rule count. Default false. |
 | `onAdvancedFilterChange` | `(filter: AdvancedFilterGroup) => void` |  | Called whenever the advanced filter changes. Set it with `initialState.advancedFilter`, control it with `state.advancedFilter`. |
 | `onGlobalFilterModeChange` | `(mode: GlobalFilterMode) => void` |  | Called whenever the global search mode changes (default `"fuzzy"`). Set it with `initialState.globalFilterMode`, control it with `state.globalFilterMode`. |

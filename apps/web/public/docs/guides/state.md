@@ -24,7 +24,7 @@ For server-side data, combine this with the `manual*` flags — see [Server-side
 
 ## Data table UI state
 
-The state the table adds on top of TanStack is table state too: **density**, **full screen**, **filter-row visibility**, the **global search mode**, **column filter modes**, the **advanced filter** and its dialog, and **inline editing** (the cell or row being edited, the create form, the draft). It sits in `table.getState()` next to sorting, takes `initialState` and controlled `state` like any slice, and reports changes through `on…Change` callbacks with the new value.
+The state the table adds on top of TanStack is table state too: **density**, **full screen**, **filter-row visibility**, whether the **search box** is open, the **global search mode**, **column filter modes**, the **advanced filter** and its dialog, and **inline editing** (the cell or row being edited, the create form, the draft). It sits in `table.getState()` next to sorting, takes `initialState` and controlled `state` like any slice, and reports changes through `on…Change` callbacks with the new value.
 
 ```tsx
 const [editingCell, setEditingCell] = React.useState<EditingCell | null>(null)
