@@ -12,12 +12,8 @@ const SECTIONS = generated as Record<string, ApiMember[]>
 
 /** A tint per kind of type, so functions, unions and primitives scan apart. */
 function typeTone(type: string): string {
-  if (type.includes("=>"))
-    return "bg-violet-500/10 text-violet-700 dark:text-violet-300"
-  if (/^(boolean|number|string)$/.test(type))
-    return "bg-sky-500/10 text-sky-700 dark:text-sky-300"
-  if (type.includes("|"))
-    return "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+  if (type.includes("=>")) return "bg-primary/15 text-foreground"
+  if (type.includes("|")) return "bg-secondary text-secondary-foreground"
   return "bg-muted text-muted-foreground"
 }
 
@@ -57,6 +53,8 @@ export function ApiTable({
   const colCount = 2 + (showType ? 1 : 0) + (showDefault ? 1 : 0)
 
   const showSearch = search ?? !only
+  // Only full reference tables get row anchors; guide excerpts can repeat names.
+  const anchored = !only
   const [query, setQuery] = React.useState("")
   const q = query.trim().toLowerCase()
   const filtered = q
@@ -113,8 +111,11 @@ export function ApiTable({
               filtered.map((row) => (
                 <tr
                   key={row.name}
-                  id={`api-${row.name}`}
-                  className="group border-b align-top last:border-0 target:bg-primary/5"
+                  id={anchored ? `api-${row.name}` : undefined}
+                  className={cn(
+                    "group border-b align-top last:border-0",
+                    anchored && "scroll-mt-28 target:bg-primary/5"
+                  )}
                 >
                   <td className="px-3 py-2 whitespace-nowrap">
                     <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
@@ -123,13 +124,15 @@ export function ApiTable({
                         <span className="text-muted-foreground">?</span>
                       )}
                     </code>
-                    <a
-                      href={`#api-${row.name}`}
-                      aria-label={`Link to ${row.name}`}
-                      className="ms-1 text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-                    >
-                      #
-                    </a>
+                    {anchored && (
+                      <a
+                        href={`#api-${row.name}`}
+                        aria-label={`Link to ${row.name}`}
+                        className="ms-1 text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                      >
+                        #
+                      </a>
+                    )}
                   </td>
                   {showType && (
                     <td className="px-3 py-2">
