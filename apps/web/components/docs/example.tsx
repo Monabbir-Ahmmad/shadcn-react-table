@@ -3,8 +3,8 @@
 import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
-import { pageMarkdownUrl } from "@/components/docs/copy-page"
 import { EXAMPLES } from "@/components/examples/registry"
+import { pageMarkdownUrl } from "@/lib/docs-meta"
 import { EXAMPLE_SOURCE } from "@/lib/example-source.generated"
 
 const GITHUB_SRC =
@@ -45,7 +45,7 @@ export function Example({ slug }: { slug: string }) {
   const copyPrompt = () => {
     const { origin, pathname } = window.location
     const base = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
-    const page = `${origin}${pageMarkdownUrl(pathname.slice(base.length) || "/")}`
+    const page = `${origin}${pageMarkdownUrl(pathname.slice(base.length) || "/", base)}`
     const prompt = `Add the "${example.title}" example (\`${slug}\`) from ${page} to my app. It uses shadcn-react-table: ${origin}${base}/SKILL.md`
     void navigator.clipboard.writeText(prompt).then(() => {
       setPromptCopied(true)
@@ -54,13 +54,20 @@ export function Example({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="my-6 overflow-hidden rounded-lg border">
-      <div className="flex items-center justify-between gap-2 border-b bg-muted/40 px-3 py-1.5">
-        <span className="text-xs font-medium">{example.title}</span>
+    <div className="my-8 overflow-hidden rounded-xl border shadow-sm ring-1 ring-primary/5">
+      <div className="flex items-center justify-between gap-2 border-b bg-muted/40 px-3 py-2">
+        <span className="flex min-w-0 flex-col">
+          <span className="text-xs font-medium">{example.title}</span>
+          {example.description && (
+            <span className="truncate text-[11px] text-muted-foreground">
+              {example.description}
+            </span>
+          )}
+        </span>
         <div className="flex items-center gap-1">
           {source && (
             <div
-              role="tablist"
+              role="group"
               aria-label="Example view"
               className="flex items-center rounded-md border bg-background p-0.5"
             >
@@ -105,7 +112,7 @@ export function Example({ slug }: { slug: string }) {
       </div>
 
       {tab === "preview" || !source ? (
-        <div className="p-4">
+        <div className="bg-background p-4">
           <Component />
         </div>
       ) : (
@@ -131,8 +138,7 @@ function TabButton({
   return (
     <button
       type="button"
-      role="tab"
-      aria-selected={active}
+      aria-pressed={active}
       onClick={onClick}
       className={cn(
         "rounded px-2 py-0.5 text-xs font-medium transition-colors",

@@ -17,7 +17,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h1: ({ className, ...props }) => (
       <h1
         className={cn(
-          "mt-2 scroll-m-20 text-3xl font-semibold tracking-tight",
+          "mt-2 scroll-m-20 font-heading text-3xl font-semibold tracking-tight md:text-4xl",
           className
         )}
         {...props}
@@ -52,7 +52,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     p: ({ className, ...props }) => (
       <p
-        className={cn("leading-7 [&:not(:first-child)]:mt-5", className)}
+        className={cn(
+          "leading-7 [&:not(:first-child)]:mt-5 [h1+&]:text-lg [h1+&]:text-muted-foreground",
+          className
+        )}
         {...props}
       />
     ),

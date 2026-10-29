@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest"
 
 import { docsFlatNav, docsNav } from "./docs-nav"
-import { groupFor, summaryFor } from "./docs-meta"
+import {
+  breadcrumbFor,
+  groupFor,
+  pageLinks,
+  pageMarkdownUrl,
+  summaryFor,
+} from "./docs-meta"
 
 describe("docs nav metadata", () => {
   it("gives every group an icon", () => {
@@ -30,5 +36,35 @@ describe("docs nav metadata", () => {
       .map((i) => i.href)
     expect(badged).toContain("/docs/guides/slot-props")
     expect(badged).toContain("/docs/ai")
+  })
+})
+
+describe("page links", () => {
+  it("builds the Markdown URL with the base path", () => {
+    expect(
+      pageMarkdownUrl("/docs/guides/sorting/", "/shadcn-react-table")
+    ).toBe("/shadcn-react-table/docs/guides/sorting.md")
+    expect(pageMarkdownUrl("/docs")).toBe("/docs.md")
+  })
+
+  it("builds absolute links for the page actions", () => {
+    const links = pageLinks("/docs/guides/sorting/")
+    expect(links.markdown).toBe(
+      "https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sorting.md"
+    )
+    expect(links.github).toBe(
+      "https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/apps/web/app/docs/guides/sorting/page.mdx"
+    )
+    expect(links.chatgpt).toContain(encodeURIComponent(links.markdown))
+    expect(links.claude).toContain(encodeURIComponent(links.markdown))
+  })
+
+  it("builds a breadcrumb from the nav group", () => {
+    expect(breadcrumbFor("/docs/guides/sorting")).toEqual([
+      { title: "Docs", href: "/docs" },
+      { title: "Sorting, grouping & expanding" },
+      { title: "Sorting" },
+    ])
+    expect(breadcrumbFor("/docs")).toEqual([{ title: "Docs" }])
   })
 })

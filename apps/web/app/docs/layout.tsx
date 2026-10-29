@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 
-import { CopyPage } from "@/components/docs/copy-page"
+import { DocsPageHeader } from "@/components/docs/page-header"
 import { DocsPrevNext } from "@/components/docs/prev-next"
 import { DocsSidebar } from "@/components/docs/sidebar"
 import { DocsTableOfContents } from "@/components/docs/table-of-contents"
@@ -28,7 +28,7 @@ export default function DocsLayout({
 
         <main className="min-w-0 flex-1 px-4 py-6 md:px-10 md:py-8 lg:px-16">
           <article className="mx-auto max-w-5xl" data-docs-article>
-            <CopyPage />
+            <DocsPageHeader />
             {children}
             <DocsPrevNext />
           </article>
