@@ -17,7 +17,7 @@ export function AnatomyStatic() {
     >
       <div className="mx-auto max-w-3xl px-4 pt-14 pb-16 sm:px-6">
         <AnatomyHeroCopy headingId="hero-title-static" />
-        <AnatomyLayers className="mx-auto mt-16 mb-4 w-[58%] max-w-[560px] -translate-x-[20%] sm:w-[72%] sm:-translate-x-[10%]" />
+        <AnatomyLayers className="mx-auto mt-16 mb-4 w-[58%] max-w-[560px] -translate-x-[20%] sm:mb-20 sm:w-[72%] sm:-translate-x-[10%]" />
         <div className="mt-14 space-y-14">
           {ANATOMY.map((layer, i) => (
             <AnatomyPart key={layer.id} layer={layer} index={i} />
