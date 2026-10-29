@@ -34,6 +34,9 @@ for every rename.
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
+- **New:** shift-click range selection (`enableBatchRowSelection`, on by
+  default); single-row selection (`enableMultiRowSelection: false`) shows
+  radio buttons.
 - **New:** composition — `useDataTableInstance()` reads the table from
   anywhere inside it, `DataTableProvider` wraps your own layout, and the
   toolbar, pagination, search, view-options, filter and menu parts are

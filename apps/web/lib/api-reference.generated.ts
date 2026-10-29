@@ -192,6 +192,14 @@ export const useDataTableOptions: ApiMember[] = [
       "While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering.",
   },
   {
+    name: "enableBatchRowSelection",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Shift-click a row's checkbox to select (or clear) every row since the last one clicked. Default true.",
+  },
+  {
     name: "displayColumnDefOptions",
     type: "Partial< Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>> >",
     required: false,
@@ -1639,6 +1647,14 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description: "Whether rows can be selected.",
+  },
+  {
+    name: "enableBatchRowSelection",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Shift-click a row's checkbox to select or clear the range since the last click.",
   },
   {
     name: "enableTopToolbar",

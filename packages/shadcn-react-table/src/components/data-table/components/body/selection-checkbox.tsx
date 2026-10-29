@@ -11,7 +11,13 @@ interface SelectionCheckboxProps extends Omit<
 > {
   checked?: boolean
   indeterminate?: boolean
-  onCheckedChange?: (checked: boolean) => void
+  /** Called with the new value and the click (for its modifier keys). */
+  onCheckedChange?: (
+    checked: boolean,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => void
+  /** A radio button (single-row selection) instead of a checkbox. */
+  variant?: "checkbox" | "radio"
 }
 
 /**
@@ -33,29 +39,38 @@ function SelectionCheckbox({
   indeterminate = false,
   checked = false,
   onCheckedChange,
+  variant = "checkbox",
   ...props
 }: SelectionCheckboxProps) {
   const active = checked || indeterminate
+  const radio = variant === "radio"
   return (
     <button
       {...mergeProps(
         {
           type: "button",
-          role: "checkbox",
-          "data-slot": "checkbox",
+          role: radio ? "radio" : "checkbox",
+          "data-slot": radio ? "radio" : "checkbox",
           "aria-checked": indeterminate ? "mixed" : checked,
-          onClick: () => onCheckedChange?.(!checked),
+          onClick: (event: React.MouseEvent<HTMLButtonElement>) =>
+            onCheckedChange?.(!checked, event),
           className: cn(
-            "peer relative flex size-4.5 shrink-0 items-center justify-center rounded-none border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
-            active
+            "peer relative flex size-4.5 shrink-0 items-center justify-center border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
+            radio ? "rounded-full" : "rounded-none",
+            active && !radio
               ? "border-primary bg-primary text-primary-foreground"
-              : "border-input"
+              : active
+                ? "border-primary text-primary"
+                : "border-input"
           ),
         } as React.ComponentProps<"button">,
         { ...props, className }
       )}
     >
-      {active && (
+      {active && radio && (
+        <span aria-hidden="true" className="size-2 rounded-full bg-current" />
+      )}
+      {active && !radio && (
         <svg
           viewBox="0 0 24 24"
           fill="none"

@@ -693,6 +693,9 @@ export interface DataTableConfig<TData extends RowData> {
   positionToolbarDropZone: "top" | "bottom" | "both" | "none"
   /** Whether rows can be selected. */
   enableRowSelection: boolean
+  /** Shift-click a row's checkbox to select or clear the range since the
+   *  last click. */
+  enableBatchRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
   enableDensityToggle: boolean
@@ -827,6 +830,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping
    *  or expanded, or under manual sorting/filtering. */
   enableGlobalFilterRankedResults?: boolean
+  /** Shift-click a row's checkbox to select (or clear) every row since the
+   *  last one clicked. Default true. */
+  enableBatchRowSelection?: boolean
   /** Column options for the columns the table adds itself (selection,
    *  expand, row actions, row number, row pin, drag handle), by id — e.g.
    *  `{ "cn-select": { size: 48 } }`. `meta` merges with the column's own. */
