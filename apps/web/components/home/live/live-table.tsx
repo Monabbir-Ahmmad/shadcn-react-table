@@ -6,10 +6,12 @@ import {
   RiArrowGoBackLine,
   RiStackLine,
 } from "@remixicon/react"
+import { Direction } from "radix-ui"
 
 import {
   DataTable,
   useDataTable,
+  type DataTableRowVirtualizer,
 } from "@monabbir/shadcn-react-table/components/data-table"
 import { dataTableLocalizationAr } from "@monabbir/shadcn-react-table/components/data-table/locales/ar"
 import { Button } from "@workspace/ui/components/button"
@@ -21,25 +23,19 @@ import {
   type CommandStatus,
 } from "@/components/home/live/command-bar"
 import { FpsMeter } from "@/components/home/live/fps-meter"
-import { BIG_ROW_COUNT, makeBigUsers } from "@/lib/big-data"
+import { makeBigUsers } from "@/lib/big-data"
 import { users, type User } from "@/lib/example-data"
 import { stateToCode } from "@/lib/state-to-code"
 import {
   applyCommand,
+  BIG_ROWS_LABEL,
+  describeCommand,
   EXAMPLE_COMMANDS,
   parseCommand,
   type Command,
   type CommandColumn,
   type CommandTarget,
-  type ParseResult,
 } from "@/lib/table-commands"
-
-const BIG_LABEL = `${BIG_ROW_COUNT.toLocaleString("en-US")} rows`
-
-// Shown as the large-dataset example: the real row count, never a million.
-const EXAMPLES = EXAMPLE_COMMANDS.map((command) =>
-  /million/.test(command) ? BIG_LABEL : command
-)
 
 /** Columns whose values the command bar knows ("only active", "only sales"). */
 const VALUE_COLUMNS = ["role", "department", "status"] as const
@@ -64,63 +60,14 @@ function afterPaint(fn: () => void) {
   requestAnimationFrame(() => setTimeout(fn, 0))
 }
 
-/** "100,000 rows", "100000", "100k rows" all load the large dataset. */
-function isBigDataAlias(text: string) {
-  const m = text
-    .toLowerCase()
-    .replace(/[\s,._]/g, "")
-    .match(/^(?:load)?(\d+)(k?)(?:rows?)?$/)
-  return !!m && Number(m[1]) * (m[2] ? 1000 : 1) === BIG_ROW_COUNT
-}
-
-const DENSITY_LABEL = {
-  compact: "Compact",
-  comfortable: "Comfortable",
-  spacious: "Spacious",
-} as const
-
-/** The one-line confirmation for a command. */
-function describe(command: Command, label: (id: string) => string): string {
-  switch (command.kind) {
-    case "group":
-      return `Grouped by ${label(command.column)}`
-    case "ungroup":
-      return "Grouping cleared"
-    case "sort":
-      return `Sorted by ${label(command.column)}, ${
-        command.desc ? "highest first" : "lowest first"
-      }`
-    case "pin":
-      return `Pinned ${label(command.column)} to the ${command.side}`
-    case "unpin":
-      return "All columns unpinned"
-    case "filter":
-      return `Showing only ${command.value} (${label(command.column)})`
-    case "clearFilters":
-      return "Filters cleared"
-    case "visibility":
-      return `${command.visible ? "Showing" : "Hid"} ${label(command.column)}`
-    case "density":
-      return `${DENSITY_LABEL[command.density]} rows`
-    case "selectAll":
-      return "Selected every row"
-    case "clearSelection":
-      return "Selection cleared"
-    case "locale":
-      return command.locale === "ar"
-        ? "Arabic, right to left"
-        : "English, left to right"
-    case "bigData":
-      return `Loaded ${BIG_LABEL}`
-    case "reset":
-      return "Back to the starting view"
-  }
-}
+/** The table's scroll container inside `root`. */
+const surfaceIn = (root: HTMLElement | null) =>
+  root?.querySelector<HTMLElement>('[data-slot="data-table-surface"]') ?? null
 
 /**
  * The live users table: a command bar drives it, Preview/Code switches to the
  * `useDataTable` call for what is on screen, and a large-dataset mode loads
- * {@link BIG_ROW_COUNT} virtualized rows with an FPS meter.
+ * 100,000 virtualized rows with an FPS meter.
  */
 export function LiveTable() {
   const columns = React.useMemo(() => userColumns(), [])
@@ -132,7 +79,18 @@ export function LiveTable() {
   const [statusId, setStatusId] = React.useState(0)
   const [, startTransition] = React.useTransition()
   const rootRef = React.useRef<HTMLDivElement>(null)
-  const fling = React.useRef(0)
+  // Bumped by anything that changes which data is shown (reset, Back to 48,
+  // a large-data load): deferred work from before it bails.
+  const epoch = React.useRef(0)
+  // The latest deferred command, so only its confirmation is shown.
+  const latest = React.useRef(0)
+  const loading = React.useRef(false)
+  // Ends the running fling (its frame and its listeners).
+  const stopFling = React.useRef<() => void>(() => {})
+  // The table's scroll offset while the Code view hides it.
+  const savedScroll = React.useRef(0)
+  const savedRow = React.useRef(-1)
+  const rowVirtualizer = React.useRef<DataTableRowVirtualizer | null>(null)
   const viewId = React.useId()
 
   const announce = (next: CommandStatus) => {
@@ -140,21 +98,38 @@ export function LiveTable() {
     setStatusId((id) => id + 1)
   }
 
+  // Drops pending work and the fling before the shown data changes. Refs
+  // only, so the memoized reset below can call it too.
+  const interrupt = React.useCallback(() => {
+    epoch.current += 1
+    loading.current = false
+    savedScroll.current = 0
+    savedRow.current = -1
+    stopFling.current()
+  }, [])
+
   const showBig = () => {
-    if (big) return announce({ kind: "done", text: `Loaded ${BIG_LABEL}` })
-    announce({ kind: "busy", text: `Generating ${BIG_LABEL}…` })
-    afterPaint(() =>
+    if (big) return announce({ kind: "done", text: `Loaded ${BIG_ROWS_LABEL}` })
+    // A second request while generating changes nothing.
+    if (loading.current) return
+    interrupt()
+    loading.current = true
+    const at = epoch.current
+    announce({ kind: "busy", text: `Generating ${BIG_ROWS_LABEL}…` })
+    afterPaint(() => {
+      if (epoch.current !== at) return
+      loading.current = false
       startTransition(() => {
         bigUsers ??= makeBigUsers()
         setData(bigUsers)
         setBig(true)
-        announce({ kind: "done", text: `Loaded ${BIG_LABEL}` })
+        announce({ kind: "done", text: `Loaded ${BIG_ROWS_LABEL}` })
       })
-    )
+    })
   }
 
   const showSmall = () => {
-    cancelAnimationFrame(fling.current)
+    interrupt()
     setData(users)
     setBig(false)
     announce({ kind: "done", text: `Back to ${users.length} rows` })
@@ -172,6 +147,7 @@ export function LiveTable() {
       ? {
           enablePagination: false,
           enableRowVirtualization: true,
+          rowVirtualizerInstanceRef: rowVirtualizer,
           slotProps: { surface: { className: "max-h-[520px]" } },
         }
       : {}),
@@ -191,7 +167,11 @@ export function LiveTable() {
         ) : (
           <Button variant="outline" size="xs" onClick={showBig}>
             <RiStackLine data-icon="inline-start" />
-            <span className="max-sm:hidden">Load</span> {BIG_LABEL}
+            {/* One flex item, so the words keep their order in RTL. */}
+            <span>
+              <span className="max-sm:hidden">Load </span>
+              {BIG_ROWS_LABEL}
+            </span>
           </Button>
         )}
       </div>
@@ -201,40 +181,85 @@ export function LiveTable() {
   /** Scroll the table to its last row: eased, a frame at a time (instant
    *  with reduced motion); any wheel, touch or key stops it. */
   function flingToBottom() {
-    const surface = rootRef.current?.querySelector<HTMLElement>(
-      '[data-slot="data-table-surface"]'
-    )
+    const surface = surfaceIn(rootRef.current)
     if (!surface) return
-    cancelAnimationFrame(fling.current)
+    stopFling.current()
     const end = () => surface.scrollHeight - surface.clientHeight
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       surface.scrollTop = end()
       return
     }
     const from = surface.scrollTop
-    const start = performance.now()
+    let start = -1
     const duration = 1800
+    let raf = 0
+    let settle = 0
     const stop = () => {
-      cancelAnimationFrame(fling.current)
+      cancelAnimationFrame(raf)
       surface.removeEventListener("wheel", stop)
       surface.removeEventListener("touchstart", stop)
       surface.removeEventListener("keydown", stop)
+      stopFling.current = () => {}
     }
     surface.addEventListener("wheel", stop, { passive: true })
     surface.addEventListener("touchstart", stop, { passive: true })
     surface.addEventListener("keydown", stop)
+    stopFling.current = stop
     const step = (now: number) => {
+      if (start < 0) start = now
       const t = Math.min(1, (now - start) / duration)
       const eased = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
       // Re-read the end each frame: measured rows can change the height.
       surface.scrollTop = from + (end() - from) * eased
-      if (t < 1) fling.current = requestAnimationFrame(step)
+      // Then hold the bottom for a few frames while the last rows are
+      // measured and the height settles.
+      if (t < 1 || ++settle < 8) raf = requestAnimationFrame(step)
       else stop()
     }
-    fling.current = requestAnimationFrame(step)
+    raf = requestAnimationFrame(step)
   }
 
-  React.useEffect(() => () => cancelAnimationFrame(fling.current), [])
+  React.useEffect(() => () => stopFling.current(), [])
+
+  /** Switch views. `hidden` drops the table's scroll offset, so keep it. */
+  const switchView = (next: "preview" | "code") => {
+    if (next === view) return
+    if (next === "code") {
+      stopFling.current()
+      const top = surfaceIn(rootRef.current)?.scrollTop ?? 0
+      savedScroll.current = top
+      // With virtualization, remember the first row in view: row heights are
+      // measured again after the table is shown, so the offset alone drifts.
+      savedRow.current =
+        rowVirtualizer.current?.getVirtualItems().find((item) => item.end > top)
+          ?.index ?? -1
+    }
+    setView(next)
+  }
+
+  // Back on Preview, restore the position once the virtualized body has its
+  // height again (it collapses while hidden), trying for a few frames.
+  React.useLayoutEffect(() => {
+    if (view !== "preview") return
+    const top = savedScroll.current
+    const row = savedRow.current
+    savedScroll.current = 0
+    savedRow.current = -1
+    const surface = surfaceIn(rootRef.current)
+    if (!top || !surface) return
+    let raf = 0
+    let tries = 0
+    const restore = () => {
+      const virtualizer = rowVirtualizer.current
+      if (surface.scrollHeight - surface.clientHeight < top) {
+        if (++tries < 30) raf = requestAnimationFrame(restore)
+      } else if (row >= 0 && virtualizer) {
+        virtualizer.scrollToIndex(row, { align: "start" })
+      } else surface.scrollTop = top
+    }
+    restore()
+    return () => cancelAnimationFrame(raf)
+  }, [view])
 
   const commandColumns = React.useMemo<CommandColumn[]>(
     () =>
@@ -277,7 +302,7 @@ export function LiveTable() {
       toggleAllRowsSelected: (selected) =>
         table.toggleAllRowsSelected(selected),
       reset: () => {
-        cancelAnimationFrame(fling.current)
+        interrupt()
         table.reset()
         table.setDensity("comfortable")
         setLocale("en")
@@ -285,37 +310,39 @@ export function LiveTable() {
         setData(users)
       },
     }),
-    [table]
+    [table, interrupt]
   )
 
   const run = (text: string): boolean => {
-    const parsed: ParseResult = isBigDataAlias(text)
-      ? { ok: true, command: { kind: "bigData" } }
-      : parseCommand(text, commandColumns)
+    const parsed = parseCommand(text, commandColumns)
     if (!parsed.ok) {
       announce({
         kind: "miss",
         input: text,
-        suggestions: parsed.suggestions
-          .slice(0, 3)
-          .map((s) => (/million/.test(s) ? BIG_LABEL : s)),
+        suggestions: parsed.suggestions.slice(0, 3),
       })
       return false
     }
     const { command } = parsed
-    const label = (id: string) =>
-      commandColumns.find((column) => column.id === id)?.label ?? id
-    const message = describe(command, label)
+    const message = describeCommand(command, commandColumns)
     if (command.kind === "bigData") {
       showBig()
     } else if (command.kind === "locale") {
       setLocale(command.locale)
       announce({ kind: "done", text: message })
     } else if (big && HEAVY.has(command.kind)) {
+      // Paint "Working…" first. Queued commands all apply, in order, unless
+      // the data changed meanwhile; only the last one confirms.
+      const at = epoch.current
+      const id = ++latest.current
       announce({ kind: "busy", text: "Working…" })
       afterPaint(() => {
+        if (epoch.current !== at) return
         applyCommand(command, target, commandColumns)
-        afterPaint(() => announce({ kind: "done", text: message }))
+        afterPaint(() => {
+          if (epoch.current === at && latest.current === id)
+            announce({ kind: "done", text: message })
+        })
       })
     } else {
       applyCommand(command, target, commandColumns)
@@ -330,7 +357,7 @@ export function LiveTable() {
         onRun={run}
         status={status}
         statusId={statusId}
-        examples={EXAMPLES}
+        examples={EXAMPLE_COMMANDS}
       />
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t pt-4">
@@ -345,7 +372,7 @@ export function LiveTable() {
               type="button"
               aria-pressed={view === option}
               aria-controls={`${viewId}-${option}`}
-              onClick={() => setView(option)}
+              onClick={() => switchView(option)}
               className="px-3 py-1 font-mono text-xs text-muted-foreground capitalize transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 aria-pressed:bg-foreground aria-pressed:text-background"
             >
               {option}
@@ -362,13 +389,17 @@ export function LiveTable() {
       </div>
 
       <div className="mt-4">
-        <div
-          id={`${viewId}-preview`}
-          hidden={view !== "preview"}
-          dir={locale === "ar" ? "rtl" : "ltr"}
-        >
-          <DataTable table={table} />
-        </div>
+        {/* As in the RTL guide: the provider turns the table's portaled menus
+            and popovers, the wrapper turns the table itself. */}
+        <Direction.Provider dir={locale === "ar" ? "rtl" : "ltr"}>
+          <div
+            id={`${viewId}-preview`}
+            hidden={view !== "preview"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
+          >
+            <DataTable table={table} />
+          </div>
+        </Direction.Provider>
         <div id={`${viewId}-code`} hidden={view !== "code"}>
           <table.Subscribe
             selector={(state) => ({

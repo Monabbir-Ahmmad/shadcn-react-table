@@ -8,7 +8,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 // Strings, numbers and literals read as values; keywords recede.
 const TOKEN =
-  /("(?:[^"\\]|\\.)*")|\b(import|from|const|new)\b|\b(true|false|\d[\d_.]*)\b/g
+  /("(?:[^"\\]|\\.)*")|\b(import|from|const|new|return)\b|\b(true|false|\d[\d_.]*)\b/g
 
 /** One line of code, monochrome: values in the foreground, syntax muted. */
 function highlight(line: string): React.ReactNode[] {

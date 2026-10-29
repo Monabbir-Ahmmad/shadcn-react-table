@@ -1,3 +1,5 @@
+import { BIG_ROW_COUNT } from "./big-data"
+
 /** A column the command bar can talk about. */
 export type CommandColumn = {
   id: string
@@ -25,6 +27,9 @@ export type Command =
 export type ParseResult =
   { ok: true; command: Command } | { ok: false; suggestions: string[] }
 
+/** The large dataset's size as the page writes it ("100,000 rows"). */
+export const BIG_ROWS_LABEL = `${BIG_ROW_COUNT.toLocaleString("en-US")} rows`
+
 export const EXAMPLE_COMMANDS = [
   "group by department",
   "sort by salary highest first",
@@ -32,9 +37,18 @@ export const EXAMPLE_COMMANDS = [
   "only active",
   "compact",
   "arabic",
-  "a million rows",
+  BIG_ROWS_LABEL,
   "reset",
 ]
+
+/** "100,000 rows", "load 100000", "100k rows": the large dataset by its size. */
+function isBigRowCount(text: string) {
+  const m = text
+    .toLowerCase()
+    .replace(/[\s,._]/g, "")
+    .match(/^(?:load|show)?(\d+)(k?)(?:rows?)?$/)
+  return !!m && Number(m[1]) * (m[2] ? 1000 : 1) === BIG_ROW_COUNT
+}
 
 const norm = (s: string) =>
   s
@@ -130,6 +144,7 @@ export function parseCommand(
     /rows?|data|million/.test(t)
   )
     return done({ kind: "bigData" })
+  if (isBigRowCount(text)) return done({ kind: "bigData" })
   if ((m = t.match(/^(compact|comfortable|spacious)( rows| density)?$/))) {
     return done({
       kind: "density",
@@ -244,5 +259,54 @@ export function applyCommand(
     case "locale":
     case "bigData":
       return
+  }
+}
+
+const DENSITY_LABEL = {
+  compact: "Compact",
+  comfortable: "Comfortable",
+  spacious: "Spacious",
+} as const
+
+/** The one-line confirmation the command bar shows after a command ran. */
+export function describeCommand(
+  command: Command,
+  columns: CommandColumn[]
+): string {
+  const label = (id: string) =>
+    columns.find((column) => column.id === id)?.label ?? id
+  switch (command.kind) {
+    case "group":
+      return `Grouped by ${label(command.column)}`
+    case "ungroup":
+      return "Grouping cleared"
+    case "sort":
+      return `Sorted by ${label(command.column)}, ${
+        command.desc ? "highest first" : "lowest first"
+      }`
+    case "pin":
+      return `Pinned ${label(command.column)} to the ${command.side}`
+    case "unpin":
+      return "All columns unpinned"
+    case "filter":
+      return `Showing only ${command.value} (${label(command.column)})`
+    case "clearFilters":
+      return "Filters cleared"
+    case "visibility":
+      return `${command.visible ? "Showing" : "Hid"} ${label(command.column)}`
+    case "density":
+      return `${DENSITY_LABEL[command.density]} rows`
+    case "selectAll":
+      return "Selected every row"
+    case "clearSelection":
+      return "Selection cleared"
+    case "locale":
+      return command.locale === "ar"
+        ? "Arabic, right to left"
+        : "English, left to right"
+    case "bigData":
+      return `Loaded ${BIG_ROWS_LABEL}`
+    case "reset":
+      return "Back to the starting view"
   }
 }

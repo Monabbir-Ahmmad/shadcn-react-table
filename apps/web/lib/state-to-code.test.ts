@@ -74,11 +74,34 @@ describe("stateToCode", () => {
     const code = stateToCode({ ...EMPTY, locale: "ar", big: true })
     expect(
       code.startsWith(
-        'import { dataTableLocalizationAr } from "@/components/ui/data-table/locales/ar"\n\n'
+        'import { dataTableLocalizationAr } from "@/components/ui/data-table/locales/ar"\n' +
+          'import { Direction } from "radix-ui"\n\n'
       )
     ).toBe(true)
     expect(code).toContain("  localization: dataTableLocalizationAr,")
     expect(code).toContain("  enablePagination: false,")
     expect(code).toContain("  enableRowVirtualization: true,")
+    // The right-to-left render from the RTL guide closes the snippet.
+    expect(
+      code.endsWith(
+        [
+          "})",
+          "",
+          "return (",
+          '  <Direction.Provider dir="rtl">',
+          '    <div dir="rtl">',
+          "      <DataTable table={table} />",
+          "    </div>",
+          "  </Direction.Provider>",
+          ")",
+        ].join("\n")
+      )
+    ).toBe(true)
+  })
+
+  it("prints no render block for a left-to-right table", () => {
+    const code = stateToCode(EMPTY)
+    expect(code.endsWith("})")).toBe(true)
+    expect(code).not.toContain("Direction")
   })
 })

@@ -2,6 +2,9 @@ import { describe, expect, it, vi, type Mock } from "vitest"
 
 import {
   applyCommand,
+  BIG_ROWS_LABEL,
+  describeCommand,
+  EXAMPLE_COMMANDS,
   parseCommand,
   type CommandColumn,
   type CommandTarget,
@@ -209,5 +212,74 @@ describe("applyCommand", () => {
     expect(t.toggleAllRowsSelected.mock.calls).toEqual([[true], [false]])
     applyCommand({ kind: "reset" }, t, COLUMNS)
     expect(t.reset).toHaveBeenCalled()
+  })
+})
+
+describe("the large dataset by its size", () => {
+  it("shows the real row count as the example, never a million", () => {
+    expect(BIG_ROWS_LABEL).toBe("100,000 rows")
+    expect(EXAMPLE_COMMANDS).toContain("100,000 rows")
+    expect(EXAMPLE_COMMANDS.join(" ")).not.toMatch(/million/)
+  })
+
+  it.each([
+    "100,000 rows",
+    "100000",
+    "100k rows",
+    "100K",
+    "load 100,000 rows",
+    "a million rows",
+  ])("%s loads it", (text) => {
+    expect(ok(text)).toEqual({ ok: true, command: { kind: "bigData" } })
+  })
+
+  it.each(["99,999 rows", "200k rows", "10 rows"])("%s does not", (text) => {
+    expect(ok(text).ok).toBe(false)
+  })
+
+  it("parses every example", () => {
+    for (const example of EXAMPLE_COMMANDS) expect(ok(example).ok).toBe(true)
+  })
+})
+
+describe("describeCommand", () => {
+  it.each([
+    [{ kind: "group", column: "department" }, "Grouped by Department"],
+    [{ kind: "ungroup" }, "Grouping cleared"],
+    [
+      { kind: "sort", column: "salary", desc: true },
+      "Sorted by Salary, highest first",
+    ],
+    [
+      { kind: "sort", column: "salary", desc: false },
+      "Sorted by Salary, lowest first",
+    ],
+    [
+      { kind: "pin", column: "email", side: "right" },
+      "Pinned Email to the right",
+    ],
+    [{ kind: "unpin" }, "All columns unpinned"],
+    [
+      { kind: "filter", column: "status", value: "active" },
+      "Showing only active (Status)",
+    ],
+    [{ kind: "clearFilters" }, "Filters cleared"],
+    [{ kind: "visibility", column: "email", visible: false }, "Hid Email"],
+    [{ kind: "visibility", column: "email", visible: true }, "Showing Email"],
+    [{ kind: "density", density: "compact" }, "Compact rows"],
+    [{ kind: "selectAll" }, "Selected every row"],
+    [{ kind: "clearSelection" }, "Selection cleared"],
+    [{ kind: "locale", locale: "ar" }, "Arabic, right to left"],
+    [{ kind: "locale", locale: "en" }, "English, left to right"],
+    [{ kind: "bigData" }, "Loaded 100,000 rows"],
+    [{ kind: "reset" }, "Back to the starting view"],
+  ] as const)("%o", (command, text) => {
+    expect(describeCommand(command, COLUMNS)).toBe(text)
+  })
+
+  it("falls back to the column id for an unknown column", () => {
+    expect(describeCommand({ kind: "group", column: "city" }, COLUMNS)).toBe(
+      "Grouped by city"
+    )
   })
 })

@@ -11,6 +11,19 @@ export type CodeState = {
 
 const LOCALE_IMPORT =
   'import { dataTableLocalizationAr } from "@/components/ui/data-table/locales/ar"'
+const DIRECTION_IMPORT = 'import { Direction } from "radix-ui"'
+
+/** The right-to-left render from the RTL guide: the table and its portaled
+ *  menus both take the direction. */
+const RTL_RETURN = [
+  "return (",
+  '  <Direction.Provider dir="rtl">',
+  '    <div dir="rtl">',
+  "      <DataTable table={table} />",
+  "    </div>",
+  "  </Direction.Provider>",
+  ")",
+].join("\n")
 
 /** An object key, quoted when it is not a plain identifier. */
 const printKey = (key: string) =>
@@ -70,5 +83,7 @@ export function stateToCode(state: CodeState): string {
   }
   lines.push("})")
   const code = lines.join("\n")
-  return state.locale === "ar" ? `${LOCALE_IMPORT}\n\n${code}` : code
+  return state.locale === "ar"
+    ? `${LOCALE_IMPORT}\n${DIRECTION_IMPORT}\n\n${code}\n\n${RTL_RETURN}`
+    : code
 }
