@@ -101,10 +101,10 @@ export const dataTableLocalizationRo: DataTableLocalization = {
     equalsBool: "Egal",
   },
   advancedFilters: "Filtre avansate", // needs review
-  advancedFiltersMatchLabel: "Potrivire", // needs review
+  advancedFiltersMatch: (logic) =>
+    `Potrivire ${logic} dintre următoarele reguli`, // needs review
   advancedFiltersMatchAll: "Toate", // needs review
   advancedFiltersMatchAny: "Oricare", // needs review
-  advancedFiltersOf: "dintre următoarele reguli", // needs review
   advancedFiltersAddRule: "Adaugă filtru", // needs review
   advancedFiltersApply: "Aplică", // needs review
   advancedFiltersClearAll: "Curăță tot", // needs review

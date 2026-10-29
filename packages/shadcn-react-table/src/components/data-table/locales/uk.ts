@@ -101,10 +101,9 @@ export const dataTableLocalizationUk: DataTableLocalization = {
     equalsBool: "Дорівнює",
   },
   advancedFilters: "Розширені фільтри", // needs review
-  advancedFiltersMatchLabel: "Застосовувати", // needs review
+  advancedFiltersMatch: (logic) => `Застосовувати ${logic} з наступних правил`, // needs review
   advancedFiltersMatchAll: "усі", // needs review
   advancedFiltersMatchAny: "будь-яке", // needs review
-  advancedFiltersOf: "з наступних правил", // needs review
   advancedFiltersAddRule: "Додати фільтр", // needs review
   advancedFiltersApply: "Застосувати", // needs review
   advancedFiltersClearAll: "Очистити все", // needs review

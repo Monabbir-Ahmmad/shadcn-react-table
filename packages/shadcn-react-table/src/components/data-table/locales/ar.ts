@@ -101,10 +101,9 @@ export const dataTableLocalizationAr: DataTableLocalization = {
     equalsBool: "يساوي",
   },
   advancedFilters: "مرشحات متقدمة", // needs review
-  advancedFiltersMatchLabel: "مطابقة", // needs review
+  advancedFiltersMatch: (logic) => `مطابقة ${logic} القواعد التالية`, // needs review
   advancedFiltersMatchAll: "جميع", // needs review
   advancedFiltersMatchAny: "أيٍّ من", // needs review
-  advancedFiltersOf: "القواعد التالية", // needs review
   advancedFiltersAddRule: "إضافة مرشح", // needs review
   advancedFiltersApply: "تطبيق", // needs review
   advancedFiltersClearAll: "مسح الكل", // needs review

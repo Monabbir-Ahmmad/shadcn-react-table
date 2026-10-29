@@ -101,10 +101,9 @@ export const dataTableLocalizationKo: DataTableLocalization = {
     equalsBool: "같음",
   },
   advancedFilters: "고급 필터", // needs review
-  advancedFiltersMatchLabel: "다음 규칙 중", // needs review
+  advancedFiltersMatch: (logic) => `다음 규칙 중 ${logic} 일치`, // needs review
   advancedFiltersMatchAll: "모두", // needs review
   advancedFiltersMatchAny: "하나라도", // needs review
-  advancedFiltersOf: "일치", // needs review
   advancedFiltersAddRule: "필터 추가", // needs review
   advancedFiltersApply: "적용", // needs review
   advancedFiltersClearAll: "모두 지우기", // needs review

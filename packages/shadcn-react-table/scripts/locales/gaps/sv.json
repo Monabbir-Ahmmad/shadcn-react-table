@@ -28,10 +28,9 @@
     "betweenDates": "Mellan"
   },
   "advancedFilters": "Avancerade filter",
-  "advancedFiltersMatchLabel": "Matcha",
+  "advancedFiltersMatch": "Matcha {logic} av följande regler",
   "advancedFiltersMatchAll": "Alla",
   "advancedFiltersMatchAny": "Någon",
-  "advancedFiltersOf": "av följande regler",
   "advancedFiltersAddRule": "Lägg till filter",
   "advancedFiltersApply": "Tillämpa",
   "advancedFiltersClearAll": "Rensa alla",

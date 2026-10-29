@@ -101,10 +101,9 @@ export const dataTableLocalizationEt: DataTableLocalization = {
     equalsBool: "On võrdne",
   },
   advancedFilters: "Täpsemad filtrid", // needs review
-  advancedFiltersMatchLabel: "Vasta", // needs review
+  advancedFiltersMatch: (logic) => `Vasta ${logic} järgmistele reeglitele`, // needs review
   advancedFiltersMatchAll: "Kõigile", // needs review
   advancedFiltersMatchAny: "Mis tahes", // needs review
-  advancedFiltersOf: "järgmistele reeglitele", // needs review
   advancedFiltersAddRule: "Lisa filter", // needs review
   advancedFiltersApply: "Rakenda", // needs review
   advancedFiltersClearAll: "Tühjenda kõik", // needs review

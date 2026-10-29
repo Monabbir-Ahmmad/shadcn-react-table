@@ -102,10 +102,9 @@ export const dataTableLocalizationId: DataTableLocalization = {
     equalsBool: "Sama dengan",
   },
   advancedFilters: "Filter lanjutan", // needs review
-  advancedFiltersMatchLabel: "Cocokkan", // needs review
+  advancedFiltersMatch: (logic) => `Cocokkan ${logic} aturan berikut`, // needs review
   advancedFiltersMatchAll: "semua", // needs review
   advancedFiltersMatchAny: "salah satu", // needs review
-  advancedFiltersOf: "aturan berikut", // needs review
   advancedFiltersAddRule: "Tambah filter", // needs review
   advancedFiltersApply: "Terapkan", // needs review
   advancedFiltersClearAll: "Hapus semua", // needs review

@@ -28,10 +28,9 @@
     "betweenDates": "Između"
   },
   "advancedFilters": "Napredni filtri",
-  "advancedFiltersMatchLabel": "Podudaraj",
+  "advancedFiltersMatch": "Podudaraj {logic} od sljedećih pravila",
   "advancedFiltersMatchAll": "sva",
   "advancedFiltersMatchAny": "bilo koje",
-  "advancedFiltersOf": "od sljedećih pravila",
   "advancedFiltersAddRule": "Dodaj filtar",
   "advancedFiltersApply": "Primijeni",
   "advancedFiltersClearAll": "Očisti sve",

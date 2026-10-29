@@ -101,10 +101,9 @@ export const dataTableLocalizationPl: DataTableLocalization = {
     equalsBool: "Równa się",
   },
   advancedFilters: "Filtry zaawansowane", // needs review
-  advancedFiltersMatchLabel: "Dopasuj", // needs review
+  advancedFiltersMatch: (logic) => `Dopasuj ${logic} z poniższych reguł`, // needs review
   advancedFiltersMatchAll: "wszystkie", // needs review
   advancedFiltersMatchAny: "dowolną", // needs review
-  advancedFiltersOf: "z poniższych reguł", // needs review
   advancedFiltersAddRule: "Dodaj filtr", // needs review
   advancedFiltersApply: "Zastosuj", // needs review
   advancedFiltersClearAll: "Wyczyść wszystko", // needs review

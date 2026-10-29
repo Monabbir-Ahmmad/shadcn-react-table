@@ -122,6 +122,28 @@ describe("localization language", () => {
     expect(screen.getByRole("option", { name: "Falsch" })).toBeTruthy()
   })
 
+  it("places the All/Any picker where the language puts it", async () => {
+    const { table } = mount({
+      enableAdvancedFilter: true,
+      localization: {
+        ...defaultLocalization,
+        // Picker first, as in a verb-final language.
+        advancedFiltersMatch: (logic) => `${logic} rules must match`,
+      },
+    })
+    act(() => table().tableInstance.setShowAdvancedFilterPanel(true))
+    const after = await screen.findByText("rules must match")
+    const picker = screen
+      .getAllByRole("combobox")
+      .find((c) => c.parentElement?.contains(after))!
+    expect(picker.textContent).toBe("All")
+    // The picker comes before the text in the sentence row.
+    expect(
+      picker.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    expect(picker.previousElementSibling).toBeNull()
+  })
+
   it("localizes the calendar popup month and weekday names", async () => {
     const born = new Date(2026, 2, 18)
     mount({

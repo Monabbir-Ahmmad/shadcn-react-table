@@ -102,10 +102,9 @@ export const dataTableLocalizationFi: DataTableLocalization = {
     equalsBool: "On yhtä kuin",
   },
   advancedFilters: "Tarkennetut suodattimet", // needs review
-  advancedFiltersMatchLabel: "Täsmää", // needs review
+  advancedFiltersMatch: (logic) => `Täsmää ${logic} seuraavista säännöistä`, // needs review
   advancedFiltersMatchAll: "Kaikkiin", // needs review
   advancedFiltersMatchAny: "Mihin tahansa", // needs review
-  advancedFiltersOf: "seuraavista säännöistä", // needs review
   advancedFiltersAddRule: "Lisää suodatin", // needs review
   advancedFiltersApply: "Käytä", // needs review
   advancedFiltersClearAll: "Tyhjennä kaikki", // needs review

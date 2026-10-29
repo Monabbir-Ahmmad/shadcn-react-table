@@ -28,10 +28,9 @@
     "betweenDates": "بین"
   },
   "advancedFilters": "فیلتر های پیشرفته",
-  "advancedFiltersMatchLabel": "تطابق",
+  "advancedFiltersMatch": "تطابق {logic} از قوانین زیر",
   "advancedFiltersMatchAll": "همه",
   "advancedFiltersMatchAny": "هر یک",
-  "advancedFiltersOf": "از قوانین زیر",
   "advancedFiltersAddRule": "افزودن فیلتر",
   "advancedFiltersApply": "اعمال",
   "advancedFiltersClearAll": "پاک کردن همه",

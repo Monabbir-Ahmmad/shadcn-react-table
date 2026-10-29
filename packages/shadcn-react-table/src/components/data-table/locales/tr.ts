@@ -101,10 +101,9 @@ export const dataTableLocalizationTr: DataTableLocalization = {
     equalsBool: "Eşit",
   },
   advancedFilters: "Gelişmiş Filtreler", // needs review
-  advancedFiltersMatchLabel: "Aşağıdaki kuralların", // needs review
+  advancedFiltersMatch: (logic) => `Aşağıdaki kuralların ${logic} eşleşsin`, // needs review
   advancedFiltersMatchAll: "tümü", // needs review
   advancedFiltersMatchAny: "herhangi biri", // needs review
-  advancedFiltersOf: "eşleşsin", // needs review
   advancedFiltersAddRule: "Filtre Ekle", // needs review
   advancedFiltersApply: "Uygula", // needs review
   advancedFiltersClearAll: "Tümünü Temizle", // needs review

@@ -75,10 +75,15 @@ export interface DataTableLocalization {
 
   // Advanced filter panel
   advancedFilters: string
-  advancedFiltersMatchLabel: string
+  /** The "Match All/Any of the following rules" sentence; `logic` marks where
+   *  the All/Any picker goes, so each language can order the words. */
+  advancedFiltersMatch: (logic: string) => string
   advancedFiltersMatchAll: string
   advancedFiltersMatchAny: string
-  advancedFiltersOf: string
+  /** @deprecated Unused; the sentence is `advancedFiltersMatch`. */
+  advancedFiltersMatchLabel?: string
+  /** @deprecated Unused; the sentence is `advancedFiltersMatch`. */
+  advancedFiltersOf?: string
   advancedFiltersAddRule: string
   advancedFiltersApply: string
   advancedFiltersClearAll: string
@@ -222,10 +227,9 @@ export const defaultLocalization: DataTableLocalization = {
   },
 
   advancedFilters: "Advanced filters",
-  advancedFiltersMatchLabel: "Match",
+  advancedFiltersMatch: (logic) => `Match ${logic} of the following rules`,
   advancedFiltersMatchAll: "All",
   advancedFiltersMatchAny: "Any",
-  advancedFiltersOf: "of the following rules",
   advancedFiltersAddRule: "Add filter",
   advancedFiltersApply: "Apply",
   advancedFiltersClearAll: "Clear all",

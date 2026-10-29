@@ -28,10 +28,9 @@
     "betweenDates": "Միջև"
   },
   "advancedFilters": "Ընդլայնված զտիչներ",
-  "advancedFiltersMatchLabel": "Համապատասխանել",
+  "advancedFiltersMatch": "Համապատասխանել {logic} հետևյալ կանոններին",
   "advancedFiltersMatchAll": "բոլոր",
   "advancedFiltersMatchAny": "ցանկացած",
-  "advancedFiltersOf": "հետևյալ կանոններին",
   "advancedFiltersAddRule": "Ավելացնել զտիչ",
   "advancedFiltersApply": "Կիրառել",
   "advancedFiltersClearAll": "Մաքրել բոլորը",

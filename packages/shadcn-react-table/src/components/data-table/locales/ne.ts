@@ -103,10 +103,9 @@ export const dataTableLocalizationNe: DataTableLocalization = {
     equalsBool: "समान",
   },
   advancedFilters: "उन्नत फिल्टरहरू", // needs review
-  advancedFiltersMatchLabel: "तलका नियमहरूमध्ये", // needs review
+  advancedFiltersMatch: (logic) => `तलका नियमहरूमध्ये ${logic} मिल्नुपर्छ`, // needs review
   advancedFiltersMatchAll: "सबै", // needs review
   advancedFiltersMatchAny: "कुनै एक", // needs review
-  advancedFiltersOf: "मिल्नुपर्छ", // needs review
   advancedFiltersAddRule: "फिल्टर थप्नुहोस्", // needs review
   advancedFiltersApply: "लागू गर्नुहोस्", // needs review
   advancedFiltersClearAll: "सबै हटाउनुहोस्", // needs review

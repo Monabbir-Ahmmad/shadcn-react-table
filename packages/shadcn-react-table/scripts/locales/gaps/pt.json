@@ -28,10 +28,9 @@
     "betweenDates": "Entre"
   },
   "advancedFilters": "Filtros avançados",
-  "advancedFiltersMatchLabel": "Corresponder a",
+  "advancedFiltersMatch": "Corresponder a {logic} seguintes regras",
   "advancedFiltersMatchAll": "todas as",
   "advancedFiltersMatchAny": "qualquer uma das",
-  "advancedFiltersOf": "seguintes regras",
   "advancedFiltersAddRule": "Adicionar filtro",
   "advancedFiltersApply": "Aplicar",
   "advancedFiltersClearAll": "Limpar tudo",

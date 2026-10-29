@@ -101,10 +101,9 @@ export const dataTableLocalizationAz: DataTableLocalization = {
     equalsBool: "Bərabər",
   },
   advancedFilters: "Qabaqcıl filterlər", // needs review
-  advancedFiltersMatchLabel: "Aşağıdakı qaydaların", // needs review
+  advancedFiltersMatch: (logic) => `Aşağıdakı qaydaların ${logic} uyğun gəlsin`, // needs review
   advancedFiltersMatchAll: "hamısı", // needs review
   advancedFiltersMatchAny: "istənilən biri", // needs review
-  advancedFiltersOf: "uyğun gəlsin", // needs review
   advancedFiltersAddRule: "Filter əlavə et", // needs review
   advancedFiltersApply: "Tətbiq et", // needs review
   advancedFiltersClearAll: "Hamısını təmizlə", // needs review

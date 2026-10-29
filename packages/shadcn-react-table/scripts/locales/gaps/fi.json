@@ -28,10 +28,9 @@
     "betweenDates": "Välillä"
   },
   "advancedFilters": "Tarkennetut suodattimet",
-  "advancedFiltersMatchLabel": "Täsmää",
+  "advancedFiltersMatch": "Täsmää {logic} seuraavista säännöistä",
   "advancedFiltersMatchAll": "Kaikkiin",
   "advancedFiltersMatchAny": "Mihin tahansa",
-  "advancedFiltersOf": "seuraavista säännöistä",
   "advancedFiltersAddRule": "Lisää suodatin",
   "advancedFiltersApply": "Käytä",
   "advancedFiltersClearAll": "Tyhjennä kaikki",

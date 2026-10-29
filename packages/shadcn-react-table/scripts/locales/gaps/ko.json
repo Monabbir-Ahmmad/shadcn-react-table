@@ -28,10 +28,9 @@
     "betweenDates": "사이"
   },
   "advancedFilters": "고급 필터",
-  "advancedFiltersMatchLabel": "다음 규칙 중",
+  "advancedFiltersMatch": "다음 규칙 중 {logic} 일치",
   "advancedFiltersMatchAll": "모두",
   "advancedFiltersMatchAny": "하나라도",
-  "advancedFiltersOf": "일치",
   "advancedFiltersAddRule": "필터 추가",
   "advancedFiltersApply": "적용",
   "advancedFiltersClearAll": "모두 지우기",

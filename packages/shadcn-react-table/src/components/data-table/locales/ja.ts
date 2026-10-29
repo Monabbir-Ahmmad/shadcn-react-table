@@ -101,10 +101,9 @@ export const dataTableLocalizationJa: DataTableLocalization = {
     equalsBool: "一致",
   },
   advancedFilters: "詳細検索", // needs review
-  advancedFiltersMatchLabel: "次の条件の", // needs review
+  advancedFiltersMatch: (logic) => `次の条件の ${logic} に一致`, // needs review
   advancedFiltersMatchAll: "すべて", // needs review
   advancedFiltersMatchAny: "いずれか", // needs review
-  advancedFiltersOf: "に一致", // needs review
   advancedFiltersAddRule: "条件を追加", // needs review
   advancedFiltersApply: "適用", // needs review
   advancedFiltersClearAll: "すべてクリア", // needs review

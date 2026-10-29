@@ -28,10 +28,9 @@
     "betweenDates": "介於"
   },
   "advancedFilters": "進階過濾",
-  "advancedFiltersMatchLabel": "符合",
+  "advancedFiltersMatch": "符合 {logic} 以下規則",
   "advancedFiltersMatchAll": "全部",
   "advancedFiltersMatchAny": "任一",
-  "advancedFiltersOf": "以下規則",
   "advancedFiltersAddRule": "新增過濾條件",
   "advancedFiltersApply": "套用",
   "advancedFiltersClearAll": "全部清除",

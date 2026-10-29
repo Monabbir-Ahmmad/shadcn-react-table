@@ -28,10 +28,9 @@
     "betweenDates": "Mezi"
   },
   "advancedFilters": "Pokročilé filtry",
-  "advancedFiltersMatchLabel": "Shoduje se",
+  "advancedFiltersMatch": "Shoduje se {logic} z následujících pravidel",
   "advancedFiltersMatchAll": "Všechna",
   "advancedFiltersMatchAny": "Libovolné",
-  "advancedFiltersOf": "z následujících pravidel",
   "advancedFiltersAddRule": "Přidat filtr",
   "advancedFiltersApply": "Použít",
   "advancedFiltersClearAll": "Vymazat vše",

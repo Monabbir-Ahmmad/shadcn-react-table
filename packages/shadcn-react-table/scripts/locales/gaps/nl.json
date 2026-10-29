@@ -28,10 +28,9 @@
     "betweenDates": "Tussen"
   },
   "advancedFilters": "Geavanceerde filters",
-  "advancedFiltersMatchLabel": "Voldoe aan",
+  "advancedFiltersMatch": "Voldoe aan {logic} volgende regels",
   "advancedFiltersMatchAll": "alle",
   "advancedFiltersMatchAny": "een van de",
-  "advancedFiltersOf": "volgende regels",
   "advancedFiltersAddRule": "Filter toevoegen",
   "advancedFiltersApply": "Toepassen",
   "advancedFiltersClearAll": "Alles wissen",

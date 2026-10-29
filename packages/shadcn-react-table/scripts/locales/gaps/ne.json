@@ -28,10 +28,9 @@
     "betweenDates": "बीच"
   },
   "advancedFilters": "उन्नत फिल्टरहरू",
-  "advancedFiltersMatchLabel": "तलका नियमहरूमध्ये",
+  "advancedFiltersMatch": "तलका नियमहरूमध्ये {logic} मिल्नुपर्छ",
   "advancedFiltersMatchAll": "सबै",
   "advancedFiltersMatchAny": "कुनै एक",
-  "advancedFiltersOf": "मिल्नुपर्छ",
   "advancedFiltersAddRule": "फिल्टर थप्नुहोस्",
   "advancedFiltersApply": "लागू गर्नुहोस्",
   "advancedFiltersClearAll": "सबै हटाउनुहोस्",

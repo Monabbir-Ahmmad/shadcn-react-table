@@ -28,10 +28,9 @@
     "betweenDates": "Arasında"
   },
   "advancedFilters": "Qabaqcıl filterlər",
-  "advancedFiltersMatchLabel": "Aşağıdakı qaydaların",
+  "advancedFiltersMatch": "Aşağıdakı qaydaların {logic} uyğun gəlsin",
   "advancedFiltersMatchAll": "hamısı",
   "advancedFiltersMatchAny": "istənilən biri",
-  "advancedFiltersOf": "uyğun gəlsin",
   "advancedFiltersAddRule": "Filter əlavə et",
   "advancedFiltersApply": "Tətbiq et",
   "advancedFiltersClearAll": "Hamısını təmizlə",

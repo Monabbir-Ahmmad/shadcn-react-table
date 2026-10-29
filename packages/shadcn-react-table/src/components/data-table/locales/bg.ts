@@ -101,10 +101,9 @@ export const dataTableLocalizationBg: DataTableLocalization = {
     equalsBool: "Равно",
   },
   advancedFilters: "Разширени филтри", // needs review
-  advancedFiltersMatchLabel: "Съвпадение", // needs review
+  advancedFiltersMatch: (logic) => `Съвпадение ${logic} от следните правила`, // needs review
   advancedFiltersMatchAll: "Всички", // needs review
   advancedFiltersMatchAny: "Някое", // needs review
-  advancedFiltersOf: "от следните правила", // needs review
   advancedFiltersAddRule: "Добави филтър", // needs review
   advancedFiltersApply: "Приложи", // needs review
   advancedFiltersClearAll: "Изчисти всички", // needs review

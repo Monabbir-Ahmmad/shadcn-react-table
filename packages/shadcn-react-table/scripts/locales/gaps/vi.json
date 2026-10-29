@@ -28,10 +28,9 @@
     "betweenDates": "Trong khoảng"
   },
   "advancedFilters": "Bộ lọc nâng cao",
-  "advancedFiltersMatchLabel": "Khớp",
+  "advancedFiltersMatch": "Khớp {logic} quy tắc sau",
   "advancedFiltersMatchAll": "tất cả",
   "advancedFiltersMatchAny": "bất kỳ",
-  "advancedFiltersOf": "quy tắc sau",
   "advancedFiltersAddRule": "Thêm bộ lọc",
   "advancedFiltersApply": "Áp dụng",
   "advancedFiltersClearAll": "Xoá tất cả",

@@ -101,10 +101,9 @@ export const dataTableLocalizationFa: DataTableLocalization = {
     equalsBool: "مساوی",
   },
   advancedFilters: "فیلتر های پیشرفته", // needs review
-  advancedFiltersMatchLabel: "تطابق", // needs review
+  advancedFiltersMatch: (logic) => `تطابق ${logic} از قوانین زیر`, // needs review
   advancedFiltersMatchAll: "همه", // needs review
   advancedFiltersMatchAny: "هر یک", // needs review
-  advancedFiltersOf: "از قوانین زیر", // needs review
   advancedFiltersAddRule: "افزودن فیلتر", // needs review
   advancedFiltersApply: "اعمال", // needs review
   advancedFiltersClearAll: "پاک کردن همه", // needs review

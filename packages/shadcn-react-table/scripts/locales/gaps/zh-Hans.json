@@ -28,10 +28,9 @@
     "betweenDates": "介于"
   },
   "advancedFilters": "高级过滤",
-  "advancedFiltersMatchLabel": "匹配",
+  "advancedFiltersMatch": "匹配 {logic} 以下规则",
   "advancedFiltersMatchAll": "全部",
   "advancedFiltersMatchAny": "任意",
-  "advancedFiltersOf": "以下规则",
   "advancedFiltersAddRule": "添加过滤条件",
   "advancedFiltersApply": "应用",
   "advancedFiltersClearAll": "全部清除",

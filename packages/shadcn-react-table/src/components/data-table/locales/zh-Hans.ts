@@ -101,10 +101,9 @@ export const dataTableLocalizationZhHans: DataTableLocalization = {
     equalsBool: "等于",
   },
   advancedFilters: "高级过滤", // needs review
-  advancedFiltersMatchLabel: "匹配", // needs review
+  advancedFiltersMatch: (logic) => `匹配 ${logic} 以下规则`, // needs review
   advancedFiltersMatchAll: "全部", // needs review
   advancedFiltersMatchAny: "任意", // needs review
-  advancedFiltersOf: "以下规则", // needs review
   advancedFiltersAddRule: "添加过滤条件", // needs review
   advancedFiltersApply: "应用", // needs review
   advancedFiltersClearAll: "全部清除", // needs review

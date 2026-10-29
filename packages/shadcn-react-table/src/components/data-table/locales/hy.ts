@@ -101,10 +101,9 @@ export const dataTableLocalizationHy: DataTableLocalization = {
     equalsBool: "Հավասար են",
   },
   advancedFilters: "Ընդլայնված զտիչներ", // needs review
-  advancedFiltersMatchLabel: "Համապատասխանել", // needs review
+  advancedFiltersMatch: (logic) => `Համապատասխանել ${logic} հետևյալ կանոններին`, // needs review
   advancedFiltersMatchAll: "բոլոր", // needs review
   advancedFiltersMatchAny: "ցանկացած", // needs review
-  advancedFiltersOf: "հետևյալ կանոններին", // needs review
   advancedFiltersAddRule: "Ավելացնել զտիչ", // needs review
   advancedFiltersApply: "Կիրառել", // needs review
   advancedFiltersClearAll: "Մաքրել բոլորը", // needs review

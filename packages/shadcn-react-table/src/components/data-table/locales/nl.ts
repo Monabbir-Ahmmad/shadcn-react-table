@@ -101,10 +101,9 @@ export const dataTableLocalizationNl: DataTableLocalization = {
     equalsBool: "Is gelijk aan",
   },
   advancedFilters: "Geavanceerde filters", // needs review
-  advancedFiltersMatchLabel: "Voldoe aan", // needs review
+  advancedFiltersMatch: (logic) => `Voldoe aan ${logic} volgende regels`, // needs review
   advancedFiltersMatchAll: "alle", // needs review
   advancedFiltersMatchAny: "een van de", // needs review
-  advancedFiltersOf: "volgende regels", // needs review
   advancedFiltersAddRule: "Filter toevoegen", // needs review
   advancedFiltersApply: "Toepassen", // needs review
   advancedFiltersClearAll: "Alles wissen", // needs review

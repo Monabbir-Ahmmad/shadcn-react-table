@@ -28,10 +28,9 @@
     "betweenDates": "Между"
   },
   "advancedFilters": "Расширенные фильтры",
-  "advancedFiltersMatchLabel": "Применять",
+  "advancedFiltersMatch": "Применять {logic} из следующих правил",
   "advancedFiltersMatchAll": "все",
   "advancedFiltersMatchAny": "любое",
-  "advancedFiltersOf": "из следующих правил",
   "advancedFiltersAddRule": "Добавить фильтр",
   "advancedFiltersApply": "Применить",
   "advancedFiltersClearAll": "Очистить всё",

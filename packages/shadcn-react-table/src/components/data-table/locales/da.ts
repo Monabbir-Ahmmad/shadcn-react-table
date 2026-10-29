@@ -101,10 +101,9 @@ export const dataTableLocalizationDa: DataTableLocalization = {
     equalsBool: "Lig Med",
   },
   advancedFilters: "Avancerede filtre", // needs review
-  advancedFiltersMatchLabel: "Match", // needs review
+  advancedFiltersMatch: (logic) => `Match ${logic} af følgende regler`, // needs review
   advancedFiltersMatchAll: "Alle", // needs review
   advancedFiltersMatchAny: "Nogen", // needs review
-  advancedFiltersOf: "af følgende regler", // needs review
   advancedFiltersAddRule: "Tilføj filter", // needs review
   advancedFiltersApply: "Anvend", // needs review
   advancedFiltersClearAll: "Ryd alle", // needs review

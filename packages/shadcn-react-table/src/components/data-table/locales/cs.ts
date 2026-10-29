@@ -101,10 +101,10 @@ export const dataTableLocalizationCs: DataTableLocalization = {
     equalsBool: "Rovná se",
   },
   advancedFilters: "Pokročilé filtry", // needs review
-  advancedFiltersMatchLabel: "Shoduje se", // needs review
+  advancedFiltersMatch: (logic) =>
+    `Shoduje se ${logic} z následujících pravidel`, // needs review
   advancedFiltersMatchAll: "Všechna", // needs review
   advancedFiltersMatchAny: "Libovolné", // needs review
-  advancedFiltersOf: "z následujících pravidel", // needs review
   advancedFiltersAddRule: "Přidat filtr", // needs review
   advancedFiltersApply: "Použít", // needs review
   advancedFiltersClearAll: "Vymazat vše", // needs review

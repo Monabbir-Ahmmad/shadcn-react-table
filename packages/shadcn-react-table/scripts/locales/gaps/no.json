@@ -28,10 +28,9 @@
     "betweenDates": "Mellom"
   },
   "advancedFilters": "Avanserte filtre",
-  "advancedFiltersMatchLabel": "Samsvar med",
+  "advancedFiltersMatch": "Samsvar med {logic} av følgende regler",
   "advancedFiltersMatchAll": "alle",
   "advancedFiltersMatchAny": "minst én",
-  "advancedFiltersOf": "av følgende regler",
   "advancedFiltersAddRule": "Legg til filter",
   "advancedFiltersApply": "Bruk",
   "advancedFiltersClearAll": "Fjern alle",

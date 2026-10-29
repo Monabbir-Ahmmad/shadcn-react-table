@@ -28,10 +28,9 @@
     "betweenDates": "Vahemikus"
   },
   "advancedFilters": "Täpsemad filtrid",
-  "advancedFiltersMatchLabel": "Vasta",
+  "advancedFiltersMatch": "Vasta {logic} järgmistele reeglitele",
   "advancedFiltersMatchAll": "Kõigile",
   "advancedFiltersMatchAny": "Mis tahes",
-  "advancedFiltersOf": "järgmistele reeglitele",
   "advancedFiltersAddRule": "Lisa filter",
   "advancedFiltersApply": "Rakenda",
   "advancedFiltersClearAll": "Tühjenda kõik",

@@ -35,6 +35,9 @@ import {
 import { getColumnLabel } from "../../helpers/column-label"
 import type { DataTableColumn } from "../../core/table-types"
 
+// Stands in for the All/Any picker when splitting the localized sentence.
+const LOGIC_SLOT = "\u0000"
+
 // Monotonic ids for new rules. Panel is client-only, so a module counter is
 // stable enough (and avoids crypto/uuid deps).
 let ruleSeq = 0
@@ -157,6 +160,13 @@ function FilterPanelContent<TData extends RowData>({
         : { operator }
     )
 
+  // The localized sentence around the All/Any picker, split where the
+  // language puts it.
+  const [matchBefore = "", matchAfter = ""] = localization
+    .advancedFiltersMatch(LOGIC_SLOT)
+    .split(LOGIC_SLOT)
+    .map((part) => part.trim())
+
   return (
     <DialogContent className="gap-3 sm:max-w-lg">
       <DialogHeader>
@@ -168,9 +178,9 @@ function FilterPanelContent<TData extends RowData>({
 
       <div className="flex max-h-[50vh] flex-col gap-2 overflow-y-auto">
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-muted-foreground">
-            {localization.advancedFiltersMatchLabel}
-          </span>
+          {matchBefore && (
+            <span className="text-muted-foreground">{matchBefore}</span>
+          )}
           <Select
             value={logic === "or" ? "any" : "all"}
             onValueChange={(v) =>
@@ -192,9 +202,9 @@ function FilterPanelContent<TData extends RowData>({
               </SelectItem>
             </SelectContent>
           </Select>
-          <span className="text-muted-foreground">
-            {localization.advancedFiltersOf}
-          </span>
+          {matchAfter && (
+            <span className="text-muted-foreground">{matchAfter}</span>
+          )}
         </div>
 
         {rules.length === 0 ? (

@@ -28,10 +28,9 @@
     "betweenDates": "Között"
   },
   "advancedFilters": "Speciális szűrők",
-  "advancedFiltersMatchLabel": "Teljesüljön",
+  "advancedFiltersMatch": "Teljesüljön {logic} az alábbi szabályok közül",
   "advancedFiltersMatchAll": "mindegyik",
   "advancedFiltersMatchAny": "bármelyik",
-  "advancedFiltersOf": "az alábbi szabályok közül",
   "advancedFiltersAddRule": "Szűrő hozzáadása",
   "advancedFiltersApply": "Alkalmaz",
   "advancedFiltersClearAll": "Összes törlése",

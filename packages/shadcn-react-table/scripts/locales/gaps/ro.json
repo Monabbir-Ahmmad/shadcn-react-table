@@ -28,10 +28,9 @@
     "betweenDates": "Între"
   },
   "advancedFilters": "Filtre avansate",
-  "advancedFiltersMatchLabel": "Potrivire",
+  "advancedFiltersMatch": "Potrivire {logic} dintre următoarele reguli",
   "advancedFiltersMatchAll": "Toate",
   "advancedFiltersMatchAny": "Oricare",
-  "advancedFiltersOf": "dintre următoarele reguli",
   "advancedFiltersAddRule": "Adaugă filtru",
   "advancedFiltersApply": "Aplică",
   "advancedFiltersClearAll": "Curăță tot",

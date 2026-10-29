@@ -101,10 +101,9 @@ export const dataTableLocalizationSv: DataTableLocalization = {
     equalsBool: "Lika med",
   },
   advancedFilters: "Avancerade filter", // needs review
-  advancedFiltersMatchLabel: "Matcha", // needs review
+  advancedFiltersMatch: (logic) => `Matcha ${logic} av följande regler`, // needs review
   advancedFiltersMatchAll: "Alla", // needs review
   advancedFiltersMatchAny: "Någon", // needs review
-  advancedFiltersOf: "av följande regler", // needs review
   advancedFiltersAddRule: "Lägg till filter", // needs review
   advancedFiltersApply: "Tillämpa", // needs review
   advancedFiltersClearAll: "Rensa alla", // needs review

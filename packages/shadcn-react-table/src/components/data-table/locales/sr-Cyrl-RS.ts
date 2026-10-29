@@ -101,10 +101,9 @@ export const dataTableLocalizationSrCyrlRS: DataTableLocalization = {
     equalsBool: "Једнако",
   },
   advancedFilters: "Напредни филтери", // needs review
-  advancedFiltersMatchLabel: "Поклапање", // needs review
+  advancedFiltersMatch: (logic) => `Поклапање ${logic} од следећих правила`, // needs review
   advancedFiltersMatchAll: "Сва", // needs review
   advancedFiltersMatchAny: "Било које", // needs review
-  advancedFiltersOf: "од следећих правила", // needs review
   advancedFiltersAddRule: "Додај филтер", // needs review
   advancedFiltersApply: "Примени", // needs review
   advancedFiltersClearAll: "Поништи све", // needs review

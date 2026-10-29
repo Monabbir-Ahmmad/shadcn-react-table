@@ -101,10 +101,10 @@ export const dataTableLocalizationHu: DataTableLocalization = {
     equalsBool: "Egyenlő",
   },
   advancedFilters: "Speciális szűrők", // needs review
-  advancedFiltersMatchLabel: "Teljesüljön", // needs review
+  advancedFiltersMatch: (logic) =>
+    `Teljesüljön ${logic} az alábbi szabályok közül`, // needs review
   advancedFiltersMatchAll: "mindegyik", // needs review
   advancedFiltersMatchAny: "bármelyik", // needs review
-  advancedFiltersOf: "az alábbi szabályok közül", // needs review
   advancedFiltersAddRule: "Szűrő hozzáadása", // needs review
   advancedFiltersApply: "Alkalmaz", // needs review
   advancedFiltersClearAll: "Összes törlése", // needs review

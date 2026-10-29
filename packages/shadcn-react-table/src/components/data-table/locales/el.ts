@@ -101,10 +101,9 @@ export const dataTableLocalizationEl: DataTableLocalization = {
     equalsBool: "Ίσο",
   },
   advancedFilters: "Σύνθετα φίλτρα", // needs review
-  advancedFiltersMatchLabel: "Ταίριασμα", // needs review
+  advancedFiltersMatch: (logic) => `Ταίριασμα ${logic} των ακόλουθων κανόνων`, // needs review
   advancedFiltersMatchAll: "Όλων", // needs review
   advancedFiltersMatchAny: "Οποιουδήποτε", // needs review
-  advancedFiltersOf: "των ακόλουθων κανόνων", // needs review
   advancedFiltersAddRule: "Προσθήκη φίλτρου", // needs review
   advancedFiltersApply: "Εφαρμογή", // needs review
   advancedFiltersClearAll: "Εκκαθάριση όλων", // needs review

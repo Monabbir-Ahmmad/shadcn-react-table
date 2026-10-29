@@ -101,10 +101,9 @@ export const dataTableLocalizationSrLatnRS: DataTableLocalization = {
     equalsBool: "Jednako",
   },
   advancedFilters: "Napredni filteri", // needs review
-  advancedFiltersMatchLabel: "Poklapanje", // needs review
+  advancedFiltersMatch: (logic) => `Poklapanje ${logic} od sledećih pravila`, // needs review
   advancedFiltersMatchAll: "Sva", // needs review
   advancedFiltersMatchAny: "Bilo koje", // needs review
-  advancedFiltersOf: "od sledećih pravila", // needs review
   advancedFiltersAddRule: "Dodaj filter", // needs review
   advancedFiltersApply: "Primeni", // needs review
   advancedFiltersClearAll: "Poništi sve", // needs review

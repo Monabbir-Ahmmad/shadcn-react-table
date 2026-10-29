@@ -28,10 +28,9 @@
     "betweenDates": "Μεταξύ"
   },
   "advancedFilters": "Σύνθετα φίλτρα",
-  "advancedFiltersMatchLabel": "Ταίριασμα",
+  "advancedFiltersMatch": "Ταίριασμα {logic} των ακόλουθων κανόνων",
   "advancedFiltersMatchAll": "Όλων",
   "advancedFiltersMatchAny": "Οποιουδήποτε",
-  "advancedFiltersOf": "των ακόλουθων κανόνων",
   "advancedFiltersAddRule": "Προσθήκη φίλτρου",
   "advancedFiltersApply": "Εφαρμογή",
   "advancedFiltersClearAll": "Εκκαθάριση όλων",

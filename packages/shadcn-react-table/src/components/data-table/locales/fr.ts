@@ -101,10 +101,10 @@ export const dataTableLocalizationFr: DataTableLocalization = {
     equalsBool: "Egale",
   },
   advancedFilters: "Filtres avancés", // needs review
-  advancedFiltersMatchLabel: "Correspondre à", // needs review
+  advancedFiltersMatch: (logic) =>
+    `Correspondre à ${logic} parmi les règles suivantes`, // needs review
   advancedFiltersMatchAll: "Toutes", // needs review
   advancedFiltersMatchAny: "Au moins une", // needs review
-  advancedFiltersOf: "parmi les règles suivantes", // needs review
   advancedFiltersAddRule: "Ajouter un filtre", // needs review
   advancedFiltersApply: "Appliquer", // needs review
   advancedFiltersClearAll: "Tout effacer", // needs review

@@ -28,10 +28,9 @@
     "betweenDates": "בין"
   },
   "advancedFilters": "סינון מתקדם",
-  "advancedFiltersMatchLabel": "התאם",
+  "advancedFiltersMatch": "התאם {logic} מהכללים הבאים",
   "advancedFiltersMatchAll": "הכול",
   "advancedFiltersMatchAny": "לפחות אחד",
-  "advancedFiltersOf": "מהכללים הבאים",
   "advancedFiltersAddRule": "הוסף סינון",
   "advancedFiltersApply": "החל",
   "advancedFiltersClearAll": "נקה הכול",

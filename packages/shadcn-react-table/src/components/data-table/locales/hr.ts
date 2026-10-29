@@ -101,10 +101,9 @@ export const dataTableLocalizationHr: DataTableLocalization = {
     equalsBool: "Jednako",
   },
   advancedFilters: "Napredni filtri", // needs review
-  advancedFiltersMatchLabel: "Podudaraj", // needs review
+  advancedFiltersMatch: (logic) => `Podudaraj ${logic} od sljedećih pravila`, // needs review
   advancedFiltersMatchAll: "sva", // needs review
   advancedFiltersMatchAny: "bilo koje", // needs review
-  advancedFiltersOf: "od sljedećih pravila", // needs review
   advancedFiltersAddRule: "Dodaj filtar", // needs review
   advancedFiltersApply: "Primijeni", // needs review
   advancedFiltersClearAll: "Očisti sve", // needs review

@@ -28,10 +28,9 @@
     "betweenDates": "Medzi"
   },
   "advancedFilters": "Rozšírené filtre",
-  "advancedFiltersMatchLabel": "Zhoda",
+  "advancedFiltersMatch": "Zhoda {logic} z nasledujúcich pravidiel",
   "advancedFiltersMatchAll": "Všetky",
   "advancedFiltersMatchAny": "Ľubovoľné",
-  "advancedFiltersOf": "z nasledujúcich pravidiel",
   "advancedFiltersAddRule": "Pridať filter",
   "advancedFiltersApply": "Použiť",
   "advancedFiltersClearAll": "Vyčistiť všetko",

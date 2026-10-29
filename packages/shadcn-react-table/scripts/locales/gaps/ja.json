@@ -28,10 +28,9 @@
     "betweenDates": "範囲内"
   },
   "advancedFilters": "詳細検索",
-  "advancedFiltersMatchLabel": "次の条件の",
+  "advancedFiltersMatch": "次の条件の {logic} に一致",
   "advancedFiltersMatchAll": "すべて",
   "advancedFiltersMatchAny": "いずれか",
-  "advancedFiltersOf": "に一致",
   "advancedFiltersAddRule": "条件を追加",
   "advancedFiltersApply": "適用",
   "advancedFiltersClearAll": "すべてクリア",

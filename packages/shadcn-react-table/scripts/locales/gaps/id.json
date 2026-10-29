@@ -28,10 +28,9 @@
     "betweenDates": "Antara"
   },
   "advancedFilters": "Filter lanjutan",
-  "advancedFiltersMatchLabel": "Cocokkan",
+  "advancedFiltersMatch": "Cocokkan {logic} aturan berikut",
   "advancedFiltersMatchAll": "semua",
   "advancedFiltersMatchAny": "salah satu",
-  "advancedFiltersOf": "aturan berikut",
   "advancedFiltersAddRule": "Tambah filter",
   "advancedFiltersApply": "Terapkan",
   "advancedFiltersClearAll": "Hapus semua",

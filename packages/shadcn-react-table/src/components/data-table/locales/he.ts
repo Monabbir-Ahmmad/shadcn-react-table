@@ -101,10 +101,9 @@ export const dataTableLocalizationHe: DataTableLocalization = {
     equalsBool: "שווה",
   },
   advancedFilters: "סינון מתקדם", // needs review
-  advancedFiltersMatchLabel: "התאם", // needs review
+  advancedFiltersMatch: (logic) => `התאם ${logic} מהכללים הבאים`, // needs review
   advancedFiltersMatchAll: "הכול", // needs review
   advancedFiltersMatchAny: "לפחות אחד", // needs review
-  advancedFiltersOf: "מהכללים הבאים", // needs review
   advancedFiltersAddRule: "הוסף סינון", // needs review
   advancedFiltersApply: "החל", // needs review
   advancedFiltersClearAll: "נקה הכול", // needs review

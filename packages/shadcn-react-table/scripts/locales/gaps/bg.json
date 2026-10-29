@@ -28,10 +28,9 @@
     "betweenDates": "Между"
   },
   "advancedFilters": "Разширени филтри",
-  "advancedFiltersMatchLabel": "Съвпадение",
+  "advancedFiltersMatch": "Съвпадение {logic} от следните правила",
   "advancedFiltersMatchAll": "Всички",
   "advancedFiltersMatchAny": "Някое",
-  "advancedFiltersOf": "от следните правила",
   "advancedFiltersAddRule": "Добави филтър",
   "advancedFiltersApply": "Приложи",
   "advancedFiltersClearAll": "Изчисти всички",

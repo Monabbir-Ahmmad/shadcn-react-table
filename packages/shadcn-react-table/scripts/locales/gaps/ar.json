@@ -28,10 +28,9 @@
     "betweenDates": "بين"
   },
   "advancedFilters": "مرشحات متقدمة",
-  "advancedFiltersMatchLabel": "مطابقة",
+  "advancedFiltersMatch": "مطابقة {logic} القواعد التالية",
   "advancedFiltersMatchAll": "جميع",
   "advancedFiltersMatchAny": "أيٍّ من",
-  "advancedFiltersOf": "القواعد التالية",
   "advancedFiltersAddRule": "إضافة مرشح",
   "advancedFiltersApply": "تطبيق",
   "advancedFiltersClearAll": "مسح الكل",

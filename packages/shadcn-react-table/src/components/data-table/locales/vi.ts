@@ -101,10 +101,9 @@ export const dataTableLocalizationVi: DataTableLocalization = {
     equalsBool: "Bằng",
   },
   advancedFilters: "Bộ lọc nâng cao", // needs review
-  advancedFiltersMatchLabel: "Khớp", // needs review
+  advancedFiltersMatch: (logic) => `Khớp ${logic} quy tắc sau`, // needs review
   advancedFiltersMatchAll: "tất cả", // needs review
   advancedFiltersMatchAny: "bất kỳ", // needs review
-  advancedFiltersOf: "quy tắc sau", // needs review
   advancedFiltersAddRule: "Thêm bộ lọc", // needs review
   advancedFiltersApply: "Áp dụng", // needs review
   advancedFiltersClearAll: "Xoá tất cả", // needs review

@@ -28,10 +28,9 @@
     "betweenDates": "Tra"
   },
   "advancedFilters": "Filtri avanzati",
-  "advancedFiltersMatchLabel": "Soddisfa",
+  "advancedFiltersMatch": "Soddisfa {logic} regole seguenti",
   "advancedFiltersMatchAll": "tutte le",
   "advancedFiltersMatchAny": "almeno una delle",
-  "advancedFiltersOf": "regole seguenti",
   "advancedFiltersAddRule": "Aggiungi filtro",
   "advancedFiltersApply": "Applica",
   "advancedFiltersClearAll": "Cancella tutto",
