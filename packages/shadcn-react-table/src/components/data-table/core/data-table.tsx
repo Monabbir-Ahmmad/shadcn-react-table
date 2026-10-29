@@ -163,9 +163,9 @@ export function DataTable<TData extends RowData>({
   // React detach and re-attach the surface on every commit, leaving
   // `refs.tableContainerRef` empty while child effects run.
   const setSurfaceRef = React.useCallback(
+    // A callback ref runs after render: writing refs there is legal React.
+    // eslint-disable-next-line react-hooks/immutability
     (node: HTMLDivElement | null) => {
-      // A callback ref runs after render: writing refs here is legal React.
-      // eslint-disable-next-line react-hooks/immutability
       gridRef.current = node
       // The exposed container ref is a RefObject, mutable by contract; read
       // through the stable table, so this callback never changes.
