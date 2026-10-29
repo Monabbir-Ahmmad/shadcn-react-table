@@ -57,6 +57,19 @@ function use3d() {
   )
 }
 
+/**
+ * False on the server and during hydration, true after: next-themes only
+ * knows the resolved theme on the client.
+ */
+const noSubscribe = () => () => {}
+function useHydrated() {
+  return React.useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false
+  )
+}
+
 const mod = (n: number) => ((n % COUNT) + COUNT) % COUNT
 
 type Drag = { x: number; start: number; moved: boolean }
@@ -68,6 +81,7 @@ type Drag = { x: number; start: number; moved: boolean }
  */
 export function StyleDeck() {
   const { resolvedTheme } = useTheme()
+  const hydrated = useHydrated()
   const is3d = use3d()
   const [choice, setChoice] = React.useState<DeckChoice>({
     ...DEFAULT_PREFS,
@@ -90,7 +104,9 @@ export function StyleDeck() {
   const greeted = React.useRef(new Set<string>())
   const drag = React.useRef<Drag | null>(null)
 
-  const dark = resolvedTheme === "dark"
+  // Light until hydrated, so the server HTML and the first client render
+  // agree; the swatches switch to the dark accents right after.
+  const dark = hydrated && resolvedTheme === "dark"
   // The latest picks, read when a frame asks for its theme (no stale closure).
   const latest = React.useRef({ choice, dark })
 
