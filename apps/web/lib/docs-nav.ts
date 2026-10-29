@@ -18,6 +18,7 @@ export const docsNav: DocsNavGroup[] = [
     items: [
       { title: "Introduction", href: "/docs" },
       { title: "Installation", href: "/docs/installation" },
+      { title: "AI agent setup", href: "/docs/ai" },
       { title: "Quick start", href: "/docs/quick-start" },
       { title: "Usage", href: "/docs/usage" },
       { title: "Updating", href: "/docs/guides/updating" },

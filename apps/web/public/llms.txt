@@ -14,6 +14,7 @@ Then `import { DataTable, useDataTable } from "@/components/ui/data-table"`: bui
 
 - [Introduction](https://monabbir-ahmmad.github.io/shadcn-react-table/docs.md): A **shadcn/ui data table** with Material React Table (MRT V3) feature parity, built on TanStack Table v9.
 - [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation.md): The data table is distributed as a **shadcn registry** item.
+- [AI agent setup](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/ai.md): Set up the data table with a coding agent — Claude Code, Cursor, Codex, Copilot and the like.
 - [Quick start](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/quick-start.md): A minimal table is two pieces: **columns** (TanStack column defs, typed with `DataTableColumnDef`) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
 - [Usage](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/usage.md): The data table has one core idea: **options in, instance out.**
 - [Updating](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating.md): `shadcn add` copies this block's source into your project — after that, the code is yours, and upstream releases don't reach it automatically.
@@ -92,5 +93,5 @@ Then `import { DataTable, useDataTable } from "@/components/ui/data-table"`: bui
 ## Optional
 
 - [Full documentation](https://monabbir-ahmmad.github.io/shadcn-react-table/llms-full.txt): every page above in one file
-- [Agent skill](https://monabbir-ahmmad.github.io/shadcn-react-table/skills/shadcn-react-table/SKILL.md): how to use the table well, for coding agents
+- [Agent skill](https://monabbir-ahmmad.github.io/shadcn-react-table/SKILL.md): how to install and use the table, for coding agents (`npx skills add Monabbir-Ahmmad/shadcn-react-table`)
 - [Registry item](https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json): the files the shadcn CLI installs

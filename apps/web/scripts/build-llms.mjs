@@ -7,6 +7,7 @@
 //   node apps/web/scripts/build-llms.mjs
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
+import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 const WEB = join(dirname(fileURLToPath(import.meta.url)), "..")
@@ -153,10 +154,29 @@ const index = [
     "## Optional",
     "",
     `- [Full documentation](${SITE}/llms-full.txt): every page above in one file`,
-    `- [Agent skill](${SITE}/skills/shadcn-react-table/SKILL.md): how to use the table well, for coding agents`,
+    `- [Agent skill](${SITE}/SKILL.md): how to install and use the table, for coding agents (\`npx skills add Monabbir-Ahmmad/shadcn-react-table\`)`,
     `- [Registry item](${SITE}/r/data-table.json): the files the shadcn CLI installs`,
   ].join("\n"),
 ].join("\n\n")
+
+// The agent skill: its source is `skills/shadcn-react-table/SKILL.md` at the
+// repo root (where `npx skills add` finds it); the site serves a copy at
+// `/SKILL.md` and `/skills/shadcn-react-table/SKILL.md`. Every docs page it
+// links to must exist.
+const SKILL = readFileSync(
+  join(WEB, "../../skills/shadcn-react-table/SKILL.md"),
+  "utf8"
+).replaceAll("\r\n", "\n")
+const missing = [...SKILL.matchAll(/\/shadcn-react-table(\/docs\/[\w/-]+\.md)/g)]
+  .map((m) => m[1])
+  .filter((path) => !pages.some((p) => p.mdPath === path))
+if (missing.length > 0) {
+  console.error(`SKILL.md links to missing docs pages: ${missing.join(", ")}`)
+  process.exit(1)
+}
+writeFileSync(join(PUBLIC, "SKILL.md"), SKILL)
+mkdirSync(join(PUBLIC, "skills/shadcn-react-table"), { recursive: true })
+writeFileSync(join(PUBLIC, "skills/shadcn-react-table/SKILL.md"), SKILL)
 
 writeFileSync(join(PUBLIC, "llms.txt"), `${index}\n`)
 writeFileSync(
