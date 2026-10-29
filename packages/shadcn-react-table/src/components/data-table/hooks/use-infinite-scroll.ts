@@ -46,7 +46,9 @@ export function useInfiniteScroll({
     }
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0]
+        // The browser may batch several records (e.g. the initial "not
+        // visible" plus a quick scroll's "visible"); the last is current.
+        const entry = entries[entries.length - 1]
         if (entry) setIsIntersecting(entry.isIntersecting)
       },
       {
