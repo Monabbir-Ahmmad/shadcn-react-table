@@ -126,4 +126,6 @@ useDataTable({
 
 ## Related
 
-- [Tree data](/docs/guides/tree)
+<Cards>
+  <Card href="/docs/guides/tree" title="Tree data" />
+</Cards>

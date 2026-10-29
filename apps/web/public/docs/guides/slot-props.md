@@ -108,10 +108,14 @@ const columns: DataTableColumnDef<Person>[] = [
 | `skeleton` | `<div> props · { column, rowIndex, table }` |  | Each loading skeleton (bar or square) in a body cell. |
 | `selectCheckbox` | `<button> props · { row?, table }` |  | Each row selection checkbox (and the select-all one, without `row`). |
 
-> **The root:** `<DataTable />`'s own props also land on the root, after `slotProps.root` — so `<DataTable table={table} className="…" />` works too.
+> **The root:** `<DataTable />
+>   `'s own props also land on the root, after `slotProps.root` — so `
+>   <DataTable table={table} className="…" />` works too.
 
 ## Related
 
-- [Theming](/docs/guides/theming)
-- [Sticky header & footer](/docs/guides/sticky)
-- [DataTable props](/docs/api/data-table-props)
+<Cards>
+  <Card href="/docs/guides/theming" title="Theming" />
+  <Card href="/docs/guides/sticky" title="Sticky header & footer" />
+  <Card href="/docs/api/data-table-props" title="DataTable props" />
+</Cards>

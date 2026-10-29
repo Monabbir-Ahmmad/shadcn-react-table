@@ -291,5 +291,7 @@ function CustomizedGroupingExample() {
 
 ## Related
 
-- [Sticky header & footer](/docs/guides/sticky)
-- [Column options](/docs/api/column-options)
+<Cards>
+  <Card href="/docs/guides/sticky" title="Sticky header & footer" />
+  <Card href="/docs/api/column-options" title="Column options" />
+</Cards>

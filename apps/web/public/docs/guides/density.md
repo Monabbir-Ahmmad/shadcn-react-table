@@ -69,4 +69,6 @@ The other toolbar options have their own flags too: `enableGlobalFilter`, `enabl
 
 ## Related
 
-- [Table instance](/docs/api/table-instance)
+<Cards>
+  <Card href="/docs/api/table-instance" title="Table instance" />
+</Cards>

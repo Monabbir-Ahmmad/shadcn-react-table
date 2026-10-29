@@ -22,9 +22,7 @@ npx skills add Monabbir-Ahmmad/shadcn-react-table
 
 ## Registry address
 
-```bash
-pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
-```
+<PmTabs command="shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json" />
 
 The same address works in Radix UI and Base UI projects; the shadcn CLI adapts the source. Languages are separate items: `…/r/data-table-locale-de.json`. To install by name, register the namespace once in `components.json` (see [Installation](/docs/installation#use-a-namespace-optional)):
 
@@ -58,6 +56,7 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 ```markdown
 ## Data table
+
 - components/ui/data-table is shadcn-react-table (installed from its shadcn registry; edit freely).
 - Before changing table options read https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table.md;
   column options: https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options.md.
@@ -69,5 +68,10 @@ For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
 
 ## Related
 
-- [Installation](/docs/installation)
-- [Migrating from Material React Table](/docs/guides/migrating-from-mrt)
+<Cards>
+  <Card href="/docs/installation" title="Installation" />
+  <Card
+    href="/docs/guides/migrating-from-mrt"
+    title="Migrating from Material React Table"
+  />
+</Cards>

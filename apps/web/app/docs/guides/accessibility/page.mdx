@@ -8,15 +8,15 @@ The table is built to be used without a mouse and with a screen reader. Its part
 
 With `enableKeyboardNavigation` (on by default) the table is an ARIA grid: one Tab stop for the whole body, `aria-rowcount` / `aria-colcount` for the full data (also when rows or columns are virtualized), and `aria-rowindex` / `aria-colindex` on every row and cell. Turn it off and the table is a plain `<table>`.
 
-| Keys | What they do |
-| --- | --- |
-| Arrow keys | Move between cells (left and right are mirrored in right-to-left tables) |
-| Home / End | First / last cell in the row |
-| Ctrl + Home / Ctrl + End | First / last cell in the table |
-| Page Up / Page Down | Up / down a screenful of rows |
-| Enter or F2 | Activate the cell: open its editor, toggle its checkbox, follow its link |
-| Ctrl + C (Cmd + C) | Copy the focused cell's text |
-| Escape | Cancel an edit; leave full screen |
+| Keys                     | What they do                                                             |
+| ------------------------ | ------------------------------------------------------------------------ |
+| Arrow keys               | Move between cells (left and right are mirrored in right-to-left tables) |
+| Home / End               | First / last cell in the row                                             |
+| Ctrl + Home / Ctrl + End | First / last cell in the table                                           |
+| Page Up / Page Down      | Up / down a screenful of rows                                            |
+| Enter or F2              | Activate the cell: open its editor, toggle its checkbox, follow its link |
+| Ctrl + C (Cmd + C)       | Copy the focused cell's text                                             |
+| Escape                   | Cancel an edit; leave full screen                                        |
 
 Rows and columns that aren't rendered (virtualization) are scrolled into view as you reach them. Focus comes back to the same cell after an edit is saved or cancelled, and to the nearest cell when its row is deleted.
 
@@ -46,6 +46,8 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 
 ## Related
 
-- [Row selection](/docs/guides/row-selection)
-- [Column resizing](/docs/guides/column-resizing)
-- [Column ordering](/docs/guides/column-ordering)
+<Cards>
+  <Card href="/docs/guides/row-selection" title="Row selection" />
+  <Card href="/docs/guides/column-resizing" title="Column resizing" />
+  <Card href="/docs/guides/column-ordering" title="Column ordering" />
+</Cards>

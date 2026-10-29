@@ -78,8 +78,8 @@ rowVirtualizerRef.current?.scrollToIndex(100)
 ```
 
 > **Row drag-ordering is disabled:** Row virtualization is incompatible with row drag-ordering. If you need to
->   reorder rows by dragging, leave virtualization off. See
->   [Row ordering](/docs/guides/row-ordering).
+>   reorder rows by dragging, leave virtualization off. See [Row
+>   ordering](/docs/guides/row-ordering).
 
 ## Column virtualization
 
@@ -136,6 +136,8 @@ return <DataTable table={table} />
 
 ## Related
 
-- [Row ordering](/docs/guides/row-ordering)
-- [DataTable props](/docs/api/data-table-props)
-- [useDataTable options](/docs/api/use-data-table)
+<Cards>
+  <Card href="/docs/guides/row-ordering" title="Row ordering" />
+  <Card href="/docs/api/data-table-props" title="DataTable props" />
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+</Cards>

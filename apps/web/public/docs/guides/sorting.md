@@ -81,7 +81,9 @@ const PRIORITY = ["low", "medium", "high"]
 
 const table = useDataTable({
   data,
-  columns: [{ accessorKey: "priority", header: "Priority", sortFn: "byPriority" }],
+  columns: [
+    { accessorKey: "priority", header: "Priority", sortFn: "byPriority" },
+  ],
   sortFns: {
     byPriority: (rowA, rowB, columnId) =>
       PRIORITY.indexOf(rowA.getValue(columnId)) -
@@ -140,5 +142,8 @@ const table = useDataTable({
 
 ## Related
 
-- [useDataTable options](/docs/api/use-data-table) — `enableMultiSort` and other sort flags pass through to TanStack.
+<Cards>
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+</Cards>
+
 - TanStack Table [sorting guide](https://tanstack.com/table/latest).

@@ -69,9 +69,7 @@ function toCsv(rows: unknown[][]) {
   const escape = (value: unknown) => {
     const text = value == null ? "" : String(value)
     const guarded = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text
-    return /[",\n]/.test(guarded)
-      ? `"${guarded.replace(/"/g, '""')}"`
-      : guarded
+    return /[",\n]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded
   }
   return rows.map((row) => row.map(escape).join(",")).join("\n")
 }
@@ -156,5 +154,7 @@ function ExportPdfExample() {
 
 ## Related
 
-- [Row selection](/docs/guides/row-selection)
-- [Toolbar customization](/docs/guides/toolbar)
+<Cards>
+  <Card href="/docs/guides/row-selection" title="Row selection" />
+  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
+</Cards>

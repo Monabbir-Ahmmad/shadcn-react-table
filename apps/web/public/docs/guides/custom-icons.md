@@ -52,7 +52,7 @@ For icon (and localization) defaults shared across many tables, wrap a subtree i
 import { DataTableConfigProvider } from "@/components/ui/data-table"
 import { RiSearchLine } from "@remixicon/react"
 
-<DataTableConfigProvider icons={{ search: RiSearchLine }}>
+;<DataTableConfigProvider icons={{ search: RiSearchLine }}>
   {children}
 </DataTableConfigProvider>
 ```
@@ -62,6 +62,8 @@ import { RiSearchLine } from "@remixicon/react"
 
 ## Related
 
-- [Icon slot reference](/docs/api/icons)
-- [Localization](/docs/guides/localization)
-- [useDataTable options](/docs/api/use-data-table)
+<Cards>
+  <Card href="/docs/api/icons" title="Icon slot reference" />
+  <Card href="/docs/guides/localization" title="Localization" />
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+</Cards>

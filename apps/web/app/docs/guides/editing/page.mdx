@@ -120,15 +120,25 @@ useDataTable({
   columns,
   enableEditing: true,
   editDisplayMode: "modal",
-  renderEditRowDialogContent: ({ row, internalEditComponents, save, cancel, hasErrors }) => (
+  renderEditRowDialogContent: ({
+    row,
+    internalEditComponents,
+    save,
+    cancel,
+    hasErrors,
+  }) => (
     <>
       <DialogHeader>
         <DialogTitle>Edit {row.original.name}</DialogTitle>
       </DialogHeader>
       <div className="grid grid-cols-2 gap-3">{internalEditComponents}</div>
       <DialogFooter>
-        <Button variant="outline" onClick={cancel}>Discard</Button>
-        <Button onClick={save} disabled={hasErrors}>Save changes</Button>
+        <Button variant="outline" onClick={cancel}>
+          Discard
+        </Button>
+        <Button onClick={save} disabled={hasErrors}>
+          Save changes
+        </Button>
       </DialogFooter>
     </>
   ),
@@ -257,7 +267,9 @@ Per-column, via `columnDef.meta`:
 
 ## Related
 
-- [Display modes](/docs/guides/display-modes)
-- [Column options](/docs/api/column-options)
-- [Table instance](/docs/api/table-instance)
-- [Row actions](/docs/guides/row-actions)
+<Cards>
+  <Card href="/docs/guides/display-modes" title="Display modes" />
+  <Card href="/docs/api/column-options" title="Column options" />
+  <Card href="/docs/api/table-instance" title="Table instance" />
+  <Card href="/docs/guides/row-actions" title="Row actions" />
+</Cards>

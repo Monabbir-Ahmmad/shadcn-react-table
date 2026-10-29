@@ -159,5 +159,7 @@ function DynamicColumnsExample() {
 
 ## Related
 
-- [Loading state](/docs/guides/loading)
-- [useDataTable options](/docs/api/use-data-table)
+<Cards>
+  <Card href="/docs/guides/loading" title="Loading state" />
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+</Cards>

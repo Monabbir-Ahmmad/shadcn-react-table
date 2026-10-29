@@ -6,15 +6,6 @@ A **shadcn/ui data table** with [Material React Table](https://www.material-reac
 
 <Example slug="advanced" />
 
-## Why this table
-
-MRT is the most complete React table, but it's tied to Material UI. This table brings that same breadth of features to the shadcn/ui ecosystem:
-
-- **One hook, one component.** `useDataTable(options)` returns an enriched TanStack instance; `<DataTable table={table} />` renders it. Everything is driven by options.
-- **Feature-complete.** Sorting, per-column filtering with mode menus, fuzzy global search, column ordering / pinning / resizing / visibility, density, sticky header & footer, row selection, row numbers, row pinning, drag-to-reorder rows, grouping with aggregation, detail panels, tree data, inline editing (cell / row / table / modal), row & cell actions, click-to-copy, row & column virtualization, CSV / Excel export, full localization, and swappable icons.
-- **Style-agnostic.** It only uses standard shadcn primitive APIs (`button`, `table`, `popover`, `command`, …), declared as registry dependencies. `shadcn add` installs them in _your_ configured style, so the table adopts your look with nothing to override.
-- **You own the source.** No opaque dependency — the component lands in your repo under `components/ui/data-table/` and is yours to extend.
-
 ## How it works
 
 It is a thin, opinionated layer over TanStack Table:
@@ -27,10 +18,24 @@ It is a thin, opinionated layer over TanStack Table:
 
 Coding agents can install and use the table from one prompt, a skill file, the shadcn MCP server, or the docs as Markdown (`/llms.txt`, and `.md` after any page URL). See [AI agent setup](/docs/ai).
 
-## Next steps
+## Start here
 
-- [Installation](/docs/installation) — add the table to your project via the shadcn registry.
-- [Quick start](/docs/quick-start) — a minimal table in a few lines.
-- [Usage](/docs/usage) — the mental model: options in, instance out.
-- [Guides](/docs/guides/sorting) — one page per feature, each with a live example.
-- [API reference](/docs/api/use-data-table) — every option, prop, and token, generated from the source types.
+<Cards>
+  <Card href="/docs/installation" title="Installation" />
+  <Card href="/docs/quick-start" title="Quick start" />
+  <Card href="/docs/ai" title="AI agent setup" />
+  <Card href="/docs/guides/migrating-from-mrt" title="Migrating from MRT" />
+</Cards>
+
+## Popular guides
+
+<Cards>
+  <Card href="/docs/guides/column-filtering" title="Column filtering" />
+  <Card href="/docs/guides/editing" title="Editing" />
+  <Card href="/docs/guides/server-side" title="Server-side data" />
+  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
+  <Card href="/docs/guides/virtualization" title="Virtualization" />
+  <Card href="/docs/guides/row-selection" title="Row selection" />
+</Cards>
+
+[Browse all guides →](/docs/guides)

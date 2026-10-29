@@ -108,9 +108,9 @@ const table = useDataTable({
 
 The ranking yields to the user: the moment they click a column to sort, their sort takes over, and clearing the search restores the original order. It applies only in `"fuzzy"` mode and is skipped while grouping or row expansion is active, or under `manualSorting` / `manualFiltering` (the server owns ordering there).
 
-> **Off by default:** Material React Table enables this by default; the data table keeps it off so adding a
->   search box never silently reorders your rows. Opt in when relevance ordering
->   is what you want.
+> **Off by default:** Material React Table enables this by default; the data table keeps it off so
+>   adding a search box never silently reorders your rows. Opt in when relevance
+>   ordering is what you want.
 
 ## Placement
 
@@ -130,5 +130,7 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` â
 
 ## Related
 
-- [Column filtering](/docs/guides/column-filtering)
-- [Filter modes](/docs/guides/filter-modes)
+<Cards>
+  <Card href="/docs/guides/column-filtering" title="Column filtering" />
+  <Card href="/docs/guides/filter-modes" title="Filter modes" />
+</Cards>

@@ -167,29 +167,31 @@ function HeadlessExample() {
 
 ## The parts
 
-| Part | What it is |
-| --- | --- |
-| `DataTableToolbar` | The whole top toolbar |
-| `DataTableBottomToolbar` | The whole bottom toolbar |
-| `DataTableGlobalFilter` | Search box with its mode menu |
-| `DataTablePagination` | Page size, range and page buttons |
-| `DataTableAlertBanner` | The selection banner |
-| `DataTableViewOptions` | Show / hide / reorder columns menu |
-| `DataTableDensityToggle` | Density menu |
-| `DataTableFullscreenToggle` | Full screen button |
-| `DataTableFilterToggle` | Show / hide the filter row |
-| `DataTableAdvancedFilterToggle` | Opens the advanced filter panel |
-| `DataTableFilterPanel` | The advanced filter panel |
-| `DataTableDropToGroupZone` | Drop zone for grouping by drag |
-| `DataTableColumnActions` | A column's actions menu (takes `column`) |
-| `DataTableColumnFilter` | A column's filter field (takes `column`) |
-| `DataTableFilterModeMenu` | A column's filter-mode menu (takes `column`) |
-| `DataTableEditModal` | The edit / create dialog |
+| Part                            | What it is                                   |
+| ------------------------------- | -------------------------------------------- |
+| `DataTableToolbar`              | The whole top toolbar                        |
+| `DataTableBottomToolbar`        | The whole bottom toolbar                     |
+| `DataTableGlobalFilter`         | Search box with its mode menu                |
+| `DataTablePagination`           | Page size, range and page buttons            |
+| `DataTableAlertBanner`          | The selection banner                         |
+| `DataTableViewOptions`          | Show / hide / reorder columns menu           |
+| `DataTableDensityToggle`        | Density menu                                 |
+| `DataTableFullscreenToggle`     | Full screen button                           |
+| `DataTableFilterToggle`         | Show / hide the filter row                   |
+| `DataTableAdvancedFilterToggle` | Opens the advanced filter panel              |
+| `DataTableFilterPanel`          | The advanced filter panel                    |
+| `DataTableDropToGroupZone`      | Drop zone for grouping by drag               |
+| `DataTableColumnActions`        | A column's actions menu (takes `column`)     |
+| `DataTableColumnFilter`         | A column's filter field (takes `column`)     |
+| `DataTableFilterModeMenu`       | A column's filter-mode menu (takes `column`) |
+| `DataTableEditModal`            | The edit / create dialog                     |
 
 The header, body and footer stay inside `<DataTable />`, which manages their scrolling, virtualization and keyboard navigation. To change how they look, use [`slotProps`](/docs/guides/slot-props).
 
 ## Related
 
-- [Toolbar customization](/docs/guides/toolbar)
-- [Part props (slotProps)](/docs/guides/slot-props)
-- [State management](/docs/guides/state)
+<Cards>
+  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
+  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
+  <Card href="/docs/guides/state" title="State management" />
+</Cards>

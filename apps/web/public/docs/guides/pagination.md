@@ -66,6 +66,8 @@ Set `manualPagination: true`, pass the total `rowCount`, and control `state.pagi
 
 ## Related
 
-- [Server-side data](/docs/guides/server-side)
-- [Infinite scroll](/docs/guides/infinite-scroll)
-- [Display modes](/docs/guides/display-modes)
+<Cards>
+  <Card href="/docs/guides/server-side" title="Server-side data" />
+  <Card href="/docs/guides/infinite-scroll" title="Infinite scroll" />
+  <Card href="/docs/guides/display-modes" title="Display modes" />
+</Cards>

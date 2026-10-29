@@ -39,7 +39,8 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-> **Indentation:** Use `row.depth` inside a cell renderer to indent child rows so the hierarchy reads clearly.
+> **Indentation:** Use `row.depth` inside a cell renderer to indent child rows so the hierarchy
+>   reads clearly.
 
 ## From a flat list
 
@@ -167,5 +168,7 @@ The expand column's header toggles every row. Hide it with `enableExpandAll: fal
 
 ## Related
 
-- [Detail panel](/docs/guides/detail-panel)
-- [Grouping & aggregation](/docs/guides/grouping)
+<Cards>
+  <Card href="/docs/guides/detail-panel" title="Detail panel" />
+  <Card href="/docs/guides/grouping" title="Grouping & aggregation" />
+</Cards>

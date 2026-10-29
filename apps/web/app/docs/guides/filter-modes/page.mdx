@@ -74,7 +74,12 @@ To restrict every column at once, pass `columnFilterModeOptions` to `useDataTabl
 const table = useDataTable({
   data,
   columns,
-  columnFilterModeOptions: ["contains", "equals", "between", "betweenInclusive"],
+  columnFilterModeOptions: [
+    "contains",
+    "equals",
+    "between",
+    "betweenInclusive",
+  ],
 })
 ```
 
@@ -146,5 +151,7 @@ Mode menu labels are localizable via `localization.filterModes`. Labels you pass
 
 ## Related
 
-- [Column filtering](/docs/guides/column-filtering)
-- [Localization](/docs/api/localization)
+<Cards>
+  <Card href="/docs/guides/column-filtering" title="Column filtering" />
+  <Card href="/docs/api/localization" title="Localization" />
+</Cards>

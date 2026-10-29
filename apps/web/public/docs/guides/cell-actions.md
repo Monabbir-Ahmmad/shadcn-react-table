@@ -39,7 +39,10 @@ function CellActionsExample() {
 `renderCellActionMenuItems` sets the menu's contents (and turns the menu on). It receives `{ cell, row, table, internalMenuItems, closeMenu }`: place `internalMenuItems` where the built-in items should go, or leave it out to replace them, and call `closeMenu()` from anything that isn't a menu item.
 
 ```tsx
-import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu"
+import {
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu"
 
 const table = useDataTable({
   data,
@@ -138,4 +141,6 @@ function ColumnActionsMenuExample() {
 
 ## Related
 
-- [Row actions](/docs/guides/row-actions)
+<Cards>
+  <Card href="/docs/guides/row-actions" title="Row actions" />
+</Cards>

@@ -184,4 +184,6 @@ function SkeletonsExample() {
 
 ## Related
 
-- [Server-side data](/docs/guides/server-side)
+<Cards>
+  <Card href="/docs/guides/server-side" title="Server-side data" />
+</Cards>

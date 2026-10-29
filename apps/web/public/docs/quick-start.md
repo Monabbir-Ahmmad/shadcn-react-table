@@ -2,6 +2,12 @@
 
 A minimal table is two pieces: **columns** (TanStack column defs, typed with `DataTableColumnDef`) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
 
+<Steps>
+
+<Step title="Define columns">
+
+Columns are TanStack column defs, typed with `DataTableColumnDef`. Give rows a stable `id` so selection and state survive re-renders.
+
 ```tsx
 "use client"
 
@@ -25,18 +31,40 @@ const columns: DataTableColumnDef<Person>[] = [
   { accessorKey: "email", header: "Email" },
   { accessorKey: "age", header: "Age", meta: { align: "right" } },
 ]
+```
 
+</Step>
+
+<Step title="Create the table">
+
+Pass `data` and `columns` to `useDataTable`. Everything else is optional.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  initialState: { pagination: { pageSize: 10 } },
+})
+```
+
+</Step>
+
+<Step title="Render it">
+
+Hand the instance to `<DataTable />`. Put the hook call inside a component:
+
+```tsx
 export function PeopleTable() {
-  const table = useDataTable({
-    data,
-    columns,
-    getRowId: (row) => row.id,
-    initialState: { pagination: { pageSize: 10 } },
-  })
+  const table = useDataTable({ data, columns, getRowId: (row) => row.id })
 
   return <DataTable table={table} />
 }
 ```
+
+</Step>
+
+</Steps>
 
 That already gives you sorting, client pagination, a toolbar with global search, column visibility, and density controls:
 

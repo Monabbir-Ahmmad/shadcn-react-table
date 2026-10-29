@@ -39,14 +39,23 @@ return <DataTable table={table} />
 
 Once the content overflows the bound, the header pins to the top and the footer pins to the bottom while the rows scroll between them. Setting `enableStickyHeader: false` removes both the pinning and the default bound, letting the table grow to its full height.
 
-> **MRT parity note:** Material React Table defaults `enableStickyHeader` and `enableStickyFooter` to `false`. This table deliberately defaults `enableStickyHeader` to `true` so headers stay useful out of the box, but leaves `enableStickyFooter` at `false` (opt in when you have an aggregation/footer row). The sticky-implies-bounded-surface behavior itself matches MRT.
+> **MRT parity note:** Material React Table defaults `enableStickyHeader` and `enableStickyFooter` to
+>   `false`. This table deliberately defaults `enableStickyHeader` to `true` so
+>   headers stay useful out of the box, but leaves `enableStickyFooter` at `false`
+>   (opt in when you have an aggregation/footer row). The
+>   sticky-implies-bounded-surface behavior itself matches MRT.
 
 ## Footer cells
 
 Footer cells are populated from each column's `footer` definition or from aggregation values. See [Grouping](/docs/guides/grouping) for how aggregation rows are produced.
 
-> **Nothing to stick to?:** If the header or footer is not sticking, the surface is probably not bounded — check that `slotProps.surface` isn't removing the default max-height (e.g. `max-h-none`) and that the data actually overflows the bound.
+> **Nothing to stick to?:** If the header or footer is not sticking, the surface is probably not bounded —
+>   check that `slotProps.surface` isn't removing the default max-height (e.g.
+>   `max-h-none`) and that the data actually overflows the bound.
 
 ## Related
-- [Grouping](/docs/guides/grouping)
-- [DataTable props](/docs/api/data-table-props)
+
+<Cards>
+  <Card href="/docs/guides/grouping" title="Grouping" />
+  <Card href="/docs/api/data-table-props" title="DataTable props" />
+</Cards>

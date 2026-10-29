@@ -134,5 +134,7 @@ useDataTable({
 
 ## Related
 
-- [Cell actions](/docs/guides/cell-actions)
-- [Editing](/docs/guides/editing)
+<Cards>
+  <Card href="/docs/guides/cell-actions" title="Cell actions" />
+  <Card href="/docs/guides/editing" title="Editing" />
+</Cards>

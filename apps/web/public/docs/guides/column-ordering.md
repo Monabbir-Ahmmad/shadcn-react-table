@@ -54,6 +54,7 @@ function ColumnDragExample() {
 ```
 
 ## Initial order
+
 Provide the starting order with `initialState.columnOrder`, an array of column ids.
 
 ```tsx
@@ -67,9 +68,13 @@ const table = useDataTable({
 })
 ```
 
-> **Pair with pinning:** Pinned columns stay anchored while the rest reorder. Combine ordering with pinning to keep key columns in view.
+> **Pair with pinning:** Pinned columns stay anchored while the rest reorder. Combine ordering with
+>   pinning to keep key columns in view.
 
 ## Related
-- [Column pinning](/docs/guides/column-pinning)
-- [useDataTable options](/docs/api/use-data-table)
-- [Column options](/docs/api/column-options)
+
+<Cards>
+  <Card href="/docs/guides/column-pinning" title="Column pinning" />
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+  <Card href="/docs/api/column-options" title="Column options" />
+</Cards>

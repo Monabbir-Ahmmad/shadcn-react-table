@@ -110,6 +110,8 @@ For each row: `getRowHeight(row)` wins unless it returns `null`/`undefined`, the
 
 ## Related
 
-- [Virtualization](/docs/guides/virtualization)
-- [Density](/docs/guides/density)
-- [useDataTable options](/docs/api/use-data-table)
+<Cards>
+  <Card href="/docs/guides/virtualization" title="Virtualization" />
+  <Card href="/docs/guides/density" title="Density" />
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+</Cards>

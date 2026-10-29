@@ -48,7 +48,7 @@ When infinite scroll is on, the pager is hidden and pagination is forced to a si
 
 ## Controlled fetch state
 
-You own the data and the loading flags; the table only decides *when* to ask for more. Append the next chunk to `data` in your `onLoadMore` handler.
+You own the data and the loading flags; the table only decides _when_ to ask for more. Append the next chunk to `data` in your `onLoadMore` handler.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
@@ -133,6 +133,8 @@ const table = useDataTable({
 
 ## Related
 
-- [Server-side data](/docs/guides/server-side)
-- [Virtualization](/docs/guides/virtualization)
-- [useDataTable options](/docs/api/use-data-table)
+<Cards>
+  <Card href="/docs/guides/server-side" title="Server-side data" />
+  <Card href="/docs/guides/virtualization" title="Virtualization" />
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+</Cards>

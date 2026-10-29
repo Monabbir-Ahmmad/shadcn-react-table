@@ -111,26 +111,28 @@ file.
 
 ### API renames in 1.0.0
 
-| 0.x                                                                                        | 1.0.0                                                          |
-| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| `table.tableInstance.setDensity(…)` (and every setter or action)                           | `table.setDensity(…)`                                          |
-| `table.tableInstance.density` (and other UI state)                                         | `table.getState().density`                                     |
-| `table.tableInstance.isLoading` (and other options, `refs`)                                | `table.dataTable.isLoading`                                    |
-| `DataTableConfig` type                                                                     | `DataTableOptionsResolved` (+ `DataTableMethods`)              |
-| `defaultDensity: "compact"`                                                                | `initialState: { density: "compact" }`                         |
-| `density`, `isFullscreen`, `showColumnFilters`, `advancedFilter`, `globalFilterMode` props | `state: { … }`                                                 |
-| `defaultShowColumnFilters`, `defaultGlobalFilterMode`, `defaultAdvancedFilter`             | `initialState: { … }`                                          |
-| `onEditCellSave` / `onSaveRow` / `onCreateRow`                                             | `onEditingCellSave` / `onEditingRowSave` / `onCreatingRowSave` |
-| `renderToolbarActions`                                                                     | `renderTopToolbarCustomActions`                                |
-| `meta.variant` / `meta.options`                                                            | `meta.filterVariant` / `meta.filterSelectOptions`              |
-| `meta.disableHighlight: true`                                                              | `meta.enableFilterMatchHighlighting: false`                    |
-| `meta.disableColumnActions: true`                                                          | `meta.enableColumnActions: false`                              |
-| `<DataTable pageSizeOptions={…} />`                                                        | `useDataTable({ pageSizeOptions: … })`                         |
-| `<DataTable surfaceClassName="…" />`                                                       | `useDataTable({ slotProps: { surface: { className: "…" } } })` |
-| `renderColumnActionsMenuItems` appended after a separator                                   | return `<>{internalMenuItems}<DropdownMenuSeparator />{yours}</>` |
-| Edit button next to the `renderRowActionMenuItems` menu                                   | Edit is in the menu: render `internalMenuItems` in your items     |
-| `sortingFns` option                                                                         | `sortFns`                                                          |
+| 0.x                                                                                        | 1.0.0                                                             |
+| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| `table.tableInstance.setDensity(…)` (and every setter or action)                           | `table.setDensity(…)`                                             |
+| `table.tableInstance.density` (and other UI state)                                         | `table.getState().density`                                        |
+| `table.tableInstance.isLoading` (and other options, `refs`)                                | `table.dataTable.isLoading`                                       |
+| `DataTableConfig` type                                                                     | `DataTableOptionsResolved` (+ `DataTableMethods`)                 |
+| `defaultDensity: "compact"`                                                                | `initialState: { density: "compact" }`                            |
+| `density`, `isFullscreen`, `showColumnFilters`, `advancedFilter`, `globalFilterMode` props | `state: { … }`                                                    |
+| `defaultShowColumnFilters`, `defaultGlobalFilterMode`, `defaultAdvancedFilter`             | `initialState: { … }`                                             |
+| `onEditCellSave` / `onSaveRow` / `onCreateRow`                                             | `onEditingCellSave` / `onEditingRowSave` / `onCreatingRowSave`    |
+| `renderToolbarActions`                                                                     | `renderTopToolbarCustomActions`                                   |
+| `meta.variant` / `meta.options`                                                            | `meta.filterVariant` / `meta.filterSelectOptions`                 |
+| `meta.disableHighlight: true`                                                              | `meta.enableFilterMatchHighlighting: false`                       |
+| `meta.disableColumnActions: true`                                                          | `meta.enableColumnActions: false`                                 |
+| `<DataTable pageSizeOptions={…} />`                                                        | `useDataTable({ pageSizeOptions: … })`                            |
+| `<DataTable surfaceClassName="…" />`                                                       | `useDataTable({ slotProps: { surface: { className: "…" } } })`    |
+| `renderColumnActionsMenuItems` appended after a separator                                  | return `<>{internalMenuItems}<DropdownMenuSeparator />{yours}</>` |
+| Edit button next to the `renderRowActionMenuItems` menu                                    | Edit is in the menu: render `internalMenuItems` in your items     |
+| `sortingFns` option                                                                        | `sortFns`                                                         |
 
 ## Related
 
-- [Installation](/docs/installation)
+<Cards>
+  <Card href="/docs/installation" title="Installation" />
+</Cards>

@@ -155,7 +155,9 @@ const table = useDataTable({
 
 ## Related
 
-- [Editing](/docs/guides/editing)
-- [Column filtering](/docs/guides/column-filtering)
-- [Toolbar customization](/docs/guides/toolbar)
-- [useDataTable options](/docs/api/use-data-table)
+<Cards>
+  <Card href="/docs/guides/editing" title="Editing" />
+  <Card href="/docs/guides/column-filtering" title="Column filtering" />
+  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
+  <Card href="/docs/api/use-data-table" title="useDataTable options" />
+</Cards>

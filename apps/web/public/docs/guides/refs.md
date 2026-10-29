@@ -34,6 +34,8 @@ return <DataTable table={table} />
 
 ## Related
 
-- [Virtualization](/docs/guides/virtualization) — the virtualizer instance refs (`rowVirtualizerInstanceRef`)
-- [Toolbar customization](/docs/guides/toolbar)
-- [Table instance](/docs/api/table-instance)
+<Cards>
+  <Card href="/docs/guides/virtualization" title="Virtualization" />
+  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
+  <Card href="/docs/api/table-instance" title="Table instance" />
+</Cards>

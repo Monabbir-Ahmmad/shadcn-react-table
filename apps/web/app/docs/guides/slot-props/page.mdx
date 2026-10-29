@@ -60,11 +60,15 @@ const columns: DataTableColumnDef<Person>[] = [
 <ApiTable of="slotParts" propLabel="Part" />
 
 <Callout variant="tip" title="The root">
-`<DataTable />`'s own props also land on the root, after `slotProps.root` — so `<DataTable table={table} className="…" />` works too.
+  `<DataTable />
+  `'s own props also land on the root, after `slotProps.root` — so `
+  <DataTable table={table} className="…" />` works too.
 </Callout>
 
 ## Related
 
-- [Theming](/docs/guides/theming)
-- [Sticky header & footer](/docs/guides/sticky)
-- [DataTable props](/docs/api/data-table-props)
+<Cards>
+  <Card href="/docs/guides/theming" title="Theming" />
+  <Card href="/docs/guides/sticky" title="Sticky header & footer" />
+  <Card href="/docs/api/data-table-props" title="DataTable props" />
+</Cards>
