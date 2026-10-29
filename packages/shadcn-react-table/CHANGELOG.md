@@ -179,6 +179,10 @@ for every rename.
 
 ### Changed
 
+- **Changed:** loading skeletons are drawn in each column, at its width and
+  pinning, with bars of varying length that line up with the header. An
+  explicit `showSkeletons: true` also covers rows already shown (e.g. while
+  refetching) instead of dimming them. New `slotProps.skeleton` part.
 - **Faster:** changing the density no longer re-renders every row; cells
   read their padding from a CSS variable the table root sets.
 - **Changed:** `localization.filterModes` is merged with the built-in labels

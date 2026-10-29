@@ -43,11 +43,10 @@ export function ColumnResizeHandle<TData extends RowData, TValue>({
     else if (event.key === shrink) resizeTo(size - step)
     else if (event.key === "Home") resizeTo(min)
     else if (event.key === "End" && max != null) resizeTo(max)
-    else if (event.key === "Enter")
-      dt(table).enableColumnAutosize
-        ? dt(table).autoSizeColumn(column.id)
-        : column.resetSize()
-    else return
+    else if (event.key === "Enter") {
+      if (dt(table).enableColumnAutosize) dt(table).autoSizeColumn(column.id)
+      else column.resetSize()
+    } else return
     event.preventDefault()
     event.stopPropagation()
   }

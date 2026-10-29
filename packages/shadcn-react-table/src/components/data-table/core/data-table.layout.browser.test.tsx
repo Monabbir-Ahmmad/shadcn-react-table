@@ -108,3 +108,33 @@ describe("density", () => {
     expect(paddingTop()).toBe("16px")
   })
 })
+
+describe("loading skeletons", () => {
+  it("line up with the header cells", async () => {
+    function Loading() {
+      const table = useDataTable<Row>({
+        columns: columns.slice(0, 4),
+        data: [],
+        getRowId: (row) => row.id,
+        isLoading: true,
+        enableColumnResizing: true,
+      })
+      return <DataTable table={table} />
+    }
+    render(<Loading />)
+    await nextFrame()
+    const heads = Array.from(
+      document.querySelectorAll("thead tr:first-child th")
+    )
+    const cells = Array.from(
+      document.querySelectorAll("tbody tr:first-child td")
+    )
+    expect(cells).toHaveLength(heads.length)
+    cells.forEach((cell, i) => {
+      const head = heads[i]!.getBoundingClientRect()
+      const box = cell.getBoundingClientRect()
+      expect(Math.abs(box.left - head.left)).toBeLessThan(1)
+      expect(Math.abs(box.width - head.width)).toBeLessThan(1)
+    })
+  })
+})

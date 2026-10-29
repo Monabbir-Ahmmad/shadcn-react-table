@@ -108,7 +108,7 @@ useDataTable({ data, columns, getRowId: (row) => row.id, isSaving })
 `isLoading` turns on three affordances together; override any of them independently:
 
 - `showProgressBars` — the top progress bar (default `isLoading || isSaving`).
-- `showSkeletons` — skeleton rows while the body is empty (default `isLoading`).
+- `showSkeletons` — skeleton rows while the body is empty (default `isLoading`). The skeletons are drawn in each column, at the column's width and pinning, with bars of varying length. Pass `showSkeletons: true` to cover rows already shown too — handy while refetching — instead of dimming them. Style the bars with `slotProps.skeleton`.
 - `showLoadingOverlay` — a dimming overlay over existing rows (default `isLoading`).
 
 ```tsx
@@ -128,7 +128,7 @@ useDataTable({
 | `isLoading` | `boolean` | `false` | Show the loading affordances (progress bar; skeletons when empty; a dimming overlay over existing rows). Toggle each independently below. |
 | `isSaving` | `boolean` | `false` | Show the progress bar for an in-flight save/mutation. Defaults the progress bar on without replacing rows with skeletons. |
 | `showProgressBars` | `boolean` |  | Show the top progress bar. Default: `isLoading \|\| isSaving`. |
-| `showSkeletons` | `boolean` |  | Replace the body with skeleton rows while empty. Default: `isLoading`. |
+| `showSkeletons` | `boolean` |  | Show skeleton rows while the body is empty. Default: `isLoading`. Passing `true` also covers rows already shown with skeletons (e.g. while refetching), instead of dimming them. |
 | `showLoadingOverlay` | `boolean` |  | Dim existing rows with an overlay while loading. Default: `isLoading`. |
 
 ## Related

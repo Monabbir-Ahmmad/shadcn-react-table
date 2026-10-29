@@ -105,6 +105,7 @@ const columns: DataTableColumnDef<Person>[] = [
 | `searchInput` | `<input> props · { table }` |  | The global search input. |
 | `editField` | `<input> props · { column, row?, table }` |  | Each inline / dialog edit field (the input, or the select's trigger). |
 | `editDialog` | `<div> props · { row?, isCreating, table }` |  | The edit / create dialog's content. |
+| `skeleton` | `<div> props · { column, rowIndex, table }` |  | Each loading skeleton (bar or square) in a body cell. |
 | `selectCheckbox` | `<button> props · { row?, table }` |  | Each row selection checkbox (and the select-all one, without `row`). |
 
 > **The root:** `<DataTable />`'s own props also land on the root, after `slotProps.root` — so `<DataTable table={table} className="…" />` works too.

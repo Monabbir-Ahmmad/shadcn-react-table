@@ -35,7 +35,7 @@ import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import { RowStateHubContext, useRowStateHub } from "./row-state-hub"
 import { getUiState } from "../../core/ui-state"
 import { getCellRenderState, renderBodyCell } from "./render-body-cell"
-import { SkeletonRows } from "./skeleton-rows"
+import { SkeletonBar, SkeletonRows } from "./skeleton-rows"
 import type { DataTableCell, DataTableRow } from "../../core/table-types"
 import { dt } from "../../core/internal"
 
@@ -116,6 +116,7 @@ export function DataTableBody<TData extends RowData>({
     renderEmpty,
     enablePagination,
     showSkeletons,
+    showSkeletonsOverRows,
     localization,
     rowHeight,
     getRowHeight,
@@ -205,14 +206,20 @@ export function DataTableBody<TData extends RowData>({
       row.depth > 0
         ? row.depth
         : 0
-    const content = renderBodyCell(
-      cell,
-      table,
-      enableFilterMatchHighlighting,
-      columnsWithCustomCell,
-      localization,
-      cellRenderState
-    )
+    // `showSkeletons: true` covers existing rows too (e.g. while refetching).
+    const content =
+      showSkeletons && showSkeletonsOverRows ? (
+        <SkeletonBar table={table} column={cell.column} rowIndex={rowIndex} />
+      ) : (
+        renderBodyCell(
+          cell,
+          table,
+          enableFilterMatchHighlighting,
+          columnsWithCustomCell,
+          localization,
+          cellRenderState
+        )
+      )
     const indented =
       treeIndent > 0 ? (
         <span
@@ -442,11 +449,15 @@ export function DataTableBody<TData extends RowData>({
         {createAtTop && <DataTableCreateRow table={table} />}
         {showSkeletons && !hasRows ? (
           <SkeletonRows
+            table={table}
+            // A page's worth, at most 10, so a big page doesn't flood the body.
             rowCount={
-              enablePagination ? table.getState().pagination.pageSize : 8
+              enablePagination
+                ? Math.min(10, table.getState().pagination.pageSize)
+                : 8
             }
-            columnCount={visibleColumnCount}
             padding={padding}
+            virtualColumns={!!enableColumnVirtualization}
           />
         ) : hasRows && enableRowVirtualization ? (
           <>

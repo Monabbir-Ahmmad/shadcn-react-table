@@ -433,6 +433,14 @@ export interface DataTableSlots<TData extends RowData> {
     WithTable<TData, { row?: DataTableRow<TData>; isCreating: boolean }>,
     React.ComponentProps<"div">
   >
+  /** Each loading skeleton (bar or square) in a body cell. */
+  skeleton?: SlotProp<
+    WithTable<
+      TData,
+      { column: DataTableColumn<TData, unknown>; rowIndex: number }
+    >,
+    React.ComponentProps<"div">
+  >
   /** Each row selection checkbox (and the select-all one, without `row`). */
   selectCheckbox?: SlotProp<
     WithTable<TData, { row?: DataTableRow<TData> }>,
@@ -570,6 +578,9 @@ export interface DataTableConfig<TData extends RowData> {
   isSaving: boolean
   showProgressBars: boolean
   showSkeletons: boolean
+  /** Whether skeletons also cover rows already shown (`showSkeletons: true`
+   *  was passed explicitly). */
+  showSkeletonsOverRows: boolean
   showLoadingOverlay: boolean
   enableFacetedValues: boolean
   enableColumnActions: boolean
@@ -852,7 +863,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   isSaving?: boolean
   /** Show the top progress bar. Default: `isLoading || isSaving`. */
   showProgressBars?: boolean
-  /** Replace the body with skeleton rows while empty. Default: `isLoading`. */
+  /** Show skeleton rows while the body is empty. Default: `isLoading`.
+   *  Passing `true` also covers rows already shown with skeletons (e.g. while
+   *  refetching), instead of dimming them. */
   showSkeletons?: boolean
   /** Dim existing rows with an overlay while loading. Default: `isLoading`. */
   showLoadingOverlay?: boolean

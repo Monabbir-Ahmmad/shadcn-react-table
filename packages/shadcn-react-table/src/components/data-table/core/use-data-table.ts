@@ -279,7 +279,11 @@ export function useDataTable<TData extends RowData>(
   // for the initial data load).
   const showProgressBars = showProgressBarsProp ?? (isLoading || isSaving)
   const showSkeletons = showSkeletonsProp ?? isLoading
-  const showLoadingOverlay = showLoadingOverlayProp ?? isLoading
+  // An explicit `showSkeletons: true` also covers rows already shown, and
+  // then replaces the dimming overlay.
+  const showSkeletonsOverRows = showSkeletonsProp === true
+  const showLoadingOverlay =
+    showLoadingOverlayProp ?? (isLoading && !showSkeletonsOverRows)
 
   // The hook's stable instance (assigned after `useTable` below).
   const tableRef = React.useRef<DataTableInstance<TData> | null>(null)
@@ -820,6 +824,7 @@ export function useDataTable<TData extends RowData>(
     isSaving,
     showProgressBars,
     showSkeletons,
+    showSkeletonsOverRows,
     showLoadingOverlay,
     enableFacetedValues,
     enableColumnActions,

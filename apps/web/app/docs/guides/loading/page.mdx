@@ -63,7 +63,7 @@ useDataTable({ data, columns, getRowId: (row) => row.id, isSaving })
 `isLoading` turns on three affordances together; override any of them independently:
 
 - `showProgressBars` — the top progress bar (default `isLoading || isSaving`).
-- `showSkeletons` — skeleton rows while the body is empty (default `isLoading`).
+- `showSkeletons` — skeleton rows while the body is empty (default `isLoading`). The skeletons are drawn in each column, at the column's width and pinning, with bars of varying length. Pass `showSkeletons: true` to cover rows already shown too — handy while refetching — instead of dimming them. Style the bars with `slotProps.skeleton`.
 - `showLoadingOverlay` — a dimming overlay over existing rows (default `isLoading`).
 
 ```tsx

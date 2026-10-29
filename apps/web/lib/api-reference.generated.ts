@@ -86,7 +86,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Replace the body with skeleton rows while empty. Default: `isLoading`.",
+      "Show skeleton rows while the body is empty. Default: `isLoading`. Passing `true` also covers rows already shown with skeletons (e.g. while refetching), instead of dimming them.",
   },
   {
     name: "showLoadingOverlay",
@@ -1226,7 +1226,15 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description:
-      "Replace the body with skeleton rows while empty. Default: `isLoading`.",
+      "Show skeleton rows while the body is empty. Default: `isLoading`. Passing `true` also covers rows already shown with skeletons (e.g. while refetching), instead of dimming them.",
+  },
+  {
+    name: "showSkeletonsOverRows",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether skeletons also cover rows already shown (`showSkeletons: true` was passed explicitly).",
   },
   {
     name: "showLoadingOverlay",
@@ -3264,6 +3272,13 @@ export const slotParts: ApiMember[] = [
     required: false,
     default: null,
     description: "The edit / create dialog's content.",
+  },
+  {
+    name: "skeleton",
+    type: "<div> props · { column, rowIndex, table }",
+    required: false,
+    default: null,
+    description: "Each loading skeleton (bar or square) in a body cell.",
   },
   {
     name: "selectCheckbox",

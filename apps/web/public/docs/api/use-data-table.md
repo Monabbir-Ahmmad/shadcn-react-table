@@ -13,7 +13,7 @@
 | `isLoading` | `boolean` | `false` | Show the loading affordances (progress bar; skeletons when empty; a dimming overlay over existing rows). Toggle each independently below. |
 | `isSaving` | `boolean` | `false` | Show the progress bar for an in-flight save/mutation. Defaults the progress bar on without replacing rows with skeletons. |
 | `showProgressBars` | `boolean` |  | Show the top progress bar. Default: `isLoading \|\| isSaving`. |
-| `showSkeletons` | `boolean` |  | Replace the body with skeleton rows while empty. Default: `isLoading`. |
+| `showSkeletons` | `boolean` |  | Show skeleton rows while the body is empty. Default: `isLoading`. Passing `true` also covers rows already shown with skeletons (e.g. while refetching), instead of dimming them. |
 | `showLoadingOverlay` | `boolean` |  | Dim existing rows with an overlay while loading. Default: `isLoading`. |
 | `enableFacetedValues` | `boolean` | `true` | Compute faceted unique values / min-max (auto select options + range bounds). Default true; disable to skip the faceted row models. |
 | `enableColumnActions` | `boolean` | `true` | Shows the column-actions menu in each header (sort, filter, pin, hide, group…). Default `true`. |
