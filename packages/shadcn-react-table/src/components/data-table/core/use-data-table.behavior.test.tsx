@@ -382,7 +382,11 @@ describe("useDataTable engine behaviour", () => {
       {
         header: "Details",
         columns: [
-          { accessorKey: "age", header: "Age", meta: { filterVariant: "range" } },
+          {
+            accessorKey: "age",
+            header: "Age",
+            meta: { filterVariant: "range" },
+          },
         ],
       },
     ]

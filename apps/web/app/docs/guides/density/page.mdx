@@ -8,14 +8,14 @@ Density controls the vertical padding of table rows. The data table ships three 
 
 ## Usage
 
-Set the initial density with `defaultDensity`:
+Set the initial density with `initialState.density`:
 
 ```tsx
 const table = useDataTable({
   data,
   columns,
   getRowId: (row) => row.id,
-  defaultDensity: "compact",
+  initialState: { density: "compact" },
 })
 
 return <DataTable table={table} />
@@ -52,9 +52,9 @@ const table = useDataTable({
 The other toolbar options have their own flags too: `enableGlobalFilter`, `enableColumnFilters`, and `enableColumnActions`. To remove the entire top toolbar, use `enableTopToolbar: false`.
 
 <Callout variant="tip" title="Persisting density">
-  `density` is plain state on the table instance, so you can mirror it into
-  local storage or a query param and restore it via `defaultDensity` on the next
-  load.
+  `density` is table state, so you can mirror it into local storage or a query
+  param (with `onDensityChange`) and restore it via `initialState.density` on
+  the next load, or control it with `state.density`.
 </Callout>
 
 ## Related

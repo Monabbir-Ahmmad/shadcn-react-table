@@ -58,20 +58,6 @@ export const useDataTableOptions: ApiMember[] = [
     description: "Override any subset of the table's icons.",
   },
   {
-    name: "defaultDensity",
-    type: "Density",
-    required: false,
-    default: '"comfortable"',
-    description: "Initial density. Uncontrolled.",
-  },
-  {
-    name: "defaultShowColumnFilters",
-    type: "boolean",
-    required: false,
-    default: "false",
-    description: "Initially show the filter row. Uncontrolled.",
-  },
-  {
     name: "isLoading",
     type: "boolean",
     required: false,
@@ -166,57 +152,28 @@ export const useDataTableOptions: ApiMember[] = [
       "While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering.",
   },
   {
-    name: "defaultGlobalFilterMode",
-    type: "GlobalFilterMode",
-    required: false,
-    default: '"fuzzy"',
-    description: 'Initial global search mode. Default "fuzzy".',
-  },
-  {
-    name: "density",
-    type: "Density",
-    required: false,
-    default: null,
-    description:
-      "Controlled density. Pair with `onDensityChange`; omit for uncontrolled (seed the initial value with `defaultDensity`).",
-  },
-  {
     name: "onDensityChange",
     type: "(density: Density) => void",
     required: false,
     default: null,
     description:
-      "Called whenever the density changes (toolbar toggle or programmatic).",
-  },
-  {
-    name: "isFullscreen",
-    type: "boolean",
-    required: false,
-    default: null,
-    description:
-      "Controlled full-screen state. Pair with `onIsFullscreenChange`.",
+      "Called whenever the density changes (toolbar toggle or programmatic). Set it with `initialState.density`, control it with `state.density`.",
   },
   {
     name: "onIsFullscreenChange",
     type: "(isFullscreen: boolean) => void",
     required: false,
     default: null,
-    description: "Called whenever the full-screen state is toggled.",
-  },
-  {
-    name: "showColumnFilters",
-    type: "boolean",
-    required: false,
-    default: null,
     description:
-      "Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`; omit for uncontrolled (seed with `defaultShowColumnFilters`).",
+      "Called whenever the full-screen state is toggled. Control it with `state.isFullscreen`.",
   },
   {
     name: "onShowColumnFiltersChange",
     type: "(showColumnFilters: boolean) => void",
     required: false,
     default: null,
-    description: "Called whenever the filter row is shown or hidden.",
+    description:
+      "Called whenever the filter row is shown or hidden. Set it with `initialState.showColumnFilters`, control it with `state.showColumnFilters`.",
   },
   {
     name: "enableAdvancedFilter",
@@ -227,41 +184,20 @@ export const useDataTableOptions: ApiMember[] = [
       "Enable the advanced filter panel: compound rules joined by AND/OR, applied on top of the per-column filters. A toolbar button opens the panel and shows the active-rule count. Default false.",
   },
   {
-    name: "advancedFilter",
-    type: "AdvancedFilterGroup",
-    required: false,
-    default: null,
-    description:
-      "Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for uncontrolled (seed with `defaultAdvancedFilter`).",
-  },
-  {
-    name: "defaultAdvancedFilter",
-    type: "AdvancedFilterGroup",
-    required: false,
-    default: null,
-    description: "Initial advanced filter for uncontrolled usage.",
-  },
-  {
     name: "onAdvancedFilterChange",
     type: "(filter: AdvancedFilterGroup) => void",
     required: false,
     default: null,
-    description: "Called whenever the advanced filter changes.",
-  },
-  {
-    name: "globalFilterMode",
-    type: "GlobalFilterMode",
-    required: false,
-    default: null,
     description:
-      "Controlled global search mode. Pair with `onGlobalFilterModeChange`; omit for uncontrolled (seed with `defaultGlobalFilterMode`).",
+      "Called whenever the advanced filter changes. Set it with `initialState.advancedFilter`, control it with `state.advancedFilter`.",
   },
   {
     name: "onGlobalFilterModeChange",
     type: "(mode: GlobalFilterMode) => void",
     required: false,
     default: null,
-    description: "Called whenever the global search mode changes.",
+    description:
+      'Called whenever the global search mode changes (default `"fuzzy"`). Set it with `initialState.globalFilterMode`, control it with `state.globalFilterMode`.',
   },
   {
     name: "onColumnFilterModesChange",
@@ -815,7 +751,7 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "renderTopToolbarCustomActions",
-    type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
     description:
@@ -1042,8 +978,7 @@ export const tableInstance: ApiMember[] = [
     type: "Density",
     required: true,
     default: null,
-    description:
-      "Controlled density. Pair with `onDensityChange`; omit for uncontrolled (seed the initial value with `defaultDensity`).",
+    description: "Current density (table state).",
   },
   {
     name: "setDensity",
@@ -1057,8 +992,7 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description:
-      "Controlled full-screen state. Pair with `onIsFullscreenChange`.",
+    description: "Whether the table is full screen (table state).",
   },
   {
     name: "setIsFullscreen",
@@ -1087,8 +1021,7 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description:
-      "Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`; omit for uncontrolled (seed with `defaultShowColumnFilters`).",
+    description: "Whether the filter row shows (table state).",
   },
   {
     name: "setShowColumnFilters",
@@ -1117,8 +1050,7 @@ export const tableInstance: ApiMember[] = [
     type: "GlobalFilterMode",
     required: true,
     default: null,
-    description:
-      "Controlled global search mode. Pair with `onGlobalFilterModeChange`; omit for uncontrolled (seed with `defaultGlobalFilterMode`).",
+    description: "Current global search mode (table state).",
   },
   {
     name: "setGlobalFilterMode",
@@ -1156,8 +1088,7 @@ export const tableInstance: ApiMember[] = [
     type: "AdvancedFilterGroup",
     required: true,
     default: null,
-    description:
-      "Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for uncontrolled (seed with `defaultAdvancedFilter`).",
+    description: "Current advanced filter (table state).",
   },
   {
     name: "setAdvancedFilter",
@@ -1824,7 +1755,7 @@ export const tableInstance: ApiMember[] = [
   },
   {
     name: "renderTopToolbarCustomActions",
-    type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
     description:
@@ -2272,20 +2203,6 @@ export const localizationKeys: ApiMember[] = [
     type: "string",
     required: true,
     default: "Any",
-    description: "",
-  },
-  {
-    name: "advancedFiltersMatchLabel",
-    type: "string",
-    required: false,
-    default: null,
-    description: "",
-  },
-  {
-    name: "advancedFiltersOf",
-    type: "string",
-    required: false,
-    default: null,
     description: "",
   },
   {

@@ -72,8 +72,10 @@ describe("localization language", () => {
           meta: { filterVariant: "date" },
         },
       ],
-      defaultShowColumnFilters: true,
-      initialState: { columnFilters: [{ id: "born", value: born }] },
+      initialState: {
+        showColumnFilters: true,
+        columnFilters: [{ id: "born", value: born }],
+      },
       localization: { ...defaultLocalization, language: "de" },
     })
     const german = new Intl.DateTimeFormat("de", {
@@ -101,16 +103,18 @@ describe("localization language", () => {
     const { table } = mount({
       enableAdvancedFilter: true,
       localization: { ...defaultLocalization, true: "Wahr", false: "Falsch" },
-      defaultAdvancedFilter: {
-        logic: "and",
-        rules: [
-          {
-            id: "r1",
-            columnId: "active",
-            operator: "equals",
-            value: undefined,
-          },
-        ],
+      initialState: {
+        advancedFilter: {
+          logic: "and",
+          rules: [
+            {
+              id: "r1",
+              columnId: "active",
+              operator: "equals",
+              value: undefined,
+            },
+          ],
+        },
       },
     })
     act(() => table().tableInstance.setShowAdvancedFilterPanel(true))
@@ -156,8 +160,10 @@ describe("localization language", () => {
           meta: { filterVariant: "date" },
         },
       ],
-      defaultShowColumnFilters: true,
-      initialState: { columnFilters: [{ id: "born", value: born }] },
+      initialState: {
+        showColumnFilters: true,
+        columnFilters: [{ id: "born", value: born }],
+      },
       localization: { ...defaultLocalization, language: "de" },
     })
     const trigger = screen.getByRole("button", { name: "Filter by Born" })
@@ -182,16 +188,18 @@ describe("localization language", () => {
     const { table } = mount({
       enableAdvancedFilter: true,
       localization: dataTableLocalizationDe,
-      defaultAdvancedFilter: {
-        logic: "and",
-        rules: [
-          {
-            id: "r1",
-            columnId: "active",
-            operator: "equals",
-            value: undefined,
-          },
-        ],
+      initialState: {
+        advancedFilter: {
+          logic: "and",
+          rules: [
+            {
+              id: "r1",
+              columnId: "active",
+              operator: "equals",
+              value: undefined,
+            },
+          ],
+        },
       },
     })
     expect(

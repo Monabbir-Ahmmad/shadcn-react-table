@@ -39,7 +39,7 @@ Build your rules in the dialog, then click **Apply** to filter the table. Closin
 
 ## Controlled usage
 
-Drive the filter from your own state with `advancedFilter` + `onAdvancedFilterChange` (or seed an uncontrolled table with `defaultAdvancedFilter`).
+Drive the filter from your own state with `state.advancedFilter` + `onAdvancedFilterChange` (or seed an uncontrolled table with `initialState.advancedFilter`).
 
 ```tsx
 const [filter, setFilter] = React.useState<AdvancedFilterGroup>({
@@ -51,7 +51,7 @@ const table = useDataTable({
   data,
   columns,
   enableAdvancedFilter: true,
-  advancedFilter: filter,
+  state: { advancedFilter: filter },
   onAdvancedFilterChange: setFilter,
 })
 ```

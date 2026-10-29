@@ -81,8 +81,6 @@ export function useDataTable<TData extends RowData>(
   const {
     localization: localizationProp,
     icons: iconsProp,
-    defaultDensity = "comfortable",
-    defaultShowColumnFilters = false,
     isLoading = false,
     isSaving = false,
     showProgressBars: showProgressBarsProp,
@@ -117,18 +115,11 @@ export function useDataTable<TData extends RowData>(
     enableGlobalFilter = true,
     enableGlobalFilterModes = true,
     enableGlobalFilterRankedResults = false,
-    defaultGlobalFilterMode = "fuzzy",
-    density: densityProp,
     onDensityChange,
-    isFullscreen: isFullscreenProp,
     onIsFullscreenChange,
-    showColumnFilters: showColumnFiltersProp,
     onShowColumnFiltersChange,
     enableAdvancedFilter = false,
-    advancedFilter: advancedFilterProp,
-    defaultAdvancedFilter,
     onAdvancedFilterChange,
-    globalFilterMode: globalFilterModeProp,
     onGlobalFilterModeChange,
     onColumnFilterModesChange,
     onShowAdvancedFilterPanelChange,
@@ -230,15 +221,15 @@ export function useDataTable<TData extends RowData>(
   const tableRef = React.useRef<DataTableInstance<TData> | null>(null)
 
   // UI state (density, full screen, editing, filter modes…) is table state in
-  // the store (see core/ui-state.ts). These are its starting values, read on
-  // the first render only, like `initialState`.
+  // the store (see core/ui-state.ts). These are its defaults, under any
+  // `initialState`.
   const [uiDefaults] = React.useState<DataTableUiState>(() => ({
-    density: defaultDensity,
+    density: "comfortable",
     isFullscreen: false,
-    showColumnFilters: defaultShowColumnFilters,
+    showColumnFilters: false,
     columnFilterModes: {},
-    globalFilterMode: defaultGlobalFilterMode,
-    advancedFilter: defaultAdvancedFilter ?? EMPTY_ADVANCED_FILTER,
+    globalFilterMode: "fuzzy",
+    advancedFilter: EMPTY_ADVANCED_FILTER,
     showAdvancedFilterPanel: false,
     editingCell: null,
     editingRowId: null,
@@ -353,35 +344,17 @@ export function useDataTable<TData extends RowData>(
     () => (controlledPinning ? toCorePinning(controlledPinning) : undefined),
     [controlledPinning]
   )
-  // The dedicated UI props (`density`, `isFullscreen`, …) are controlled
-  // state too; they win over the same key in `state`.
-  const state = React.useMemo(() => {
-    const controlledUi = Object.fromEntries(
-      Object.entries({
-        density: densityProp,
-        isFullscreen: isFullscreenProp,
-        showColumnFilters: showColumnFiltersProp,
-        advancedFilter: advancedFilterProp,
-        globalFilterMode: globalFilterModeProp,
-      }).filter(([, value]) => value !== undefined)
-    )
-    if (!stateProp && Object.keys(controlledUi).length === 0) return undefined
-    // Only set `columnPinning` when the consumer controls it (an own key
-    // holding `undefined` would pin TanStack to its initial pinning).
-    return {
-      ...stateProp,
-      ...controlledUi,
-      ...(corePinning && { columnPinning: corePinning }),
-    } as CoreTableState
-  }, [
-    stateProp,
-    corePinning,
-    densityProp,
-    isFullscreenProp,
-    showColumnFiltersProp,
-    advancedFilterProp,
-    globalFilterModeProp,
-  ])
+  const state = React.useMemo(
+    () =>
+      stateProp &&
+      // Only set `columnPinning` when the consumer controls it (an own key
+      // holding `undefined` would pin TanStack to its initial pinning).
+      ({
+        ...stateProp,
+        ...(corePinning && { columnPinning: corePinning }),
+      } as CoreTableState),
+    [stateProp, corePinning]
+  )
 
   // One change handler per UI slice: stores the value unless the slice is
   // controlled, and reports it to the consumer's callback either way.

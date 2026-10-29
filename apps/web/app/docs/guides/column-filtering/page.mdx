@@ -2,7 +2,7 @@ export const metadata = { title: "Column filtering" }
 
 # Column filtering
 
-Each column can expose its own filter control in a per-column filter row. Toggle the row with the funnel icon in the toolbar, or have it open from the start with `defaultShowColumnFilters: true`.
+Each column can expose its own filter control in a per-column filter row. Toggle the row with the funnel icon in the toolbar, or have it open from the start with `initialState: { showColumnFilters: true }`.
 
 <Example slug="column-filters" />
 
@@ -42,7 +42,7 @@ const table = useDataTable({
   data,
   columns,
   getRowId: (row) => row.id,
-  defaultShowColumnFilters: true,
+  initialState: { showColumnFilters: true },
 })
 ```
 
@@ -69,8 +69,6 @@ Select / multi-select filters auto-derive their options, and range filters their
 <ApiTable
   of="useDataTableOptions"
   only={[
-    "defaultShowColumnFilters",
-    "showColumnFilters",
     "onShowColumnFiltersChange",
     "enableColumnFilterModes",
     "enableFilterMatchHighlighting",

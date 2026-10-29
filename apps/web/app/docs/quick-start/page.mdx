@@ -54,7 +54,7 @@ const table = useDataTable({
   columns,
   getRowId: (row) => row.id,
   enableMultiSort: true,
-  defaultShowColumnFilters: true,
+  initialState: { showColumnFilters: true },
   enableRowSelection: true,
 })
 ```

@@ -80,8 +80,7 @@ function ColumnFiltersExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultShowColumnFilters: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -93,9 +92,8 @@ function FilterModesExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultShowColumnFilters: true,
     enableColumnFilterModes: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -121,8 +119,7 @@ function GlobalSearchExample() {
     columns,
     getRowId: (row) => row.id,
     enableGlobalFilter: true,
-    defaultGlobalFilterMode: "fuzzy",
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { globalFilterMode: "fuzzy", pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -199,8 +196,7 @@ function DensityExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultDensity: "compact",
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { density: "compact", pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -591,14 +587,13 @@ function CustomIconsExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultShowColumnFilters: true,
     icons: {
       sortAscending: RiSortAsc,
       sortDescending: RiSortDesc,
       columnActions: RiMoreFill,
       columnVisibility: RiEqualizerLine,
     },
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -675,8 +670,7 @@ function LocalizationExample() {
     columns,
     getRowId: (row) => row.id,
     localization: SPANISH,
-    defaultShowColumnFilters: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -829,8 +823,7 @@ function AdvancedExample() {
     enableStickyFooter: true,
     enableEditing: true,
     editDisplayMode: "row",
-    defaultShowColumnFilters: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
     onEditingRowSave: ({ row, values, exit }) => {
       setData((prev) =>
         prev.map((r) =>

@@ -33,9 +33,11 @@ describe("UI state as table state", () => {
     expect(result.current.tableInstance.density).toBe("compact")
   })
 
-  it("keeps the default* options as starting values", () => {
-    const { result } = setup({ defaultDensity: "spacious" })
-    expect(result.current.getState().density).toBe("spacious")
+  it("defaults to comfortable density, filters hidden, fuzzy search", () => {
+    const state = setup().result.current.getState()
+    expect(state.density).toBe("comfortable")
+    expect(state.showColumnFilters).toBe(false)
+    expect(state.globalFilterMode).toBe("fuzzy")
   })
 
   it("updates uncontrolled slices and reports them", () => {
@@ -69,11 +71,11 @@ describe("UI state as table state", () => {
     expect(result.current.tableInstance.editingCell).toEqual(cell)
   })
 
-  it("treats the dedicated props as controlled state", () => {
-    const { result, rerender } = setup({ density: "compact" })
+  it("follows controlled density through state", () => {
+    const { result, rerender } = setup({ state: { density: "compact" } })
     act(() => result.current.tableInstance.setDensity("spacious"))
     expect(result.current.getState().density).toBe("compact")
-    rerender({ density: "spacious" })
+    rerender({ state: { density: "spacious" } })
     expect(result.current.getState().density).toBe("spacious")
   })
 

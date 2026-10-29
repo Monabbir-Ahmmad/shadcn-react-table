@@ -41,41 +41,24 @@ const table = useDataTable({
 })
 ```
 
-The dedicated props below are shortcuts for the same slices:
+Observe a slice without taking it over with its `on…Change` callback:
 
 ```tsx
 const table = useDataTable({
   data,
   columns,
   getRowId: (row) => row.id,
-
-  // Uncontrolled with a seed:
-  defaultDensity: "compact",
-  defaultShowColumnFilters: true,
-  defaultGlobalFilterMode: "fuzzy",
-
-  // Observe changes (still uncontrolled):
-  onDensityChange: (d) => saveToLocalStorage("density", d),
-
-  // Or take control:
-  isFullscreen,
-  onIsFullscreenChange: setIsFullscreen,
+  initialState: { density: "compact" },
+  onDensityChange: (density) => saveToLocalStorage("density", density),
 })
 ```
 
 <ApiTable
   of="useDataTableOptions"
   only={[
-    "defaultDensity",
-    "density",
     "onDensityChange",
-    "isFullscreen",
     "onIsFullscreenChange",
-    "defaultShowColumnFilters",
-    "showColumnFilters",
     "onShowColumnFiltersChange",
-    "defaultGlobalFilterMode",
-    "globalFilterMode",
     "onGlobalFilterModeChange",
     "onColumnFilterModesChange",
     "onShowAdvancedFilterPanelChange",

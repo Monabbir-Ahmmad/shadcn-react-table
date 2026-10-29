@@ -287,8 +287,10 @@ export interface CellRenderProps<TData extends RowData, TValue = unknown> {
 export interface DataTableConfig<TData extends RowData> {
   localization: DataTableLocalization
   icons: DataTableIcons
+  /** Current density (table state). */
   density: Density
   setDensity: React.Dispatch<React.SetStateAction<Density>>
+  /** Whether the table is full screen (table state). */
   isFullscreen: boolean
   setIsFullscreen: React.Dispatch<React.SetStateAction<boolean>>
   /** Text direction the table renders in, read from the page (`dir="rtl"`
@@ -297,12 +299,14 @@ export interface DataTableConfig<TData extends RowData> {
   direction: "ltr" | "rtl"
   /** Set by `DataTable` when it measures its direction. */
   setDirection: React.Dispatch<React.SetStateAction<"ltr" | "rtl">>
+  /** Whether the filter row shows (table state). */
   showColumnFilters: boolean
   setShowColumnFilters: React.Dispatch<React.SetStateAction<boolean>>
   /** Active filter mode per column id. */
   columnFilterModes: Record<string, FilterMode>
   /** Switch a column's filter mode (resets the value when it becomes invalid). */
   setColumnFilterMode: (columnId: string, mode: FilterMode) => void
+  /** Current global search mode (table state). */
   globalFilterMode: GlobalFilterMode
   setGlobalFilterMode: (mode: GlobalFilterMode) => void
   enableGlobalFilter: boolean
@@ -310,6 +314,7 @@ export interface DataTableConfig<TData extends RowData> {
   /** Compound AND/OR filter panel (independent of, and additive to, the
    *  per-column filters and global search). */
   enableAdvancedFilter: boolean
+  /** Current advanced filter (table state). */
   advancedFilter: AdvancedFilterGroup
   setAdvancedFilter: React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>
   /** Whether the advanced filter dialog is open. */
@@ -466,7 +471,9 @@ export interface DataTableConfig<TData extends RowData> {
   enableToolbarInternalActions: boolean
   enableKeyboardNavigation: boolean
   title?: React.ReactNode
-  renderTopToolbarCustomActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderBottomToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderToolbarInternalActions?: (
@@ -537,10 +544,6 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   localization?: Partial<DataTableLocalization>
   /** Override any subset of the table's icons. */
   icons?: Partial<DataTableIcons>
-  /** Initial density. Uncontrolled. */
-  defaultDensity?: Density
-  /** Initially show the filter row. Uncontrolled. */
-  defaultShowColumnFilters?: boolean
   /** Show the loading affordances (progress bar; skeletons when empty; a dimming
    *  overlay over existing rows). Toggle each independently below. */
   isLoading?: boolean
@@ -573,37 +576,25 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping
    *  or expanded, or under manual sorting/filtering. */
   enableGlobalFilterRankedResults?: boolean
-  /** Initial global search mode. Default "fuzzy". */
-  defaultGlobalFilterMode?: GlobalFilterMode
-  /** Controlled density. Pair with `onDensityChange`; omit for uncontrolled
-   *  (seed the initial value with `defaultDensity`). */
-  density?: Density
-  /** Called whenever the density changes (toolbar toggle or programmatic). */
+  /** Called whenever the density changes (toolbar toggle or programmatic).
+   *  Set it with `initialState.density`, control it with `state.density`. */
   onDensityChange?: (density: Density) => void
-  /** Controlled full-screen state. Pair with `onIsFullscreenChange`. */
-  isFullscreen?: boolean
-  /** Called whenever the full-screen state is toggled. */
+  /** Called whenever the full-screen state is toggled. Control it with
+   *  `state.isFullscreen`. */
   onIsFullscreenChange?: (isFullscreen: boolean) => void
-  /** Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`;
-   *  omit for uncontrolled (seed with `defaultShowColumnFilters`). */
-  showColumnFilters?: boolean
-  /** Called whenever the filter row is shown or hidden. */
+  /** Called whenever the filter row is shown or hidden. Set it with
+   *  `initialState.showColumnFilters`, control it with `state.showColumnFilters`. */
   onShowColumnFiltersChange?: (showColumnFilters: boolean) => void
   /** Enable the advanced filter panel: compound rules joined by AND/OR, applied
    *  on top of the per-column filters. A toolbar button opens the panel and
    *  shows the active-rule count. Default false. */
   enableAdvancedFilter?: boolean
-  /** Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for
-   *  uncontrolled (seed with `defaultAdvancedFilter`). */
-  advancedFilter?: AdvancedFilterGroup
-  /** Initial advanced filter for uncontrolled usage. */
-  defaultAdvancedFilter?: AdvancedFilterGroup
-  /** Called whenever the advanced filter changes. */
+  /** Called whenever the advanced filter changes. Set it with
+   *  `initialState.advancedFilter`, control it with `state.advancedFilter`. */
   onAdvancedFilterChange?: (filter: AdvancedFilterGroup) => void
-  /** Controlled global search mode. Pair with `onGlobalFilterModeChange`;
-   *  omit for uncontrolled (seed with `defaultGlobalFilterMode`). */
-  globalFilterMode?: GlobalFilterMode
-  /** Called whenever the global search mode changes. */
+  /** Called whenever the global search mode changes (default `"fuzzy"`). Set
+   *  it with `initialState.globalFilterMode`, control it with
+   *  `state.globalFilterMode`. */
   onGlobalFilterModeChange?: (mode: GlobalFilterMode) => void
   /** Called when a column's filter mode changes, with every column's mode.
    *  Control it with `state.columnFilterModes`. */
@@ -856,7 +847,9 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   title?: React.ReactNode
   /** Custom content rendered in the top toolbar's left region (next to the
    *  title), e.g. bulk-action buttons. */
-  renderTopToolbarCustomActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   /** Replace the entire top toolbar with custom content. */
   renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   /** Replace the entire bottom toolbar (pagination region) with custom content. */

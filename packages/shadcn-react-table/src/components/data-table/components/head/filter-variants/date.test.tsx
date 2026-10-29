@@ -19,8 +19,10 @@ function Table({ variant, value }: { variant: FilterVariant; value: unknown }) {
     columns,
     data: [{ id: "1", born: new Date(2020, 2, 15) }],
     getRowId: (row) => row.id,
-    showColumnFilters: true,
-    initialState: { columnFilters: [{ id: "born", value }] },
+    initialState: {
+      showColumnFilters: true,
+      columnFilters: [{ id: "born", value }],
+    },
   })
   return <DataTable table={table} />
 }

@@ -32,7 +32,7 @@ function Table() {
     columns,
     data: people,
     getRowId: (row) => row.id,
-    showColumnFilters: true,
+    initialState: { showColumnFilters: true },
   })
   return <DataTable table={table} />
 }

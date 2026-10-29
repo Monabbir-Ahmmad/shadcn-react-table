@@ -8,7 +8,7 @@ An expandable global search box appears in the toolbar by default (`enableGlobal
 
 ## Search modes
 
-When `enableGlobalFilterModes: true` (the default), the search box shows a mode menu — fuzzy, contains, and more. The initial mode comes from `defaultGlobalFilterMode`, which defaults to `"fuzzy"`.
+When `enableGlobalFilterModes: true` (the default), the search box shows a mode menu — fuzzy, contains, and more. The initial mode comes from `initialState.globalFilterMode`, which defaults to `"fuzzy"`.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
@@ -19,7 +19,7 @@ const table = useDataTable({
   getRowId: (row) => row.id,
   enableGlobalFilter: true,
   enableGlobalFilterModes: true,
-  defaultGlobalFilterMode: "fuzzy",
+  initialState: { globalFilterMode: "fuzzy" },
 })
 return <DataTable table={table} />
 ```
@@ -67,7 +67,7 @@ const table = useDataTable({
   data,
   columns,
   getRowId: (row) => row.id,
-  defaultGlobalFilterMode: "fuzzy",
+  initialState: { globalFilterMode: "fuzzy" },
   enableGlobalFilterRankedResults: true,
 })
 ```
@@ -86,7 +86,7 @@ Move the search to the left toolbar region with `positionGlobalFilter: "left"` �
 
 ## Relevant options
 
-<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "defaultGlobalFilterMode", "enableGlobalFilterRankedResults", "globalFilterMode", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
+<ApiTable of="useDataTableOptions" only={["enableGlobalFilter", "enableGlobalFilterModes", "enableGlobalFilterRankedResults", "onGlobalFilterModeChange", "positionGlobalFilter"]} />
 
 ## Related
 
