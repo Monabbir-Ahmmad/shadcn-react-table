@@ -115,7 +115,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     th: ({ className, ...props }) => (
       <th
         className={cn(
-          "border-b bg-muted/50 px-3 py-2 text-left font-medium",
+          "border-b bg-muted/50 px-3 py-2 text-start font-medium",
           className
         )}
         {...props}
@@ -123,7 +123,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     td: ({ className, ...props }) => (
       <td
-        className={cn("border-b px-3 py-2 align-top last:border-0", className)}
+        className={cn(
+          // No bottom border on the last row (the wrapper draws the edge).
+          "border-b px-3 py-2 align-top [tr:last-child_&]:border-b-0",
+          className
+        )}
         {...props}
       />
     ),
