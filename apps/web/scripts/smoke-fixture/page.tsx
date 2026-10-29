@@ -87,10 +87,10 @@ export default function Page() {
     enableEditing: true,
     editDisplayMode: "modal",
     // No-op handlers: type-check the editing callback shapes consumers write.
-    onEditCellSave: ({ row, column, value }) =>
+    onEditingCellSave: ({ row, column, value }) =>
       console.log(row.id, column.id, value),
-    onSaveRow: ({ row, values }) => console.log(row.id, values),
-    onCreateRow: ({ values }) => console.log(values),
+    onEditingRowSave: ({ row, values }) => console.log(row.id, values),
+    onCreatingRowSave: ({ values }) => console.log(values),
     enableRowVirtualization: true,
     renderDetailPanel: ({ row }) => <div>{row.original.name}</div>,
     renderRowActionMenuItems: ({ row }) => (

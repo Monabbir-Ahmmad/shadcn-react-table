@@ -228,7 +228,7 @@ function LoadingExample() {
     getRowId: (row) => row.id,
     isLoading,
     initialState: { pagination: { pageSize: 10 } },
-    renderToolbarActions: () => (
+    renderTopToolbarCustomActions: () => (
       <Button
         variant="outline"
         size="sm"
@@ -419,13 +419,13 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       age: 30,
       salary: 50000,
     },
-    onEditCellSave: ({ row, column, value }) =>
+    onEditingCellSave: ({ row, column, value }) =>
       setData((prev) =>
         prev.map((r) =>
           r.id === row.id ? ({ ...r, [column.id]: value } as User) : r
         )
       ),
-    onSaveRow: ({ row, values, exit }) => {
+    onEditingRowSave: ({ row, values, exit }) => {
       setData((prev) =>
         prev.map((r) =>
           r.id === row.id ? { ...r, ...(values as Partial<User>) } : r
@@ -433,7 +433,7 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       )
       exit()
     },
-    onCreateRow: ({ values, exit }) => {
+    onCreatingRowSave: ({ values, exit }) => {
       setData((prev) => [
         {
           ...makeUsers(1)[0]!,
@@ -444,7 +444,7 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       ])
       exit()
     },
-    renderToolbarActions: ({ table }) => (
+    renderTopToolbarCustomActions: ({ table }) => (
       <Button
         variant="outline"
         size="sm"
@@ -575,7 +575,7 @@ function EventListenersExample() {
     getRowId: (row) => row.id,
     initialState: { pagination: { pageSize: 10 } },
     onRowClick: ({ row }) => setLast(row.original.email),
-    renderToolbarActions: () => (
+    renderTopToolbarCustomActions: () => (
       <span className="text-xs text-muted-foreground">
         {last ? `Last clicked: ${last}` : "Click any row"}
       </span>
@@ -638,7 +638,7 @@ function ExportExample() {
     columns,
     getRowId: (row) => row.id,
     enableRowSelection: true,
-    renderToolbarActions: ({ table }) => (
+    renderTopToolbarCustomActions: ({ table }) => (
       <Button
         variant="outline"
         size="sm"
@@ -776,7 +776,7 @@ function InfiniteScrollExample() {
     hasNextPage,
     isFetchingNextPage,
     onLoadMore: loadMore,
-    renderToolbarActions: () => (
+    renderTopToolbarCustomActions: () => (
       <span className="text-xs text-muted-foreground tabular-nums">
         Loaded {rows.length} of {all.length}
       </span>
@@ -831,7 +831,7 @@ function AdvancedExample() {
     editDisplayMode: "row",
     defaultShowColumnFilters: true,
     initialState: { pagination: { pageSize: 10 } },
-    onSaveRow: ({ row, values, exit }) => {
+    onEditingRowSave: ({ row, values, exit }) => {
       setData((prev) =>
         prev.map((r) =>
           r.id === row.id ? { ...r, ...(values as Partial<User>) } : r

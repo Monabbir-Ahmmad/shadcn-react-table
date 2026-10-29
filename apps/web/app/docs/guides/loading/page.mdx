@@ -8,7 +8,7 @@ Pass `isLoading: true` to render skeleton rows and a progress bar in place of th
 
 ## Usage
 
-Drive `isLoading` from your own state and toggle it however you like — here with `useState` and a button in `renderToolbarActions`:
+Drive `isLoading` from your own state and toggle it however you like — here with `useState` and a button in `renderTopToolbarCustomActions`:
 
 ```tsx
 const [isLoading, setIsLoading] = useState(false)
@@ -18,7 +18,7 @@ const table = useDataTable({
   columns,
   getRowId: (row) => row.id,
   isLoading,
-  renderToolbarActions: () => (
+  renderTopToolbarCustomActions: () => (
     <Button
       variant="outline"
       size="sm"

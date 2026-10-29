@@ -6,7 +6,7 @@ Set `enableEditing: true` to make rows editable, then choose how editing is pres
 
 ## Cell editing
 
-`editDisplayMode: "cell"` is the default. Click a cell to edit it inline and commit the new value with `onEditCellSave`.
+`editDisplayMode: "cell"` is the default. Click a cell to edit it inline and commit the new value with `onEditingCellSave`.
 
 <Example slug="editing-cell" />
 
@@ -17,7 +17,7 @@ const table = useDataTable({
   getRowId: (row) => row.id,
   enableEditing: true,
   editDisplayMode: "cell",
-  onEditCellSave: ({ row, column, value }) => {
+  onEditingCellSave: ({ row, column, value }) => {
     setData((prev) =>
       prev.map((r) => (r.id === row.id ? { ...r, [column.id]: value } : r))
     )
@@ -29,7 +29,7 @@ return <DataTable table={table} />
 
 ## Row editing
 
-`editDisplayMode: "row"` edits a whole row at once with save/cancel controls. Persist the row with `onSaveRow`, then call `exit()` to leave edit mode.
+`editDisplayMode: "row"` edits a whole row at once with save/cancel controls. Persist the row with `onEditingRowSave`, then call `exit()` to leave edit mode.
 
 <Example slug="editing-row" />
 
@@ -40,7 +40,7 @@ const table = useDataTable({
   getRowId: (row) => row.id,
   enableEditing: true,
   editDisplayMode: "row",
-  onSaveRow: ({ row, values, exit }) => {
+  onEditingRowSave: ({ row, values, exit }) => {
     setData((prev) =>
       prev.map((r) => (r.id === row.id ? { ...r, ...values } : r))
     )
@@ -64,7 +64,7 @@ const table = useDataTable({
   getRowId: (row) => row.id,
   enableEditing: true,
   editDisplayMode: "table",
-  onEditCellSave: ({ row, column, value }) => {
+  onEditingCellSave: ({ row, column, value }) => {
     setData((prev) =>
       prev.map((r) => (r.id === row.id ? { ...r, [column.id]: value } : r))
     )
@@ -74,7 +74,7 @@ const table = useDataTable({
 
 ## Modal editing & creating
 
-`editDisplayMode: "modal"` edits (and creates) rows in a dialog. Use `onSaveRow` for edits and `onCreateRow` for new rows; both receive `exit()` to close the dialog. Seed the create form with `createRowDefaults`, and open it from the toolbar via `table.tableInstance.beginCreate()`.
+`editDisplayMode: "modal"` edits (and creates) rows in a dialog. Use `onEditingRowSave` for edits and `onCreatingRowSave` for new rows; both receive `exit()` to close the dialog. Seed the create form with `createRowDefaults`, and open it from the toolbar via `table.tableInstance.beginCreate()`.
 
 <Example slug="editing-modal" />
 
@@ -86,17 +86,17 @@ const table = useDataTable({
   enableEditing: true,
   editDisplayMode: "modal",
   createRowDefaults: { name: "", role: "member" },
-  onSaveRow: ({ row, values, exit }) => {
+  onEditingRowSave: ({ row, values, exit }) => {
     setData((prev) =>
       prev.map((r) => (r.id === row.id ? { ...r, ...values } : r))
     )
     exit()
   },
-  onCreateRow: ({ values, exit }) => {
+  onCreatingRowSave: ({ values, exit }) => {
     setData((prev) => [...prev, { id: crypto.randomUUID(), ...values }])
     exit()
   },
-  renderToolbarActions: ({ table }) => (
+  renderTopToolbarCustomActions: ({ table }) => (
     <Button size="sm" onClick={() => table.tableInstance.beginCreate()}>
       New row
     </Button>
@@ -142,7 +142,7 @@ const columns = [
 
 ## Custom editor
 
-When `editVariant` isn't enough, supply your own editor with `meta.renderEditCell`. It replaces the built-in field while the cell/row is editing; drive the value through the table instance (`setRowDraftValue` for row/modal editing, or `onEditCellSave` for cell editing):
+When `editVariant` isn't enough, supply your own editor with `meta.renderEditCell`. It replaces the built-in field while the cell/row is editing; drive the value through the table instance (`setRowDraftValue` for row/modal editing, or `onEditingCellSave` for cell editing):
 
 ```tsx
 {
@@ -172,9 +172,9 @@ When `editVariant` isn't enough, supply your own editor with `meta.renderEditCel
     "editDisplayMode",
     "createDisplayMode",
     "createRowDefaults",
-    "onEditCellSave",
-    "onSaveRow",
-    "onCreateRow",
+    "onEditingCellSave",
+    "onEditingRowSave",
+    "onCreatingRowSave",
   ]}
 />
 

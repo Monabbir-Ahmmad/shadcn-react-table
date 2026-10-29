@@ -50,7 +50,7 @@ const table = useDataTable({
   columns,
   enableEditing: true,
   createDisplayMode: "row",
-  onCreateRow: ({ values, exit }) => {
+  onCreatingRowSave: ({ values, exit }) => {
     // persist the new row, then:
     exit()
   },

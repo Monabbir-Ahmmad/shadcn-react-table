@@ -35,11 +35,11 @@ useDataTable({
 
 ## Custom actions
 
-Add your own buttons without replacing anything. `renderToolbarActions` fills the top toolbar's left region (next to the title); `renderBottomToolbarCustomActions` fills the bottom toolbar's left region (next to pagination):
+Add your own buttons without replacing anything. `renderTopToolbarCustomActions` fills the top toolbar's left region (next to the title); `renderBottomToolbarCustomActions` fills the bottom toolbar's left region (next to pagination):
 
 ```tsx
 useDataTable({
-  renderToolbarActions: ({ table }) => (
+  renderTopToolbarCustomActions: ({ table }) => (
     <Button size="sm" onClick={() => table.tableInstance.beginCreate()}>
       Add row
     </Button>

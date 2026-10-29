@@ -34,7 +34,7 @@ export function DataTableToolbar<TData extends RowData>({
 }) {
   const {
     title,
-    renderToolbarActions,
+    renderTopToolbarCustomActions,
     renderToolbarInternalActions,
     enableToolbarInternalActions,
     enableGlobalFilter,
@@ -70,7 +70,7 @@ export function DataTableToolbar<TData extends RowData>({
           {title != null && (
             <div className="text-sm font-semibold tracking-wide">{title}</div>
           )}
-          {renderToolbarActions?.({ table })}
+          {renderTopToolbarCustomActions?.({ table })}
         </div>
 
         {enableToolbarInternalActions && (

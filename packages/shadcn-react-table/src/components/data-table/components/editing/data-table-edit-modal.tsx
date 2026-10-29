@@ -22,7 +22,7 @@ import { DataTableEditField } from "./data-table-edit-field"
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any
  * mode). Renders an editor per editable column bound to the shared row draft;
- * Save commits via `onSaveRow` / `onCreateRow`.
+ * Save commits via `onEditingRowSave` / `onCreatingRowSave`.
  */
 export function DataTableEditModal<TData extends RowData>({
   table,
@@ -38,8 +38,8 @@ export function DataTableEditModal<TData extends RowData>({
     rowDraft,
     setRowDraftValue,
     cancelEdit,
-    onSaveRow,
-    onCreateRow,
+    onEditingRowSave,
+    onCreatingRowSave,
   } = table.tableInstance
   // The table around this dialog does not re-render for the edit draft.
   useTableState(table, (state) => [
@@ -79,9 +79,9 @@ export function DataTableEditModal<TData extends RowData>({
   const submit = () => {
     if (hasErrors) return
     if (isCreating) {
-      onCreateRow?.({ values: rowDraft, table, exit: cancelEdit })
+      onCreatingRowSave?.({ values: rowDraft, table, exit: cancelEdit })
     } else if (editingRow) {
-      onSaveRow?.({
+      onEditingRowSave?.({
         row: editingRow,
         values: rowDraft,
         table,

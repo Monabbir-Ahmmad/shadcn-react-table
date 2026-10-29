@@ -27,7 +27,7 @@ through. Our presentation/feature options and UI state live on `table.tableInsta
 | Grouping               | `enableGrouping` (drop-zone + menu + aggregation rows)                                                                          |
 | Expansion              | `renderDetailPanel`, `getSubRows` (tree); `enableExpanding` auto-derives                                                        |
 | Footer row             | per-column `footer` (rendered whenever defined; sticky by default)                                                              |
-| Editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditCellSave`/`onSaveRow`/`onCreateRow`                   |
+| Editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditingCellSave`/`onEditingRowSave`/`onCreatingRowSave`                   |
 | Actions / copy         | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy`                                                            |
 | Virtualization         | `enableRowVirtualization` and `enableColumnVirtualization` (give the surface a bounded height)                                  |
 | Event listeners        | `onRowClick` / `onRowDoubleClick` / `onCellClick` / `onCellDoubleClick`                                                         |

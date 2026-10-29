@@ -15,14 +15,14 @@ import type { DataTableColumn } from "../../core/table-types"
 /**
  * Inline create row for `createDisplayMode: "row"`. Renders an editor per
  * editable column bound to the shared `rowDraft`, with Save/Cancel in a
- * full-width action strip beneath it. Save commits via `onCreateRow`.
+ * full-width action strip beneath it. Save commits via `onCreatingRowSave`.
  */
 export function DataTableCreateRow<TData extends RowData>({
   table,
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { enableEditing, rowDraft, onCreateRow, cancelEdit, localization } =
+  const { enableEditing, rowDraft, onCreatingRowSave, cancelEdit, localization } =
     table.tableInstance
   // The body does not re-render for the edit draft.
   useTableState(table, (state) => state.rowDraft)
@@ -37,7 +37,7 @@ export function DataTableCreateRow<TData extends RowData>({
 
   const submit = () => {
     if (hasErrors) return
-    onCreateRow?.({ values: rowDraft, table, exit: cancelEdit })
+    onCreatingRowSave?.({ values: rowDraft, table, exit: cancelEdit })
   }
 
   return (

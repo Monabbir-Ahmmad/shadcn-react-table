@@ -60,7 +60,7 @@ function RowActionsCell<TData extends RowData>({
     editDisplayMode,
     editingRowId,
     rowDraft,
-    onSaveRow,
+    onEditingRowSave,
     beginRowEdit,
     cancelEdit,
     renderRowActions,
@@ -82,7 +82,7 @@ function RowActionsCell<TData extends RowData>({
           aria-label={localization.save}
           className="size-7"
           onClick={() =>
-            onSaveRow?.({ row, values: rowDraft, table, exit: cancelEdit })
+            onEditingRowSave?.({ row, values: rowDraft, table, exit: cancelEdit })
           }
         >
           <icons.save />

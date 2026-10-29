@@ -50,7 +50,7 @@ It takes a few presentational props — see [DataTable props](/docs/api/data-tab
 Sub-components read configuration and UI state from `table.tableInstance` rather than via props. You can use it too — for toolbar actions, custom layouts, or programmatic control:
 
 ```tsx
-renderToolbarActions: ({ table }) => (
+renderTopToolbarCustomActions: ({ table }) => (
   <Button onClick={() => table.tableInstance.beginCreate()}>New row</Button>
 )
 ```

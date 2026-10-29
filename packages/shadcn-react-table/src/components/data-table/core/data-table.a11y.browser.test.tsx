@@ -35,7 +35,7 @@ function Table({
     data,
     getRowId: (row) => row.id,
     enablePagination: false,
-    onEditCellSave: ({ row, column, value }) =>
+    onEditingCellSave: ({ row, column, value }) =>
       setData((prev) =>
         prev.map((r) =>
           r.id === row.id ? { ...r, [column.id]: String(value) } : r

@@ -154,7 +154,7 @@ function LocalDraftEditor<TData extends RowData>({
   const commit = (next: unknown = draft) => {
     if (meta?.validate?.(next)) return
     if (next !== cell.getValue()) {
-      cn.onEditCellSave?.({ row, column, value: next, table })
+      cn.onEditingCellSave?.({ row, column, value: next, table })
     }
     if (exitOnCommit) cn.setEditingCell(null)
   }

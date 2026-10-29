@@ -82,31 +82,31 @@ async function pickOption(name: string) {
 
 describe("select cell editor", () => {
   it("saves the picked value in cell mode and exits editing", async () => {
-    const onEditCellSave = vi.fn()
+    const onEditingCellSave = vi.fn()
     const { table } = mount({
       enableEditing: true,
       editDisplayMode: "cell",
-      onEditCellSave,
+      onEditingCellSave,
     })
     act(() =>
       table().tableInstance.setEditingCell({ rowId: "1", columnId: "status" })
     )
     await pickOption("b")
-    expect(onEditCellSave).toHaveBeenCalledTimes(1)
-    expect(onEditCellSave.mock.calls[0]![0].value).toBe("b")
+    expect(onEditingCellSave).toHaveBeenCalledTimes(1)
+    expect(onEditingCellSave.mock.calls[0]![0].value).toBe("b")
     expect(table().tableInstance.editingCell).toBeNull()
   })
 
   it("saves the picked value, not the previous one, in table mode", async () => {
-    const onEditCellSave = vi.fn()
-    mount({ enableEditing: true, editDisplayMode: "table", onEditCellSave })
+    const onEditingCellSave = vi.fn()
+    mount({ enableEditing: true, editDisplayMode: "table", onEditingCellSave })
     await pickOption("b")
-    expect(onEditCellSave).toHaveBeenCalledTimes(1)
-    expect(onEditCellSave.mock.calls[0]![0].value).toBe("b")
+    expect(onEditingCellSave).toHaveBeenCalledTimes(1)
+    expect(onEditingCellSave.mock.calls[0]![0].value).toBe("b")
   })
 
   it("does not save when validation rejects the picked value", async () => {
-    const onEditCellSave = vi.fn()
+    const onEditingCellSave = vi.fn()
     const validating: DataTableColumnDef<Person>[] = columns.map((c) =>
       "accessorKey" in c && c.accessorKey === "status"
         ? {
@@ -123,17 +123,17 @@ describe("select cell editor", () => {
         columns={validating}
         enableEditing
         editDisplayMode="table"
-        onEditCellSave={onEditCellSave}
+        onEditingCellSave={onEditingCellSave}
       />
     )
     await pickOption("b")
-    expect(onEditCellSave).not.toHaveBeenCalled()
+    expect(onEditingCellSave).not.toHaveBeenCalled()
     expect(screen.getAllByText("no b").length).toBeGreaterThan(0)
   })
 
   it("keeps a numeric column's values numeric", async () => {
     type Task = { id: string; priority: number }
-    const onEditCellSave = vi.fn()
+    const onEditingCellSave = vi.fn()
     function Numeric() {
       const table = useDataTable<Task>({
         columns: [
@@ -153,13 +153,13 @@ describe("select cell editor", () => {
         getRowId: (row) => row.id,
         enableEditing: true,
         editDisplayMode: "table",
-        onEditCellSave,
+        onEditingCellSave,
       })
       return <DataTable table={table} />
     }
     render(<Numeric />)
     await pickOption("2")
-    expect(onEditCellSave).toHaveBeenCalledTimes(1)
-    expect(onEditCellSave.mock.calls[0]![0].value).toBe(2)
+    expect(onEditingCellSave).toHaveBeenCalledTimes(1)
+    expect(onEditingCellSave.mock.calls[0]![0].value).toBe(2)
   })
 })

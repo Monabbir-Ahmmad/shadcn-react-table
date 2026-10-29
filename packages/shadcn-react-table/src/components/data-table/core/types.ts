@@ -191,7 +191,7 @@ declare module "@tanstack/react-table" {
     editSelectOptions?: DataTableFilterOption[]
     /** Custom inline editor for this column (escape hatch). Replaces the built-in
      *  editor while the cell/row is editing; drive the value via `table.tableInstance`
-     *  (`rowDraft`/`setRowDraftValue` or `onEditCellSave`). */
+     *  (`rowDraft`/`setRowDraftValue` or `onEditingCellSave`). */
     renderEditCell?: (props: CellRenderProps<TData, TValue>) => React.ReactNode
     /** Custom render for this column's group header cell (when grouped). */
     renderGroupedCell?: (
@@ -370,19 +370,19 @@ export interface DataTableConfig<TData extends RowData> {
   /** Exit any editing/creating state, discarding the draft. */
   cancelEdit: () => void
   enableClickToCopy: boolean
-  onEditCellSave?: (props: {
+  onEditingCellSave?: (props: {
     row: DataTableRow<TData>
     column: DataTableColumn<TData, unknown>
     value: unknown
     table: DataTableInstance<TData>
   }) => void
-  onSaveRow?: (props: {
+  onEditingRowSave?: (props: {
     row: DataTableRow<TData>
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
-  onCreateRow?: (props: {
+  onCreatingRowSave?: (props: {
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
@@ -465,7 +465,7 @@ export interface DataTableConfig<TData extends RowData> {
   enableToolbarInternalActions: boolean
   enableKeyboardNavigation: boolean
   title?: React.ReactNode
-  renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbarCustomActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderBottomToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderToolbarInternalActions?: (
@@ -673,7 +673,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableClickToCopy?: boolean
   /** Called when a cell edit is committed (cell and table editing) with the
    *  new `value`. Persist it; the table does not change `data` itself. */
-  onEditCellSave?: (props: {
+  onEditingCellSave?: (props: {
     row: DataTableRow<TData>
     column: DataTableColumn<TData, unknown>
     value: unknown
@@ -681,7 +681,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   }) => void
   /** Called when a row edit is saved (row and modal editing) with the edited
    *  `values`. Call `exit()` to leave editing, e.g. after the save succeeds. */
-  onSaveRow?: (props: {
+  onEditingRowSave?: (props: {
     row: DataTableRow<TData>
     values: Record<string, unknown>
     table: DataTableInstance<TData>
@@ -689,7 +689,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   }) => void
   /** Called when the new-row editor is saved with the row's `values`. Call
    *  `exit()` to close it. */
-  onCreateRow?: (props: {
+  onCreatingRowSave?: (props: {
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
@@ -855,7 +855,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   title?: React.ReactNode
   /** Custom content rendered in the top toolbar's left region (next to the
    *  title), e.g. bulk-action buttons. */
-  renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbarCustomActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
   /** Replace the entire top toolbar with custom content. */
   renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   /** Replace the entire bottom toolbar (pagination region) with custom content. */

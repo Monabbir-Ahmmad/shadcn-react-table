@@ -66,14 +66,14 @@ function downloadCsv(csv: string, fileName: string) {
 }
 ```
 
-Wire it to the toolbar with `renderToolbarActions`:
+Wire it to the toolbar with `renderTopToolbarCustomActions`:
 
 ```tsx
 const table = useDataTable({
   data,
   columns,
   enableRowSelection: true,
-  renderToolbarActions: ({ table }) => (
+  renderTopToolbarCustomActions: ({ table }) => (
     <Button onClick={() => downloadCsv(toCsv(toRows(table)), "users")}>
       Export CSV
     </Button>

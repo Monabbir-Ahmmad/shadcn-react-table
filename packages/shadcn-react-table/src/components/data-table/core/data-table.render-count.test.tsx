@@ -180,7 +180,7 @@ describe("body re-renders", () => {
         enablePagination: false,
         enableEditing: true,
         editDisplayMode: "row",
-        renderToolbarActions: toolbar,
+        renderTopToolbarCustomActions: toolbar,
       })
       onTable(instance)
       return <DataTable table={instance} />
