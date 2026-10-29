@@ -156,21 +156,30 @@ export function DataTableBody<TData extends RowData>({
         className={cn(
           "relative",
           BODY_CELL_CLASS,
-          padding,
+          // A fixed height is the whole row's height, so the cell drops its
+          // vertical padding and the content box below fills the row.
+          isFixedHeight ? "py-0" : padding,
           ALIGN_CELL[align],
           // Fixed layout (resizing on) clips overflowing content with an
           // ellipsis instead of letting it bleed into the next column. An
           // "auto" row opts out so its content wraps and the row grows.
-          enableColumnResizing && !isAutoHeight && "overflow-hidden text-ellipsis",
-          isAutoHeight && "align-top whitespace-normal wrap-break-word",
+          enableColumnResizing &&
+            !isAutoHeight &&
+            "overflow-hidden text-ellipsis",
+          isAutoHeight && "align-top wrap-break-word whitespace-normal",
           getColumnPinningClass(cell.column),
           enableKeyboardNavigation &&
             "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:-outline-offset-2 focus-visible:outline-none"
         )}
       >
         {isFixedHeight ? (
-          // Pin the content box to the requested height and clip overflow.
-          <div className="overflow-hidden" style={{ height: rowHeightValue }}>
+          // Pin the row to the requested height (the row's 1px bottom border,
+          // from shadcn's TableRow, counts towards it), centre the content as
+          // the density padding would, and clip overflow.
+          <div
+            className="flex items-center overflow-hidden"
+            style={{ height: rowHeightValue - 1 }}
+          >
             {indented}
           </div>
         ) : (
