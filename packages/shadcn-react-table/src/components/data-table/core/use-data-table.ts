@@ -641,7 +641,9 @@ export function useDataTable<TData extends RowData>(
     enableColumnActions,
     enableColumnFilters,
     enableColumnFilterModes,
-    enableFilterMatchHighlighting,
+    // With filtering switched off, filter values in state match nothing.
+    enableFilterMatchHighlighting:
+      enableFilterMatchHighlighting && tableOptions.enableFilters !== false,
     columnsWithCustomCell,
     enableColumnOrdering,
     enableColumnPinning,
