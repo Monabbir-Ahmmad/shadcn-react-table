@@ -16,11 +16,6 @@ import {
 /** The deck's picks; font and radius may be STYLE_DEFAULT. */
 export type DeckChoice = FrameChoice
 
-// The site's radius steps, with the one nearest shadcn's default (0.625rem)
-// swapped for the default itself, so "every style at shadcn's default" is one
-// click away.
-const DECK_RADII = RADII.map((r) => (r === "0.65rem" ? "0.625rem" : r))
-
 const OWN: Option = {
   value: STYLE_DEFAULT,
   label: "Style default",
@@ -113,7 +108,7 @@ export function DeckPickers({
         onChange={set("radius")}
         options={[
           OWN,
-          ...DECK_RADII.map((r) => {
+          ...RADII.map((r) => {
             const n = r.replace("rem", "")
             return {
               value: r,

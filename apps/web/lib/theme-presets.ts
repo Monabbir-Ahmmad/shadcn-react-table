@@ -175,7 +175,7 @@ export const FONTS = [
   { name: "mono", label: "Geist Mono", value: "var(--font-mono)" },
 ] as const
 
-export const RADII = ["0rem", "0.3rem", "0.45rem", "0.65rem", "1rem"]
+export const RADII = ["0rem", "0.3rem", "0.45rem", "0.625rem", "1rem"]
 
 export const ICON_LIBS: { name: IconLibrary; label: string }[] = [
   { name: "lucide", label: "Lucide" },

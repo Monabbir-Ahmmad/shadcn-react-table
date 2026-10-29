@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { ACCENTS, BASE_COLORS, FONTS, themeVars } from "./theme-presets"
+import { ACCENTS, BASE_COLORS, FONTS, RADII, themeVars } from "./theme-presets"
 
 describe("themeVars", () => {
   it("sets the accent, radius and font", () => {
@@ -56,5 +56,12 @@ describe("FONTS", () => {
         false
       )["--font-sans"]
     ).toBe("var(--font-mono)")
+  })
+})
+
+describe("RADII", () => {
+  it("includes shadcn's default radius", () => {
+    expect(RADII).toContain("0.625rem")
+    expect(RADII).not.toContain("0.65rem")
   })
 })

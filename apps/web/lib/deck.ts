@@ -66,10 +66,11 @@ export function coverflow(offset: number) {
   const sign = Math.sign(offset)
   const near = Math.min(a, 1)
   const far = Math.max(a - 1, 0)
+  // `+ 0` turns -0 into 0, so the front card's values are plain zeros.
   return {
-    x: sign * (near * SIDE_X + far * SIDE_X * 0.4),
-    z: -(near * SIDE_Z + far * SIDE_Z),
-    turn: sign * near * SIDE_TURN,
+    x: sign * (near * SIDE_X + far * SIDE_X * 0.4) + 0,
+    z: -(near * SIDE_Z + far * SIDE_Z) + 0,
+    turn: sign * near * SIDE_TURN + 0,
     opacity:
       a <= 1 ? 1 - (1 - SIDE_OPACITY) * a : SIDE_OPACITY * Math.max(0, 1 - far),
   }

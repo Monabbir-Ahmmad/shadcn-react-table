@@ -75,7 +75,9 @@ export function StyleDeck() {
     radius: STYLE_DEFAULT,
   })
   const [rotation, setRotation] = React.useState(0)
-  const [dragging, setDragging] = React.useState(false)
+  // The rotation a drag started from, or null when not dragging.
+  const [dragFrom, setDragFrom] = React.useState<number | null>(null)
+  const dragging = dragFrom !== null
   const [heights, setHeights] = React.useState<Record<string, number>>({})
   const [cardWidth, setCardWidth] = React.useState(0)
   const [near, setNear] = React.useState(false)
@@ -171,12 +173,18 @@ export function StyleDeck() {
   const stageHeight =
     CHROME + Math.max(...STYLES.map((s) => bodyHeight(s.name)))
 
+  // Exactly half a step from two cards, neither is in front; the nearer
+  // whole step decides.
+  const slotFront = STYLES.findIndex(
+    (_, i) => deckSlot(i, rotation, COUNT).front
+  )
   const front = is3d
-    ? Math.max(
-        0,
-        STYLES.findIndex((_, i) => deckSlot(i, rotation, COUNT).front)
-      )
+    ? slotFront === -1
+      ? mod(Math.round(rotation))
+      : slotFront
     : flatFront
+  // What screen readers hear: the settled front card, not every drag frame.
+  const settled = is3d && dragFrom !== null ? mod(dragFrom) : front
   const go = (delta: number) => setRotation((r) => Math.round(r) + delta)
 
   /** Turn (or, when flat, scroll) to a style by the shortest way. */
@@ -232,7 +240,7 @@ export function StyleDeck() {
     if (!d.moved && Math.abs(dx) < 5) return
     if (!d.moved) {
       d.moved = true
-      setDragging(true)
+      setDragFrom(d.start)
     }
     // Dragging about two thirds of a card turns the deck by one card.
     setRotation(d.start - dx / Math.max(cardWidth * 0.65, 160))
@@ -243,7 +251,7 @@ export function StyleDeck() {
     drag.current = null
     if (!d) return
     if (d.moved) {
-      setDragging(false)
+      setDragFrom(null)
       setRotation((r) => {
         const target = Math.round(r)
         // A short flick still moves one card.
@@ -259,18 +267,30 @@ export function StyleDeck() {
     if (Math.abs(offset) > cardWidth / 2) go(Math.sign(offset))
   }
 
+  // The browser took the pointer (say, a touch that became a page scroll):
+  // settle any drag in progress, and never treat it as a click.
+  const onPointerCancel = () => {
+    const d = drag.current
+    drag.current = null
+    if (!d?.moved) return
+    setDragFrom(null)
+    setRotation((r) => Math.round(r))
+  }
+
   const base = BASE_COLORS.find((b) => b.name === choice.base) ?? BASE_COLORS[0]
   const icons = ICON_LIBS.find((i) => i.name === choice.icons) ?? ICON_LIBS[0]
-  // The front card's effective values (its own font and radius by default).
-  const shown = frameTheme(choice, STYLES[front]?.name ?? "", dark)
-  const font = FONTS.find((f) => f.name === shown.font) ?? FONTS[0]
-  const caption = [
-    STYLES[front]?.label,
-    base?.label,
-    icons?.label,
-    font?.label,
-    shown.radius,
-  ].join(" · ")
+  /** A card's effective values (its own font and radius by default). */
+  const captionFor = (index: number) => {
+    const shown = frameTheme(choice, STYLES[index]?.name ?? "", dark)
+    const font = FONTS.find((f) => f.name === shown.font) ?? FONTS[0]
+    return [
+      STYLES[index]?.label,
+      base?.label,
+      icons?.label,
+      font?.label,
+      shown.radius,
+    ].join(" · ")
+  }
 
   return (
     <section
@@ -310,7 +330,7 @@ export function StyleDeck() {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={onPointerCancel}
         onScroll={onScroll}
         className={cn(
           "group/deck outline-none",
@@ -477,8 +497,11 @@ export function StyleDeck() {
               </Button>
             )}
           </div>
-          <p aria-live="polite" className="text-foreground">
-            {caption}
+          <p aria-hidden className="text-foreground">
+            {captionFor(front)}
+          </p>
+          <p aria-live="polite" className="sr-only">
+            {captionFor(settled)}
           </p>
         </div>
       </div>

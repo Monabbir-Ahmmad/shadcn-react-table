@@ -70,7 +70,9 @@ describe("frameTheme", () => {
 
 describe("coverflow", () => {
   it("keeps the front card flat, centred and solid", () => {
-    expect(coverflow(0)).toEqual({ x: 0, z: -0, turn: 0, opacity: 1 })
+    expect(coverflow(0)).toEqual({ x: 0, z: 0, turn: 0, opacity: 1 })
+    expect(coverflow(0).z).toBe(0)
+    expect(coverflow(0).x).toBe(0)
   })
 
   it("turns, pushes back and dims the two neighbours", () => {
