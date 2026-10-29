@@ -11,9 +11,9 @@ const GLYPH: Record<Mark, { glyph: string; label: string; className: string }> =
   }
 
 const LEGEND: { mark: Mark; text: string }[] = [
-  { mark: "yes", text: "Built in" },
-  { mark: "partial", text: "Site-wide, not in the guide" },
-  { mark: "no", text: "Not covered" },
+  { mark: "yes", text: "Yes" },
+  { mark: "partial", text: "Partly" },
+  { mark: "no", text: "No" },
 ]
 
 const COLUMNS = [

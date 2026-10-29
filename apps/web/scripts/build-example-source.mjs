@@ -6,6 +6,7 @@
 import { writeFileSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
+import prettier from "prettier"
 import { Project, SyntaxKind } from "ts-morph"
 
 const WEB = join(dirname(fileURLToPath(import.meta.url)), "..")
@@ -14,6 +15,9 @@ const REGISTRY = join(WEB, "components/examples/registry.tsx")
 // which `EXAMPLES` spreads in.
 const MORE = join(WEB, "components/examples/more.tsx")
 const OUT = join(WEB, "lib/example-source.generated.ts")
+// Slug, title and category of every example, in registry order: a server-safe
+// list for pages that only need counts and titles (not the live examples).
+const META_OUT = join(WEB, "lib/example-meta.generated.ts")
 
 const project = new Project({
   skipAddingFilesFromTsConfig: true,
@@ -64,7 +68,19 @@ const entries = [
     .getElements()
 )
 
+/** The value of a string-literal property, or null. */
+function literal(el, key) {
+  const init = el.getProperty(key)?.getInitializer?.()
+  if (
+    init?.getKind() === SyntaxKind.StringLiteral ||
+    init?.getKind() === SyntaxKind.NoSubstitutionTemplateLiteral
+  )
+    return init.getLiteralValue()
+  return null
+}
+
 const sources = {}
+const meta = []
 let missing = 0
 for (const el of entries) {
   if (el.getKind() !== SyntaxKind.ObjectLiteralExpression) continue
@@ -75,10 +91,21 @@ for (const el of entries) {
     .getInitializerOrThrow()
     .getText()
     .replace(/^["'`]|["'`]$/g, "")
-  const { name, invocation } = resolveComponent(compProp.getInitializerOrThrow())
+  const title = literal(el, "title")
+  const category = literal(el, "category")
+  if (title === null || category === null)
+    throw new Error(
+      `[example-source] "${slug}" needs a literal title and category`
+    )
+  meta.push({ slug, title, category })
+  const { name, invocation } = resolveComponent(
+    compProp.getInitializerOrThrow()
+  )
   const body = name ? functions.get(name) : null
   if (!body) {
-    console.warn(`  [example-source] no source for "${slug}" (component ${name})`)
+    console.warn(
+      `  [example-source] no source for "${slug}" (component ${name})`
+    )
     missing++
     continue
   }
@@ -96,14 +123,31 @@ const file = (
   "export const EXAMPLE_SOURCE: Record<string, string> = " +
   JSON.stringify(sources, null, 2) +
   "\n"
+)
   // Normalize CRLF that JSON.stringify escaped into the string literals when
   // the registry source was checked out with Windows line endings (git
   // autocrlf), so the artifact is identical on every machine.
-).replaceAll("\\r\\n", "\\n")
+  .replaceAll("\\r\\n", "\\n")
 
 writeFileSync(OUT, file)
+
+const metaSource =
+  banner +
+  "/** Every example's slug, title and category, in registry order. */\n" +
+  "export const EXAMPLE_META: { slug: string; title: string; category: string }[] = " +
+  JSON.stringify(meta, null, 2) +
+  "\n"
+writeFileSync(
+  META_OUT,
+  await prettier.format(metaSource, {
+    ...(await prettier.resolveConfig(META_OUT)),
+    filepath: META_OUT,
+  })
+)
 console.log(
   `example sources built → apps/web/lib/example-source.generated.ts (${
     Object.keys(sources).length
-  } examples${missing ? `, ${missing} missing` : ""})`
+  } examples${missing ? `, ${missing} missing` : ""}), example-meta.generated.ts (${
+    meta.length
+  })`
 )

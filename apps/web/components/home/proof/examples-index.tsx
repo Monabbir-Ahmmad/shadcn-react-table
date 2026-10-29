@@ -1,16 +1,14 @@
-"use client"
-
 import Link from "next/link"
 
-import { EXAMPLES } from "@/components/examples/registry"
 import { ProofSection } from "@/components/home/proof/proof-section"
+import { EXAMPLE_META } from "@/lib/example-meta.generated"
 
 type Group = { category: string; count: number; titles: string[] }
 
 /** Examples by category, in the order they first appear. */
 function groupByCategory() {
   const groups = new Map<string, Group>()
-  for (const { category, title } of EXAMPLES) {
+  for (const { category, title } of EXAMPLE_META) {
     let group = groups.get(category)
     if (!group) {
       group = { category, count: 0, titles: [] }
@@ -22,6 +20,8 @@ function groupByCategory() {
   return [...groups.values()]
 }
 
+const GROUPS = groupByCategory()
+
 /** Every example category, its count and a few titles, linking to the guides. */
 export function ExamplesIndex() {
   return (
@@ -29,11 +29,11 @@ export function ExamplesIndex() {
       id="examples"
       index="08"
       label="Examples"
-      title={`${EXAMPLES.length} examples to copy.`}
+      title={`${EXAMPLE_META.length} examples to copy.`}
       lead="Every guide runs its examples live next to their source. Copy one, or point your agent at it."
     >
       <div className="columns-2 gap-10 md:columns-3">
-        {groupByCategory().map((group) => (
+        {GROUPS.map((group) => (
           <div
             key={group.category}
             className="mb-8 break-inside-avoid border-t pt-3"

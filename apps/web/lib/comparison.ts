@@ -42,6 +42,7 @@ export const COMPARISON: {
     shadcn: "no",
   },
   { feature: "Drag rows between tables", us: "yes", mrt: "yes", shadcn: "no" },
+  // MRT "no" = absent from its docs and guides (checked 2026-10-30).
   {
     feature: "Advanced AND/OR filter builder",
     us: "yes",
