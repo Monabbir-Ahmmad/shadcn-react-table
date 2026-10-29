@@ -67,12 +67,15 @@ under your OS temp directory when you are done. A failure names the step
 
 ## Useful commands
 
-| Command          | What it does                                  |
-| ---------------- | --------------------------------------------- |
-| `pnpm dev`       | Run the web app (`next dev`)                  |
-| `pnpm build`     | Build all workspaces                          |
-| `pnpm lint`      | ESLint across workspaces                      |
-| `pnpm typecheck` | `tsc --noEmit` across workspaces              |
-| `pnpm format`    | Prettier `--write` across workspaces          |
+| Command                                                               | What it does                                    |
+| --------------------------------------------------------------------- | ----------------------------------------------- |
+| `pnpm dev`                                                            | Run the web app (`next dev`)                    |
+| `pnpm build`                                                          | Build all workspaces                            |
+| `pnpm lint`                                                           | ESLint across workspaces                        |
+| `pnpm typecheck`                                                      | `tsc --noEmit` across workspaces                |
+| `pnpm format`                                                         | Prettier `--write` across workspaces            |
+| `pnpm test`                                                           | Unit tests (Vitest, jsdom)                      |
+| `pnpm test:browser`                                                   | Browser tests (Vitest, headless Chromium)       |
+| `pnpm --filter shadcn-react-table-web registry:smoke -- --base radix` | Install the block into a fresh app and build it |
 
 See [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) for architecture details.

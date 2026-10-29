@@ -5,6 +5,10 @@ on:
     branches: [main]
   push:
     branches: [main]
+  # Weekly run on main: the install smoke test tracks `shadcn@latest` and
+  # floating dependency ranges, which can break without a commit here.
+  schedule:
+    - cron: "0 6 * * 1"
 
 # Cancel superseded runs on the same ref (e.g. new pushes to a PR branch).
 concurrency:
