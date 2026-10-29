@@ -277,6 +277,21 @@ describe("describeCommand", () => {
     expect(describeCommand(command, COLUMNS)).toBe(text)
   })
 
+  it("names the visual side of a pin in right-to-left mode", () => {
+    const left = { kind: "pin", column: "email", side: "left" } as const
+    const right = { kind: "pin", column: "email", side: "right" } as const
+    expect(describeCommand(left, COLUMNS, "ltr")).toBe(
+      "Pinned Email to the left"
+    )
+    expect(describeCommand(right, COLUMNS)).toBe("Pinned Email to the right")
+    expect(describeCommand(left, COLUMNS, "rtl")).toBe(
+      "Pinned Email to the start, on the right"
+    )
+    expect(describeCommand(right, COLUMNS, "rtl")).toBe(
+      "Pinned Email to the end, on the left"
+    )
+  })
+
   it("falls back to the column id for an unknown column", () => {
     expect(describeCommand({ kind: "group", column: "city" }, COLUMNS)).toBe(
       "Grouped by city"

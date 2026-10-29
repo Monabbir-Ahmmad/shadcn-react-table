@@ -47,16 +47,15 @@ export function ExamplesIndex() {
                 <li key={title}>{title}</li>
               ))}
             </ul>
-            <Link
-              href="/docs/guides"
-              aria-label={`All ${group.category} examples`}
-              className="mt-2 inline-block font-mono text-xs underline-offset-4 transition-colors hover:text-primary hover:underline"
-            >
-              All →
-            </Link>
           </div>
         ))}
       </div>
+      <Link
+        href="/docs/guides"
+        className="inline-block font-mono text-xs underline-offset-4 transition-colors hover:text-primary hover:underline"
+      >
+        Browse all guides →
+      </Link>
     </ProofSection>
   )
 }

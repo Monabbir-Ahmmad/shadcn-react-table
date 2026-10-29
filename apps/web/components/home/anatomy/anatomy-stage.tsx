@@ -16,9 +16,10 @@ import {
   type AnatomyFrame,
 } from "@/lib/anatomy"
 import { ANATOMY } from "@/lib/anatomy-content"
+import { SITE_HEADER_HEIGHT } from "@/lib/site"
 
 /** Height of the sticky site header the stage pins under. */
-const HEADER = 57
+const HEADER = SITE_HEADER_HEIGHT
 
 const NO_SCRIPT_CSS = [
   "[data-anatomy-stage]{height:auto}",
@@ -133,7 +134,7 @@ export function AnatomyStage() {
       </noscript>
       <div
         data-anatomy-sticky=""
-        className="sticky top-[57px] grid h-[calc(100vh-57px)] grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-center gap-8 px-6 lg:grid-cols-[minmax(0,9fr)_minmax(0,11fr)] lg:gap-12 lg:px-12"
+        className="sticky top-(--site-header-h) grid h-[calc(100vh-var(--site-header-h))] grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-center gap-8 px-6 lg:grid-cols-[minmax(0,9fr)_minmax(0,11fr)] lg:gap-12 lg:px-12"
       >
         {/* Everything stays in the accessibility tree, in reading order
             (hero, parts 01-05, outro); only what the scroll shows is visible.

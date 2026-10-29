@@ -69,7 +69,7 @@ export function ApiTable({
   return (
     <div className="my-6 flex flex-col gap-2">
       {showSearch && (
-        <div className="sticky top-[57px] z-10 flex items-center justify-between gap-3 bg-background/90 py-2 backdrop-blur">
+        <div className="sticky top-(--site-header-h) z-10 flex items-center justify-between gap-3 bg-background/90 py-2 backdrop-blur">
           <input
             type="search"
             value={query}

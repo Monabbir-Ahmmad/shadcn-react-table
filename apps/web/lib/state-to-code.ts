@@ -9,6 +9,9 @@ export type CodeState = {
   big: boolean
 }
 
+/** The live table's height in large-data mode (its scroll surface). */
+export const BIG_SURFACE_CLASS = "max-h-[520px]"
+
 const LOCALE_IMPORT =
   'import { dataTableLocalizationAr } from "@/components/ui/data-table/locales/ar"'
 const DIRECTION_IMPORT = 'import { Direction } from "radix-ui"'
@@ -72,7 +75,11 @@ export function stateToCode(state: CodeState): string {
     "  enableColumnPinning: true,",
   ]
   if (state.big)
-    lines.push("  enablePagination: false,", "  enableRowVirtualization: true,")
+    lines.push(
+      "  enablePagination: false,",
+      "  enableRowVirtualization: true,",
+      `  slotProps: { surface: { className: ${JSON.stringify(BIG_SURFACE_CLASS)} } },`
+    )
   if (state.locale === "ar")
     lines.push("  localization: dataTableLocalizationAr,")
   if (initial.length) {

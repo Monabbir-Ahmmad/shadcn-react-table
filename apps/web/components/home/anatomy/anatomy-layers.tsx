@@ -273,7 +273,7 @@ function ToolbarSketch() {
       <span className="flex h-[58%] w-[34%] items-center gap-[6%] border bg-background px-[2.5%]">
         <span className="aspect-square h-[42%] rounded-full border-[1.5px] border-muted-foreground/60" />
         <span className={cn(FONT, "text-muted-foreground")}>
-          Search 1M rows…
+          Search 100,000 rows…
         </span>
       </span>
       {/* Filter chip */}

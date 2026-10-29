@@ -34,7 +34,7 @@ export function SiteHeader() {
   ]
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b bg-background/70 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 md:px-6">
+    <header className="sticky top-0 z-30 flex h-(--site-header-h) items-center justify-between gap-4 border-b bg-background/70 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 md:px-6">
       <div className="flex items-center gap-3 md:gap-6">
         <div className="md:hidden">
           <DocsMobileNav />

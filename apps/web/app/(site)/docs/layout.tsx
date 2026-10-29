@@ -22,7 +22,7 @@ export default function DocsLayout({
       <SiteHeader />
 
       <div className="mx-auto flex w-full flex-1 flex-col md:flex-row">
-        <aside className="hidden shrink-0 overflow-y-auto px-4 py-6 md:sticky md:top-[57px] md:block md:h-[calc(100svh-57px)] md:w-64 md:border-e">
+        <aside className="hidden shrink-0 overflow-y-auto px-4 py-6 md:sticky md:top-(--site-header-h) md:block md:h-[calc(100svh-var(--site-header-h))] md:w-64 md:border-e">
           <DocsSidebar />
         </aside>
 
@@ -34,7 +34,7 @@ export default function DocsLayout({
           </article>
         </main>
 
-        <aside className="hidden xl:sticky xl:top-[57px] xl:block xl:h-[calc(100svh-57px)] xl:w-56 xl:shrink-0 xl:overflow-y-auto xl:border-s xl:px-4 xl:py-6">
+        <aside className="hidden xl:sticky xl:top-(--site-header-h) xl:block xl:h-[calc(100svh-var(--site-header-h))] xl:w-56 xl:shrink-0 xl:overflow-y-auto xl:border-s xl:px-4 xl:py-6">
           <DocsTableOfContents />
         </aside>
       </div>

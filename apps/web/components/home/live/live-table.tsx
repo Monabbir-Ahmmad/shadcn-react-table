@@ -25,7 +25,7 @@ import {
 import { FpsMeter } from "@/components/home/live/fps-meter"
 import { makeBigUsers } from "@/lib/big-data"
 import { users, type User } from "@/lib/example-data"
-import { stateToCode } from "@/lib/state-to-code"
+import { BIG_SURFACE_CLASS, stateToCode } from "@/lib/state-to-code"
 import {
   applyCommand,
   BIG_ROWS_LABEL,
@@ -52,7 +52,8 @@ const HEAVY = new Set<Command["kind"]>([
   "clearSelection",
 ])
 
-// Generated on first use, then kept for the page's lifetime.
+// Generated on first use and kept while shown (reloading it is instant);
+// released on "Back to 48 rows" and reset, so the ~140 MB go with it.
 let bigUsers: User[] | null = null
 
 /** Runs `fn` once the browser has painted what is on screen now. */
@@ -130,6 +131,7 @@ export function LiveTable() {
 
   const showSmall = () => {
     interrupt()
+    bigUsers = null
     setData(users)
     setBig(false)
     announce({ kind: "done", text: `Back to ${users.length} rows` })
@@ -148,7 +150,7 @@ export function LiveTable() {
           enablePagination: false,
           enableRowVirtualization: true,
           rowVirtualizerInstanceRef: rowVirtualizer,
-          slotProps: { surface: { className: "max-h-[520px]" } },
+          slotProps: { surface: { className: BIG_SURFACE_CLASS } },
         }
       : {}),
     renderTopToolbarCustomActions: () => (
@@ -307,6 +309,7 @@ export function LiveTable() {
         table.setDensity("comfortable")
         setLocale("en")
         setBig(false)
+        bigUsers = null
         setData(users)
       },
     }),
@@ -324,7 +327,11 @@ export function LiveTable() {
       return false
     }
     const { command } = parsed
-    const message = describeCommand(command, commandColumns)
+    const message = describeCommand(
+      command,
+      commandColumns,
+      locale === "ar" ? "rtl" : "ltr"
+    )
     if (command.kind === "bigData") {
       showBig()
     } else if (command.kind === "locale") {
@@ -380,7 +387,11 @@ export function LiveTable() {
           ))}
         </div>
         {big ? (
-          <FpsMeter active={big} rows={data.length} />
+          <FpsMeter
+            active={big}
+            paused={view !== "preview"}
+            rows={data.length}
+          />
         ) : (
           <p className="font-mono text-xs text-muted-foreground tabular-nums">
             {data.length} rows

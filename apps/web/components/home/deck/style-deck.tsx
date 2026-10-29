@@ -360,6 +360,7 @@ export function StyleDeck() {
           <p className="text-base text-pretty text-muted-foreground lg:pb-1.5">
             The block installs in your project&apos;s style; here it is in all
             six.
+            <noscript> The six live tables need JavaScript.</noscript>
           </p>
         </div>
         <div className="mt-10 border-t pt-6 md:mt-12">

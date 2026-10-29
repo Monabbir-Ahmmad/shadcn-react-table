@@ -81,6 +81,10 @@ describe("stateToCode", () => {
     expect(code).toContain("  localization: dataTableLocalizationAr,")
     expect(code).toContain("  enablePagination: false,")
     expect(code).toContain("  enableRowVirtualization: true,")
+    // The height the live table's virtualized surface uses, so the code is exact.
+    expect(code).toContain(
+      '  slotProps: { surface: { className: "max-h-[520px]" } },'
+    )
     // The right-to-left render from the RTL guide closes the snippet.
     expect(
       code.endsWith(

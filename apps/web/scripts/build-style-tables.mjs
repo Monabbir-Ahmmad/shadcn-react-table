@@ -1,6 +1,8 @@
 // Copies the data-table module once per shadcn style, pointing its primitive
 // imports at that style's kit, so each style page renders the real table in
 // that style. Offline and fast; runs before dev, build and typecheck.
+// Note: `pnpm dev` generates the copies only when it starts — restart it to
+// pick up edits to the package source in the style frames.
 import {
   mkdirSync,
   readdirSync,

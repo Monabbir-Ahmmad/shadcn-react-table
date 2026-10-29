@@ -1,7 +1,8 @@
 /* global document, window, getComputedStyle -- used inside page.evaluate() callbacks, which run in the browser */
 // Drives the home page in a real browser against the served static export and
 // checks the four things that only work live: the anatomy stage, the command
-// driven table (including the large dataset), and the style deck.
+// driven table (including the large dataset), and the style deck — once in
+// light and once in dark mode. Page errors and console errors fail the check.
 //   GITHUB_PAGES=true pnpm --filter shadcn-react-table-web build
 //   node apps/web/scripts/preview-server.mjs
 //   node apps/web/scripts/check-home.mjs [baseUrl]
@@ -41,25 +42,45 @@ function assert(condition, message) {
 
 const SURFACE = '[data-slot="data-table-surface"]'
 const results = []
+let scheme = "light"
 async function step(name, fn) {
   const started = Date.now()
   try {
     await fn()
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error)
-    throw new CheckError(`${name}: ${reason}`)
+    throw new CheckError(`[${scheme}] ${name}: ${reason}`)
   }
-  results.push(`ok  ${name} (${Date.now() - started} ms)`)
+  results.push(`ok  [${scheme}] ${name} (${Date.now() - started} ms)`)
 }
+
+// The static export has no per-segment RSC files, so the router's prefetches
+// of `__next.<segments>.txt` (a route group shows as `!<base64>`) 404 on every
+// page. Those, and only those, are not failures.
+const PREFETCH_404 = /\/__next\.[\w.!-]+\.txt(\?|$)/
+const isPrefetch404 = (message) =>
+  /^Failed to load resource: .*\b404\b/.test(message.text()) &&
+  PREFETCH_404.test(message.location().url)
 
 const browser = await chromium.launch()
 const failures = []
-try {
+async function checkHome(colorScheme) {
+  scheme = colorScheme
   const context = await browser.newContext({
     viewport: { width: 1280, height: 900 },
+    colorScheme,
   })
   const page = await context.newPage()
-  page.on("pageerror", (error) => failures.push(`page error: ${error.message}`))
+  page.on("pageerror", (error) =>
+    failures.push(`[${scheme}] page error: ${error.message}`)
+  )
+  page.on("console", (message) => {
+    if (message.type() !== "error" || isPrefetch404(message)) return
+    const where = message.location().url
+    failures.push(
+      `[${scheme}] console error: ${message.text()}${where ? ` (${where})` : ""}`
+    )
+  })
   const command = page.locator('input[placeholder^="Tell the table"]')
   const run = async (text) => {
     await command.fill(text)
@@ -67,18 +88,27 @@ try {
   }
 
   await page.goto(`${BASE}/`, { waitUntil: "load" })
+  // The sticky header's height, as the page sets it (--site-header-h).
+  const header = await page.evaluate(() =>
+    parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        "--site-header-h"
+      )
+    )
+  )
+  assert(header > 0, "the page sets no --site-header-h")
 
   await step("anatomy: one layer panel with a Guide link at 50%", async () => {
     await page.waitForSelector("[data-anatomy-stage]", { state: "visible" })
-    await page.evaluate(() => {
+    await page.evaluate((header) => {
       const section = document.querySelector("[data-anatomy-stage]")
       const rect = section.getBoundingClientRect()
-      const distance = rect.height - window.innerHeight + 57
+      const distance = rect.height - window.innerHeight + header
       window.scrollTo({
-        top: rect.top + window.scrollY - 57 + 0.5 * distance,
+        top: rect.top + window.scrollY - header + 0.5 * distance,
         behavior: "instant",
       })
-    })
+    }, header)
     // Panels cross-fade over 200 ms.
     await page.waitForTimeout(600)
     const shown = await page.evaluate(() =>
@@ -186,6 +216,15 @@ try {
       undefined,
       { timeout: 15_000 }
     )
+    // The front card's frame renders the real table.
+    await page
+      .frameLocator(
+        '#styles [aria-roledescription="slide"]:not([aria-hidden="true"]) iframe'
+      )
+      .first()
+      .locator("table")
+      .first()
+      .waitFor({ timeout: 15_000 })
     const stage = page.locator('#styles [aria-roledescription="carousel"]')
     const front = () =>
       page
@@ -214,6 +253,10 @@ try {
   })
 
   await context.close()
+}
+
+try {
+  for (const colorScheme of ["light", "dark"]) await checkHome(colorScheme)
 } catch (error) {
   failures.unshift(error instanceof Error ? error.message : String(error))
 } finally {

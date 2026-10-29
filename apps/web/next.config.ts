@@ -1,5 +1,16 @@
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 import createMDX from "@next/mdx"
 import type { NextConfig } from "next"
+
+// Read, not imported: the config may load as CommonJS or as native ESM
+// depending on the Node version. Next runs from apps/web.
+const tablePackage = JSON.parse(
+  readFileSync(
+    join(process.cwd(), "../../packages/shadcn-react-table/package.json"),
+    "utf8"
+  )
+) as { version: string }
 
 // Static export for GitHub Pages is opt-in via GITHUB_PAGES=true (set by the
 // deploy workflow), so local `next dev` / `next build` stay unaffected and serve
@@ -14,7 +25,11 @@ const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "mdx"],
   // Exposed to the client so the docs search can load the Pagefind runtime from
   // the correct (base-path-prefixed) static URL.
-  env: { NEXT_PUBLIC_BASE_PATH: basePath ?? "" },
+  // The block's version, for the header, without shipping its package.json.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath ?? "",
+    NEXT_PUBLIC_TABLE_VERSION: tablePackage.version,
+  },
   ...(isPages
     ? {
         output: "export",

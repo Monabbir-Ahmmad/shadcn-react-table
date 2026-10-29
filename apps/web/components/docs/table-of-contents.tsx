@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 
 import { cn } from "@workspace/ui/lib/utils"
 
+import { SITE_HEADER_HEIGHT } from "@/lib/site"
+
 type TocEntry = { id: string; text: string }
 type TocItem = TocEntry & { children: TocEntry[] }
 
@@ -67,7 +69,10 @@ function useTableOfContents(): { items: TocItem[]; activeId: string | null } {
             setActiveId((first.target as HTMLElement).id)
           }
         },
-        { rootMargin: "-57px 0% -85% 0%", threshold: 0 }
+        {
+          rootMargin: `-${SITE_HEADER_HEIGHT}px 0% -85% 0%`,
+          threshold: 0,
+        }
       )
 
       headings.forEach((h) => observer.observe(h))

@@ -268,10 +268,15 @@ const DENSITY_LABEL = {
   spacious: "Spacious",
 } as const
 
-/** The one-line confirmation the command bar shows after a command ran. */
+/**
+ * The one-line confirmation the command bar shows after a command ran. Pins
+ * apply to the start/end side, so in right-to-left mode "left" pins to the
+ * start, which shows on the right: the confirmation says so.
+ */
 export function describeCommand(
   command: Command,
-  columns: CommandColumn[]
+  columns: CommandColumn[],
+  dir: "ltr" | "rtl" = "ltr"
 ): string {
   const label = (id: string) =>
     columns.find((column) => column.id === id)?.label ?? id
@@ -285,6 +290,10 @@ export function describeCommand(
         command.desc ? "highest first" : "lowest first"
       }`
     case "pin":
+      if (dir === "rtl")
+        return command.side === "left"
+          ? `Pinned ${label(command.column)} to the start, on the right`
+          : `Pinned ${label(command.column)} to the end, on the left`
       return `Pinned ${label(command.column)} to the ${command.side}`
     case "unpin":
       return "All columns unpinned"
