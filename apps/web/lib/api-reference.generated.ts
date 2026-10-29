@@ -995,6 +995,21 @@ export const tableInstance: ApiMember[] = [
     description: "",
   },
   {
+    name: "direction",
+    type: '"ltr" | "rtl"',
+    required: true,
+    default: null,
+    description:
+      'Text direction the table renders in, read from the page (`dir="rtl"` on the table or an ancestor). Drives column resizing, arrow keys and column virtualization.',
+  },
+  {
+    name: "setDirection",
+    type: 'React.Dispatch<React.SetStateAction<"ltr" | "rtl">>',
+    required: true,
+    default: null,
+    description: "Set by `DataTable` when it measures its direction.",
+  },
+  {
     name: "showColumnFilters",
     type: "boolean",
     required: true,
@@ -2110,11 +2125,12 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
-    name: "advancedFiltersMatchLabel",
-    type: "string",
+    name: "advancedFiltersMatch",
+    type: "(logic: string) => string",
     required: true,
-    default: "Match",
-    description: "",
+    default: "(logic) => `Match ${logic} of the following rules`",
+    description:
+      'The "Match All/Any of the following rules" sentence; `logic` marks where the All/Any picker goes, so each language can order the words.',
   },
   {
     name: "advancedFiltersMatchAll",
@@ -2131,10 +2147,17 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
+    name: "advancedFiltersMatchLabel",
+    type: "string",
+    required: false,
+    default: null,
+    description: "",
+  },
+  {
     name: "advancedFiltersOf",
     type: "string",
-    required: true,
-    default: "of the following rules",
+    required: false,
+    default: null,
     description: "",
   },
   {

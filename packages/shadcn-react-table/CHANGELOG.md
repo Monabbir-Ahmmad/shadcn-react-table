@@ -87,6 +87,20 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
   group drop zone ("Group by Name") instead of its internal id.
 - **Fixed:** page buttons, page-size options and row numbers use the
   language's digits (Persian, Nepali…), like the rest of the pagination text.
+- **Added:** right-to-left layouts. The table follows `dir="rtl"` on itself or
+  an ancestor: columns, pinned columns, resizing, chevrons, arrow keys and
+  column virtualization all mirror. See the Right-to-left guide.
+- **Changed:** cell and header alignment use logical classes: `meta.align`
+  `"left"` / `"right"` mean the start / end of the cell (`text-start` /
+  `text-end`), and pinned columns use `inset-inline-start` / `-end`. Left-to-
+  right tables look the same.
+- **Added:** `direction` on the table instance (`"ltr"` or `"rtl"`, measured
+  from the page).
+- **Changed:** the advanced filter sentence is one localization key,
+  `advancedFiltersMatch: (logic) => string`, so each language can place the
+  All/Any picker where its grammar needs it. `advancedFiltersMatchLabel` and
+  `advancedFiltersOf` are deprecated and unused; a custom localization that
+  spreads `defaultLocalization` (or a locale) keeps compiling.
 
 ## 0.5.0
 
