@@ -84,6 +84,7 @@ beforeEach(() => {
   })
 })
 afterEach(() => {
+  vi.restoreAllMocks()
   for (const [key, descriptor] of Object.entries(descriptors)) {
     if (descriptor)
       Object.defineProperty(HTMLElement.prototype, key, descriptor)
@@ -141,8 +142,32 @@ describe("row virtualization work", () => {
     expect(
       Number(dataRows()[0]!.getAttribute("aria-rowindex"))
     ).toBeGreaterThan(500)
-    // Work stays with the rows on screen, not the 5,000 rows of data.
+    // The probes still see the table's work (else the bounds below pass
+    // vacuously)�
+    expect(created.rows).toBeGreaterThan(0)
+    expect(getIsExpanded).toHaveBeenCalled()
+    // �which stays with the rows on screen, not the 5,000 rows of data.
     expect(created.rows).toBeLessThan(200)
     expect(getIsExpanded.mock.calls.length).toBeLessThan(200)
+  })
+
+  it("shows and hides a row's detail panel", () => {
+    render(<Table onTable={() => {}} />)
+    const toggle = () =>
+      screen.getAllByRole("button", { name: "Toggle row expanded" })[0]!
+    expect(screen.queryByText("detail 1")).toBeNull()
+
+    fireEvent.click(toggle())
+    const detail = screen.getByText("detail 1")
+    // The panel sits right under its row.
+    expect(detail.closest("tr")!.previousElementSibling!.textContent).toContain(
+      "row-1"
+    )
+    expect(toggle().getAttribute("aria-expanded")).toBe("true")
+
+    fireEvent.click(toggle())
+    expect(screen.queryByText("detail 1")).toBeNull()
+    expect(toggle().getAttribute("aria-expanded")).toBe("false")
+    expect(screen.getByText("row-2")).toBeTruthy()
   })
 })
