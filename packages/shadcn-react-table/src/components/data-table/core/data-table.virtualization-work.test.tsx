@@ -143,10 +143,10 @@ describe("row virtualization work", () => {
       Number(dataRows()[0]!.getAttribute("aria-rowindex"))
     ).toBeGreaterThan(500)
     // The probes still see the table's work (else the bounds below pass
-    // vacuously)�
+    // vacuously)...
     expect(created.rows).toBeGreaterThan(0)
     expect(getIsExpanded).toHaveBeenCalled()
-    // �which stays with the rows on screen, not the 5,000 rows of data.
+    // ...which stays with the rows on screen, not the 5,000 rows of data.
     expect(created.rows).toBeLessThan(200)
     expect(getIsExpanded.mock.calls.length).toBeLessThan(200)
   })
