@@ -1,0 +1,95 @@
+# shadcn-react-table
+
+> A shadcn/ui data table with Material React Table parity — sorting, filtering, grouping, editing, virtualization, pinning, keyboard navigation and more — built on TanStack Table v9. It is a shadcn registry block: the source is copied into your project and uses your own shadcn components and theme.
+
+Install into a project set up with shadcn/ui and Tailwind CSS v4:
+
+```bash
+npx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+```
+
+Then `import { DataTable, useDataTable } from "@/components/ui/data-table"`: build the table with `const table = useDataTable({ data, columns, getRowId })` and render `<DataTable table={table} />`.
+
+## Getting started
+
+- [Introduction](https://monabbir-ahmmad.github.io/shadcn-react-table/docs.md): A **shadcn/ui data table** with Material React Table (MRT V3) feature parity, built on TanStack Table v9.
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation.md): The data table is distributed as a **shadcn registry** item.
+- [Quick start](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/quick-start.md): A minimal table is two pieces: **columns** (TanStack column defs, typed with `DataTableColumnDef`) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
+- [Usage](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/usage.md): The data table has one core idea: **options in, instance out.**
+- [Updating](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating.md): `shadcn add` copies this block's source into your project — after that, the code is yours, and upstream releases don't reach it automatically.
+- [Migrating from MRT](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/migrating-from-mrt.md): The data table follows Material React Table (MRT) closely: the same hook-then-component shape, most of the same options, and the same TanStack Table underneath.
+
+## Filtering & search
+
+- [Column filtering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-filtering.md): Each column can expose its own filter control in a per-column filter row.
+- [Filter modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/filter-modes.md): Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty.
+- [Global search](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/global-search.md): An expandable global search box appears in the toolbar by default (`enableGlobalFilter: true`).
+- [Advanced filter](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/advanced-filter.md): Set `enableAdvancedFilter: true` to add a toolbar button that opens a dialog where users build compound filter rules — multiple conditions joined by **All** (AND) or **Any** (OR) logic.
+
+## Columns
+
+- [Column visibility](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-visibility.md): A "Columns" toggle in the toolbar lets users show or hide columns.
+- [Column ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-ordering.md): Set `enableColumnOrdering: true` to add a drag grip to each header.
+- [Column pinning](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-pinning.md): Set `enableColumnPinning: true` to let users pin columns left or right from the column-actions menu.
+- [Column resizing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-resizing.md): Set `enableColumnResizing: true` to add a drag handle on each column's edge.
+
+## Rows
+
+- [Row selection](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-selection.md): Set `enableRowSelection: true` to add a leading checkbox column.
+- [Row ordering](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-ordering.md): Set `enableRowOrdering: true` to add a drag-handle column for drag-and-drop row reordering.
+- [Row pinning](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-pinning.md): Set `enableRowPinning: true` to add a pin toggle inside the row-number column.
+- [Row numbers](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-numbers.md): Set `enableRowNumbers: true` to add a leading row-number column to the table.
+
+## Sorting, grouping & expanding
+
+- [Sorting](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sorting.md): Sorting is on by default.
+- [Grouping & aggregation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/grouping.md): Set `enableGrouping: true` to let users group rows by a column.
+- [Detail panel](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/detail-panel.md): Provide `renderDetailPanel` to render an expandable panel beneath each row.
+- [Tree data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/tree.md): For hierarchical data, provide TanStack Table's `getSubRows` to tell the table where each row's children live.
+
+## Editing & actions
+
+- [Editing](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing.md): Set `enableEditing: true` to make rows editable, then choose how editing is presented with `editDisplayMode`.
+- [Row actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-actions.md): Provide `renderRowActions` to add a trailing actions column.
+- [Cell actions](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/cell-actions.md): Cells can have a right-click menu.
+- [Event listeners](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/event-listeners.md): The data table exposes click handlers for rows and cells so you can react to user interaction.
+
+## Display & customization
+
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density.md): Density controls the vertical padding of table rows.
+- [Sticky header & footer](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky.md): The header row (`enableStickyHeader`, default `true`) sticks to the top of the scroll surface.
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar.md): The table renders a **top toolbar** (title slot + your actions on the left, an icon-action cluster on the right) and a **bottom toolbar** (pagination).
+- [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props.md): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the `slotProps` option.
+- [Display columns](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-columns.md): Some features add columns of their own: row selection, the expand toggle, row actions, row numbers, row pinning and the row drag handle.
+- [Composition](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/composition.md): `<DataTable />` lays out the whole table for you.
+- [Display modes](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/display-modes.md): Several features expose a `*DisplayMode` option that changes _how_ the UI is presented without changing the underlying behavior.
+- [Table refs](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/refs.md): The table instance exposes DOM refs to its structural elements on `table.dataTable.refs`.
+- [Theming](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/theming.md): The data table is **style-agnostic**.
+- [Custom icons](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/custom-icons.md): Every glyph is a named slot.
+- [Localization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/localization.md): The table ships in 38 languages.
+- [Right-to-left](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/rtl.md): The table supports right-to-left languages such as Arabic, Hebrew and Persian.
+
+## Data & performance
+
+- [Loading state](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/loading.md): Pass `isLoading: true` to render skeleton rows and a progress bar in place of the data.
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side.md): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [Infinite scroll](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/infinite-scroll.md): Infinite scroll loads more rows as the user scrolls toward the bottom, instead of paging through the data.
+- [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization.md): Virtualization renders only the cells currently in view, keeping large tables fast.
+- [Row height](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-height.md): By default rows size to their content (and the virtualizer measures them).
+- [Export](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/export.md): The table ships no built-in export — the same stance as Material React Table — so the block carries no CSV or spreadsheet dependencies.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state.md): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+
+## API reference
+
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table.md): `useDataTable(options)` accepts everything TanStack's `TableOptions` accepts (controlled `state`, `on*Change`, `manual*` flags, `getRowId`, `getSubRows`, `initialState`, …; column pinning in `state`/`initialState` keeps the `left`/`right` shape) **plus** the data-table options below.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options.md): Per-column configuration lives on the standard TanStack `columnDef.meta` object, which the table augments with the fields below (fully typed wherever `meta` is read).
+- [DataTable props](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/data-table-props.md): `<DataTable />` is mostly driven by the instance from `useDataTable`.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance.md): `useDataTable` returns the standard TanStack table instance with three additions: the table's UI state in `table.getState()` (density, editing, filter modes…), methods to change it on `table` itself, and the resolved options and DOM refs on **`table.dataTable`**.
+- [Localization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/localization.md): Every user-facing string flows through a localization table.
+- [Icons](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/icons.md): Every glyph the table renders is a named slot.
+
+## Optional
+
+- [Full documentation](https://monabbir-ahmmad.github.io/shadcn-react-table/llms-full.txt): every page above in one file
+- [Agent skill](https://monabbir-ahmmad.github.io/shadcn-react-table/skills/shadcn-react-table/SKILL.md): how to use the table well, for coding agents
+- [Registry item](https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json): the files the shadcn CLI installs

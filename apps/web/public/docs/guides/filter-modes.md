@@ -1,0 +1,161 @@
+# Filter modes
+
+Filter modes let users change how a column's filter is applied — for example matching with Contains, Starts with, Equals, Between, Greater than, or Empty. With `enableColumnFilterModes: true` (the default) each filter field shows a mode menu offering the modes appropriate to that column's `meta.filterVariant`.
+
+Example (`filter-modes`):
+
+```tsx
+function FilterModesExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableColumnFilterModes: true,
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Setting the initial mode
+
+Set a column's starting mode with `meta.filterMode`.
+
+```tsx
+import { DataTable, useDataTable } from "@/components/ui/data-table"
+
+const columns = [
+  {
+    accessorKey: "title",
+    header: "Title",
+    meta: { filterVariant: "text", filterMode: "startsWith" },
+  },
+  {
+    accessorKey: "score",
+    header: "Score",
+    meta: { filterVariant: "range", filterMode: "between" },
+  },
+]
+
+const table = useDataTable({ data, columns, getRowId: (row) => row.id })
+return <DataTable table={table} />
+```
+
+## Toggling the mode menu
+
+`enableColumnFilterModes` is `true` by default. Turn it off globally to hide every mode menu, or override it per column with `meta.enableColumnFilterModes`.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableColumnFilterModes: false,
+})
+```
+
+```tsx
+const columns = [
+  // mode menu hidden for this column only
+  { accessorKey: "id", header: "ID", meta: { enableColumnFilterModes: false } },
+]
+```
+
+## Restricting the available modes
+
+Limit a column's mode menu to a specific subset (and order) with `meta.columnFilterModeOptions`. Only modes valid for the column's variant are kept (plus any [custom functions](#custom-filter-functions)); include the column's default mode.
+
+```tsx
+const columns = [
+  {
+    accessorKey: "title",
+    header: "Title",
+    meta: {
+      filterVariant: "text",
+      filterMode: "contains",
+      columnFilterModeOptions: ["contains", "startsWith", "equals"],
+    },
+  },
+]
+```
+
+To restrict every column at once, pass `columnFilterModeOptions` to `useDataTable`. Each column keeps the modes its variant supports; a column's own `meta.columnFilterModeOptions` wins.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  columnFilterModeOptions: ["contains", "equals", "between", "betweenInclusive"],
+})
+```
+
+## Custom filter functions
+
+Add your own filter functions with the `filterFns` option. Each one takes TanStack's filter function arguments — `(row, columnId, filterValue)` — and returns whether the row passes. Then use it by name:
+
+- in a mode menu, by listing it in `meta.columnFilterModeOptions` or `columnFilterModeOptions`;
+- as a column's starting mode, with `meta.filterMode`;
+- as a column's fixed filter (no mode menu), with `filterFn`;
+- in the global search, by listing it in `globalFilterModeOptions` — see [Global search](/docs/guides/global-search#custom-search-modes).
+
+```tsx
+const table = useDataTable({
+  data,
+  columns: [
+    {
+      accessorKey: "name",
+      header: "Name",
+      meta: {
+        columnFilterModeOptions: ["contains", "startsWith", "wordStartsWith"],
+      },
+    },
+  ],
+  filterFns: {
+    wordStartsWith: (row, columnId, value) =>
+      String(row.getValue(columnId))
+        .toLowerCase()
+        .split(/\s+/)
+        .some((word) => word.startsWith(String(value).toLowerCase())),
+  },
+  localization: { filterModes: { wordStartsWith: "Any word starts with" } },
+})
+```
+
+The menu labels a custom function with `localization.filterModes[name]`, or the name itself when there is no label. The names are read when the table is created, so define the functions outside your component (or memoize them).
+
+## Custom mode menu
+
+Replace the built-in radio items with your own using `renderColumnFilterModeMenuItems`. You get the allowed `modes`, the `currentMode`, and an `onSelect(mode)` to switch.
+
+```tsx
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  renderColumnFilterModeMenuItems: ({ modes, currentMode, onSelect }) =>
+    modes.map((mode) => (
+      <DropdownMenuItem
+        key={mode}
+        disabled={mode === currentMode}
+        onClick={() => onSelect(mode)}
+      >
+        {mode}
+      </DropdownMenuItem>
+    )),
+})
+```
+
+The global-search mode menu has the same hook: `renderGlobalFilterModeMenuItems` — see [Global search](/docs/guides/global-search).
+
+## Localizing mode labels
+
+Mode menu labels are localizable via `localization.filterModes`. Labels you pass are merged with the built-in ones, so you only need to list the modes you change or add.
+
+## Related
+
+- [Column filtering](/docs/guides/column-filtering)
+- [Localization](/docs/api/localization)

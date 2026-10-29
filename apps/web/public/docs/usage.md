@@ -1,0 +1,101 @@
+# Usage
+
+The data table has one core idea: **options in, instance out.**
+
+```tsx
+const table = useDataTable(options) // enriched TanStack instance
+return <DataTable table={table} /> // renders it
+```
+
+## The hook
+
+`useDataTable(options)` wraps TanStack's `useTable`. It:
+
+- supplies default row models (core, sorted, filtered, faceted, grouped, expanded, paginated) — TanStack v9 no longer accepts row-model options, so the table wires them itself;
+- injects display columns when needed (selection, row numbers, drag handle, expand, row actions);
+- merges localization and icons (built-in defaults → [`DataTableConfigProvider`](/docs/guides/custom-icons) → per-call options);
+- adds to the instance: UI state in **`table.getState()`**, methods such as **`table.setDensity`**, and the resolved options on **`table.dataTable`**.
+
+Because it extends TanStack's `TableOptions`, **anything TanStack accepts passes through**: controlled `state`, `on*Change` handlers, `manual*` server-side flags, `getRowId`, `getSubRows`, `initialState`, and so on.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  // data-table options
+  enableGrouping: true,
+  // standard TanStack options, passed straight through
+  state: { sorting },
+  onSortingChange: setSorting,
+  manualPagination: true,
+  rowCount: total,
+})
+```
+
+## The component
+
+`<DataTable table={table} />` reads `table.dataTable` and renders the full layout: top toolbar → alert banner → drop-to-group zone → bordered scroll surface (sticky header, optional filter row, body, optional sticky footer) → pagination.
+
+Any extra `div` props land on its root — see [DataTable props](/docs/api/data-table-props). To style or add props to an inner part, such as bounding the scroll surface for sticky headers or virtualization, use [`slotProps`](/docs/guides/slot-props):
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  slotProps: { surface: { className: "max-h-[600px]" } },
+})
+```
+
+## The instance
+
+The table's parts read their configuration from the instance rather than via props. You can use it too — for toolbar actions, custom layouts, or programmatic control:
+
+```tsx
+renderTopToolbarCustomActions: ({ table }) => (
+  <Button onClick={() => table.beginCreate()}>New row</Button>
+)
+```
+
+The UI state (density, full screen, filter visibility, editing…) is in `table.getState()`, its methods are on `table` (`setDensity`, `beginRowEdit`, `cancelEdit`, …), and every resolved option and DOM ref is on `table.dataTable`. See the full [Table instance](/docs/api/table-instance) reference.
+
+## Columns
+
+Columns are TanStack column defs, typed with `DataTableColumnDef`. The table reads extra per-column configuration from **`columnDef.meta`** — filter variant, alignment, edit variant, aggregation labels, click-to-copy, and more. See [Column options](/docs/api/column-options).
+
+```tsx
+const columns: DataTableColumnDef<Person>[] = [
+  {
+    accessorKey: "status",
+    header: "Status",
+    meta: {
+      filterVariant: "multi-select",
+      filterSelectOptions: STATUS_OPTIONS,
+    },
+  },
+  {
+    accessorKey: "salary",
+    header: "Salary",
+    aggregationFn: "sum",
+    meta: {
+      align: "right",
+      filterVariant: "range-slider",
+      editVariant: "number",
+    },
+  },
+]
+```
+
+## App-wide defaults
+
+Wrap a subtree in `DataTableConfigProvider` to set default `icons` and `localization` for every table inside it, without editing each call site:
+
+```tsx
+import { DataTableConfigProvider } from "@/components/ui/data-table"
+
+;<DataTableConfigProvider localization={spanish} icons={lucideIcons}>
+  <App />
+</DataTableConfigProvider>
+```
+
+Precedence is: built-in defaults → provider → per-call `useDataTable({ localization, icons })`.
