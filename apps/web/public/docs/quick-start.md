@@ -75,6 +75,28 @@ const table = useDataTable({
 >   module scope). Handing TanStack a new `columns` identity every render can
 >   reset state.
 
+Example (`minimal`):
+
+```tsx
+function MinimalExample() {
+  const data = React.useMemo(() => baseUsers.slice(0, 8), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Turn off most of the built-ins for a plain, read-only table.
+    enableTopToolbar: false,
+    enablePagination: false,
+    enableSorting: false,
+    enableColumnFilters: false,
+    enableColumnActions: false,
+    enableKeyboardNavigation: false,
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Where to go next
 
 - [Usage](/docs/usage) — the options-in / instance-out model and `table.dataTable`.

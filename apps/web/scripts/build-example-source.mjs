@@ -10,6 +10,9 @@ import { Project, SyntaxKind } from "ts-morph"
 
 const WEB = join(dirname(fileURLToPath(import.meta.url)), "..")
 const REGISTRY = join(WEB, "components/examples/registry.tsx")
+// More examples live in a second file with its own `MORE_EXAMPLES` list,
+// which `EXAMPLES` spreads in.
+const MORE = join(WEB, "components/examples/more.tsx")
 const OUT = join(WEB, "lib/example-source.generated.ts")
 
 const project = new Project({
@@ -17,12 +20,15 @@ const project = new Project({
   compilerOptions: { allowJs: false, jsx: 4 },
 })
 const sf = project.addSourceFileAtPath(REGISTRY)
+const moreSf = project.addSourceFileAtPath(MORE)
 
 // name -> verbatim source text for every top-level function declaration.
 const functions = new Map()
-for (const fn of sf.getFunctions()) {
-  const name = fn.getName()
-  if (name) functions.set(name, fn.getText().trim())
+for (const file of [sf, moreSf]) {
+  for (const fn of file.getFunctions()) {
+    const name = fn.getName()
+    if (name) functions.set(name, fn.getText().trim())
+  }
 }
 
 /**
@@ -46,15 +52,21 @@ function resolveComponent(initializer) {
   return { name: null, invocation: null }
 }
 
-// Find the EXAMPLES array and walk its object-literal entries.
-const examplesDecl = sf.getVariableDeclarationOrThrow("EXAMPLES")
-const arr = examplesDecl.getInitializerIfKindOrThrow(
-  SyntaxKind.ArrayLiteralExpression
+// Find the EXAMPLES and MORE_EXAMPLES arrays and walk their object-literal
+// entries.
+const entries = [
+  [sf, "EXAMPLES"],
+  [moreSf, "MORE_EXAMPLES"],
+].flatMap(([file, name]) =>
+  file
+    .getVariableDeclarationOrThrow(name)
+    .getInitializerIfKindOrThrow(SyntaxKind.ArrayLiteralExpression)
+    .getElements()
 )
 
 const sources = {}
 let missing = 0
-for (const el of arr.getElements()) {
+for (const el of entries) {
   if (el.getKind() !== SyntaxKind.ObjectLiteralExpression) continue
   const slugProp = el.getProperty("slug")
   const compProp = el.getProperty("Component")

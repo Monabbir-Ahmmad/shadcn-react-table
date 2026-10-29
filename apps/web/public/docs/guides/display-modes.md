@@ -53,6 +53,70 @@ const table = useDataTable({
 })
 ```
 
+Example (`popover-filters`):
+
+```tsx
+function PopoverFiltersExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Each header gets a filter button that opens its field, Excel-style.
+    columnFilterDisplayMode: "popover",
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+Example (`custom-filter-sidebar`):
+
+```tsx
+function CustomFilterSidebarExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data,
+    columns: FACETED_COLUMNS,
+    getRowId: (row) => row.id,
+    // Filter fields render where you put them.
+    columnFilterDisplayMode: "custom",
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-4 md:flex-row">
+        <aside className="flex w-full shrink-0 flex-col gap-3 md:w-56">
+          <h3 className="text-sm font-medium">Filters</h3>
+          <table.Subscribe selector={(state) => state.columnFilters}>
+            {() =>
+              table
+                .getFlatHeaders()
+                .filter((header) => header.column.getCanFilter())
+                .map((header) => (
+                  <label
+                    key={header.id}
+                    className="flex flex-col gap-1 text-xs"
+                  >
+                    <span className="text-muted-foreground">
+                      {String(header.column.columnDef.header)}
+                    </span>
+                    <DataTableColumnFilter header={header} table={table} />
+                  </label>
+                ))
+            }
+          </table.Subscribe>
+        </aside>
+        <div className="min-w-0 flex-1">
+          <DataTable table={table} />
+        </div>
+      </div>
+    </DataTableProvider>
+  )
+}
+```
+
 ## Create display mode
 
 `createDisplayMode` decouples the create form from `editDisplayMode`:

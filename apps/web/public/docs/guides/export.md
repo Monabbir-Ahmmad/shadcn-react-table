@@ -112,6 +112,48 @@ from their CDN tarball, not npm. For heavier CSV needs (custom delimiters,
 streaming), [PapaParse](https://www.papaparse.com/)'s `unparse` accepts the
 same shape.
 
+Example (`export-pdf`):
+
+```tsx
+function ExportPdfExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={async () => {
+          // Loaded on demand, so the PDF library stays out of the page bundle.
+          const { jsPDF } = await import("jspdf")
+          const { autoTable } = await import("jspdf-autotable")
+          const rows = table.getPrePaginatedRowModel().rows
+          const doc = new jsPDF()
+          autoTable(doc, {
+            head: [["Name", "Email", "Role", "Department", "Salary"]],
+            body: rows.map(({ original: u }) => [
+              `${u.firstName} ${u.lastName}`,
+              u.email,
+              u.role,
+              u.department,
+              currency.format(u.salary),
+            ]),
+          })
+          doc.save("people.pdf")
+        }}
+      >
+        Export PDF
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Row selection](/docs/guides/row-selection)

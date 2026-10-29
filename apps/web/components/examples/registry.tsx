@@ -47,6 +47,7 @@ import {
   type User,
 } from "@/lib/example-data"
 import { currency, userColumns } from "./columns"
+import { MORE_EXAMPLES } from "./more"
 
 function useUserColumns() {
   return React.useMemo(() => userColumns(), [])
@@ -1908,4 +1909,5 @@ export const EXAMPLES: ExampleDef[] = [
     category: "Data",
     Component: ConfigProviderShell,
   },
+  ...MORE_EXAMPLES,
 ]

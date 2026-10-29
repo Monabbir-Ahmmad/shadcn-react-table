@@ -59,6 +59,39 @@ useDataTable({
 
 Sticky pinned rows need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
 
+Example (`row-pinning-modes`):
+
+```tsx
+function RowPinningModesExample() {
+  const [mode, setMode] =
+    React.useState<RowPinningDisplayMode>("top-and-bottom")
+  const data = React.useMemo(() => makeUsers(60), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    enableRowPinning: true,
+    enableRowSelection: true,
+    rowPinningDisplayMode: mode,
+    initialState: { rowPinning: { top: ["U-1004"], bottom: ["U-1050"] } },
+    slotProps: { surface: { className: "max-h-[420px]" } },
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <Choice
+        label="rowPinningDisplayMode"
+        value={mode}
+        options={PINNING_MODES}
+        onChange={setMode}
+      />
+      <DataTable table={table} />
+    </div>
+  )
+}
+```
+
 ## Related
 
 - [useDataTable options](/docs/api/use-data-table)

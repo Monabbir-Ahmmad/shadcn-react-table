@@ -92,6 +92,71 @@ const table = useDataTable({
 >   from the data — the server supplies the rows, so you must provide facet
 >   options yourself if you use them.
 
+## With React Query
+
+Keep the table's pagination, sorting and search in React state, put them in the query key, and pass the result back as `data` and `rowCount`. `placeholderData: keepPreviousData` keeps the current page on screen while the next one loads; `showProgressBars` follows `isFetching`.
+
+Example (`react-query`):
+
+```tsx
+function ReactQueryExample() {
+  const [client] = React.useState(() => new QueryClient())
+  return (
+    <QueryClientProvider client={client}>
+      <PeopleFromServer />
+    </QueryClientProvider>
+  )
+}
+```
+
+## Columns from the data
+
+When the columns depend on the response, build them with `useMemo` from the data's fields, so they change only when the data does.
+
+Example (`dynamic-columns`):
+
+```tsx
+function DynamicColumnsExample() {
+  // Columns come from the fetched data's fields.
+  const [records, setRecords] = React.useState<Record<string, string>[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
+  React.useEffect(() => {
+    let live = true
+    void delay(500).then(() => {
+      if (!live) return
+      setRecords(
+        baseUsers.slice(0, 10).map((u) => ({
+          id: u.id,
+          city: u.city,
+          country: u.country,
+          status: u.status,
+        }))
+      )
+      setIsLoading(false)
+    })
+    return () => {
+      live = false
+    }
+  }, [])
+  const columns = React.useMemo<DataTableColumnDef<Record<string, string>>[]>(
+    () =>
+      Object.keys(records[0] ?? {}).map((key) => ({
+        accessorKey: key,
+        header: key[0]!.toUpperCase() + key.slice(1),
+      })),
+    [records]
+  )
+  const table = useDataTable({
+    data: records,
+    columns,
+    getRowId: (row) => row.id!,
+    isLoading,
+    enablePagination: false,
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Loading state](/docs/guides/loading)

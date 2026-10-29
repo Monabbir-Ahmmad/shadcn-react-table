@@ -98,6 +98,73 @@ function CompositionExample() {
 }
 ```
 
+## Fully headless
+
+Render the rows with your own markup and keep only the parts you want from the table — here the search box and pagination. The instance drives both; wrap the part that reads state in `table.Subscribe` so it re-renders.
+
+Example (`headless`):
+
+```tsx
+function HeadlessExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data: data,
+    columns: HEADLESS_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageIndex: 0, pageSize: 5 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium">My own table markup</h3>
+          <DataTableGlobalFilter table={table} />
+        </div>
+        {/* Plain markup driven by the same instance. */}
+        <table.Subscribe selector={(state) => state}>
+          {() => (
+            <table className="w-full text-sm">
+              <thead>
+                {table.getHeaderGroups().map((group) => (
+                  <tr key={group.id} className="border-b text-start">
+                    {group.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className="py-2 text-start font-medium"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="border-b last:border-0">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="py-2">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </table.Subscribe>
+        <DataTablePagination table={table} />
+      </div>
+    </DataTableProvider>
+  )
+}
+```
+
 ## The parts
 
 | Part | What it is |

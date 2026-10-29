@@ -59,6 +59,39 @@ function Trash() {
 
 A row dropped there calls `onRowDragEnd` with `over: { type: "zone", id: "trash" }`.
 
+Example (`row-dragging`):
+
+```tsx
+function RowDraggingExample() {
+  const [todo, setTodo] = React.useState<Task[]>([
+    { id: "t1", title: "Write the release notes" },
+    { id: "t2", title: "Review the migration guide" },
+    { id: "t3", title: "Record the demo" },
+  ])
+  const [done, setDone] = React.useState<Task[]>([
+    { id: "t4", title: "Ship slotProps" },
+  ])
+  const move =
+    (from: "todo" | "done") => (task: Task, to: "other" | "trash") => {
+      const [setFrom, setTo] =
+        from === "todo" ? [setTodo, setDone] : [setDone, setTodo]
+      setFrom((rows) => rows.filter((r) => r.id !== task.id))
+      if (to === "other") setTo((rows) => [...rows, task])
+    }
+  return (
+    <DataTableDndProvider>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 md:flex-row">
+          <TaskList title="To do" tasks={todo} onDragEnd={move("todo")} />
+          <TaskList title="Done" tasks={done} onDragEnd={move("done")} />
+        </div>
+        <Trash />
+      </div>
+    </DataTableDndProvider>
+  )
+}
+```
+
 ## Reordering too
 
 `enableRowDragging` only adds the drag handle; combine it with `enableRowOrdering` (and `onRowOrderChange`) to reorder inside the table as well.

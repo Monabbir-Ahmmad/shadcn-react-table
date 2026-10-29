@@ -56,6 +56,18 @@ const table = useDataTable({
   options yourself if you use them.
 </Callout>
 
+## With React Query
+
+Keep the table's pagination, sorting and search in React state, put them in the query key, and pass the result back as `data` and `rowCount`. `placeholderData: keepPreviousData` keeps the current page on screen while the next one loads; `showProgressBars` follows `isFetching`.
+
+<Example slug="react-query" />
+
+## Columns from the data
+
+When the columns depend on the response, build them with `useMemo` from the data's fields, so they change only when the data does.
+
+<Example slug="dynamic-columns" />
+
 ## Related
 
 - [Loading state](/docs/guides/loading)

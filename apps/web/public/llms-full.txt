@@ -315,6 +315,28 @@ const table = useDataTable({
 >   module scope). Handing TanStack a new `columns` identity every render can
 >   reset state.
 
+Example (`minimal`):
+
+```tsx
+function MinimalExample() {
+  const data = React.useMemo(() => baseUsers.slice(0, 8), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Turn off most of the built-ins for a plain, read-only table.
+    enableTopToolbar: false,
+    enablePagination: false,
+    enableSorting: false,
+    enableColumnFilters: false,
+    enableColumnActions: false,
+    enableKeyboardNavigation: false,
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Where to go next
 
 - [Usage](/docs/usage) — the options-in / instance-out model and `table.dataTable`.
@@ -823,6 +845,24 @@ Set `enableColumnFilter: false` on a column to remove its filter control entirel
 ## Faceted values
 
 Select / multi-select filters auto-derive their options, and range filters their min/max bounds, from the data's faceted values. This is on by default; set `enableFacetedValues: false` to skip computing the faceted row models (e.g. for very large client-side datasets) — then provide `meta.filterSelectOptions` explicitly for select-style filters.
+
+Example (`faceted-values`):
+
+```tsx
+function FacetedValuesExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data,
+    columns: FACETED_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: {
+      showColumnFilters: true,
+      pagination: { pageIndex: 0, pageSize: 10 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Relevant options
 
@@ -1375,6 +1415,25 @@ return <DataTable table={table} />
 
 The whole column moves with its header — body, filter and footer cells included — and the other columns slide aside to show where it will land. The movement comes from CSS variables on the scroll surface, so dragging doesn't re-render any rows. With "reduce motion" turned on in the operating system, the columns move without the slide animation.
 
+Example (`column-drag`):
+
+```tsx
+function ColumnDragExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Drag a header's grip: the whole column follows and the others make room.
+    enableColumnOrdering: true,
+    enableColumnPinning: true,
+    initialState: { pagination: { pageIndex: 0, pageSize: 8 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Initial order
 Provide the starting order with `initialState.columnOrder`, an array of column ids.
 
@@ -1897,6 +1956,39 @@ function Trash() {
 
 A row dropped there calls `onRowDragEnd` with `over: { type: "zone", id: "trash" }`.
 
+Example (`row-dragging`):
+
+```tsx
+function RowDraggingExample() {
+  const [todo, setTodo] = React.useState<Task[]>([
+    { id: "t1", title: "Write the release notes" },
+    { id: "t2", title: "Review the migration guide" },
+    { id: "t3", title: "Record the demo" },
+  ])
+  const [done, setDone] = React.useState<Task[]>([
+    { id: "t4", title: "Ship slotProps" },
+  ])
+  const move =
+    (from: "todo" | "done") => (task: Task, to: "other" | "trash") => {
+      const [setFrom, setTo] =
+        from === "todo" ? [setTodo, setDone] : [setDone, setTodo]
+      setFrom((rows) => rows.filter((r) => r.id !== task.id))
+      if (to === "other") setTo((rows) => [...rows, task])
+    }
+  return (
+    <DataTableDndProvider>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 md:flex-row">
+          <TaskList title="To do" tasks={todo} onDragEnd={move("todo")} />
+          <TaskList title="Done" tasks={done} onDragEnd={move("done")} />
+        </div>
+        <Trash />
+      </div>
+    </DataTableDndProvider>
+  )
+}
+```
+
 ## Reordering too
 
 `enableRowDragging` only adds the drag handle; combine it with `enableRowOrdering` (and `onRowOrderChange`) to reorder inside the table as well.
@@ -1979,6 +2071,39 @@ useDataTable({
 ```
 
 Sticky pinned rows need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
+
+Example (`row-pinning-modes`):
+
+```tsx
+function RowPinningModesExample() {
+  const [mode, setMode] =
+    React.useState<RowPinningDisplayMode>("top-and-bottom")
+  const data = React.useMemo(() => makeUsers(60), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    enableRowPinning: true,
+    enableRowSelection: true,
+    rowPinningDisplayMode: mode,
+    initialState: { rowPinning: { top: ["U-1004"], bottom: ["U-1050"] } },
+    slotProps: { surface: { className: "max-h-[420px]" } },
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <Choice
+        label="rowPinningDisplayMode"
+        value={mode}
+        options={PINNING_MODES}
+        onChange={setMode}
+      />
+      <DataTable table={table} />
+    </div>
+  )
+}
+```
 
 ## Related
 
@@ -2347,6 +2472,80 @@ function CustomAggregationExample() {
 }
 ```
 
+Example (`multi-aggregation`):
+
+```tsx
+function MultiAggregationExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () => [
+      { accessorKey: "department", header: "Department" },
+      { accessorKey: "firstName", header: "First name" },
+      {
+        accessorKey: "salary",
+        header: "Salary",
+        aggregationFn: ["sum", "mean", "max"],
+        cell: ({ getValue }) => currency.format(getValue() as number),
+        meta: { align: "right" },
+      },
+      { accessorKey: "age", header: "Age", aggregationFn: ["min", "max"] },
+    ],
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    initialState: {
+      grouping: ["department"],
+      pagination: { pageIndex: 0, pageSize: 20 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Grouped column mode
+
+TanStack's `groupedColumnMode` decides where a grouped column goes: `"reorder"` (default) moves it first, `"remove"` hides it, and `false` leaves it in place.
+
+Example (`grouped-column-mode`):
+
+```tsx
+function GroupedColumnModeExample() {
+  const [mode, setMode] = React.useState<false | "reorder" | "remove">(
+    "reorder"
+  )
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    // TanStack's own option: move grouped columns first, hide them, or leave them.
+    groupedColumnMode: mode,
+    initialState: {
+      grouping: ["department"],
+      expanded: true,
+      pagination: { pageIndex: 0, pageSize: 20 },
+    },
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <Choice
+        label="groupedColumnMode"
+        value={mode}
+        options={GROUPED_MODES}
+        onChange={setMode}
+      />
+      <DataTable table={table} />
+    </div>
+  )
+}
+```
+
 ## Custom group cells
 
 For finer control over how grouped rows render, the column `meta` exposes render hooks that receive the full table instance: `renderGroupedCell` (the group-header cell), `renderAggregatedCell` (overrides `aggregatedCell`), and `renderPlaceholderCell` (cells with no value because another column owns the group; empty by default).
@@ -2362,6 +2561,59 @@ For finer control over how grouped rows render, the column `meta` exposes render
       </span>
     ),
   },
+}
+```
+
+Example (`customized-grouping`):
+
+```tsx
+function CustomizedGroupingExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () =>
+      userColumns().map((column) =>
+        "accessorKey" in column && column.accessorKey === "department"
+          ? {
+              ...column,
+              meta: {
+                ...column.meta,
+                // A custom group header: name, count and total salary.
+                renderGroupedCell: ({ row }) => (
+                  <span className="flex items-center gap-2">
+                    <span className="font-medium">
+                      {String(row.getValue("department"))}
+                    </span>
+                    <span className="rounded-full bg-muted px-2 text-xs text-muted-foreground">
+                      {row.subRows.length}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {currency.format(
+                        row.subRows.reduce(
+                          (sum, r) => sum + (r.original as User).salary,
+                          0
+                        )
+                      )}
+                    </span>
+                  </span>
+                ),
+              },
+            }
+          : column
+      ),
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    initialState: {
+      grouping: ["department"],
+      density: "compact",
+      pagination: { pageIndex: 0, pageSize: 20 },
+    },
+  })
+  return <DataTable table={table} />
 }
 ```
 
@@ -2432,6 +2684,63 @@ return <DataTable table={table} />
 >   yourself — defining `renderDetailPanel` turns on row expansion and inserts the
 >   expander column.
 
+## Charts and lazy content
+
+The panel renders only while the row is expanded, so it can hold anything — a chart, or content that loads when the row opens.
+
+Example (`chart-detail-panel`):
+
+```tsx
+function ChartDetailPanelExample() {
+  const data = React.useMemo(() => baseUsers.slice(0, 10), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    renderDetailPanel: ({ row }) => {
+      // Deterministic monthly hours per person.
+      const seed = Number(row.original.id.replace(/\D/g, ""))
+      const hours = MONTHS.map((month, i) => ({
+        month,
+        hours: 120 + ((seed * (i + 3)) % 60),
+      }))
+      return (
+        <ChartContainer
+          config={{ hours: { label: "Hours", color: "var(--chart-1)" } }}
+          className="h-40 w-full max-w-xl"
+        >
+          <BarChart data={hours}>
+            <XAxis dataKey="month" tickLine={false} axisLine={false} />
+            <Bar dataKey="hours" fill="var(--color-hours)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      )
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
+Example (`lazy-detail-panel`):
+
+```tsx
+function LazyDetailPanelExample() {
+  const data = React.useMemo(() => baseUsers.slice(0, 10), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    // The panel mounts on expand, so it loads only then.
+    renderDetailPanel: ({ row }) => <LazyDetails user={row.original} />,
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Positioning the expander
 
 The expander column leads the data columns by default. Set `positionExpandColumn: "last"` to move it to the trailing edge.
@@ -2493,6 +2802,126 @@ return <DataTable table={table} />
 ```
 
 > **Indentation:** Use `row.depth` inside a cell renderer to indent child rows so the hierarchy reads clearly.
+
+## From a flat list
+
+APIs often return trees as a flat list with parent ids. Build `subRows` once with `useMemo` and pass `getSubRows` as usual.
+
+Example (`tree-from-flat`):
+
+```tsx
+function TreeFromFlatExample() {
+  // Build `subRows` from `parentId` once.
+  const data = React.useMemo(() => {
+    const byId = new Map<string, FlatNode>(
+      FLAT_ORG.map((node) => [node.id, { ...node }])
+    )
+    const roots: FlatNode[] = []
+    for (const node of byId.values()) {
+      const parent = node.parentId ? byId.get(node.parentId) : undefined
+      if (parent) (parent.subRows ??= []).push(node)
+      else roots.push(node)
+    }
+    return roots
+  }, [])
+  const table = useDataTable<FlatNode>({
+    data,
+    columns: [
+      { accessorKey: "name", header: "Name" },
+      { accessorKey: "title", header: "Title" },
+    ],
+    getRowId: (row) => row.id,
+    getSubRows: (row) => row.subRows,
+    enablePagination: false,
+    initialState: { expanded: true },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Loading children on expand
+
+Let rows expand before their children exist with TanStack's `getRowCanExpand`, and load the children when the row expands (control `expanded` and watch it in `onExpandedChange`).
+
+Example (`lazy-sub-rows`):
+
+```tsx
+function LazySubRowsExample() {
+  const [data, setData] = React.useState(ROOT_FOLDERS)
+  const [expanded, setExpanded] = React.useState<ExpandedState>({})
+  const loading = React.useRef(new Set<string>())
+
+  const table = useDataTable<Folder>({
+    data,
+    columns: [{ accessorKey: "name", header: "Folder" }],
+    getRowId: (row) => row.id,
+    getSubRows: (row) => row.subRows,
+    // Rows can expand before their children are loaded.
+    getRowCanExpand: (row) => row.original.hasChildren,
+    enablePagination: false,
+    state: { expanded },
+    onExpandedChange: (updater) => {
+      const next = typeof updater === "function" ? updater(expanded) : updater
+      setExpanded(next)
+      // Load the children of each newly expanded row that has none yet.
+      for (const id of Object.keys(next === true ? {} : next)) {
+        const row = table.getRow(id)
+        if (row.original.subRows || loading.current.has(id)) continue
+        loading.current.add(id)
+        void delay(500).then(() => {
+          setData((prev) =>
+            withChildren(
+              prev,
+              id,
+              [1, 2, 3].map((n) => ({
+                id: `${id}-${n}`,
+                name: `${row.original.name} ${n}`,
+                hasChildren: id.split("-").length < 2,
+              }))
+            )
+          )
+        })
+      }
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Editing tree rows
+
+Editing works at any depth: `onEditingRowSave` gets the row, and you update the matching node in your nested data.
+
+Example (`editing-tree`):
+
+```tsx
+function EditingTreeExample() {
+  const [data, setData] = React.useState(orgData)
+  const table = useDataTable<OrgNode>({
+    data,
+    columns: [
+      { accessorKey: "name", header: "Name" },
+      { accessorKey: "title", header: "Title" },
+      {
+        accessorKey: "headcount",
+        header: "Headcount",
+        meta: { editVariant: "number", align: "right" },
+      },
+    ],
+    getRowId: (row) => row.id,
+    getSubRows: (row) => row.subRows,
+    enablePagination: false,
+    enableEditing: true,
+    editDisplayMode: "row",
+    initialState: { expanded: true },
+    onEditingRowSave: ({ row, values, exit }) => {
+      setData((prev) => updateNode(prev, row.id, values as Partial<OrgNode>))
+      exit()
+    },
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Expand-all toggle
 
@@ -4036,6 +4465,73 @@ function CompositionExample() {
 }
 ```
 
+## Fully headless
+
+Render the rows with your own markup and keep only the parts you want from the table — here the search box and pagination. The instance drives both; wrap the part that reads state in `table.Subscribe` so it re-renders.
+
+Example (`headless`):
+
+```tsx
+function HeadlessExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data: data,
+    columns: HEADLESS_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageIndex: 0, pageSize: 5 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium">My own table markup</h3>
+          <DataTableGlobalFilter table={table} />
+        </div>
+        {/* Plain markup driven by the same instance. */}
+        <table.Subscribe selector={(state) => state}>
+          {() => (
+            <table className="w-full text-sm">
+              <thead>
+                {table.getHeaderGroups().map((group) => (
+                  <tr key={group.id} className="border-b text-start">
+                    {group.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className="py-2 text-start font-medium"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="border-b last:border-0">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="py-2">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </table.Subscribe>
+        <DataTablePagination table={table} />
+      </div>
+    </DataTableProvider>
+  )
+}
+```
+
 ## The parts
 
 | Part | What it is |
@@ -4122,6 +4618,70 @@ const table = useDataTable({
   columns,
   columnFilterDisplayMode: "popover",
 })
+```
+
+Example (`popover-filters`):
+
+```tsx
+function PopoverFiltersExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Each header gets a filter button that opens its field, Excel-style.
+    columnFilterDisplayMode: "popover",
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+Example (`custom-filter-sidebar`):
+
+```tsx
+function CustomFilterSidebarExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data,
+    columns: FACETED_COLUMNS,
+    getRowId: (row) => row.id,
+    // Filter fields render where you put them.
+    columnFilterDisplayMode: "custom",
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-4 md:flex-row">
+        <aside className="flex w-full shrink-0 flex-col gap-3 md:w-56">
+          <h3 className="text-sm font-medium">Filters</h3>
+          <table.Subscribe selector={(state) => state.columnFilters}>
+            {() =>
+              table
+                .getFlatHeaders()
+                .filter((header) => header.column.getCanFilter())
+                .map((header) => (
+                  <label
+                    key={header.id}
+                    className="flex flex-col gap-1 text-xs"
+                  >
+                    <span className="text-muted-foreground">
+                      {String(header.column.columnDef.header)}
+                    </span>
+                    <DataTableColumnFilter header={header} table={table} />
+                  </label>
+                ))
+            }
+          </table.Subscribe>
+        </aside>
+        <div className="min-w-0 flex-1">
+          <DataTable table={table} />
+        </div>
+      </div>
+    </DataTableProvider>
+  )
+}
 ```
 
 ## Create display mode
@@ -4712,6 +5272,57 @@ useDataTable({
 })
 ```
 
+Example (`skeletons`):
+
+```tsx
+function SkeletonsExample() {
+  const all = React.useMemo(() => baseUsers, [])
+  const [data, setData] = React.useState<User[]>(all)
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [refetching, setRefetching] = React.useState(false)
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    isLoading: isLoading || refetching,
+    // While refetching, cover the rows already shown.
+    showSkeletons: refetching || undefined,
+    initialState: { pagination: { pageIndex: 0, pageSize: 8 } },
+    renderTopToolbarCustomActions: () => (
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setData([])
+            setIsLoading(true)
+            void delay(1500).then(() => {
+              setData(all)
+              setIsLoading(false)
+            })
+          }}
+        >
+          First load
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setRefetching(true)
+            void delay(1500).then(() => setRefetching(false))
+          }}
+        >
+          Refetch
+        </Button>
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Relevant options
 
 | Name | Type | Default | Description |
@@ -4823,6 +5434,71 @@ const table = useDataTable({
 > **Facets are not auto-computed:** In manual filtering, faceted option lists and min/max values are not computed
 >   from the data — the server supplies the rows, so you must provide facet
 >   options yourself if you use them.
+
+## With React Query
+
+Keep the table's pagination, sorting and search in React state, put them in the query key, and pass the result back as `data` and `rowCount`. `placeholderData: keepPreviousData` keeps the current page on screen while the next one loads; `showProgressBars` follows `isFetching`.
+
+Example (`react-query`):
+
+```tsx
+function ReactQueryExample() {
+  const [client] = React.useState(() => new QueryClient())
+  return (
+    <QueryClientProvider client={client}>
+      <PeopleFromServer />
+    </QueryClientProvider>
+  )
+}
+```
+
+## Columns from the data
+
+When the columns depend on the response, build them with `useMemo` from the data's fields, so they change only when the data does.
+
+Example (`dynamic-columns`):
+
+```tsx
+function DynamicColumnsExample() {
+  // Columns come from the fetched data's fields.
+  const [records, setRecords] = React.useState<Record<string, string>[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
+  React.useEffect(() => {
+    let live = true
+    void delay(500).then(() => {
+      if (!live) return
+      setRecords(
+        baseUsers.slice(0, 10).map((u) => ({
+          id: u.id,
+          city: u.city,
+          country: u.country,
+          status: u.status,
+        }))
+      )
+      setIsLoading(false)
+    })
+    return () => {
+      live = false
+    }
+  }, [])
+  const columns = React.useMemo<DataTableColumnDef<Record<string, string>>[]>(
+    () =>
+      Object.keys(records[0] ?? {}).map((key) => ({
+        accessorKey: key,
+        header: key[0]!.toUpperCase() + key.slice(1),
+      })),
+    [records]
+  )
+  const table = useDataTable({
+    data: records,
+    columns,
+    getRowId: (row) => row.id!,
+    isLoading,
+    enablePagination: false,
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Related
 
@@ -5355,6 +6031,48 @@ For `.xlsx`, feed the same array-of-arrays to
 from their CDN tarball, not npm. For heavier CSV needs (custom delimiters,
 streaming), [PapaParse](https://www.papaparse.com/)'s `unparse` accepts the
 same shape.
+
+Example (`export-pdf`):
+
+```tsx
+function ExportPdfExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={async () => {
+          // Loaded on demand, so the PDF library stays out of the page bundle.
+          const { jsPDF } = await import("jspdf")
+          const { autoTable } = await import("jspdf-autotable")
+          const rows = table.getPrePaginatedRowModel().rows
+          const doc = new jsPDF()
+          autoTable(doc, {
+            head: [["Name", "Email", "Role", "Department", "Salary"]],
+            body: rows.map(({ original: u }) => [
+              `${u.firstName} ${u.lastName}`,
+              u.email,
+              u.role,
+              u.department,
+              currency.format(u.salary),
+            ]),
+          })
+          doc.save("people.pdf")
+        }}
+      >
+        Export PDF
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
 
 ## Related
 

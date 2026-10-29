@@ -121,6 +121,57 @@ useDataTable({
 })
 ```
 
+Example (`skeletons`):
+
+```tsx
+function SkeletonsExample() {
+  const all = React.useMemo(() => baseUsers, [])
+  const [data, setData] = React.useState<User[]>(all)
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [refetching, setRefetching] = React.useState(false)
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    isLoading: isLoading || refetching,
+    // While refetching, cover the rows already shown.
+    showSkeletons: refetching || undefined,
+    initialState: { pagination: { pageIndex: 0, pageSize: 8 } },
+    renderTopToolbarCustomActions: () => (
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setData([])
+            setIsLoading(true)
+            void delay(1500).then(() => {
+              setData(all)
+              setIsLoading(false)
+            })
+          }}
+        >
+          First load
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setRefetching(true)
+            void delay(1500).then(() => setRefetching(false))
+          }}
+        >
+          Refetch
+        </Button>
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Relevant options
 
 | Name | Type | Default | Description |

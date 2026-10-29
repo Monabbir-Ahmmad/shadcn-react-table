@@ -144,6 +144,80 @@ function CustomAggregationExample() {
 }
 ```
 
+Example (`multi-aggregation`):
+
+```tsx
+function MultiAggregationExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () => [
+      { accessorKey: "department", header: "Department" },
+      { accessorKey: "firstName", header: "First name" },
+      {
+        accessorKey: "salary",
+        header: "Salary",
+        aggregationFn: ["sum", "mean", "max"],
+        cell: ({ getValue }) => currency.format(getValue() as number),
+        meta: { align: "right" },
+      },
+      { accessorKey: "age", header: "Age", aggregationFn: ["min", "max"] },
+    ],
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    initialState: {
+      grouping: ["department"],
+      pagination: { pageIndex: 0, pageSize: 20 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Grouped column mode
+
+TanStack's `groupedColumnMode` decides where a grouped column goes: `"reorder"` (default) moves it first, `"remove"` hides it, and `false` leaves it in place.
+
+Example (`grouped-column-mode`):
+
+```tsx
+function GroupedColumnModeExample() {
+  const [mode, setMode] = React.useState<false | "reorder" | "remove">(
+    "reorder"
+  )
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    // TanStack's own option: move grouped columns first, hide them, or leave them.
+    groupedColumnMode: mode,
+    initialState: {
+      grouping: ["department"],
+      expanded: true,
+      pagination: { pageIndex: 0, pageSize: 20 },
+    },
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <Choice
+        label="groupedColumnMode"
+        value={mode}
+        options={GROUPED_MODES}
+        onChange={setMode}
+      />
+      <DataTable table={table} />
+    </div>
+  )
+}
+```
+
 ## Custom group cells
 
 For finer control over how grouped rows render, the column `meta` exposes render hooks that receive the full table instance: `renderGroupedCell` (the group-header cell), `renderAggregatedCell` (overrides `aggregatedCell`), and `renderPlaceholderCell` (cells with no value because another column owns the group; empty by default).
@@ -159,6 +233,59 @@ For finer control over how grouped rows render, the column `meta` exposes render
       </span>
     ),
   },
+}
+```
+
+Example (`customized-grouping`):
+
+```tsx
+function CustomizedGroupingExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () =>
+      userColumns().map((column) =>
+        "accessorKey" in column && column.accessorKey === "department"
+          ? {
+              ...column,
+              meta: {
+                ...column.meta,
+                // A custom group header: name, count and total salary.
+                renderGroupedCell: ({ row }) => (
+                  <span className="flex items-center gap-2">
+                    <span className="font-medium">
+                      {String(row.getValue("department"))}
+                    </span>
+                    <span className="rounded-full bg-muted px-2 text-xs text-muted-foreground">
+                      {row.subRows.length}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {currency.format(
+                        row.subRows.reduce(
+                          (sum, r) => sum + (r.original as User).salary,
+                          0
+                        )
+                      )}
+                    </span>
+                  </span>
+                ),
+              },
+            }
+          : column
+      ),
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    initialState: {
+      grouping: ["department"],
+      density: "compact",
+      pagination: { pageIndex: 0, pageSize: 20 },
+    },
+  })
+  return <DataTable table={table} />
 }
 ```
 

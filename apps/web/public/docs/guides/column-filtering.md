@@ -101,6 +101,24 @@ Set `enableColumnFilter: false` on a column to remove its filter control entirel
 
 Select / multi-select filters auto-derive their options, and range filters their min/max bounds, from the data's faceted values. This is on by default; set `enableFacetedValues: false` to skip computing the faceted row models (e.g. for very large client-side datasets) — then provide `meta.filterSelectOptions` explicitly for select-style filters.
 
+Example (`faceted-values`):
+
+```tsx
+function FacetedValuesExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data,
+    columns: FACETED_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: {
+      showColumnFilters: true,
+      pagination: { pageIndex: 0, pageSize: 10 },
+    },
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Relevant options
 
 `useDataTable` options that affect column filtering:
