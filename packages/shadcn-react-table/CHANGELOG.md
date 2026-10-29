@@ -11,6 +11,8 @@ The first stable release. The API below is what 1.x keeps; see the
 [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating)
 for every rename.
 
+### Breaking changes
+
 - **Changed (breaking):** the table's methods are on `table`
   (`table.setDensity`, `table.beginRowEdit`, `table.autoSizeColumn`…), its UI
   state is in `table.getState()`, and its resolved options and refs are on
@@ -30,17 +32,65 @@ for every rename.
   `enableColumnActions: false`.
 - **Changed (breaking):** `pageSizeOptions` is a `useDataTable` option, no
   longer a `<DataTable>` prop.
+- **Changed (breaking):** `renderColumnActionsMenuItems`,
+  `renderRowActionMenuItems` and `renderCellActionMenuItems` receive
+  `internalMenuItems` and `closeMenu`, and their return value is the whole
+  menu: include `internalMenuItems` to keep the built-in items. The column
+  menu no longer appends your items after a separator, and with a row menu the
+  row's Edit action moves into it.
+- **Changed (breaking):** `<DataTable surfaceClassName>` is replaced by
+  `slotProps: { surface: { className } }`.
+- **Removed:** the deprecated localization keys `advancedFiltersMatchLabel`
+  and `advancedFiltersOf`.
+- **Breaking — TanStack Table v9:** the engine now runs on
+  `@tanstack/react-table` v9 (native `useTable` with every built-in feature,
+  row model, and sort/filter/aggregation function registered, so behaviour
+  matches 0.4.x). Re-add the block to pick up the new dependencies. See the
+  [upgrade guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
+- **Removed options:** `getCoreRowModel` and the other `get*RowModel` options;
+  the table wires every row model itself.
+- **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
+  `column.getIsPinned()` returns `"start" | "end"`, and
+  `getPrePaginationRowModel()` is now `getPrePaginatedRowModel()` and
+  `getPaginationRowModel()` is now `getPaginatedRowModel()`. `getLeft*` /
+  `getRight*` are `getStart*` / `getEnd*` (leaf columns, visible cells, header
+  groups, total size), and `column.getStart("left")` / `column.getAfter("right")`
+  take `"start"` / `"end"`. Custom aggregation functions use
+  `constructAggregationFn({ aggregate })`.
+- **Renamed options reach you too:** the column option `sortingFn` is now
+  `sortFn`, and `state.columnSizingInfo`, `initialState.columnSizingInfo` and
+  `onColumnSizingInfoChange` are now `columnResizing` and
+  `onColumnResizingChange`.
+- **Renamed:** the `sortingFns` option is now `sortFns` (TanStack v9's name);
+  `filterFns` and `aggregationFns` keep their names. Functions can also go
+  inline on the column (`filterFn`, `sortFn`, `aggregationFn`); type inline
+  filter functions with the exported `DataTableFilterFn<TData>`.
+- **Row type must satisfy `RowData`:** TanStack v9 requires
+  `Record<string, any> | Array<any>`, so `unknown` is no longer accepted.
+  `DataTableInstance<unknown>` and `useDataTable<unknown>` need a concrete row
+  type; `DataTableInstance` with no type argument now defaults to `RowData`.
+- **`table.options`** is now the options object the table was created with on
+  each render (TanStack v9's React adapter behaviour), not TanStack's
+  internally merged options with feature defaults.
+- **Type registration:** the block's types register a small TanStack feature
+  (`dataTableInstanceFeature`) through TanStack's `Plugins` /
+  `Table_FeatureMap` interfaces, scoped to tables built with the block's
+  feature set. Other TanStack tables in your app are unaffected, except ones
+  typed `Table<any, …>`.
+- **Changed (breaking):** the component that calls `useDataTable` no longer
+  re-renders when the table's state changes; `<DataTable>` subscribes to what
+  it shows. Code that reads the state during that component's render (a
+  "3 selected" label) needs `stateSelector: (state) => state.rowSelection`, or
+  `table.Subscribe` around the part that shows it. Event handlers, effects and
+  the table's render props are unaffected.
+
+### New
+
 - **New `slotProps` option:** extra props (classes, styles, `data-*`,
   handlers, refs) for every part of the table — surface, rows, cells,
   toolbars, search box, edit fields, dialog, checkboxes — as objects or
   functions of the part's context. Columns can target their own cells with
   `meta.slotProps`. Props merge with the table's own instead of replacing them.
-- **Fixed (accessibility):** the columns the table adds itself (row actions,
-  drag handle, row pin, single-select, expand) name their headers for screen
-  readers; filter-row cells are cells, not column headers; the date filters'
-  names include their visible text. Checked with axe in CI.
-- **Faster:** changing the density no longer re-renders every row; cells
-  read their padding from a CSS variable the table root sets.
 - **New:** `enableTableHead` / `enableTableFooter` hide the header or footer
   rows, `enableExpandAll` hides the expand-all toggle, and column
   `meta.visibleInShowHideMenu: false` leaves a column out of the show / hide
@@ -62,12 +112,6 @@ for every rename.
 - **New:** `displayColumnDefOptions` (by column id, e.g. `"cn-select"`) and
   `defaultDisplayColumn` override the columns the table adds itself. New
   `DisplayColumnId` type.
-- **Changed (breaking):** `renderColumnActionsMenuItems`,
-  `renderRowActionMenuItems` and `renderCellActionMenuItems` receive
-  `internalMenuItems` and `closeMenu`, and their return value is the whole
-  menu: include `internalMenuItems` to keep the built-in items. The column
-  menu no longer appends your items after a separator, and with a row menu the
-  row's Edit action moves into it.
 - **New:** `enableCellActions` turns on a built-in cell menu (Copy, Edit), and
   `enableClickToCopy` (table and column) also takes `"context-menu"` or a
   per-cell function. New `copy` icon slot.
@@ -80,66 +124,11 @@ for every rename.
   also be a column's `meta.filterMode` and appear in the mode menus when listed
   in `columnFilterModeOptions` (column or new table-wide option) or the new
   `globalFilterModeOptions`. `FilterMode` / `GlobalFilterMode` accept any name.
-- **Changed:** `localization.filterModes` is merged with the built-in labels
-  key by key, so adding a label no longer drops the others.
-- **Changed (breaking):** `<DataTable surfaceClassName>` is replaced by
-  `slotProps: { surface: { className } }`.
-- **Removed:** the deprecated localization keys `advancedFiltersMatchLabel`
-  and `advancedFiltersOf`.
-- **Breaking — TanStack Table v9:** the engine now runs on
-  `@tanstack/react-table` v9 (native `useTable` with every built-in feature,
-  row model, and sort/filter/aggregation function registered, so behaviour
-  matches 0.4.x). Re-add the block to pick up the new dependencies. See the
-  [upgrade guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating).
 - **New `DataTableColumnDef<TData>` type** (plus `DataTableRow`,
   `DataTableColumn`, `DataTableCell`, `DataTableHeader`, `DataTableState`,
   `DataTableColumnPinningState`, `DataTableFeatures`). Type your columns with
   `DataTableColumnDef` instead of TanStack's `ColumnDef`, which now needs a
   feature-set parameter.
-- **Unchanged API:** column pinning in `initialState` / `state` /
-  `onColumnPinningChange` and in `table.getState()` keeps `left` / `right`, and
-  the value returned by `table.getState()` keeps its `columnSizingInfo` name
-  (the `columnSizingInfo` options below are renamed). The table instance keeps a
-  stable identity across renders, and render contexts
-  (`cell: ({ table }) => …`, likewise `header`, `footer`, `aggregatedCell`)
-  still receive the enriched instance and are typed as such, so
-  `table.getState()`, `table.dataTable` and the table's methods type-check.
-- **Removed options:** `getCoreRowModel` and the other `get*RowModel` options;
-  the table wires every row model itself.
-- **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
-  `column.getIsPinned()` returns `"start" | "end"`, and
-  `getPrePaginationRowModel()` is now `getPrePaginatedRowModel()` and
-  `getPaginationRowModel()` is now `getPaginatedRowModel()`. `getLeft*` /
-  `getRight*` are `getStart*` / `getEnd*` (leaf columns, visible cells, header
-  groups, total size), and `column.getStart("left")` / `column.getAfter("right")`
-  take `"start"` / `"end"`. Custom aggregation functions use
-  `constructAggregationFn({ aggregate })`.
-- **Renamed options reach you too:** the column option `sortingFn` is now
-  `sortFn`, and `state.columnSizingInfo`, `initialState.columnSizingInfo` and
-  `onColumnSizingInfoChange` are now `columnResizing` and
-  `onColumnResizingChange`.
-- **Removed options:** `filterFns`, `sortingFns` and `aggregationFns`. Pass
-  custom functions inline on the column (`filterFn`, `sortFn`,
-  `aggregationFn`); built-in string names still work. Type inline filter
-  functions with the exported `DataTableFilterFn<TData>`.
-- **Row type must satisfy `RowData`:** TanStack v9 requires
-  `Record<string, any> | Array<any>`, so `unknown` is no longer accepted.
-  `DataTableInstance<unknown>` and `useDataTable<unknown>` need a concrete row
-  type; `DataTableInstance` with no type argument now defaults to `RowData`.
-- **`table.options`** is now the options object the table was created with on
-  each render (TanStack v9's React adapter behaviour), not TanStack's
-  internally merged options with feature defaults.
-- **Type registration:** the block's types register a small TanStack feature
-  (`dataTableInstanceFeature`) through TanStack's `Plugins` /
-  `Table_FeatureMap` interfaces, scoped to tables built with the block's
-  feature set. Other TanStack tables in your app are unaffected, except ones
-  typed `Table<any, …>`.
-- **Changed (breaking):** the component that calls `useDataTable` no longer
-  re-renders when the table's state changes; `<DataTable>` subscribes to what
-  it shows. Code that reads the state during that component's render (a
-  "3 selected" label) needs `stateSelector: (state) => state.rowSelection`, or
-  `table.Subscribe` around the part that shows it. Event handlers, effects and
-  the table's render props are unaffected.
 - **Added:** `stateSelector` option: re-render the component holding the table
   when the selected part of the state changes.
 - **Added:** the table's UI state is TanStack table state: `density`,
@@ -149,18 +138,50 @@ for every rename.
   in `table.getState()`, take `initialState` and controlled `state`, and reset
   with `table.reset()`. New callbacks `onColumnFilterModesChange`,
   `onShowAdvancedFilterPanelChange`, `onEditingCellChange`,
-  `onEditingRowIdChange`, `onIsCreatingChange` and `onRowDraftChange`; the
-  existing props (`density`, `onDensityChange`, `defaultDensity`, …) still
-  work.
-- **Changed:** parts of the table re-render only for the state they show, and
-  each row for its own selection and editing state. On 1,000 rows: selecting a
-  row takes ~9 ms instead of ~57 ms, typing in a row editor ~4.5 ms instead of
-  ~56 ms; sorting is ~10% faster.
+  `onEditingRowIdChange`, `onIsCreatingChange` and `onRowDraftChange`.
 - **Added:** 37 locales (38 languages with English), each its own registry
   item: `data-table-locale-<lang>`. Translations are adapted from Material
   React Table; lines marked "needs review" await a native speaker.
 - **Added:** localization keys `language`, `true`, `false`, `dragStart`,
   `dragOver`, `dragEnd`, `dragCancel`, `dragInstructions`, `dragRowLabel`.
+- **Added:** column reordering works with column virtualization.
+- **Added:** right-to-left layouts. The table follows `dir="rtl"` on itself or
+  an ancestor: columns, pinned columns, resizing, chevrons, arrow keys and
+  column virtualization all mirror. See the Right-to-left guide.
+- **Added:** with keyboard navigation on (the default) the table is an ARIA
+  grid: `role="grid"`, `aria-rowcount` / `aria-colcount`, `aria-rowindex` on
+  rows, `aria-colindex` on cells and `aria-selected` on selectable rows. Tests
+  that query `getByRole("table")` need `getByRole("grid")`.
+- **Added:** cell commands: Enter or F2 activates the focused cell's control
+  (opens its editor), PageUp / PageDown move a screen of rows, Ctrl+C / Cmd+C
+  copies the cell's text.
+- **Added:** focus stays in the table when the focused element goes away: an
+  inline editor closing, save / cancel buttons disappearing, or a deleted row.
+- **Added:** full screen is a modal dialog: Escape leaves, Tab stays inside,
+  the page behind stops scrolling, and focus returns afterwards.
+- **Added:** `aria-busy` on the table and a screen-reader status message while
+  loading.
+- **Added:** `direction` on the table instance (`"ltr"` or `"rtl"`, measured
+  from the page).
+
+### Changed
+
+- **Faster:** changing the density no longer re-renders every row; cells
+  read their padding from a CSS variable the table root sets.
+- **Changed:** `localization.filterModes` is merged with the built-in labels
+  key by key, so adding a label no longer drops the others.
+- **Unchanged API:** column pinning in `initialState` / `state` /
+  `onColumnPinningChange` and in `table.getState()` keeps `left` / `right`, and
+  the value returned by `table.getState()` keeps its `columnSizingInfo` name
+  (the `columnSizingInfo` options below are renamed). The table instance keeps a
+  stable identity across renders, and render contexts
+  (`cell: ({ table }) => …`, likewise `header`, `footer`, `aggregatedCell`)
+  still receive the enriched instance and are typed as such, so
+  `table.getState()`, `table.dataTable` and the table's methods type-check.
+- **Changed:** parts of the table re-render only for the state they show, and
+  each row for its own selection and editing state. On 1,000 rows: selecting a
+  row takes ~9 ms instead of ~57 ms, typing in a row editor ~4.5 ms instead of
+  ~56 ms; sorting is ~10% faster.
 - **Changed:** `range` / `range-slider` filters default to `betweenInclusive`
   (rows equal to a bound are kept, as in Material React Table).
 - **Changed:** the column `fuzzy` filter mode now matches fuzzily, like the
@@ -179,6 +200,26 @@ for every rename.
   above plus `advancedFiltersMatch`). A custom localization that spreads
   `defaultLocalization` (or a locale) keeps compiling; one written out in full
   needs the new keys.
+- **Changed:** cell and header alignment use logical classes: `meta.align`
+  `"left"` / `"right"` mean the start / end of the cell (`text-start` /
+  `text-end`), and pinned columns use `inset-inline-start` / `-end`. Left-to-
+  right tables look the same.
+- **Changed:** body rows re-render only when their own state (selection,
+  expansion, pinning, editing) or something table-wide changes, so selecting a
+  row or editing a cell no longer re-renders every row. Row and cell click
+  handlers always call the latest callback.
+- **Changed:** the advanced filter sentence is one localization key,
+  `advancedFiltersMatch: (logic) => string`, so each language can place the
+  All/Any picker where its grammar needs it. `advancedFiltersMatchLabel` and
+  `advancedFiltersOf` are deprecated and unused; a custom localization that
+  spreads `defaultLocalization` (or a locale) keeps compiling.
+
+### Fixed
+
+- **Fixed (accessibility):** the columns the table adds itself (row actions,
+  drag handle, row pin, single-select, expand) name their headers for screen
+  readers; filter-row cells are cells, not column headers; the date filters'
+  names include their visible text. Checked with axe in CI.
 - **Fixed:** clicks on controls inside a row (edit, save, cancel, row-action
   menu and its items, expand, pin, copy, drag handle, inline editors) no longer
   also fire `onRowClick` / `onCellClick`.
@@ -231,44 +272,12 @@ for every rename.
 - **Fixed:** picking an option in a select editor keeps a numeric column's
   value a number.
 - **Fixed:** the date filter pickers open on the selected month, not today's.
-- **Added:** column reordering works with column virtualization.
 - **Fixed:** the search box keeps what the user is typing when a controlled
   `globalFilter` stores earlier keystrokes late (router or async state).
 - **Fixed:** drag-and-drop announcements count rows across pages and name the
   group drop zone ("Group by Name") instead of its internal id.
 - **Fixed:** page buttons, page-size options and row numbers use the
   language's digits (Persian, Nepali…), like the rest of the pagination text.
-- **Added:** right-to-left layouts. The table follows `dir="rtl"` on itself or
-  an ancestor: columns, pinned columns, resizing, chevrons, arrow keys and
-  column virtualization all mirror. See the Right-to-left guide.
-- **Changed:** cell and header alignment use logical classes: `meta.align`
-  `"left"` / `"right"` mean the start / end of the cell (`text-start` /
-  `text-end`), and pinned columns use `inset-inline-start` / `-end`. Left-to-
-  right tables look the same.
-- **Added:** with keyboard navigation on (the default) the table is an ARIA
-  grid: `role="grid"`, `aria-rowcount` / `aria-colcount`, `aria-rowindex` on
-  rows, `aria-colindex` on cells and `aria-selected` on selectable rows. Tests
-  that query `getByRole("table")` need `getByRole("grid")`.
-- **Added:** cell commands: Enter or F2 activates the focused cell's control
-  (opens its editor), PageUp / PageDown move a screen of rows, Ctrl+C / Cmd+C
-  copies the cell's text.
-- **Added:** focus stays in the table when the focused element goes away: an
-  inline editor closing, save / cancel buttons disappearing, or a deleted row.
-- **Added:** full screen is a modal dialog: Escape leaves, Tab stays inside,
-  the page behind stops scrolling, and focus returns afterwards.
-- **Added:** `aria-busy` on the table and a screen-reader status message while
-  loading.
-- **Changed:** body rows re-render only when their own state (selection,
-  expansion, pinning, editing) or something table-wide changes, so selecting a
-  row or editing a cell no longer re-renders every row. Row and cell click
-  handlers always call the latest callback.
-- **Added:** `direction` on the table instance (`"ltr"` or `"rtl"`, measured
-  from the page).
-- **Changed:** the advanced filter sentence is one localization key,
-  `advancedFiltersMatch: (logic) => string`, so each language can place the
-  All/Any picker where its grammar needs it. `advancedFiltersMatchLabel` and
-  `advancedFiltersOf` are deprecated and unused; a custom localization that
-  spreads `defaultLocalization` (or a locale) keeps compiling.
 
 ## 0.4.2
 
