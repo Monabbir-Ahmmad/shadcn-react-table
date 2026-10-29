@@ -52,3 +52,25 @@ describe("row pinning column", () => {
     expect(grip("cn-row-pin")).toBe(false)
   })
 })
+
+describe("injected display columns", () => {
+  it("keeps the expand and row-actions columns out of header reordering", () => {
+    const table = renderHook(() =>
+      useDataTable<Person>({
+        columns,
+        data,
+        getRowId: (r) => r.id,
+        enableColumnOrdering: true,
+        renderRowActions: () => null,
+        renderDetailPanel: () => null,
+      })
+    ).result.current
+    const opts = headerControlsOptionsFromTable(table)
+    const grip = (id: string) =>
+      shouldShowColumnDragGrip(table.getColumn(id)!, opts)
+
+    expect(grip("name")).toBe(true)
+    expect(grip("cn-expand")).toBe(false)
+    expect(grip("cn-row-actions")).toBe(false)
+  })
+})

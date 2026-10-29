@@ -24,14 +24,6 @@ export const ALIGN_CELL = {
   right: "text-right",
 } as const
 
-/** Injected columns that should never be draggable in the header. */
-export const DISPLAY_COLUMN_IDS = new Set([
-  SELECTION_COLUMN_ID,
-  ROW_NUMBER_COLUMN_ID,
-  ROW_PIN_COLUMN_ID,
-  ROW_DRAG_COLUMN_ID,
-])
-
 // All injected (non-user) columns, used to find the first real data column so
 // tree (sub-row) rows can be indented by depth there.
 export const NON_DATA_COLUMN_IDS = new Set([
@@ -42,6 +34,9 @@ export const NON_DATA_COLUMN_IDS = new Set([
   EXPAND_COLUMN_ID,
   ROW_ACTIONS_COLUMN_ID,
 ])
+
+/** Injected columns that should never be draggable in the header. */
+export const DISPLAY_COLUMN_IDS = NON_DATA_COLUMN_IDS
 
 /**
  * Body-row state tint, shared by the virtualized row and the DnD/normal row so
