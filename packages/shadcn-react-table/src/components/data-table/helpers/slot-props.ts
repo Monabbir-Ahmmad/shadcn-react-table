@@ -7,14 +7,25 @@ import type { DataTableInstance, DataTableSlots } from "../core/types"
 
 type AnyProps = Record<string, unknown>
 
+// Composed refs, cached per pair so the same two refs give the same callback
+// on every render (a new callback makes React detach and re-attach the
+// element on each commit).
+const composedRefs = new WeakMap<object, WeakMap<object, unknown>>()
+
 /** Points both refs at the element (callback or object refs). */
-function composeRefs<T>(...refs: Array<React.Ref<T> | undefined>) {
-  return (el: T | null) => {
-    for (const ref of refs) {
+function composeRefs<T>(a: React.Ref<T>, b: React.Ref<T>) {
+  const byFirst = composedRefs.get(a as object) ?? new WeakMap()
+  composedRefs.set(a as object, byFirst)
+  const cached = byFirst.get(b as object)
+  if (cached) return cached as (el: T | null) => void
+  const composed = (el: T | null) => {
+    for (const ref of [a, b]) {
       if (typeof ref === "function") ref(el)
       else if (ref) (ref as React.RefObject<T | null>).current = el
     }
   }
+  byFirst.set(b as object, composed)
+  return composed
 }
 
 /**

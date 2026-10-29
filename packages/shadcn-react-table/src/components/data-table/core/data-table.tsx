@@ -159,6 +159,21 @@ export function DataTable<TData extends RowData>({
   )
 
   const gridRef = React.useRef<HTMLDivElement>(null)
+  // One callback for the table's lifetime: a new one each render would make
+  // React detach and re-attach the surface on every commit, leaving
+  // `refs.tableContainerRef` empty while child effects run.
+  const setSurfaceRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      // A callback ref runs after render: writing refs here is legal React.
+      // eslint-disable-next-line react-hooks/immutability
+      gridRef.current = node
+      // The exposed container ref is a RefObject, mutable by contract; read
+      // through the stable table, so this callback never changes.
+      // eslint-disable-next-line react-hooks/immutability
+      table.dataTable.refs.tableContainerRef.current = node
+    },
+    [table]
+  )
   // The table re-renders itself on state changes; the component holding the
   // table does not (see `useDataTable`'s `stateSelector`).
   useTableState(table, (state) =>
@@ -319,17 +334,10 @@ export function DataTable<TData extends RowData>({
 
           <div
             {...mergeProps(
-              // The callback ref runs after render; assigning .current there
-              // is legal React.
+              // The callback ref runs after render, not during it.
               // eslint-disable-next-line react-hooks/refs
               {
-                ref: (node: HTMLDivElement | null) => {
-                  gridRef.current = node
-                  // The exposed container ref is a RefObject, mutable by
-                  // contract.
-                  // eslint-disable-next-line react-hooks/immutability
-                  refs.tableContainerRef.current = node
-                },
+                ref: setSurfaceRef,
                 onKeyDown,
                 onFocus,
                 onBlur,
