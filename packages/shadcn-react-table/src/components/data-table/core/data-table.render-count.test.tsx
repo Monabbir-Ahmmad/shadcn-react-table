@@ -105,4 +105,56 @@ describe("body re-renders", () => {
     expect(first).not.toHaveBeenCalled()
     expect(second).toHaveBeenCalledTimes(1)
   })
+
+  it("does not re-render the component holding the table on state changes", () => {
+    const renders = { count: 0 }
+    let callerRenders = 0
+    function Caller() {
+      callerRenders++
+      return <Table renders={renders} enableRowSelection />
+    }
+    render(<Caller />)
+    const before = callerRenders
+    fireEvent.click(screen.getByRole("button", { name: /sort by name/i }))
+    fireEvent.click(
+      screen.getAllByRole("checkbox", { name: /select row/i })[0]!
+    )
+    expect(callerRenders).toBe(before)
+    // The table itself still shows the new state.
+    expect(
+      screen.getByText("Name").closest("th")!.getAttribute("aria-sort")
+    ).not.toBe("none")
+    expect(
+      screen
+        .getAllByRole("checkbox", { name: /select row/i })[0]!
+        .getAttribute("aria-checked")
+    ).toBe("true")
+  })
+
+  it("re-renders the holder for the state it selects", () => {
+    const renders = { count: 0 }
+    let callerRenders = 0
+    let selected = ""
+    function Caller() {
+      callerRenders++
+      const table = useDataTable<Row>({
+        columns: makeColumns(renders),
+        data,
+        getRowId: (row) => row.id,
+        enableRowSelection: true,
+        stateSelector: (state) => state.rowSelection,
+      })
+      selected = Object.keys(table.getState().rowSelection).join()
+      return <DataTable table={table} />
+    }
+    render(<Caller />)
+    const before = callerRenders
+    fireEvent.click(screen.getByRole("button", { name: /sort by name/i }))
+    expect(callerRenders).toBe(before)
+    fireEvent.click(
+      screen.getAllByRole("checkbox", { name: /select row/i })[1]!
+    )
+    expect(callerRenders).toBeGreaterThan(before)
+    expect(selected).toBe("2")
+  })
 })

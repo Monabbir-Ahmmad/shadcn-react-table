@@ -28,6 +28,7 @@ import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
 import { createEditingActions } from "../hooks/use-editing-state"
 import { useGlobalFilterMode } from "../hooks/use-global-filter-mode"
 import { usePageIndexClamp } from "../hooks/use-page-index-clamp"
+import { useTableStateListener } from "../hooks/use-table-state"
 import { usePageResetOnFilterChange } from "../hooks/use-page-reset-on-filter-change"
 import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { useDataTableConfigContext } from "./config-context"
@@ -55,6 +56,11 @@ import type {
 } from "./types"
 
 type CoreTableState = Partial<TableState<DataTableFeatures>>
+type CoreStoreState = TableState<DataTableFeatures>
+
+/** The default `useTable` selector: the calling component re-renders on no
+ *  table state change. */
+const selectNothing = () => null
 
 /**
  * Core hook. Wraps `useTable` with MRT-flavoured defaults (row models,
@@ -180,6 +186,7 @@ export function useDataTable<TData extends RowData>(
     renderToolbarInternalActions,
     renderBottomToolbarCustomActions,
     renderEmpty,
+    stateSelector,
     columns,
     ...tableOptions
   } = options
@@ -501,57 +508,65 @@ export function useDataTable<TData extends RowData>(
   )
   /* eslint-enable react-hooks/preserve-manual-memoization */
 
-  const reactTable = useTable<DataTableFeatures, TData>({
-    ...coreOptions,
-    features,
-    // Only set `columnPinning` when given: TanStack spreads `initialState`
-    // over its defaults, so an own `undefined` key would erase the default.
-    initialState:
-      initialState &&
-      ({
-        ...initialState,
-        ...(initialState.columnPinning && {
-          columnPinning: toCorePinning(initialState.columnPinning),
-        }),
-      } as CoreTableState),
-    state,
-    // Only when the consumer handles pinning: TanStack merges these options
-    // over its feature defaults, so an own `undefined` key would replace the
-    // default internal state updater and make pinning a no-op.
-    ...(pinningChange && { onColumnPinningChange: pinningChange }),
-    ...uiHandlers,
-    columns: sizedColumns,
-    // Default page-reset off: TanStack's auto-reset runs a state update during
-    // render (warns in React 19 dev). We reset on filter changes via an effect
-    // below instead. Consumers can re-enable by passing the option explicitly.
-    autoResetPageIndex: tableOptions.autoResetPageIndex ?? false,
-    // `enableFilters: false` is the master switch; TanStack v9 still applies
-    // filters handed in through state, so hand the (no-op) filtering to us.
-    // Spread conditionally: an own `undefined` key would override a consumer
-    // `manualFiltering`.
-    ...(tableOptions.enableFilters === false && { manualFiltering: true }),
-    defaultColumn: {
-      filterFn: dynamicFilterFn,
-      ...tableOptions.defaultColumn,
+  // Subscribes the calling component to nothing by default (DataTable
+  // subscribes to what it shows), or to what `stateSelector` picks.
+  const selectState = stateSelector
+    ? (state: CoreStoreState) => stateSelector(toDataTableState(state))
+    : selectNothing
+  const reactTable = useTable<DataTableFeatures, TData, unknown>(
+    {
+      ...coreOptions,
+      features,
+      // Only set `columnPinning` when given: TanStack spreads `initialState`
+      // over its defaults, so an own `undefined` key would erase the default.
+      initialState:
+        initialState &&
+        ({
+          ...initialState,
+          ...(initialState.columnPinning && {
+            columnPinning: toCorePinning(initialState.columnPinning),
+          }),
+        } as CoreTableState),
+      state,
+      // Only when the consumer handles pinning: TanStack merges these options
+      // over its feature defaults, so an own `undefined` key would replace the
+      // default internal state updater and make pinning a no-op.
+      ...(pinningChange && { onColumnPinningChange: pinningChange }),
+      ...uiHandlers,
+      columns: sizedColumns,
+      // Default page-reset off: TanStack's auto-reset runs a state update during
+      // render (warns in React 19 dev). We reset on filter changes via an effect
+      // below instead. Consumers can re-enable by passing the option explicitly.
+      autoResetPageIndex: tableOptions.autoResetPageIndex ?? false,
+      // `enableFilters: false` is the master switch; TanStack v9 still applies
+      // filters handed in through state, so hand the (no-op) filtering to us.
+      // Spread conditionally: an own `undefined` key would override a consumer
+      // `manualFiltering`.
+      ...(tableOptions.enableFilters === false && { manualFiltering: true }),
+      defaultColumn: {
+        filterFn: dynamicFilterFn,
+        ...tableOptions.defaultColumn,
+      },
+      enableGlobalFilter,
+      globalFilterFn: tableOptions.globalFilterFn ?? dynamicGlobalFilterFn,
+      enableColumnPinning,
+      enableColumnResizing,
+      columnResizeMode: tableOptions.columnResizeMode ?? "onChange",
+      // Dragging a right-to-left column's edge to the left widens it.
+      columnResizeDirection:
+        // eslint-disable-next-line react-hooks/refs
+        tableOptions.columnResizeDirection ?? getUi().direction,
+      enableRowPinning,
+      keepPinnedRows: tableOptions.keepPinnedRows ?? true,
+      enableGrouping,
+      enableExpanding,
+      // Detail panels expand arbitrary rows; tree data uses getSubRows' own logic.
+      getRowCanExpand:
+        tableOptions.getRowCanExpand ??
+        (renderDetailPanel ? () => true : undefined),
     },
-    enableGlobalFilter,
-    globalFilterFn: tableOptions.globalFilterFn ?? dynamicGlobalFilterFn,
-    enableColumnPinning,
-    enableColumnResizing,
-    columnResizeMode: tableOptions.columnResizeMode ?? "onChange",
-    // Dragging a right-to-left column's edge to the left widens it.
-    columnResizeDirection:
-      // eslint-disable-next-line react-hooks/refs
-      tableOptions.columnResizeDirection ?? getUi().direction,
-    enableRowPinning,
-    keepPinnedRows: tableOptions.keepPinnedRows ?? true,
-    enableGrouping,
-    enableExpanding,
-    // Detail panels expand arbitrary rows; tree data uses getSubRows' own logic.
-    getRowCanExpand:
-      tableOptions.getRowCanExpand ??
-      (renderDetailPanel ? () => true : undefined),
-  })
+    selectState
+  )
 
   // v9's useTable returns a fresh wrapper every render; keep one instance for
   // the hook's lifetime (v8 semantics: consumers and our memos rely on a stable
@@ -567,6 +582,20 @@ export function useDataTable<TData extends RowData>(
 
   const ui = getUiState(table)
   const enableColumnFilters = tableOptions.enableColumnFilters !== false
+
+  // The measured direction reaches column resizing through the options, which
+  // the calling component no longer refreshes on state changes.
+  const ownResizeDirection = tableOptions.columnResizeDirection
+  useTableStateListener(table, () => {
+    if (ownResizeDirection) return
+    const { direction } = getUiState(table)
+    if (table.options.columnResizeDirection !== direction) {
+      table.setOptions((prev) => ({
+        ...prev,
+        columnResizeDirection: direction,
+      }))
+    }
+  })
 
   usePageResetOnFilterChange(table, {
     enablePagination,

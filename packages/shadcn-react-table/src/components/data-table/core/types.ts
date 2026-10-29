@@ -524,6 +524,12 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Called with an updater over the `left` / `right` pinning state when the
    *  user pins or unpins a column. */
   onColumnPinningChange?: OnChangeFn<DataTableColumnPinningState>
+  /** Re-render the component that calls `useDataTable` when the selected part
+   *  of the table state changes (compared shallowly). By default it does not
+   *  re-render on table state changes at all: `<DataTable>` subscribes to
+   *  what it shows. Select what your own render reads, e.g.
+   *  `(state) => state.rowSelection` for a "3 selected" label. */
+  stateSelector?: (state: DataTableState) => unknown
   /** Text for every label, message and screen-reader string. Partial: missing
    *  keys fall back to English (or to `DataTableConfigProvider`). Install a
    *  locale item for a full language. */

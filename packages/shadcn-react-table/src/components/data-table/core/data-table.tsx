@@ -25,6 +25,7 @@ import { useDragAnnouncements } from "../hooks/use-drag-announcements"
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll"
 import { useTableDnd } from "../hooks/use-table-dnd"
 import { useTableVirtualizers } from "../hooks/use-table-virtualizers"
+import { useTableState } from "../hooks/use-table-state"
 import { useFullscreenModal } from "../hooks/use-fullscreen-modal"
 import { getDataRowCount, getHeaderRowCount } from "../helpers/grid-rows"
 import { getColumnSizeVars } from "../utils/column-styles"
@@ -135,6 +136,9 @@ export function DataTable<TData extends RowData>({
   )
 
   const gridRef = React.useRef<HTMLDivElement>(null)
+  // The table re-renders itself on state changes; the component holding the
+  // table does not (see `useDataTable`'s `stateSelector`).
+  useTableState(table, (state) => state)
 
   // Read the direction the table actually renders in (`dir` on it or any
   // ancestor), for the behaviour CSS cannot mirror: resizing, arrow keys and
