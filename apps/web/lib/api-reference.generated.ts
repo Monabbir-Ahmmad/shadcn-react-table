@@ -561,11 +561,11 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "positionCreatingRow",
-    type: '"top" | "bottom"',
+    type: '"top" | "bottom" | number',
     required: false,
     default: '"top"',
     description:
-      'Where the inline create row (`createDisplayMode: "row"`) appears. Default "top".',
+      'Where the inline create row (`createDisplayMode: "row"`) appears: `"top"` (default), `"bottom"`, or a row index on the current page to insert it before (with row virtualization an index means `"top"`).',
   },
   {
     name: "renderRowActions",
@@ -1482,11 +1482,11 @@ export const dataTableOptions: ApiMember[] = [
   },
   {
     name: "positionCreatingRow",
-    type: '"top" | "bottom"',
+    type: '"top" | "bottom" | number',
     required: true,
     default: null,
     description:
-      'Where the inline create row (`createDisplayMode: "row"`) appears. Default "top".',
+      'Where the inline create row (`createDisplayMode: "row"`) appears: `"top"` (default), `"bottom"`, or a row index on the current page to insert it before (with row virtualization an index means `"top"`).',
   },
   {
     name: "enableClickToCopy",

@@ -164,4 +164,28 @@ describe("positionCreatingRow", () => {
       rows.findIndex((tr) => tr.textContent?.includes("Lily"))
     )
   })
+
+  it("puts the inline create row before a row index", () => {
+    const { table } = mount({
+      createDisplayMode: "row",
+      positionCreatingRow: 1,
+    })
+    act(() => table().beginCreate())
+    const rows = Array.from(document.querySelectorAll("tbody tr"))
+    expect(rows[0]!.textContent).toContain("Mason")
+    expect(rows[1]!.getAttribute("data-slot")).toBe("data-table-create-row")
+    // The create row's action strip (Cancel / Save) follows it.
+    expect(rows[2]!.textContent).toContain("Save")
+    expect(rows[3]!.textContent).toContain("Lily")
+  })
+
+  it("treats an index past the last row as the bottom", () => {
+    const { table } = mount({
+      createDisplayMode: "row",
+      positionCreatingRow: 99,
+    })
+    act(() => table().beginCreate())
+    const rows = Array.from(document.querySelectorAll("tbody tr"))
+    expect(rows.at(-2)!.getAttribute("data-slot")).toBe("data-table-create-row")
+  })
 })

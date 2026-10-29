@@ -2724,7 +2724,7 @@ function EditDialogExample() {
 
 ### Inline create row position
 
-With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below.
+With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below, or a row index (`positionCreatingRow: 3`) to insert it before that row on the current page.
 
 Example (`create-row`):
 
@@ -5408,7 +5408,7 @@ The table is styled with Tailwind, not per-component style props. Structural slo
 | `onCreatingRowCancel` | `(props: { table: DataTableInstance<TData> }) => void` |  | Called when the user cancels the create form. |
 | `renderEditRowDialogContent` | `( props: EditDialogContentProps<TData> & { row: DataTableRow<TData> } ) => React.ReactNode` |  | Replace the edit dialog's content. You get the built-in fields as `internalEditComponents`, plus `save()` / `cancel()`. |
 | `renderCreateRowDialogContent` | `( props: EditDialogContentProps<TData> ) => React.ReactNode` |  | Replace the create dialog's content (same props, without `row`). |
-| `positionCreatingRow` | `"top" \| "bottom"` | `"top"` | Where the inline create row (`createDisplayMode: "row"`) appears. Default "top". |
+| `positionCreatingRow` | `"top" \| "bottom" \| number` | `"top"` | Where the inline create row (`createDisplayMode: "row"`) appears: `"top"` (default), `"bottom"`, or a row index on the current page to insert it before (with row virtualization an index means `"top"`). |
 | `renderRowActions` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode` |  | Content of the row-actions column, replacing the default edit and menu buttons. |
 | `renderCellActionMenuItems` | `(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Copy, Edit) the menu shows for this cell. */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode` |  | The contents of the right-click menu on each cell (turns the menu on). Include `internalMenuItems` to keep the built-in Copy / Edit items. |
 | `renderRowActionMenuItems` | `(props: { row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Edit, when the row can be edited). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode` |  | Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically. While editing is on, the Edit action moves into this menu: include `internalMenuItems` to keep it. |
@@ -5617,7 +5617,7 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `onCreatingRowCancel` | `(props: { table: DataTableInstance<TData> }) => void` |  | Called when the user cancels the create form. |
 | `renderEditRowDialogContent` | `( props: EditDialogContentProps<TData> & { row: DataTableRow<TData> } ) => React.ReactNode` |  | Replace the edit dialog's content. You get the built-in fields as `internalEditComponents`, plus `save()` / `cancel()`. |
 | `renderCreateRowDialogContent` | `( props: EditDialogContentProps<TData> ) => React.ReactNode` |  | Replace the create dialog's content (same props, without `row`). |
-| `positionCreatingRow` | `"top" \| "bottom"` |  | Where the inline create row (`createDisplayMode: "row"`) appears. Default "top". |
+| `positionCreatingRow` | `"top" \| "bottom" \| number` |  | Where the inline create row (`createDisplayMode: "row"`) appears: `"top"` (default), `"bottom"`, or a row index on the current page to insert it before (with row virtualization an index means `"top"`). |
 | `enableClickToCopy` | `ClickToCopyOption<TData>` |  | Copy cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function. Per-column override via meta. |
 | `enableCellActions` | `boolean \| ((cell: DataTableCell<TData, unknown>) => boolean)` |  | A right-click menu on each cell with built-in Copy (when click-to-copy is on) and Edit (when the cell is editable) items, or a function deciding per cell. `renderCellActionMenuItems` customizes it. Default false. |
 | `onEditingCellSave` | `(props: { row: DataTableRow<TData> column: DataTableColumn<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void` |  | Called when a cell edit is committed (cell and table editing) with the new `value`. Persist it; the table does not change `data` itself. |

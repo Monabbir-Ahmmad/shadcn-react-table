@@ -394,13 +394,41 @@ export function DataTableBody<TData extends RowData>({
     dt(table).enableEditing &&
     dt(table).isCreating &&
     dt(table).createDisplayMode === "row"
+  // Where the create row goes: before everything, after everything, or
+  // before the center row at a page index (a number past the end means the
+  // bottom; virtualized bodies use the top).
+  const createPosition = dt(table).positionCreatingRow
+  const createIndex =
+    typeof createPosition === "number"
+      ? enableRowVirtualization || !hasRows
+        ? 0
+        : Math.max(0, Math.floor(createPosition))
+      : null
+  const createAtTop =
+    showCreateRow && (createPosition === "top" || createIndex === 0)
+  const createAtBottom =
+    showCreateRow &&
+    (createPosition === "bottom" ||
+      (createIndex != null &&
+        createIndex >= centerRows.length &&
+        createIndex > 0))
+  const createBefore =
+    showCreateRow && createIndex != null && createIndex > 0 ? createIndex : -1
+  const centerNodes = centerRows.map((row, i) =>
+    renderRow(row, centerOffset + i)
+  )
+  if (createBefore > 0 && createBefore < centerRows.length) {
+    centerNodes.splice(
+      createBefore,
+      0,
+      <DataTableCreateRow key="cn-create-row" table={table} />
+    )
+  }
 
   return (
     <RowStateHubContext.Provider value={rowStateHub}>
       <TableBody {...getSlotProps(table, "body", {})}>
-        {showCreateRow && dt(table).positionCreatingRow === "top" && (
-          <DataTableCreateRow table={table} />
-        )}
+        {createAtTop && <DataTableCreateRow table={table} />}
         {showSkeletons && !hasRows ? (
           <SkeletonRows
             rowCount={
@@ -501,7 +529,7 @@ export function DataTableBody<TData extends RowData>({
               items={centerRowIds}
               strategy={verticalListSortingStrategy}
             >
-              {centerRows.map((row, i) => renderRow(row, centerOffset + i))}
+              {centerNodes}
             </SortableContext>
             {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
           </>
@@ -515,9 +543,7 @@ export function DataTableBody<TData extends RowData>({
             </TableCell>
           </TableRow>
         )}
-        {showCreateRow && dt(table).positionCreatingRow === "bottom" && (
-          <DataTableCreateRow table={table} />
-        )}
+        {createAtBottom && <DataTableCreateRow table={table} />}
       </TableBody>
     </RowStateHubContext.Provider>
   )

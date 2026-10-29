@@ -415,7 +415,7 @@ function EditDialogExample() {
 
 ### Inline create row position
 
-With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below.
+With `createDisplayMode: "row"`, the create row sits above the data. Set `positionCreatingRow: "bottom"` to put it below, or a row index (`positionCreatingRow: 3`) to insert it before that row on the current page.
 
 Example (`create-row`):
 

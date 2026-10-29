@@ -100,7 +100,8 @@ for every rename.
   menu.
 - **New editing options:** `onEditingRowCancel` / `onCreatingRowCancel`,
   `renderEditRowDialogContent` / `renderCreateRowDialogContent` (with
-  `internalEditComponents`, `save`, `cancel`), `positionCreatingRow`, and
+  `internalEditComponents`, `save`, `cancel`), `positionCreatingRow`
+  (`"top"`, `"bottom"` or a row index), and
   column `editSelectOptions` as a per-row function.
 - **New filter variants:** `autocomplete` (text with suggestions),
   `datetime` / `datetime-range` (compared to the minute) and `time` /

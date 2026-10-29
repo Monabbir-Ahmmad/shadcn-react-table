@@ -654,7 +654,7 @@ export interface DataTableConfig<TData extends RowData> {
   renderCreateRowDialogContent?: (
     props: EditDialogContentProps<TData>
   ) => React.ReactNode
-  positionCreatingRow: "top" | "bottom"
+  positionCreatingRow: "top" | "bottom" | number
   enableClickToCopy: ClickToCopyOption<TData>
   enableCellActions:
     boolean | ((cell: DataTableCell<TData, unknown>) => boolean)
@@ -1060,9 +1060,10 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   renderCreateRowDialogContent?: (
     props: EditDialogContentProps<TData>
   ) => React.ReactNode
-  /** Where the inline create row (`createDisplayMode: "row"`) appears.
-   *  Default "top". */
-  positionCreatingRow?: "top" | "bottom"
+  /** Where the inline create row (`createDisplayMode: "row"`) appears:
+   *  `"top"` (default), `"bottom"`, or a row index on the current page to
+   *  insert it before (with row virtualization an index means `"top"`). */
+  positionCreatingRow?: "top" | "bottom" | number
   /** Content of the row-actions column, replacing the default edit and menu
    *  buttons. */
   renderRowActions?: (props: {
