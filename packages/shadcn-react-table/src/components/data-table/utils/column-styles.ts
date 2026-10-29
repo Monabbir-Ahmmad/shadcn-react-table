@@ -35,10 +35,11 @@ export function getColumnPinningClass<TData extends RowData, TValue>(
     : "before:pointer-events-none before:absolute before:inset-y-0 before:-left-px before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/60 before:to-transparent"
 }
 
-/** Column ids go into CSS custom-property names; anything outside
- *  `[A-Za-z0-9_-]` (spaces, dots, slashes…) would make `var()` invalid. */
+/** Column ids go into CSS custom-property names; ASCII punctuation and spaces
+ *  (dots, slashes…) would make `var()` invalid. Non-ASCII letters are valid
+ *  name characters, so ids like `fødsel` and `fådsel` stay distinct. */
 export function cssVarId(id: string): string {
-  return id.replace(/[^A-Za-z0-9_-]/g, "_")
+  return id.replace(/[^A-Za-z0-9_\u0080-￿-]/g, "_")
 }
 
 /**

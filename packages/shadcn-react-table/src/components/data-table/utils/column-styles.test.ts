@@ -14,4 +14,13 @@ describe("getColumnWidthStyle", () => {
       width: "calc(var(--col-first_name_v2-size) * 1px)",
     })
   })
+
+  it("keeps non-ASCII letters, which CSS names allow", () => {
+    expect(getColumnWidthStyle("fødsel")).toEqual({
+      width: "calc(var(--col-fødsel-size) * 1px)",
+    })
+    expect(getColumnWidthStyle("fødsel")).not.toEqual(
+      getColumnWidthStyle("fådsel")
+    )
+  })
 })
