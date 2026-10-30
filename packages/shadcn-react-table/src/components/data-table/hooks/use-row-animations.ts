@@ -57,6 +57,22 @@ const COPY_DROPS = [
   "aria-colindex",
 ]
 
+// A detail panel opens top-down and closes bottom-up. Only clipped, never
+// resized: the rows below already glide by the panel's height, so a height
+// animation would move them twice (and lay the table out every frame).
+const CLIPPED = "inset(0 0 100% 0)"
+const REVEAL: Keyframe[] = [
+  { clipPath: CLIPPED, opacity: 0 },
+  { clipPath: "inset(0)", opacity: 1 },
+]
+const HIDE: Keyframe[] = [
+  { clipPath: "inset(0)", opacity: 1 },
+  { clipPath: CLIPPED, opacity: 0 },
+]
+const FADE: Keyframe[] = [{ opacity: 1 }, { opacity: 0 }]
+
+const isDetail = (tr: HTMLTableRowElement) => tr.dataset.rowKind === "detail"
+
 /** Whether the Web Animations API is there (jsdom has none). */
 const canAnimate = () =>
   typeof Element !== "undefined" &&
@@ -105,11 +121,12 @@ function copyRow(tr: HTMLTableRowElement) {
   return copy
 }
 
-/** Draws a leave copy at its row's last place and fades it out. */
-function fadeOutCopy(
+/** Draws a leave copy at its row's last place and animates it out. */
+function animateOutCopy(
   layer: HTMLElement,
   table: HTMLTableElement,
   { node, top, left, width, widths }: Leaving,
+  keyframes: Keyframe[],
   options: KeyframeAnimationOptions,
   ghosts: Set<HTMLElement>
 ) {
@@ -142,7 +159,7 @@ function fadeOutCopy(
     ghosts.delete(ghost)
   }
   ghost
-    .animate([{ opacity: 1 }, { opacity: 0 }], { ...options, fill: "forwards" })
+    .animate(keyframes, { ...options, fill: "forwards" })
     .finished.then(remove, remove)
 }
 
@@ -270,6 +287,21 @@ export function useRowAnimations({
     for (const key of plan.enters) {
       const tr = rows.get(key)
       if (!tr) continue
+      if (isDetail(tr)) {
+        // Clip the cells (the panel is one full-width cell). Same timing as
+        // the glide, so the panel's bottom edge and the row below move
+        // together.
+        for (const cell of tr.cells) {
+          track(
+            cell.animate(REVEAL, {
+              duration,
+              easing: ease,
+              fill: "backwards",
+            })
+          )
+        }
+        continue
+      }
       track(
         tr.animate(
           [
@@ -289,11 +321,14 @@ export function useRowAnimations({
     const layer = motionLayer(table)
     if (!layer) return
     for (const copy of work.leaving) {
-      fadeOutCopy(
+      // A panel closes with the glide of the rows below; other rows fade.
+      const detail = isDetail(copy.node)
+      animateOutCopy(
         layer,
         table,
         copy,
-        { duration: durationFast, easing: ease },
+        detail ? HIDE : FADE,
+        { duration: detail ? duration : durationFast, easing: ease },
         ghosts.current
       )
     }

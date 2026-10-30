@@ -11,6 +11,7 @@ import { cdp } from "vitest/browser"
 
 import { nextFrame } from "../../../../test/browser/pointer"
 import { DataTable } from "./data-table"
+import { MOTION_DEFAULTS } from "./motion"
 import type { DataTableInstance, UseDataTableOptions } from "./types"
 import { useDataTable } from "./use-data-table"
 
@@ -67,6 +68,27 @@ const surface = () =>
 /** Lets every running animation on the page finish. */
 const settle = () =>
   Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {})))
+
+const findRow = (key: string) =>
+  bodyRows().find((tr) => tr.dataset.rowId === key)
+
+const expandButton = (key: string) =>
+  findRow(key)!.querySelector<HTMLElement>("button[aria-expanded]")!
+
+/** An 80px tall detail panel. */
+const detailPanel = ({ row }: { row: { id: string } }) => (
+  <div style={{ height: 80 }}>Detail {row.id}</div>
+)
+
+/** The element's animations that animate `prop`. */
+const animating = (el: Element, prop: string) =>
+  el
+    .getAnimations()
+    .filter((a) =>
+      (a.effect as KeyframeEffect).getKeyframes().some((k) => prop in k)
+    )
+
+const timing = (a: Animation) => a.effect!.getTiming()
 
 describe("row animations", () => {
   it("marks rows and detail panels with their keys", () => {
@@ -301,6 +323,109 @@ describe("row animations", () => {
           surface().getBoundingClientRect().left
       )
     ).toBeLessThan(2)
+  })
+
+  it("reveals a detail panel as the rows below glide down", async () => {
+    render(<Harness renderDetailPanel={detailPanel} />)
+    await nextFrame()
+    const was = findRow("r2")!.getBoundingClientRect().top
+    fireEvent.click(expandButton("r1"))
+    const detail = findRow("r1:detail")!
+    const reveal = [...detail.cells].flatMap((td) => animating(td, "clipPath"))
+    expect(reveal.length).toBeGreaterThan(0)
+    // The row below glides down with the panel's bottom edge: same timing,
+    // and it starts where it was (no jump).
+    const next = findRow("r2")!
+    const glide = animating(next, "transform")
+    expect(glide.length).toBe(1)
+    expect(timing(reveal[0]!).duration).toBe(timing(glide[0]!).duration)
+    expect(timing(reveal[0]!).easing).toBe(timing(glide[0]!).easing)
+    expect(timing(reveal[0]!).delay).toBe(0)
+    expect(Math.abs(next.getBoundingClientRect().top - was)).toBeLessThan(2)
+    await nextFrame()
+    await settle()
+    expect(Math.abs(next.getBoundingClientRect().top - was)).toBeGreaterThan(50)
+  })
+
+  it("clips a detail panel while it opens", async () => {
+    render(<Harness renderDetailPanel={detailPanel} />)
+    await nextFrame()
+    // The last row: nothing below covers its panel.
+    fireEvent.click(expandButton("r7"))
+    const detail = findRow("r7:detail")!
+    const { left, top, width, height } = detail.getBoundingClientRect()
+    const hit = () =>
+      document.elementFromPoint(left + width / 2, top + height / 2)
+    // Fully clipped at the start: the panel is not under its own centre.
+    expect(detail.contains(hit())).toBe(false)
+    await settle()
+    expect(detail.contains(hit())).toBe(true)
+  })
+
+  it("hides a detail panel as the rows below glide up", async () => {
+    render(
+      <Harness
+        renderDetailPanel={detailPanel}
+        initialState={{ expanded: { r1: true } }}
+      />
+    )
+    await nextFrame()
+    fireEvent.click(expandButton("r1"))
+    expect(findRow("r1:detail")).toBeUndefined()
+    const ghost = layer()!
+      .querySelector('tr[data-row-kind="detail"]')!
+      .closest<HTMLElement>('[data-slot="data-table-leave-copy"]')!
+    const hide = animating(ghost, "clipPath")
+    expect(hide.length).toBe(1)
+    const next = findRow("r2")!
+    const glide = animating(next, "transform")
+    expect(glide.length).toBe(1)
+    // From below: a positive offset.
+    const from = (glide[0]!.effect as KeyframeEffect).getKeyframes()[0]!
+    expect(String(from.transform)).toMatch(/translateY\(\d+(\.\d+)?px\)/)
+    expect(timing(hide[0]!).duration).toBe(timing(glide[0]!).duration)
+    expect(timing(hide[0]!).easing).toBe(timing(glide[0]!).easing)
+    await waitFor(() => expect(ghost.isConnected).toBe(false), {
+      timeout: MOTION_DEFAULTS.duration + 150,
+      interval: 20,
+    })
+  })
+
+  it("expands without motion when animations are off", async () => {
+    render(<Harness renderDetailPanel={detailPanel} enableAnimations={false} />)
+    await nextFrame()
+    fireEvent.click(expandButton("r1"))
+    expect(findRow("r1:detail")).toBeDefined()
+    expect(running()).toBe(0)
+    expect(document.querySelectorAll("td").length).toBeGreaterThan(0)
+    expect(
+      [...document.querySelectorAll("td")].some(
+        (td) => td.getAnimations().length > 0
+      )
+    ).toBe(false)
+  })
+
+  it("expands without motion under reduced motion", async () => {
+    const session = cdp()
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+    })
+    try {
+      render(<Harness renderDetailPanel={detailPanel} />)
+      await nextFrame()
+      fireEvent.click(expandButton("r1"))
+      expect(findRow("r1:detail")).toBeDefined()
+      expect(running()).toBe(0)
+      expect(
+        [...document.querySelectorAll("td")].some(
+          (td) => td.getAnimations().length > 0
+        )
+      ).toBe(false)
+      fireEvent.click(expandButton("r1"))
+      expect(layer()).toBeNull()
+    } finally {
+      await session.send("Emulation.setEmulatedMedia", { features: [] })
+    }
   })
 
   it("animates nothing while a row is being edited", async () => {
