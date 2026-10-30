@@ -855,7 +855,17 @@ Use `meta.renderColumnFilter` as an escape hatch to render your own filter contr
 
 ## Match highlighting
 
-Matched substrings in cells are highlighted by default. Disable it for the whole table with `enableFilterMatchHighlighting: false`, or for a single column with `meta.enableFilterMatchHighlighting: true`.
+Matched substrings in cells are highlighted by default. Disable it for the whole table with `enableFilterMatchHighlighting: false`, or for a single column with `meta.enableFilterMatchHighlighting: false`.
+
+A column with its own `cell` renderer gets the highlighted value as `renderedCellValue` (as in Material React Table). Render it where the value goes to keep the highlighting:
+
+```tsx
+{
+  accessorKey: "team",
+  header: "Team",
+  cell: ({ renderedCellValue }) => <Badge>{renderedCellValue}</Badge>,
+}
+```
 
 ## Disabling a column's filter
 
@@ -1151,7 +1161,7 @@ return <DataTable table={table} />
 
 ## Opening the search box
 
-The search box starts closed (a search button) unless a search is set. Its open state is table state, `showGlobalFilter`: start it open with `initialState: { showGlobalFilter: true }`, control it with `state.showGlobalFilter` and `onShowGlobalFilterChange`, or open it from code with `table.setShowGlobalFilter(true)`. Setting a search value from outside opens it too.
+The search box starts closed unless a search is set. The search button opens it and stays beside it; clicking the button again closes the box and clears the search. Its open state is table state, `showGlobalFilter`: start it open with `initialState: { showGlobalFilter: true }`, control it with `state.showGlobalFilter` and `onShowGlobalFilterChange`, or open it from code with `table.setShowGlobalFilter(true)`. Setting a search value from outside opens it too.
 
 ## Custom search modes
 
@@ -4025,7 +4035,7 @@ function AnimationsExample() {
 - **New and removed rows:** new rows fade in with a small rise. Removed rows fade out. With [virtualization](/docs/guides/virtualization), rows that a sort or filter brings into the drawn window fade in too.
 - **Filter row and density:** rows glide when the filter row opens or closes and when the density changes, so the new spacing does not jump.
 - **Columns:** hiding, showing, pinning or reordering a column glides the columns that move. A shown column fades in, and a hidden column's header fades out where it was.
-- **Search box:** the search button opens into the box and the box shrinks back into the button. The toolbar buttons around it glide to their new place.
+- **Search box:** the box slides out beside the search button and back into it, pushing the toolbar buttons aside as it goes.
 - **Selection banner and grouping drop zone:** the "N selected" banner and the drop zone slide and fade in and out, and the table below glides to make room.
 - **Detail panels:** a panel opens from the top down while the rows below glide. It closes from the bottom up.
 - **Sort arrow:** the sort icon fades and scales between states. The default arrow also turns around for descending order, and when the sort is cleared it fades out without turning back. A custom sort icon never turns.
@@ -4292,6 +4302,8 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 | `data-table-toolbar` |  |  | Top toolbar root. |
 | `data-table-toolbar-actions` |  |  | Internal actions cluster (search, filters, density, full screen, …). |
 | `data-table-alert-banner` |  |  | Selection alert banner. |
+| `data-table-bottom-toolbar` |  |  | Bottom toolbar (custom actions and/or pagination). |
+| `data-table-pagination` |  |  | Pagination controls. |
 
 ```tsx
 <DataTable table={table} className="[&_[data-slot=data-table-toolbar]]:px-2" />

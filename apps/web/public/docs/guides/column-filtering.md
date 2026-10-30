@@ -93,7 +93,17 @@ Use `meta.renderColumnFilter` as an escape hatch to render your own filter contr
 
 ## Match highlighting
 
-Matched substrings in cells are highlighted by default. Disable it for the whole table with `enableFilterMatchHighlighting: false`, or for a single column with `meta.enableFilterMatchHighlighting: true`.
+Matched substrings in cells are highlighted by default. Disable it for the whole table with `enableFilterMatchHighlighting: false`, or for a single column with `meta.enableFilterMatchHighlighting: false`.
+
+A column with its own `cell` renderer gets the highlighted value as `renderedCellValue` (as in Material React Table). Render it where the value goes to keep the highlighting:
+
+```tsx
+{
+  accessorKey: "team",
+  header: "Team",
+  cell: ({ renderedCellValue }) => <Badge>{renderedCellValue}</Badge>,
+}
+```
 
 ## Disabling a column's filter
 
