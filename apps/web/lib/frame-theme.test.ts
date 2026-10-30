@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { frameTheme, STYLE_DEFAULT, STYLE_DEFAULTS } from "./deck"
+import { frameTheme, STYLE_DEFAULT, STYLE_DEFAULTS } from "./frame-theme"
 import { FONTS } from "./theme-presets"
 
 describe("frameTheme", () => {

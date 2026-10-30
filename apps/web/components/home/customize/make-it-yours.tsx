@@ -18,7 +18,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import styles from "@/style-kits/styles.json"
 import type { IconLibrary } from "@/components/examples/icon-sets"
 import { SectionLabel } from "@/components/home/section-label"
-import { frameTheme, STYLE_DEFAULT, type FrameChoice } from "@/lib/deck"
+import { frameTheme, STYLE_DEFAULT, type FrameChoice } from "@/lib/frame-theme"
 import {
   ACCENTS,
   BASE_COLORS,

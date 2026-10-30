@@ -10,9 +10,9 @@ import {
 
 import { cn } from "@workspace/ui/lib/utils"
 
-// Each font gets its own CSS variable so the theme customizer (and the style
-// deck's font picker) can switch --font-sans / --font-heading between them at
-// runtime. Shared by the site's and the style frames' root layouts.
+// Each font gets its own CSS variable so the theme customizer (and the home
+// page's "Make it yours" font picker) can switch --font-sans / --font-heading
+// between them at runtime. Shared by the site's and the style frames' root layouts.
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
 const raleway = Raleway({ subsets: ["latin"], variable: "--font-raleway" })
 const notoSerif = Noto_Serif({

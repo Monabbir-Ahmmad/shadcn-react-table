@@ -1,5 +1,5 @@
 import styles from "@/style-kits/styles.json"
-import { StyleFrameClient } from "@/components/home/deck/style-frame-client"
+import { StyleFrameClient } from "@/components/home/customize/style-frame-client"
 
 export const dynamicParams = false
 
