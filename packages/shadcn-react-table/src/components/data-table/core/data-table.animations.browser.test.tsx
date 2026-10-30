@@ -287,11 +287,35 @@ describe("row animations", () => {
     const drawn = bodyRows().length
     expect(drawn).toBeLessThan(100)
     // Rows drawn before and after glide (r1 moves from index 1 to 5); rows
-    // new to the window (they were in the data before) do not fade in.
+    // new to the window fade in (see below).
     expect(running()).toBeGreaterThan(0)
     expect(running()).toBeLessThanOrEqual(drawn)
     const r1 = bodyRows().find((tr) => tr.dataset.rowId === "r1")!
     expect(animating(r1, "transform").length).toBe(1)
+  })
+
+  it("fades in rows that a sort brings into a virtual window", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        data={rows(2000)}
+        enableRowVirtualization
+        onTable={(t) => (table = t)}
+      />
+    )
+    await nextFrame()
+    const before = new Set(bodyRows().map((tr) => tr.dataset.rowId))
+    act(() => table.setSorting([{ id: "n", desc: false }]))
+    const arrived = bodyRows().filter((tr) => !before.has(tr.dataset.rowId))
+    expect(arrived.length).toBeGreaterThan(0)
+    for (const tr of arrived) {
+      const fade = animating(tr, "opacity")
+      expect(fade).toHaveLength(1)
+      const first = (fade[0]!.effect as KeyframeEffect).getKeyframes()[0]!
+      expect(Number(first.opacity)).toBe(0)
+    }
+    // Nothing left the data, so no copies.
+    expect(layer()!.children.length).toBe(0)
   })
 
   it("glides a row into the top pinned group and back", async () => {

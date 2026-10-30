@@ -371,7 +371,9 @@ export function useRowAnimations({
         track(tr.animate(CLEAR_BORDER, { duration }))
       }
     })
-    for (const key of plan.enters) {
+    // Rows new to a virtual window came with the change (from outside the
+    // drawn rows, so there is no place to glide from): they fade in too.
+    for (const key of [...plan.enters, ...plan.arrivals]) {
       const tr = rows.get(key)
       if (!tr) continue
       if (isDetail(tr)) {

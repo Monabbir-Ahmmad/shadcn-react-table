@@ -17,6 +17,7 @@ describe("planRowAnimations", () => {
       moves: [],
       enters: [],
       leaves: [],
+      arrivals: [],
       skipped: false,
     })
   })
@@ -70,7 +71,7 @@ describe("planRowAnimations", () => {
     expect(plan.moves).toEqual([])
   })
 
-  it("ignores rows that only came into view (virtual scrolling)", () => {
+  it("lists rows new to the drawn window as arrivals, not entering", () => {
     const prev = snap(
       ["a", "b", "c"],
       [
@@ -85,9 +86,12 @@ describe("planRowAnimations", () => {
         ["c", 40],
       ]
     )
+    // "c" was in the data but not drawn (a virtual window). The hook plans
+    // only on a row change, never on scroll, so it arrived with the change.
     const plan = planRowAnimations(prev, next)
     expect(plan.enters).toEqual([])
     expect(plan.leaves).toEqual([])
+    expect(plan.arrivals).toEqual(["c"])
   })
 
   it("does nothing when nothing moved", () => {
@@ -113,6 +117,7 @@ describe("planRowAnimations", () => {
       moves: [],
       enters: [],
       leaves: [],
+      arrivals: [],
       skipped: false,
     })
   })
@@ -131,6 +136,7 @@ describe("planRowAnimations", () => {
       moves: [],
       enters: [],
       leaves: [],
+      arrivals: [],
       skipped: true,
     })
   })

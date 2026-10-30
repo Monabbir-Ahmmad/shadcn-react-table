@@ -10,6 +10,9 @@ export type RowAnimationPlan = {
   moves: { key: string; dy: number }[]
   enters: string[]
   leaves: string[]
+  /** Rows already in the data, drawn now but not before: a change brought
+   *  them into a virtual window. */
+  arrivals: string[]
   skipped: boolean
 }
 
@@ -21,13 +24,16 @@ const none = (skipped = false): RowAnimationPlan => ({
   moves: [],
   enters: [],
   leaves: [],
+  arrivals: [],
   skipped,
 })
 
 /**
  * What changed between two snapshots: rows to glide (with the distance), rows
- * that appeared in the data and rows that left it. Rows that only scrolled
- * into or out of the drawn window are neither entering nor leaving.
+ * that appeared in the data and rows that left it. Rows that were in the data
+ * but are newly drawn are arrivals, not entering; rows no longer drawn but
+ * still in the data are not leaving. Only call it for a row change: a scroll
+ * would make every row new to the window an arrival.
  */
 export function planRowAnimations(
   prev: RowSnapshot | null,
@@ -37,11 +43,14 @@ export function planRowAnimations(
   if (!prev) return none()
   const moves: { key: string; dy: number }[] = []
   const enters: string[] = []
+  const arrivals: string[] = []
   for (const [key, top] of next.tops) {
     const before = prev.tops.get(key)
     if (before !== undefined) {
       if (before !== top) moves.push({ key, dy: before - top })
-    } else if (!prev.members.has(key)) {
+    } else if (prev.members.has(key)) {
+      arrivals.push(key)
+    } else {
       enters.push(key)
     }
   }
@@ -49,8 +58,7 @@ export function planRowAnimations(
   for (const key of prev.tops.keys()) {
     if (!next.members.has(key)) leaves.push(key)
   }
-  if (moves.length + enters.length + leaves.length > limit) {
-    return none(true)
-  }
-  return { moves, enters, leaves, skipped: false }
+  const count = moves.length + enters.length + leaves.length + arrivals.length
+  if (count > limit) return none(true)
+  return { moves, enters, leaves, arrivals, skipped: false }
 }
