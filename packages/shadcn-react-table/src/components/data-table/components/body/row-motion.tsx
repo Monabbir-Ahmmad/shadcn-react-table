@@ -6,6 +6,7 @@ import type * as React from "react"
 import { dt } from "../../core/internal"
 import type { DataTableInstance } from "../../core/types"
 import { isFilterRowVisible } from "../../helpers/grid-rows"
+import { useColumnAnimations } from "../../hooks/use-column-animations"
 import { useRowAnimations } from "../../hooks/use-row-animations"
 import { publishStickyOffsets } from "../../hooks/use-row-pinning-display"
 import { useTableState } from "../../hooks/use-table-state"
@@ -32,13 +33,32 @@ function rowKeys<TData extends RowData>(
 }
 
 /**
- * Runs the row animations. Renders nothing; it sits before the `<table>` so
- * its insertion effect sees the rows before React updates them (React runs a
- * component's insertion effects after updating its own children, and a
- * sibling's before the next sibling's DOM updates). That order is React's
- * internal behaviour, not a documented guarantee; the leave, glide and
- * detail-panel tests in `data-table.animations.browser.test.tsx` catch a
- * change (see `useRowAnimations`).
+ * Where the columns are: each drawn leaf column in order, with its pinned
+ * side. A string, so it only changes when the order, visibility or pinning
+ * does (never on a resize, nor when the consumer passes new state objects of
+ * the same value). Work proportional to the columns.
+ */
+function columnLayout<TData extends RowData>(table: DataTableInstance<TData>) {
+  const leaves = table.getHeaderGroups().at(-1)?.headers ?? []
+  return leaves
+    .map(({ column }) => `${column.id}:${column.getIsPinned() || ""}`)
+    .join("|")
+}
+
+/** Every header column id (leaf and group columns). */
+function columnKeys<TData extends RowData>(table: DataTableInstance<TData>) {
+  return new Set(table.getFlatHeaders().map((header) => header.column.id))
+}
+
+/**
+ * Runs the row and column animations. Renders nothing; it sits before the
+ * `<table>` so its insertion effects see the rows and cells before React
+ * updates them (React runs a component's insertion effects after updating
+ * its own children, and a sibling's before the next sibling's DOM updates).
+ * That order is React's internal behaviour, not a documented guarantee; the
+ * leave, glide, detail-panel and column glide tests in
+ * `data-table.animations.browser.test.tsx` catch a change (see
+ * `useRowAnimations`).
  */
 export function DataTableRowMotion<TData extends RowData>({
   table,
@@ -94,6 +114,13 @@ export function DataTableRowMotion<TData extends RowData>({
         })
       }
     },
+  })
+  useColumnAnimations({
+    tableRef,
+    active,
+    signal: [columnLayout(table)],
+    members: () => columnKeys(table),
+    paused: () => editing,
   })
   return null
 }

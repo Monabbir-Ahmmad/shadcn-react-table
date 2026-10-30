@@ -160,6 +160,10 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
           colSpan,
           style,
           "data-pinned": getPinSide(column) || undefined,
+          // Found by the column motion, which leaves a dragged column's drop
+          // to dnd-kit's own animation.
+          "data-column-id": column.id,
+          "data-dragging": isDragging || undefined,
           "aria-sort": ariaSort(column.getIsSorted()),
           className: cn(
             "relative bg-card",

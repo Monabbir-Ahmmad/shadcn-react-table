@@ -107,6 +107,7 @@ export function DataTableFooter<TData extends RowData>({
         {...mergeProps(
           {
             colSpan: layout?.colSpan ?? header.colSpan,
+            "data-column-id": header.column.id,
             style: {
               ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),
               ...getColumnPinningStyle(header.column),

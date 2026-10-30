@@ -106,6 +106,7 @@ export function DataTableHeader<TData extends RowData>({
         {
           // The filter row holds controls, not column headers.
           role: enableKeyboardNavigation ? "gridcell" : "cell",
+          "data-column-id": header.column.id,
           colSpan: layout?.colSpan ?? header.colSpan,
           style: {
             ...(layout?.widthStyle ?? getWidthStyle(header.column, table)),

@@ -9,9 +9,10 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { cdp } from "vitest/browser"
 
-import { nextFrame } from "../../../../test/browser/pointer"
+import { dragPointer, nextFrame } from "../../../../test/browser/pointer"
 import { DataTable } from "./data-table"
 import { MOTION_DEFAULTS } from "./motion"
+import type { DataTableColumnDef } from "./table-types"
 import type { DataTableInstance, UseDataTableOptions } from "./types"
 import { useDataTable } from "./use-data-table"
 
@@ -1470,6 +1471,382 @@ describe("toolbar motion", () => {
       expect(zone()).toBeNull()
       expect(copies()).toHaveLength(0)
       expect(scripted()).toHaveLength(0)
+    } finally {
+      await session.send("Emulation.setEmulatedMedia", { features: [] })
+    }
+  })
+})
+
+describe("column glide", () => {
+  type Wide = { id: string; a: string; b: string; c: string; d: string }
+
+  const KEYS = ["a", "b", "c", "d"] as const
+
+  const wideColumns: DataTableColumnDef<Wide>[] = KEYS.map((key) => ({
+    accessorKey: key,
+    header: key.toUpperCase(),
+    size: 120,
+  }))
+
+  const wideRows = (count: number): Wide[] =>
+    Array.from({ length: count }, (_, i) => ({
+      id: `w${i}`,
+      a: `a${i}`,
+      b: `b${i}`,
+      c: `c${i}`,
+      d: `d${i}`,
+    }))
+
+  const fiveRows = wideRows(5)
+
+  function Columns({
+    data = fiveRows,
+    columns = wideColumns,
+    onTable,
+    width,
+    dir,
+    ...options
+  }: Partial<UseDataTableOptions<Wide>> & {
+    data?: Wide[]
+    columns?: DataTableColumnDef<Wide>[]
+    onTable?: (table: DataTableInstance<Wide>) => void
+    width?: number
+    dir?: "rtl"
+  }) {
+    const table = useDataTable<Wide>({
+      data,
+      columns,
+      getRowId: (row) => row.id,
+      enablePagination: false,
+      ...options,
+    })
+    onTable?.(table)
+    return (
+      <div dir={dir} style={{ width }}>
+        <DataTable table={table} />
+      </div>
+    )
+  }
+
+  const OWN = '[data-slot="table-container"] > table'
+
+  /** A column's cells in the table (never a leave copy's). */
+  const cellsOf = (id: string) => [
+    ...document.querySelectorAll<HTMLElement>(
+      `${OWN} > * > tr > [data-column-id="${id}"]`
+    ),
+  ]
+
+  const head = (id: string) =>
+    document.querySelector<HTMLElement>(
+      `${OWN} > thead > tr > th[data-column-id="${id}"]`
+    )!
+
+  /** Each drawn column's left edge on screen, from its header. */
+  const lefts = (ids: readonly string[] = KEYS) =>
+    new Map(
+      ids.flatMap((id) => {
+        const th = document.querySelector(
+          `${OWN} > thead > tr > th[data-column-id="${id}"]`
+        )
+        return th ? [[id, th.getBoundingClientRect().left] as const] : []
+      })
+    )
+
+  /** Where a glide starts: its first keyframe's offset, in px. */
+  const fromX = (el: Element) => {
+    const [glide] = animating(el, "transform")
+    const first = (glide!.effect as KeyframeEffect).getKeyframes()[0]!
+    return parseFloat(
+      /translateX\((-?[\d.]+)px\)/.exec(String(first.transform))![1]!
+    )
+  }
+
+  const copies = () =>
+    document.querySelectorAll<HTMLElement>(
+      '[data-slot="data-table-leave-copy"]'
+    )
+
+  /** Web animations only (the table's own), not CSS transitions. */
+  const scripted = () =>
+    document
+      .getAnimations()
+      .filter(
+        (a) => !(a instanceof CSSTransition) && !(a instanceof CSSAnimation)
+      )
+
+  const pauseAt = (time: number) => {
+    for (const a of document.getAnimations()) {
+      a.pause()
+      a.currentTime = time
+    }
+  }
+
+  /** Ends every animation on the page (paused ones too). */
+  const finishAll = async () => {
+    for (const a of document.getAnimations()) a.finish()
+    await settle()
+  }
+
+  it("marks the header and body cells with their column", () => {
+    render(<Columns />)
+    // The header and five rows.
+    expect(cellsOf("b")).toHaveLength(6)
+    expect(head("b").textContent).toContain("B")
+  })
+
+  it("glides the columns after a hidden column into its place", async () => {
+    let table!: DataTableInstance<Wide>
+    render(<Columns onTable={(t) => (table = t)} />)
+    await nextFrame()
+    const was = lefts()
+    act(() => table.getColumn("b")!.toggleVisibility(false))
+    expect(cellsOf("b")).toHaveLength(0)
+    // The column before it stays put.
+    for (const cell of cellsOf("a")) {
+      expect(animating(cell, "transform")).toHaveLength(0)
+    }
+    const starts = new Map<string, number[]>()
+    for (const id of ["c", "d"]) {
+      const cells = cellsOf(id)
+      expect(cells).toHaveLength(6)
+      for (const cell of cells) {
+        const [glide] = animating(cell, "transform")
+        expect(glide).toBeDefined()
+        expect(timing(glide!).duration).toBe(MOTION_DEFAULTS.duration)
+      }
+      starts.set(id, cells.map(fromX))
+    }
+    // From where it was: no jump.
+    pauseAt(0)
+    for (const [id, left] of lefts(["c", "d"])) {
+      expect(left).toBeCloseTo(was.get(id)!, 0)
+    }
+    // A copy of the hidden header fades out where it was.
+    const [copy] = copies()
+    expect(copy).toBeDefined()
+    expect(copy!.textContent).toContain("B")
+    expect(copy!.inert).toBe(true)
+    expect(copy!.querySelector("[data-column-id]")).toBeNull()
+    const th = copy!.querySelector("th")!
+    expect(th.getBoundingClientRect().left).toBeCloseTo(was.get("b")!, 0)
+    expect(animating(copy!, "opacity")).toHaveLength(1)
+    // Above the sticky header, which would hide it.
+    expect(Number(getComputedStyle(copy!).zIndex)).toBeGreaterThan(20)
+    await finishAll()
+    expect(copies()).toHaveLength(0)
+    expect(scripted()).toHaveLength(0)
+    // Exactly where the static layout puts them.
+    const now = lefts(["c", "d"])
+    for (const id of ["c", "d"]) {
+      for (const start of starts.get(id)!) {
+        expect(start).toBeGreaterThan(0)
+        expect(start).toBeCloseTo(was.get(id)! - now.get(id)!, 0)
+      }
+    }
+  })
+
+  it("fades a shown column in while the columns after it glide aside", async () => {
+    let table!: DataTableInstance<Wide>
+    render(
+      <Columns
+        onTable={(t) => (table = t)}
+        initialState={{ columnVisibility: { b: false } }}
+      />
+    )
+    await nextFrame()
+    act(() => table.getColumn("b")!.toggleVisibility(true))
+    const shown = cellsOf("b")
+    expect(shown).toHaveLength(6)
+    for (const cell of shown) {
+      const [fade] = animating(cell, "opacity")
+      expect(fade).toBeDefined()
+      expect(timing(fade!).duration).toBe(MOTION_DEFAULTS.durationFast)
+      expect(timing(fade!).fill).toBe("backwards")
+    }
+    for (const cell of [...cellsOf("c"), ...cellsOf("d")]) {
+      expect(fromX(cell)).toBeLessThan(0)
+    }
+    for (const cell of cellsOf("a")) {
+      expect(cell.getAnimations()).toHaveLength(0)
+    }
+    await settle()
+    expect(scripted()).toHaveLength(0)
+  })
+
+  it("glides a pinned column to the pinned side and keeps it sticky", async () => {
+    let table!: DataTableInstance<Wide>
+    render(
+      <Columns
+        onTable={(t) => (table = t)}
+        width={300}
+        enableColumnPinning
+        initialState={{ columnPinning: { left: ["a"] } }}
+      />
+    )
+    await nextFrame()
+    const was = lefts()
+    act(() => table.getColumn("c")!.pin("start"))
+    const starts = cellsOf("c").map(fromX)
+    expect(starts).toHaveLength(6)
+    // `b` moves aside, after the newly pinned `c`.
+    for (const cell of cellsOf("b")) expect(fromX(cell)).toBeLessThan(0)
+    // The column pinned before it stays put.
+    for (const cell of cellsOf("a")) {
+      expect(animating(cell, "transform")).toHaveLength(0)
+    }
+    // Sticky while it glides.
+    pauseAt(MOTION_DEFAULTS.duration / 2)
+    for (const cell of cellsOf("c")) {
+      expect(getComputedStyle(cell).position).toBe("sticky")
+    }
+    pauseAt(0)
+    expect(head("c").getBoundingClientRect().left).toBeCloseTo(was.get("c")!, 0)
+    await finishAll()
+    const now = lefts()
+    for (const start of starts) {
+      expect(start).toBeGreaterThan(0)
+      expect(start).toBeCloseTo(was.get("c")! - now.get("c")!, 0)
+    }
+    // Still stuck after the glide: scrolling leaves the pinned columns put.
+    const s = surface()
+    expect(s.scrollWidth).toBeGreaterThan(s.clientWidth)
+    s.scrollLeft = 100
+    await nextFrame()
+    expect(head("a").getBoundingClientRect().left).toBeCloseTo(now.get("a")!, 0)
+    expect(head("c").getBoundingClientRect().left).toBeCloseTo(now.get("c")!, 0)
+    expect(head("d").getBoundingClientRect().left).toBeCloseTo(
+      now.get("d")! - 100,
+      0
+    )
+    expect(scripted()).toHaveLength(0)
+  })
+
+  it("glides the right way in a right-to-left table", async () => {
+    let table!: DataTableInstance<Wide>
+    render(<Columns onTable={(t) => (table = t)} dir="rtl" />)
+    await nextFrame()
+    await nextFrame()
+    const was = lefts()
+    // Right to left: `a` is the rightmost column.
+    expect(was.get("a")!).toBeGreaterThan(was.get("b")!)
+    act(() => table.getColumn("b")!.toggleVisibility(false))
+    const starts = cellsOf("c").map(fromX)
+    pauseAt(0)
+    expect(head("c").getBoundingClientRect().left).toBeCloseTo(was.get("c")!, 0)
+    await finishAll()
+    const now = lefts(["c"])
+    for (const start of starts) {
+      // The columns after it move right, into its place.
+      expect(start).toBeLessThan(0)
+      expect(start).toBeCloseTo(was.get("c")! - now.get("c")!, 0)
+    }
+  })
+
+  it("never animates a resize", async () => {
+    let table!: DataTableInstance<Wide>
+    render(
+      <Columns onTable={(t) => (table = t)} width={300} enableColumnResizing />
+    )
+    await nextFrame()
+    const was = lefts()
+    act(() => table.setColumnSizing({ a: 220 }))
+    expect(lefts().get("b")).not.toBeCloseTo(was.get("b")!, 0)
+    expect(scripted()).toHaveLength(0)
+  })
+
+  it("leaves a dropped column to the drag's own animation", async () => {
+    render(<Columns enableColumnOrdering />)
+    await nextFrame()
+    const grip = screen.getAllByRole("button", { name: /reorder column/i })[0]!
+    const width = head("a").offsetWidth
+    await dragPointer(grip, { dx: width * 1.5 })
+    // Dropped after `b`.
+    const now = lefts()
+    expect(now.get("a")!).toBeGreaterThan(now.get("b")!)
+    expect(scripted()).toHaveLength(0)
+    expect(copies()).toHaveLength(0)
+  })
+
+  it("only glides the drawn columns of a virtualized table", async () => {
+    const many: DataTableColumnDef<Wide>[] = Array.from(
+      { length: 40 },
+      (_, i) => ({
+        id: `x${i}`,
+        accessorFn: () => `v${i}`,
+        header: `X${i}`,
+        size: 120,
+      })
+    )
+    let table!: DataTableInstance<Wide>
+    render(
+      <Columns
+        onTable={(t) => (table = t)}
+        columns={many}
+        width={600}
+        enableColumnVirtualization
+      />
+    )
+    await nextFrame()
+    await nextFrame()
+    const headers = () => [
+      ...document.querySelectorAll(`${OWN} > thead > tr > th[data-column-id]`),
+    ]
+    const drawn = headers().length
+    expect(drawn).toBeLessThan(40)
+    act(() => table.getColumn("x1")!.toggleVisibility(false))
+    const gliding = headers().filter(
+      (th) => animating(th, "transform").length > 0
+    )
+    expect(gliding.length).toBeGreaterThan(0)
+    expect(gliding.length).toBeLessThan(drawn)
+    // Drawn cells only: the header and five rows of each gliding column.
+    const glides = scripted().filter((a) =>
+      (a.effect as KeyframeEffect).getKeyframes().some((k) => "transform" in k)
+    )
+    expect(glides).toHaveLength(gliding.length * 6)
+  })
+
+  it("skips a change that would move too many cells", async () => {
+    let table!: DataTableInstance<Wide>
+    render(<Columns onTable={(t) => (table = t)} data={wideRows(1200)} />)
+    await nextFrame()
+    act(() => table.getColumn("a")!.toggleVisibility(false))
+    expect(scripted()).toHaveLength(0)
+    expect(copies()).toHaveLength(0)
+  })
+
+  it("changes columns at once when animations are off", async () => {
+    let table!: DataTableInstance<Wide>
+    render(
+      <Columns
+        onTable={(t) => (table = t)}
+        enableColumnPinning
+        enableAnimations={false}
+      />
+    )
+    await nextFrame()
+    act(() => table.getColumn("b")!.toggleVisibility(false))
+    act(() => table.getColumn("c")!.pin("start"))
+    act(() => table.getColumn("b")!.toggleVisibility(true))
+    expect(scripted()).toHaveLength(0)
+    expect(copies()).toHaveLength(0)
+  })
+
+  it("changes columns at once under reduced motion", async () => {
+    const session = cdp()
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+    })
+    try {
+      let table!: DataTableInstance<Wide>
+      render(<Columns onTable={(t) => (table = t)} enableColumnPinning />)
+      await nextFrame()
+      act(() => table.getColumn("b")!.toggleVisibility(false))
+      act(() => table.getColumn("c")!.pin("start"))
+      act(() => table.getColumn("b")!.toggleVisibility(true))
+      expect(scripted()).toHaveLength(0)
+      expect(copies()).toHaveLength(0)
     } finally {
       await session.send("Emulation.setEmulatedMedia", { features: [] })
     }

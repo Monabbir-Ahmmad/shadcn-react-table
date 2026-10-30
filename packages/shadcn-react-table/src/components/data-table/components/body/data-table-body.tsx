@@ -256,6 +256,7 @@ export function DataTableBody<TData extends RowData>({
           {
             "data-cell-row": rowIndex,
             "data-cell-col": colIndex,
+            "data-column-id": cell.column.id,
             "aria-colindex": isGrid ? colIndex + 1 : undefined,
             "data-pinned": getPinSide(cell.column) || undefined,
             // The grid navigation hook makes one rendered cell the tab stop.
