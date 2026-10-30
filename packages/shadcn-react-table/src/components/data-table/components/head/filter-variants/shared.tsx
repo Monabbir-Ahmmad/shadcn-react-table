@@ -3,15 +3,22 @@
 import * as React from "react"
 import type { RowData } from "@tanstack/react-table"
 
-import { Input } from "@workspace/ui/components/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+} from "@workspace/ui/components/input-group"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { IconComponent } from "../../../core/icons"
+import { dt } from "../../../core/internal"
 import type {
   DataTableFilterOption,
   DataTableInstance,
 } from "../../../core/types"
 import type { DataTableColumn } from "../../../core/table-types"
+import { DataTableFilterModeMenu } from "../../menus/data-table-filter-mode-menu"
 
 export interface FilterFieldProps<TData extends RowData, TValue> {
   column: DataTableColumn<TData, TValue>
@@ -20,6 +27,10 @@ export interface FilterFieldProps<TData extends RowData, TValue> {
 
 export const FIELD_CLASS =
   "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
+
+/** The control inside a `FilterInputGroup` (the group carries the height). */
+export const GROUP_CONTROL_CLASS =
+  "h-full text-xs font-normal tracking-normal normal-case"
 
 const GREGORIAN = "gregory"
 
@@ -104,12 +115,67 @@ export const CALENDAR_NAV_PROPS = {
   endMonth: new Date(new Date().getFullYear() + 10, 11),
 } as const
 
-/** A muted pill shown for valueless modes (empty / not empty). */
-export function ValuelessLabel({ label }: { label: string }) {
+/**
+ * The input group a text-like filter renders in: the filter-mode menu leads
+ * (unless `modeMenu` is off), the control fills the middle, and a clear button
+ * trails when `onClear` is given (pass it only while there is a value).
+ */
+export function FilterInputGroup<TData extends RowData, TValue>({
+  column,
+  table,
+  modeMenu = true,
+  onClear,
+  clearLabel,
+  className,
+  children,
+}: FilterFieldProps<TData, TValue> & {
+  modeMenu?: boolean
+  onClear?: () => void
+  /** Defaults to `localization.clearFilter`. */
+  clearLabel?: string
+  className?: string
+  children: React.ReactNode
+}) {
+  const { localization, icons } = dt(table)
   return (
-    <div className="flex h-8 items-center rounded-sm border border-dashed px-2 text-xs text-muted-foreground">
-      {label}
-    </div>
+    <InputGroup className={cn("h-8 rounded-sm", className)}>
+      {modeMenu && (
+        <DataTableFilterModeMenu column={column} table={table} addon />
+      )}
+      {children}
+      {onClear && (
+        <InputGroupAddon align="inline-end" className="py-0">
+          <InputGroupButton
+            size="icon-xs"
+            aria-label={clearLabel ?? localization.clearFilter}
+            onClick={onClear}
+            className="text-muted-foreground"
+          >
+            <icons.clear className="size-3.5" />
+          </InputGroupButton>
+        </InputGroupAddon>
+      )}
+    </InputGroup>
+  )
+}
+
+/** A muted, dashed field shown for valueless modes (empty / not empty), with
+ *  the mode menu inside so the mode can be changed back. */
+export function ValuelessLabel<TData extends RowData, TValue>({
+  column,
+  table,
+  label,
+}: FilterFieldProps<TData, TValue> & { label: string }) {
+  return (
+    <FilterInputGroup
+      column={column}
+      table={table}
+      className="border-dashed border-border"
+    >
+      <InputGroupText className="min-w-0 px-2 text-xs">
+        <span className="truncate">{label}</span>
+      </InputGroupText>
+    </FilterInputGroup>
   )
 }
 
@@ -135,45 +201,38 @@ export function useSelectOptions<TData extends RowData, TValue>(
   }, [facets, column.columnDef.meta?.filterSelectOptions])
 }
 
-/** A text input with a trailing clear affordance. */
-export function ClearableInput({
+/** A text input in a `FilterInputGroup`, with a clear button while it has a
+ *  value. */
+export function ClearableInput<TData extends RowData, TValue>({
+  column,
+  table,
   value,
   onChange,
   placeholder,
   ariaLabel,
-  clearLabel,
-  ClearIcon,
   list,
-}: {
+}: FilterFieldProps<TData, TValue> & {
   value: string
   onChange: (next: string) => void
   placeholder: string
   ariaLabel: string
-  clearLabel: string
-  ClearIcon: IconComponent
   /** Id of a `<datalist>` of suggestions. */
   list?: string
 }) {
   return (
-    <div className="relative flex-1">
-      <Input
+    <FilterInputGroup
+      column={column}
+      table={table}
+      onClear={value ? () => onChange("") : undefined}
+    >
+      <InputGroupInput
         list={list}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        className={cn(FIELD_CLASS, value && "pe-7")}
+        className={GROUP_CONTROL_CLASS}
       />
-      {value && (
-        <button
-          type="button"
-          aria-label={clearLabel}
-          onClick={() => onChange("")}
-          className="absolute inset-y-0 end-1.5 flex items-center text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ClearIcon className="size-3.5" />
-        </button>
-      )}
-    </div>
+    </FilterInputGroup>
   )
 }

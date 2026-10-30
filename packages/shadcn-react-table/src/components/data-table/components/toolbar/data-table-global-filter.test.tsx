@@ -113,3 +113,20 @@ describe("global filter input", () => {
     }
   })
 })
+
+describe("global filter input group", () => {
+  it("puts the search mode menu and clear button inside the input", () => {
+    const { table } = mount()
+    act(() => table().setGlobalFilter("abc"))
+    const field = screen
+      .getByRole("textbox")
+      .closest('[data-slot="input-group"]')
+    expect(field).not.toBeNull()
+    expect(
+      field!.contains(screen.getByRole("button", { name: "Search mode" }))
+    ).toBe(true)
+    expect(
+      field!.contains(screen.getByRole("button", { name: "Clear search" }))
+    ).toBe(true)
+  })
+})

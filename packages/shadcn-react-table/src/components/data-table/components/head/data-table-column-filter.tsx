@@ -16,8 +16,17 @@ import {
   TextFilterField,
   type FilterFieldProps,
 } from "./filter-variants"
-import type { DataTableInstance } from "../../core/types"
+import type { DataTableInstance, FilterVariant } from "../../core/types"
 import type { DataTableHeader } from "../../core/table-types"
+
+/** Variants without a text-like input keep the mode menu beside the field;
+ *  the rest render it inside their input group. */
+const MENU_BESIDE_VARIANTS = new Set<FilterVariant>([
+  "select",
+  "multi-select",
+  "checkbox",
+  "range-slider",
+])
 
 interface DataTableColumnFilterProps<TData extends RowData, TValue> {
   header: DataTableHeader<TData, TValue>
@@ -26,7 +35,8 @@ interface DataTableColumnFilterProps<TData extends RowData, TValue> {
 
 /**
  * One filter-row field. Reads `column.meta.filterVariant` and renders the matching
- * control, preceded by the filter-mode menu (where the variant supports modes).
+ * control with its filter-mode menu (where the variant supports modes): inside
+ * the input group for text-like variants, beside the field for the rest.
  * `meta.renderColumnFilter` is an escape hatch for fully custom UI. Returns an
  * empty placeholder for non-filterable columns so the grid stays aligned.
  */
@@ -45,9 +55,13 @@ export function DataTableColumnFilter<TData extends RowData, TValue>({
     return <>{custom({ column, table })}</>
   }
 
+  const variant = column.columnDef.meta?.filterVariant ?? "text"
+
   return (
     <div className="flex items-center gap-0.5">
-      <DataTableFilterModeMenu column={column} table={table} />
+      {MENU_BESIDE_VARIANTS.has(variant) && (
+        <DataTableFilterModeMenu column={column} table={table} />
+      )}
       <div className="min-w-0 flex-1">
         <FilterField column={column} table={table} />
       </div>

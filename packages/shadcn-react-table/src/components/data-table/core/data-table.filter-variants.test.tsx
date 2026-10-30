@@ -167,3 +167,96 @@ describe("autocomplete filter", () => {
     expect(names()).toEqual(["Early"])
   })
 })
+
+describe("filter input groups", () => {
+  const group = (element: Element) =>
+    element.closest('[data-slot="input-group"]')
+
+  it("puts the text filter's mode menu and clear button inside the input", () => {
+    mount({ initialState: { showColumnFilters: true } })
+    const input = screen.getByLabelText("Filter by Name")
+    const field = group(input)
+    expect(field).not.toBeNull()
+    // No clear button while the field is empty.
+    expect(screen.queryByRole("button", { name: "Clear filter" })).toBeNull()
+    expect(
+      field!.contains(
+        screen.getByRole("button", { name: "Change filter mode" })
+      )
+    ).toBe(true)
+
+    fireEvent.change(input, { target: { value: "ea" } })
+    const clear = screen.getByRole("button", { name: "Clear filter" })
+    expect(field!.contains(clear)).toBe(true)
+    fireEvent.click(clear)
+    expect((input as HTMLInputElement).value).toBe("")
+    expect(names()).toEqual(["Early", "Day", "Late", "Next"])
+  })
+
+  it("puts the number filter's mode menu and clear button inside the input", () => {
+    mount({
+      columns: column("opens", {
+        filterVariant: "range",
+        filterMode: "greaterThan",
+      }),
+      initialState: {
+        showColumnFilters: true,
+        columnFilters: [{ id: "opens", value: "5" }],
+      },
+    })
+    const field = group(screen.getByLabelText("Filter by When"))
+    expect(field).not.toBeNull()
+    expect(
+      field!.contains(
+        screen.getAllByRole("button", { name: "Change filter mode" })[1]!
+      )
+    ).toBe(true)
+    expect(
+      field!.contains(screen.getByRole("button", { name: "Clear filter" }))
+    ).toBe(true)
+  })
+
+  it("gives each side of a number range its own group", () => {
+    mount({
+      columns: column("opens", { filterVariant: "range" }),
+      initialState: {
+        showColumnFilters: true,
+        columnFilters: [{ id: "opens", value: ["", "9"] }],
+      },
+    })
+    const min = group(screen.getByLabelText("Min"))
+    const max = group(screen.getByLabelText("Max"))
+    expect(min).not.toBeNull()
+    expect(max).not.toBeNull()
+    expect(min).not.toBe(max)
+    // The mode menu leads the first side; only the filled side clears.
+    expect(
+      min!.contains(
+        screen.getAllByRole("button", { name: "Change filter mode" })[1]!
+      )
+    ).toBe(true)
+    const clear = screen.getByRole("button", { name: "Clear filter (Max)" })
+    expect(max!.contains(clear)).toBe(true)
+    fireEvent.click(clear)
+    expect((screen.getByLabelText("Max") as HTMLInputElement).value).toBe("")
+  })
+
+  it("keeps a select filter's mode menu beside the field", () => {
+    mount({
+      columns: [
+        {
+          accessorKey: "name",
+          header: "Name",
+          meta: {
+            filterVariant: "select",
+            columnFilterModeOptions: ["firstLetter"],
+          },
+        },
+      ],
+      filterFns: { firstLetter: () => true },
+      initialState: { showColumnFilters: true },
+    })
+    const trigger = screen.getByRole("button", { name: "Change filter mode" })
+    expect(group(trigger)).toBeNull()
+  })
+})

@@ -14,7 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { Input } from "@workspace/ui/components/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@workspace/ui/components/input-group"
 import {
   Tooltip,
   TooltipContent,
@@ -27,8 +32,9 @@ import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 /**
  * Expandable global search (MRT order: first in the toolbar icon cluster). The
- * search button expands into an input with a leading icon, an optional
- * search-mode menu, and a clear affordance. Input is debounced in manual
+ * search button expands into an input group: the leading search icon (the
+ * search-mode menu's trigger when modes are on), the input, and a clear
+ * button. Input is debounced in manual
  * (server) mode so each keystroke doesn't fire a request.
  */
 export function DataTableGlobalFilter<TData extends RowData>({
@@ -134,9 +140,61 @@ export function DataTableGlobalFilter<TData extends RowData>({
   }
 
   return (
-    <div className="flex h-9 items-center gap-0.5 rounded-md border bg-background ps-2 pe-1 focus-within:border-ring">
-      <icons.search className="size-3.5 shrink-0 text-muted-foreground" />
-      <Input
+    <InputGroup className="h-9 w-auto rounded-md border-border bg-background ps-1 pe-1 focus-within:border-ring">
+      <InputGroupAddon align="inline-start" className="py-0">
+        {enableGlobalFilterModes ? (
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <InputGroupButton
+                    size="icon-xs"
+                    aria-label={localization.globalFilterMode}
+                    className="text-muted-foreground"
+                  >
+                    <icons.search className="size-3.5" />
+                  </InputGroupButton>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>{localization.globalFilterMode}</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="start" className="w-48">
+              {/* Base UI's GroupLabel requires a Group ancestor; Radix renders
+                  the group as an inert wrapper. */}
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  {localization.globalFilterMode}
+                </DropdownMenuLabel>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              {renderGlobalFilterModeMenuItems ? (
+                renderGlobalFilterModeMenuItems({
+                  modes,
+                  currentMode: globalFilterMode,
+                  onSelect: setGlobalFilterMode,
+                  table,
+                })
+              ) : (
+                <DropdownMenuRadioGroup
+                  value={globalFilterMode}
+                  onValueChange={(mode) =>
+                    setGlobalFilterMode(mode as GlobalFilterMode)
+                  }
+                >
+                  {modes.map((mode) => (
+                    <DropdownMenuRadioItem key={mode} value={mode}>
+                      {localization.filterModes[mode] ?? mode}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <icons.search className="ms-1 size-3.5 shrink-0 text-muted-foreground" />
+        )}
+      </InputGroupAddon>
+      <InputGroupInput
         {...mergeProps(
           // The ref is forwarded to the input, not read during render.
           // eslint-disable-next-line react-hooks/refs
@@ -151,72 +209,23 @@ export function DataTableGlobalFilter<TData extends RowData>({
             placeholder: localization.searchPlaceholder,
             "aria-label": localization.search,
             className:
-              "h-7 w-40 border-0 px-1 text-xs font-normal tracking-normal normal-case shadow-none focus-visible:ring-0 sm:w-56",
+              "h-7 w-40 flex-none px-1 text-xs font-normal tracking-normal normal-case shadow-none sm:w-56",
           } as React.ComponentProps<"input">,
           getSlotProps(table, "searchInput", {})
         )}
       />
       {value && (
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={localization.clearSearch}
-          onClick={clear}
-          className="size-7"
-        >
-          <icons.clear />
-        </Button>
+        <InputGroupAddon align="inline-end" className="py-0">
+          <InputGroupButton
+            size="icon-xs"
+            aria-label={localization.clearSearch}
+            onClick={clear}
+            className="text-muted-foreground"
+          >
+            <icons.clear className="size-3.5" />
+          </InputGroupButton>
+        </InputGroupAddon>
       )}
-      {enableGlobalFilterModes && (
-        <DropdownMenu>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={localization.globalFilterMode}
-                  className="size-7"
-                >
-                  <icons.search className="size-3" />
-                </Button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent>{localization.globalFilterMode}</TooltipContent>
-          </Tooltip>
-          <DropdownMenuContent align="end" className="w-48">
-            {/* Base UI's GroupLabel requires a Group ancestor; Radix renders
-                the group as an inert wrapper. */}
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>
-                {localization.globalFilterMode}
-              </DropdownMenuLabel>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            {renderGlobalFilterModeMenuItems ? (
-              renderGlobalFilterModeMenuItems({
-                modes,
-                currentMode: globalFilterMode,
-                onSelect: setGlobalFilterMode,
-                table,
-              })
-            ) : (
-              <DropdownMenuRadioGroup
-                value={globalFilterMode}
-                onValueChange={(mode) =>
-                  setGlobalFilterMode(mode as GlobalFilterMode)
-                }
-              >
-                {modes.map((mode) => (
-                  <DropdownMenuRadioItem key={mode} value={mode}>
-                    {localization.filterModes[mode] ?? mode}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </div>
+    </InputGroup>
   )
 }

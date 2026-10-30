@@ -3,13 +3,18 @@
 import type { RowData } from "@tanstack/react-table"
 import { format } from "date-fns"
 
-import { Input } from "@workspace/ui/components/input"
+import { InputGroupInput } from "@workspace/ui/components/input-group"
 
 import { VALUELESS_MODES } from "../../../fns/filter-fns"
 import { getColumnLabel } from "../../../helpers/column-label"
 import { getEffectiveMode } from "../../../helpers/effective-filter-mode"
 import { parseDate } from "../../../helpers/parse-date"
-import { FIELD_CLASS, ValuelessLabel, type FilterFieldProps } from "./shared"
+import {
+  FilterInputGroup,
+  GROUP_CONTROL_CLASS,
+  ValuelessLabel,
+  type FilterFieldProps,
+} from "./shared"
 import { dt } from "../../../core/internal"
 
 type Kind = "datetime" | "time"
@@ -41,7 +46,13 @@ export function DateTimeFilterField<TData extends RowData, TValue>({
   const type = kind === "time" ? "time" : "datetime-local"
 
   if (VALUELESS_MODES.has(mode)) {
-    return <ValuelessLabel label={localization.filterModes[mode] ?? mode} />
+    return (
+      <ValuelessLabel
+        column={column}
+        table={table}
+        label={localization.filterModes[mode] ?? mode}
+      />
+    )
   }
 
   if (mode === "betweenDates") {
@@ -55,34 +66,58 @@ export function DateTimeFilterField<TData extends RowData, TValue>({
     }
     return (
       <div className="flex items-center gap-1">
-        <Input
-          type={type}
-          value={toInputValue(kind, value[0])}
-          onChange={(e) => setBound(0, e.target.value)}
-          aria-label={`${label} (${localization.min})`}
-          className={FIELD_CLASS}
-        />
+        <FilterInputGroup
+          column={column}
+          table={table}
+          onClear={value[0] != null ? () => setBound(0, "") : undefined}
+          clearLabel={`${localization.clearFilter} (${localization.min})`}
+        >
+          <InputGroupInput
+            type={type}
+            value={toInputValue(kind, value[0])}
+            onChange={(e) => setBound(0, e.target.value)}
+            aria-label={`${label} (${localization.min})`}
+            className={GROUP_CONTROL_CLASS}
+          />
+        </FilterInputGroup>
         <span className="text-muted-foreground">–</span>
-        <Input
-          type={type}
-          value={toInputValue(kind, value[1])}
-          onChange={(e) => setBound(1, e.target.value)}
-          aria-label={`${label} (${localization.max})`}
-          className={FIELD_CLASS}
-        />
+        <FilterInputGroup
+          column={column}
+          table={table}
+          modeMenu={false}
+          onClear={value[1] != null ? () => setBound(1, "") : undefined}
+          clearLabel={`${localization.clearFilter} (${localization.max})`}
+        >
+          <InputGroupInput
+            type={type}
+            value={toInputValue(kind, value[1])}
+            onChange={(e) => setBound(1, e.target.value)}
+            aria-label={`${label} (${localization.max})`}
+            className={GROUP_CONTROL_CLASS}
+          />
+        </FilterInputGroup>
       </div>
     )
   }
 
+  const value = column.getFilterValue()
   return (
-    <Input
-      type={type}
-      value={toInputValue(kind, column.getFilterValue())}
-      onChange={(e) =>
-        column.setFilterValue(fromInputValue(kind, e.target.value))
+    <FilterInputGroup
+      column={column}
+      table={table}
+      onClear={
+        value != null ? () => column.setFilterValue(undefined) : undefined
       }
-      aria-label={label}
-      className={FIELD_CLASS}
-    />
+    >
+      <InputGroupInput
+        type={type}
+        value={toInputValue(kind, value)}
+        onChange={(e) =>
+          column.setFilterValue(fromInputValue(kind, e.target.value))
+        }
+        aria-label={label}
+        className={GROUP_CONTROL_CLASS}
+      />
+    </FilterInputGroup>
   )
 }

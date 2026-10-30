@@ -13,6 +13,10 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 import {
+  InputGroupAddon,
+  InputGroupButton,
+} from "@workspace/ui/components/input-group"
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -29,14 +33,20 @@ import { dt } from "../../core/internal"
  * The `Filter` adornment that opens a mode menu (contains/equals/…; numeric and
  * date variants get their own sets). Swapping the mode changes the column's
  * `filterFn` and resets the stale value. Hidden when the variant has a single
- * fixed mode or modes are disabled.
+ * fixed mode or modes are disabled. With `addon`, it renders as the leading
+ * addon of the filter's `InputGroup` (text-like filters), else as a standalone
+ * button beside the field.
  */
 export function DataTableFilterModeMenu<TData extends RowData, TValue>({
   column,
   table,
+  addon = false,
 }: {
   column: DataTableColumn<TData, TValue>
   table: DataTableInstance<TData>
+  /** Render inside an `InputGroup`: an inline-start addon with an
+   *  `InputGroupButton` trigger. */
+  addon?: boolean
 }) {
   const {
     localization,
@@ -67,21 +77,31 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
 
   const current = getEffectiveMode(column, table)
 
-  return (
+  const trigger = addon ? (
+    <InputGroupButton
+      size="icon-xs"
+      aria-label={localization.changeFilterMode}
+      className="text-muted-foreground"
+    >
+      <icons.filter className="size-3.5" />
+    </InputGroupButton>
+  ) : (
+    <button
+      type="button"
+      aria-label={localization.changeFilterMode}
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 aria-expanded:text-foreground"
+      )}
+    >
+      <icons.filter className="size-3.5" />
+    </button>
+  )
+
+  const menu = (
     <DropdownMenu>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label={localization.changeFilterMode}
-              className={cn(
-                "flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 aria-expanded:text-foreground"
-              )}
-            >
-              <icons.filter className="size-3.5" />
-            </button>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent>{localization.filterMode}</TooltipContent>
       </Tooltip>
@@ -116,5 +136,13 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
         )}
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+
+  return addon ? (
+    <InputGroupAddon align="inline-start" className="py-0">
+      {menu}
+    </InputGroupAddon>
+  ) : (
+    menu
   )
 }
