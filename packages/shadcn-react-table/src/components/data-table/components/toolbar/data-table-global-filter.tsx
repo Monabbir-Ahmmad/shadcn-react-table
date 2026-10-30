@@ -29,6 +29,11 @@ import type { DataTableInstance } from "../../core/types"
 import type { GlobalFilterMode } from "../../fns/filter-fns"
 import { dt } from "../../core/internal"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
+import { GLIDE_KEY_ATTR } from "../../hooks/use-layout-glide"
+
+// The button and the box are one item to the toolbar's glide: the box grows
+// out of the button and shrinks back into it (see `useLayoutGlide`).
+const GLIDE_KEY = { [GLIDE_KEY_ATTR]: "search" }
 
 /**
  * Expandable global search (MRT order: first in the toolbar icon cluster). The
@@ -120,6 +125,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
             size="icon"
             aria-label={localization.search}
             className="size-8"
+            {...GLIDE_KEY}
             onClick={() => {
               setExpanded(true)
               requestAnimationFrame(() => inputRef.current?.focus())
@@ -140,7 +146,10 @@ export function DataTableGlobalFilter<TData extends RowData>({
   }
 
   return (
-    <InputGroup className="h-9 w-auto rounded-md border-border bg-background ps-1 pe-1 focus-within:border-ring">
+    <InputGroup
+      {...GLIDE_KEY}
+      className="h-9 w-auto rounded-md border-border bg-background ps-1 pe-1 focus-within:border-ring"
+    >
       <InputGroupAddon align="inline-start" className="py-0">
         {enableGlobalFilterModes ? (
           <DropdownMenu>

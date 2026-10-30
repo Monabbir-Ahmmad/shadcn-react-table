@@ -1258,3 +1258,220 @@ describe("control animations", () => {
     expect(getComputedStyle(path).strokeDashoffset).toBe("0px")
   })
 })
+
+describe("toolbar motion", () => {
+  const searchButton = () =>
+    screen.getByRole("button", { name: "Search" }) as HTMLElement
+  const searchBox = () =>
+    document.querySelector<HTMLElement>(
+      '[data-slot="data-table-toolbar"] [data-slot="input-group"]'
+    )!
+  const copies = () =>
+    document.querySelectorAll<HTMLElement>(
+      '[data-slot="data-table-glide-copy"]'
+    )
+  const banner = () =>
+    document.querySelector<HTMLElement>('[data-slot="data-table-alert-banner"]')
+  const zone = () =>
+    document.querySelector<HTMLElement>('[data-slot="data-table-group-zone"]')
+  /** Web animations only (the table's own), not CSS transitions. */
+  const scripted = () =>
+    document
+      .getAnimations()
+      .filter(
+        (a) => !(a instanceof CSSTransition) && !(a instanceof CSSAnimation)
+      )
+  const pauseAt = (time: number) => {
+    for (const a of document.getAnimations()) {
+      a.pause()
+      a.currentTime = time
+    }
+  }
+  const resume = () => {
+    for (const a of document.getAnimations()) a.play()
+  }
+  const near = (a: number, b: number) => Math.abs(a - b) < 1
+  /** The clip-path insets (top, right, bottom, left) of a keyframe, in px. */
+  const insets = (a: Animation, at: 0 | 1) => {
+    const frame = (a.effect as KeyframeEffect).getKeyframes()[at]!
+    return /inset\(([^)]*?)(?: round [^)]*)?\)/
+      .exec(String(frame.clipPath))![1]!
+      .split(/\s+/)
+      .map((v) => parseFloat(v))
+  }
+  const selectBoxes = () =>
+    screen.getAllByRole("checkbox", { name: /select row/i })
+
+  it("grows the search box out of the button", async () => {
+    render(<Harness />)
+    await nextFrame()
+    const from = searchButton().getBoundingClientRect()
+    fireEvent.click(searchButton())
+    const box = searchBox()
+    const rect = box.getBoundingClientRect()
+    const [grow] = animating(box, "clipPath")
+    expect(grow).toBeDefined()
+    expect(timing(grow!).duration).toBe(MOTION_DEFAULTS.duration)
+    expect(animating(box, "opacity")).toHaveLength(1)
+    // It starts clipped to the button's box.
+    const [top, right, bottom, left] = insets(grow!, 0)
+    expect(near(top!, from.top - rect.top)).toBe(true)
+    expect(near(right!, rect.right - from.right)).toBe(true)
+    expect(near(bottom!, rect.bottom - from.bottom)).toBe(true)
+    expect(near(left!, from.left - rect.left)).toBe(true)
+    // A copy of the button fades out where it was.
+    const [copy] = copies()
+    expect(copy).toBeDefined()
+    const at = copy!.getBoundingClientRect()
+    expect(near(at.left, from.left) && near(at.top, from.top)).toBe(true)
+    expect(animating(copy!, "opacity")).toHaveLength(1)
+    // Focus lands in the input at once.
+    await nextFrame()
+    expect(document.activeElement).toBe(box.querySelector("input"))
+    await settle()
+    expect(copies()).toHaveLength(0)
+    expect(scripted()).toHaveLength(0)
+    const end = box.getBoundingClientRect()
+    expect([end.left, end.width]).toEqual([rect.left, rect.width])
+  })
+
+  it("shrinks the search box back into the button", async () => {
+    render(<Harness />)
+    await nextFrame()
+    fireEvent.click(searchButton())
+    await settle()
+    const was = searchBox().getBoundingClientRect()
+    fireEvent.blur(searchBox().querySelector("input")!)
+    // The button is back at once, fading in.
+    const button = searchButton()
+    expect(animating(button, "opacity")).toHaveLength(1)
+    const to = button.getBoundingClientRect()
+    // A copy of the box plays the close where the box was.
+    const [copy] = copies()
+    expect(copy).toBeDefined()
+    expect(copy!.querySelector("input")).not.toBeNull()
+    const at = copy!.getBoundingClientRect()
+    expect(near(at.left, was.left) && near(at.width, was.width)).toBe(true)
+    const [shrink] = animating(copy!, "clipPath")
+    expect(timing(shrink!).duration).toBe(MOTION_DEFAULTS.duration)
+    // It ends clipped to the button's box.
+    const [, right, , left] = insets(shrink!, 1)
+    expect(near(left!, Math.max(0, to.left - was.left))).toBe(true)
+    expect(near(right!, Math.max(0, was.right - to.right))).toBe(true)
+    await settle()
+    expect(copies()).toHaveLength(0)
+  })
+
+  it("glides the toolbar items when the search box opens", async () => {
+    render(<Harness positionGlobalFilter="left" title="People" />)
+    await nextFrame()
+    const title = screen.getByText("People")
+    const from = title.getBoundingClientRect().left
+    fireEvent.click(searchButton())
+    const [glide] = animating(title, "transform")
+    expect(glide).toBeDefined()
+    expect(timing(glide!).duration).toBe(MOTION_DEFAULTS.duration)
+    // It starts where it was…
+    pauseAt(0)
+    expect(near(title.getBoundingClientRect().left, from)).toBe(true)
+    resume()
+    await settle()
+    // …and ends where the layout puts it, past the open box.
+    const to = title.getBoundingClientRect().left
+    expect(to).toBeGreaterThan(from)
+    expect(to).toBe(title.offsetLeft + title.parentElement!.offsetLeft)
+  })
+
+  it("glides the toolbar items when an item appears", async () => {
+    const { rerender } = render(<Harness enableDensityToggle={false} />)
+    await nextFrame()
+    const search = searchButton()
+    const from = search.getBoundingClientRect().left
+    rerender(<Harness />)
+    expect(animating(search, "transform")).toHaveLength(1)
+    pauseAt(0)
+    expect(near(search.getBoundingClientRect().left, from)).toBe(true)
+    // The new item (before the full screen toggle) fades in.
+    const density = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-toolbar-actions"] > :nth-last-child(2)'
+    )!
+    expect(animating(density, "opacity")).toHaveLength(1)
+    resume()
+    await settle()
+    expect(search.getBoundingClientRect().left).toBeLessThan(from)
+  })
+
+  it("slides the selection banner in and out as the table glides", async () => {
+    render(<Harness enableRowSelection />)
+    await nextFrame()
+    const top = () => surface().getBoundingClientRect().top
+    const before = top()
+    fireEvent.click(selectBoxes()[0]!)
+    const el = banner()!
+    const enter = animating(el, "opacity")
+    expect(enter).toHaveLength(1)
+    expect(timing(enter[0]!).duration).toBe(MOTION_DEFAULTS.durationFast)
+    expect(animating(el, "transform")).toHaveLength(1)
+    // The table glides down from where it was.
+    expect(animating(surface(), "transform")).toHaveLength(1)
+    pauseAt(0)
+    expect(near(top(), before)).toBe(true)
+    resume()
+    await settle()
+    const shown = top()
+    expect(shown).toBeGreaterThan(before)
+
+    fireEvent.click(selectBoxes()[0]!)
+    // Still there, fading out, while the table glides back up.
+    expect(banner()).toBe(el)
+    expect(animating(el, "opacity")).toHaveLength(1)
+    expect(animating(surface(), "transform")).toHaveLength(1)
+    pauseAt(0)
+    expect(near(top(), shown)).toBe(true)
+    resume()
+    await settle()
+    await nextFrame()
+    expect(banner()).toBeNull()
+    expect(top()).toBe(before)
+  })
+
+  it("slides the group drop zone in and out", async () => {
+    const { rerender } = render(<Harness />)
+    await nextFrame()
+    const before = surface().getBoundingClientRect().top
+    rerender(<Harness enableGrouping />)
+    const el = zone()!
+    expect(animating(el, "opacity")).toHaveLength(1)
+    expect(animating(surface(), "transform")).toHaveLength(1)
+    await settle()
+    rerender(<Harness />)
+    expect(zone()).toBe(el)
+    await settle()
+    await nextFrame()
+    expect(zone()).toBeNull()
+    expect(surface().getBoundingClientRect().top).toBe(before)
+  })
+
+  it("moves nothing under reduced motion", async () => {
+    const session = cdp()
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+    })
+    try {
+      const { rerender } = render(<Harness enableRowSelection />)
+      await nextFrame()
+      fireEvent.click(searchButton())
+      fireEvent.blur(searchBox().querySelector("input")!)
+      fireEvent.click(selectBoxes()[0]!)
+      fireEvent.click(selectBoxes()[0]!)
+      expect(banner()).toBeNull()
+      rerender(<Harness enableRowSelection enableGrouping />)
+      rerender(<Harness enableRowSelection />)
+      expect(zone()).toBeNull()
+      expect(copies()).toHaveLength(0)
+      expect(scripted()).toHaveLength(0)
+    } finally {
+      await session.send("Emulation.setEmulatedMedia", { features: [] })
+    }
+  })
+})

@@ -47,6 +47,7 @@ import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
 import { DENSITY_PADDING_VARS } from "./constants"
 import { MOTION_ROOT_CLASS, useAnimationsActive } from "./motion"
+import { usePresence } from "../hooks/use-presence"
 
 /**
  * Body wrapper that freezes during an active column resize. With
@@ -146,6 +147,18 @@ export function DataTable<TData extends RowData>({
   } = dt(table)
   const { refs } = table.dataTable
   const animate = useAnimationsActive(enableAnimations)
+  // The drop zones slide in and fade out when grouping turns on or off.
+  const zoneTop = usePresence<HTMLDivElement>(
+    enableGrouping &&
+      (positionToolbarDropZone === "top" || positionToolbarDropZone === "both"),
+    animate
+  )
+  const zoneBottom = usePresence<HTMLDivElement>(
+    enableGrouping &&
+      (positionToolbarDropZone === "bottom" ||
+        positionToolbarDropZone === "both"),
+    animate
+  )
 
   // The paper div feeds `refs.tablePaperRef` and, when given, the consumer's
   // own ref; a plain `ref={refs.tablePaperRef}` would be overwritten by the
@@ -326,11 +339,13 @@ export function DataTable<TData extends RowData>({
 
   const dndContent = (
     <>
-      {enableGrouping &&
-        (positionToolbarDropZone === "top" ||
-          positionToolbarDropZone === "both") && (
-          <DropToGroupZoneRegion table={table} config={dt(table)} />
-        )}
+      {zoneTop.present && (
+        <DropToGroupZoneRegion
+          table={table}
+          config={dt(table)}
+          presenceRef={zoneTop.ref}
+        />
+      )}
 
       <div
         {...mergeProps(
@@ -506,11 +521,13 @@ export function DataTable<TData extends RowData>({
         )}
       </div>
 
-      {enableGrouping &&
-        (positionToolbarDropZone === "bottom" ||
-          positionToolbarDropZone === "both") && (
-          <DropToGroupZoneRegion table={table} config={dt(table)} />
-        )}
+      {zoneBottom.present && (
+        <DropToGroupZoneRegion
+          table={table}
+          config={dt(table)}
+          presenceRef={zoneBottom.ref}
+        />
+      )}
     </>
   )
 

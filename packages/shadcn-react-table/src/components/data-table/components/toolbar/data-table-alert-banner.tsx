@@ -6,19 +6,22 @@ import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableInstance } from "../../core/types"
 import { dt } from "../../core/internal"
-import { readMotionTokens } from "../../core/motion"
+import { readMotionTokens, useAnimationsActive } from "../../core/motion"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
+import { usePresence } from "../../hooks/use-presence"
 
 /**
  * Selection alert banner shown between the toolbar and the table when any rows
  * are selected: a muted strip with the localized count and a Clear action.
+ * It slides in, and fades out with the last count it showed before it goes
+ * (see `usePresence`).
  */
 export function DataTableAlertBanner<TData extends RowData>({
   table,
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, enableRowSelection } = dt(table)
+  const { localization, enableRowSelection, enableAnimations } = dt(table)
   const selectedCount = enableRowSelection
     ? table.getSelectedRowModel().rows.length
     : 0
@@ -28,15 +31,24 @@ export function DataTableAlertBanner<TData extends RowData>({
     selectedCount > 0
       ? localization.rowsSelected(selectedCount, totalCount)
       : null
+  const { present, ref } = usePresence<HTMLDivElement>(
+    text !== null,
+    useAnimationsActive(enableAnimations)
+  )
+  // The count it last showed, kept while it fades out.
+  const [lastText, setLastText] = React.useState(text)
+  if (text !== null && text !== lastText) setLastText(text)
+  const shown = present ? (text ?? lastText) : null
   const countRef = React.useRef<HTMLSpanElement>(null)
-  useCountCrossfade(countRef, text)
+  useCountCrossfade(countRef, shown)
 
-  if (text === null) return null
+  if (shown === null) return null
 
   return (
     <div
       {...mergeProps(
         {
+          ref,
           "data-slot": "data-table-alert-banner",
           className:
             "flex items-center justify-between gap-3 rounded-md border bg-muted px-3 py-2 text-xs font-medium text-muted-foreground",
@@ -48,7 +60,7 @@ export function DataTableAlertBanner<TData extends RowData>({
       {/* The box the old count's copy fades out in (see useCountCrossfade). */}
       <span className="relative">
         <span ref={countRef} data-slot="data-table-selected-count">
-          {text}
+          {shown}
         </span>
       </span>
       <button

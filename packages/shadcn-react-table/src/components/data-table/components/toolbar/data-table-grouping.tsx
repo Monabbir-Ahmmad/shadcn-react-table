@@ -12,6 +12,7 @@ import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import { dt } from "../../core/internal"
 import { DndKeyContext, useDndId } from "../../core/dnd-scope"
+import { mergeProps } from "../../helpers/slot-props"
 
 export const GROUP_DROPZONE_ID = "cn-group-dropzone"
 
@@ -22,8 +23,12 @@ export const GROUP_DROPZONE_ID = "cn-group-dropzone"
  */
 export function DataTableDropToGroupZone<TData extends RowData>({
   table,
+  presenceRef,
 }: {
   table: DataTableInstance<TData>
+  /** Receives the zone's element as well, for its enter and exit motion
+   *  (see `usePresence`). */
+  presenceRef?: React.Ref<HTMLDivElement>
 }) {
   const { localization, icons } = dt(table)
   const grouping = table.getState().grouping
@@ -36,7 +41,10 @@ export function DataTableDropToGroupZone<TData extends RowData>({
 
   return (
     <div
-      ref={setNodeRef}
+      {...mergeProps({ ref: setNodeRef } as React.ComponentProps<"div">, {
+        ref: presenceRef,
+      })}
+      data-slot="data-table-group-zone"
       className={cn(
         "flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground transition-colors",
         isOver && "border-primary bg-muted text-foreground"

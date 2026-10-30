@@ -192,7 +192,10 @@ describe("selected count", () => {
   })
 
   it("animates only a change, never the banner appearing", () => {
-    const animate = vi.fn(() => ({ finished: new Promise(() => {}) }))
+    const animate = vi.fn(() => ({
+      finished: new Promise(() => {}),
+      cancel: () => {},
+    }))
     HTMLElement.prototype.animate = animate as never
     try {
       render(<ControlsHarness />)
@@ -206,7 +209,10 @@ describe("selected count", () => {
   })
 
   it("never animates with animations off", () => {
-    const animate = vi.fn(() => ({ finished: new Promise(() => {}) }))
+    const animate = vi.fn(() => ({
+      finished: new Promise(() => {}),
+      cancel: () => {},
+    }))
     HTMLElement.prototype.animate = animate as never
     try {
       render(<ControlsHarness enableAnimations={false} />)
