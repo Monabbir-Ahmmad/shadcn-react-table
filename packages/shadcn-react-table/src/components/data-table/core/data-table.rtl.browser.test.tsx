@@ -86,6 +86,34 @@ describe("right-to-left tables", () => {
     expect(Math.abs(rect("H0", "th").right - box.right)).toBeLessThanOrEqual(2)
   })
 
+  it("draws the pinned columns' dividers on their mirrored inner edges", async () => {
+    render(
+      <RtlTable
+        colCount={12}
+        enableColumnPinning
+        initialState={{ columnPinning: { left: ["c0"], right: ["c11"] } }}
+      />
+    )
+    await settle()
+    // A start-pinned column sits on the right: its line is on its left edge.
+    const startCell = getComputedStyle(
+      screen.getByText("r1c0").closest("td")!,
+      "::after"
+    )
+    expect(startCell.borderRightWidth).toBe("1px")
+    expect(startCell.borderRightStyle).toBe("solid")
+    expect(parseFloat(startCell.left) + parseFloat(startCell.width) - 1).toBe(0)
+    // An end-pinned column sits on the left: its line is on its right edge.
+    const end = screen.getByText("r1c11").closest("td")!
+    const endCell = getComputedStyle(end, "::before")
+    expect(endCell.borderLeftWidth).toBe("1px")
+    expect(endCell.borderLeftStyle).toBe("solid")
+    expect(parseFloat(endCell.left)).toBeCloseTo(
+      end.getBoundingClientRect().width - 1,
+      0
+    )
+  })
+
   it("widens a column when its edge is dragged outwards (to the left)", async () => {
     render(<RtlTable colCount={3} enableColumnResizing />)
     await settle()

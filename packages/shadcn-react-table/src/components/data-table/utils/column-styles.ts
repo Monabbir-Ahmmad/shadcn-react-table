@@ -26,8 +26,14 @@ export function getColumnPinningStyle<TData extends RowData, TValue>(
 }
 
 /**
- * Edge-shadow class for the boundary pinned columns (last left / first right),
- * built from `--border` (via a utility) so it reads in light and dark.
+ * Divider class for the boundary pinned columns (last left / first right): a
+ * solid 1px line along the cell's inner edge with a soft shadow outside it,
+ * built from `--border` (via a utility) so it reads in light and dark. Both
+ * live in one pseudo-element of the sticky cell (the line is its border, the
+ * shadow its background), so they stick with it: a collapsed table border
+ * would be drawn by the table and stay behind. The line sits inside the cell,
+ * so a clipping (resizable) header still shows it. Logical insets and borders
+ * mirror it in RTL.
  */
 export function getColumnPinningClass<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>
@@ -35,8 +41,25 @@ export function getColumnPinningClass<TData extends RowData, TValue>(
   const side = getPinSide(column)
   if (!side || !isPinnedEdgeColumn(column, side)) return ""
   return side === "left"
-    ? "after:pointer-events-none after:absolute after:inset-y-0 after:-end-px after:w-2 after:translate-x-full after:bg-gradient-to-r after:from-border/60 after:to-transparent rtl:after:-translate-x-full rtl:after:bg-gradient-to-l"
-    : "before:pointer-events-none before:absolute before:inset-y-0 before:-start-px before:w-2 before:-translate-x-full before:bg-gradient-to-l before:from-border/60 before:to-transparent rtl:before:translate-x-full rtl:before:bg-gradient-to-r"
+    ? "after:pointer-events-none after:absolute after:inset-y-0 after:-end-2 after:w-[calc(--spacing(2)+1px)] after:border-s after:border-border after:bg-gradient-to-r after:from-border/60 after:to-transparent after:bg-clip-padding rtl:after:bg-gradient-to-l"
+    : "before:pointer-events-none before:absolute before:inset-y-0 before:-start-2 before:w-[calc(--spacing(2)+1px)] before:border-e before:border-border before:bg-gradient-to-l before:from-border/60 before:to-transparent before:bg-clip-padding rtl:before:bg-gradient-to-r"
+}
+
+/**
+ * Divider class for a sticky pinned row group (`<tbody data-pinned-rows>`):
+ * a solid 1px line along the group's edge that faces the scrolling body
+ * (under the top group, over the bottom one) with a soft shadow outside it.
+ * Drawn by the group's own pseudo-element, not a border: collapsed table
+ * borders don't stick, and the cells' box-shadows (the selection mark, a
+ * focus ring, a glide's moving border) and pseudo-elements (the column
+ * dividers) stay untouched. Its layer (z 10) is above the group's pinned
+ * cells (z 2) and the rows gliding inside the group (z 3–9, see
+ * `use-row-animations`), so a glide never covers it.
+ */
+export function getRowPinningClass(position: "top" | "bottom"): string {
+  return position === "top"
+    ? "after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-2 after:z-10 after:h-[calc(--spacing(2)+1px)] after:border-t after:border-border after:bg-gradient-to-b after:from-border/60 after:to-transparent after:bg-clip-padding"
+    : "after:pointer-events-none after:absolute after:inset-x-0 after:-top-2 after:z-10 after:h-[calc(--spacing(2)+1px)] after:border-b after:border-border after:bg-gradient-to-t after:from-border/60 after:to-transparent after:bg-clip-padding"
 }
 
 /** Column ids go into CSS custom-property names; ASCII punctuation and spaces

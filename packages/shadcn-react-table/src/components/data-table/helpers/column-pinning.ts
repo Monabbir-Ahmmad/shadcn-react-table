@@ -42,14 +42,20 @@ export function getPinOffset<TData extends RowData, TValue>(
   return side === "left" ? column.getStart("start") : column.getAfter("end")
 }
 
-/** The boundary column of a pinned group: last on the left, first on the right. */
+/** The boundary column of a pinned group: last on the left, first on the right.
+ *  A group column counts when one of its leaves is that boundary column, so
+ *  its header cell lines up with the edge below it. */
 export function isPinnedEdgeColumn<TData extends RowData, TValue>(
   column: DataTableColumn<TData, TValue>,
   side: PinSide
 ): boolean {
-  return side === "left"
-    ? column.getIsLastColumn("start")
-    : column.getIsFirstColumn("end")
+  const isEdge = (leaf: DataTableColumn<TData, TValue>) =>
+    side === "left"
+      ? leaf.getIsLastColumn("start")
+      : leaf.getIsFirstColumn("end")
+  return column.columns.length
+    ? column.getLeafColumns().some(isEdge)
+    : isEdge(column)
 }
 
 export function toCorePinning(

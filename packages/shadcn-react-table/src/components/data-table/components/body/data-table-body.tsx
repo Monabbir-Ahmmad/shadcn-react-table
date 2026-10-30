@@ -27,6 +27,7 @@ import {
   getColumnDragStyle,
   getColumnPinningClass,
   getColumnPinningStyle,
+  getRowPinningClass,
   getWidthStyle,
 } from "../../utils/column-styles"
 import { DataTableCreateRow } from "../editing/data-table-create-row"
@@ -479,7 +480,7 @@ export function DataTableBody<TData extends RowData>({
       {stickyPins && topRows.length > 0 && (
         <TableBody
           data-pinned-rows="top"
-          className="sticky z-10"
+          className={cn("sticky z-10", getRowPinningClass("top"))}
           style={{ top: "var(--dt-head-h, 0px)" }}
         >
           {topRows.map((row, i) => renderRow(row, i))}
@@ -615,7 +616,7 @@ export function DataTableBody<TData extends RowData>({
       {stickyPins && bottomRows.length > 0 && (
         <TableBody
           data-pinned-rows="bottom"
-          className="sticky z-10"
+          className={cn("sticky z-10", getRowPinningClass("bottom"))}
           style={{ bottom: "var(--dt-foot-h, 0px)" }}
         >
           {bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
