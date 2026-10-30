@@ -2,8 +2,20 @@
 
 import * as React from "react"
 
-const TABBABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+import { NOT_IN_LEAVE_COPY } from "../core/motion"
+
+// Never the controls of a leaving row's copy (row animations), which fades
+// out in the motion layer for a moment.
+const TABBABLE = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+]
+  .map((selector) => selector + NOT_IN_LEAVE_COPY)
+  .join(", ")
 
 const EDITABLE = new Set(["INPUT", "TEXTAREA", "SELECT"])
 

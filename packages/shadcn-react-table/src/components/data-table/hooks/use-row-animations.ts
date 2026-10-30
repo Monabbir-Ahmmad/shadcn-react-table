@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { readMotionTokens } from "../core/motion"
+import { LEAVE_COPY_SLOT, readMotionTokens } from "../core/motion"
 import {
   MAX_ANIMATED_ROWS,
   planRowAnimations,
@@ -17,7 +17,8 @@ type Args = {
   /** Every row key now (row ids + "<id>:detail" for open panels). Built only
    *  when `signal` changes. */
   members: () => ReadonlySet<string>
-  /** True while rows must not move (a cell or row is being edited). */
+  /** True while rows must not move (a cell or row is being edited). A row
+   *  drag in progress is detected by the hook itself (`tr[data-dragging]`). */
   paused: () => boolean
 }
 
@@ -109,7 +110,8 @@ function fadeOutCopy(
   layer: HTMLElement,
   table: HTMLTableElement,
   { node, top, left, width, widths }: Leaving,
-  options: KeyframeAnimationOptions
+  options: KeyframeAnimationOptions,
+  ghosts: Set<HTMLElement>
 ) {
   const ghost = document.createElement("table")
   ghost.className = table.className
@@ -125,7 +127,7 @@ function fadeOutCopy(
     tableLayout: "fixed",
   })
   ghost.inert = true
-  ghost.setAttribute("data-slot", "data-table-leave-copy")
+  ghost.setAttribute("data-slot", LEAVE_COPY_SLOT)
   ;[...node.cells].forEach((cell, i) => {
     const w = `${widths[i] ?? 0}px`
     Object.assign(cell.style, { width: w, minWidth: w, maxWidth: w })
@@ -134,7 +136,11 @@ function fadeOutCopy(
   body.append(node)
   ghost.append(body)
   layer.append(ghost)
-  const remove = () => ghost.remove()
+  ghosts.add(ghost)
+  const remove = () => {
+    ghost.remove()
+    ghosts.delete(ghost)
+  }
   ghost
     .animate([{ opacity: 1 }, { opacity: 0 }], { ...options, fill: "forwards" })
     .finished.then(remove, remove)
@@ -160,6 +166,15 @@ export function useRowAnimations({
   const lastMembers = React.useRef<ReadonlySet<string> | null>(null)
   const job = React.useRef<Job | null>(null)
   const running = React.useRef(new Set<Animation>())
+  const ghosts = React.useRef(new Set<HTMLElement>())
+
+  /** Drops the motion in flight, so it never plays against a new layout. */
+  const stop = () => {
+    for (const animation of running.current) animation.cancel()
+    running.current.clear()
+    for (const ghost of ghosts.current) ghost.remove()
+    ghosts.current.clear()
+  }
 
   // Before React touches the rows: where they sit, and copies of the rows
   // about to leave.
@@ -169,6 +184,7 @@ export function useRowAnimations({
     lastSignal.current = signal
     if (!active || !canAnimate()) {
       lastMembers.current = null
+      stop()
       return
     }
     // Unchanged rows: nothing to do, unless animations just turned on and
@@ -180,15 +196,18 @@ export function useRowAnimations({
     // On the first commit the table is not attached yet: `next` is the
     // baseline for the next change.
     const table = tableRef.current
-    if (
-      !prev ||
-      !table ||
-      paused() ||
-      table.querySelector(":scope > tbody > tr[data-dragging]")
-    ) {
+    if (!prev || !table) return
+    if (paused() || table.querySelector(":scope > tbody > tr[data-dragging]")) {
+      stop()
       return
     }
     const rows = drawnRows(table)
+    // Far more drawn rows than could animate: the planner would skip this
+    // change, so skip it before reading every row's position.
+    if (rows.size > 3 * MAX_ANIMATED_ROWS) {
+      stop()
+      return
+    }
     const tops = topsOf(table, rows)
     const gone = [...rows.keys()].filter((key) => !next.has(key))
     const layer = motionLayer(table)
@@ -227,7 +246,10 @@ export function useRowAnimations({
       members: work.members,
       tops: topsOf(table, rows),
     })
-    if (plan.skipped) return
+    if (plan.skipped) {
+      stop()
+      return
+    }
     const { duration, durationFast, ease } = readMotionTokens(table)
     const track = (animation: Animation) => {
       live.add(animation)
@@ -267,15 +289,24 @@ export function useRowAnimations({
     const layer = motionLayer(table)
     if (!layer) return
     for (const copy of work.leaving) {
-      fadeOutCopy(layer, table, copy, { duration: durationFast, easing: ease })
+      fadeOutCopy(
+        layer,
+        table,
+        copy,
+        { duration: durationFast, easing: ease },
+        ghosts.current
+      )
     }
   })
 
   React.useEffect(() => {
     const live = running.current
+    const copies = ghosts.current
     return () => {
       for (const animation of live) animation.cancel()
       live.clear()
+      for (const ghost of copies) ghost.remove()
+      copies.clear()
     }
   }, [])
 }

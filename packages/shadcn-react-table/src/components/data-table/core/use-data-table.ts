@@ -46,6 +46,7 @@ import {
 } from "./features"
 import { defaultIcons } from "./icons"
 import { defaultLocalization } from "./localization"
+import { NOT_IN_LEAVE_COPY } from "./motion"
 import {
   changeHandlerKey,
   EMPTY_ADVANCED_FILTER,
@@ -727,7 +728,9 @@ export function useDataTable<TData extends RowData>(
       // matches the actual type scale and density; fall back to sane defaults.
       const containerEl = tableContainerRef.current
       const sampleCell =
-        containerEl?.querySelector<HTMLElement>("tbody td") ??
+        containerEl?.querySelector<HTMLElement>(
+          `tbody td${NOT_IN_LEAVE_COPY}`
+        ) ??
         containerEl?.querySelector<HTMLElement>("thead th") ??
         null
       let font = "14px sans-serif"

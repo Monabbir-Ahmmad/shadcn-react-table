@@ -47,6 +47,12 @@ export function readMotionTokens(el: Element | null) {
   }
 }
 
+/** `data-slot` of the short-lived copies of leaving rows (motion layer). */
+export const LEAVE_COPY_SLOT = "data-table-leave-copy"
+
+/** Selector suffix that keeps a query out of the leave copies. */
+export const NOT_IN_LEAVE_COPY = `:not([data-slot="${LEAVE_COPY_SLOT}"] *)`
+
 const QUERY = "(prefers-reduced-motion: reduce)"
 
 /** Whether the user asked for reduced motion (false where unknown). */

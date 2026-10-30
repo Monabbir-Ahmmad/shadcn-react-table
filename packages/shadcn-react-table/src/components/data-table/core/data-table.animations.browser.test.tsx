@@ -161,9 +161,57 @@ describe("row animations", () => {
     act(() => table.setSorting([{ id: "n", desc: false }]))
     const drawn = bodyRows().length
     expect(drawn).toBeLessThan(100)
-    // Rows new to the window (they were in the data before) do not fade in;
-    // the planner caps the work at the drawn rows.
+    // Rows drawn before and after glide (r1 moves from index 1 to 5); rows
+    // new to the window (they were in the data before) do not fade in.
+    expect(running()).toBeGreaterThan(0)
     expect(running()).toBeLessThanOrEqual(drawn)
+    const r1 = bodyRows().find((tr) => tr.dataset.rowId === "r1")!
+    expect(r1.getAnimations().length).toBe(1)
+  })
+
+  it("glides a row into the top pinned group and back", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} enableRowPinning />)
+    await nextFrame()
+    const row = () => bodyRows().find((tr) => tr.dataset.rowId === "r5")!
+    act(() => table.getRow("r5").pin("top"))
+    expect(row().closest("tbody")!.dataset.pinnedRows).toBe("top")
+    expect(row().getAnimations().length).toBe(1)
+    // The rows above it make room by gliding down (the rows below may
+    // shift by the pinned group's border too).
+    expect(running()).toBeGreaterThanOrEqual(6)
+    await settle()
+    expect(running()).toBe(0)
+
+    act(() => table.getRow("r5").pin(false))
+    expect(row().closest("tbody")!.dataset.pinnedRows).toBeUndefined()
+    expect(row().getAnimations().length).toBe(1)
+    await settle()
+    expect(running()).toBe(0)
+    expect(layer()!.children.length).toBe(0)
+  })
+
+  it("just updates when far too many rows are drawn", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness data={rows(1000)} onTable={(t) => (table = t)} />)
+    await nextFrame()
+    act(() => table.setSorting([{ id: "n", desc: false }]))
+    expect(running()).toBe(0)
+  })
+
+  it("drops the motion in flight when animations turn off", async () => {
+    let table!: DataTableInstance<Row>
+    const { rerender } = render(<Harness onTable={(t) => (table = t)} />)
+    await nextFrame()
+    act(() => table.setGlobalFilter("Name 1"))
+    expect(layer()!.children.length).toBeGreaterThan(0)
+    act(() => table.setGlobalFilter(""))
+    expect(running()).toBeGreaterThan(0)
+    rerender(<Harness onTable={(t) => (table = t)} enableAnimations={false} />)
+    expect(running()).toBe(0)
+    expect(document.querySelector('[data-slot="data-table-leave-copy"]')).toBe(
+      null
+    )
   })
 
   it("fades out rows that leave and removes the copies", async () => {
