@@ -6,7 +6,11 @@ import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableInstance } from "../../core/types"
 import { dt } from "../../core/internal"
-import { readMotionTokens, useAnimationsActive } from "../../core/motion"
+import {
+  isEditingOrCreating,
+  readMotionTokens,
+  useAnimationsActive,
+} from "../../core/motion"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import { usePresence } from "../../hooks/use-presence"
 
@@ -31,9 +35,12 @@ export function DataTableAlertBanner<TData extends RowData>({
     selectedCount > 0
       ? localization.rowsSelected(selectedCount, totalCount)
       : null
+  // Still while a cell or row is edited or created (read here, not
+  // subscribed: it only matters when the selection changes).
+  const editing = isEditingOrCreating(table.getState())
   const { present, ref } = usePresence<HTMLDivElement>(
     text !== null,
-    useAnimationsActive(enableAnimations)
+    useAnimationsActive(enableAnimations) && !editing
   )
   // The count it last showed, kept while it fades out.
   const [lastText, setLastText] = React.useState(text)

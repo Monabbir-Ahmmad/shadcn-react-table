@@ -24,11 +24,14 @@ export const GROUP_DROPZONE_ID = "cn-group-dropzone"
 export function DataTableDropToGroupZone<TData extends RowData>({
   table,
   presenceRef,
+  leaving = false,
 }: {
   table: DataTableInstance<TData>
   /** Receives the zone's element as well, for its enter and exit motion
    *  (see `usePresence`). */
   presenceRef?: React.Ref<HTMLDivElement>
+  /** It is fading out: it no longer takes a drop. */
+  leaving?: boolean
 }) {
   const { localization, icons } = dt(table)
   const grouping = table.getState().grouping
@@ -37,6 +40,7 @@ export function DataTableDropToGroupZone<TData extends RowData>({
   const { setNodeRef, isOver } = useDroppable({
     id: dndId(GROUP_DROPZONE_ID),
     data: { type: "group-zone", tableKey },
+    disabled: leaving,
   })
 
   return (

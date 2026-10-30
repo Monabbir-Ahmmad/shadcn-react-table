@@ -46,7 +46,11 @@ import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
 import { DENSITY_PADDING_VARS } from "./constants"
-import { MOTION_ROOT_CLASS, useAnimationsActive } from "./motion"
+import {
+  isEditingOrCreating,
+  MOTION_ROOT_CLASS,
+  useAnimationsActive,
+} from "./motion"
 import { usePresence } from "../hooks/use-presence"
 
 /**
@@ -147,17 +151,19 @@ export function DataTable<TData extends RowData>({
   } = dt(table)
   const { refs } = table.dataTable
   const animate = useAnimationsActive(enableAnimations)
-  // The drop zones slide in and fade out when grouping turns on or off.
+  // The drop zones slide in and fade out when grouping turns on or off;
+  // still while a cell or row is edited or created, as the rows are.
+  const zoneMotion = animate && !isEditingOrCreating(table.getState())
   const zoneTop = usePresence<HTMLDivElement>(
     enableGrouping &&
       (positionToolbarDropZone === "top" || positionToolbarDropZone === "both"),
-    animate
+    zoneMotion
   )
   const zoneBottom = usePresence<HTMLDivElement>(
     enableGrouping &&
       (positionToolbarDropZone === "bottom" ||
         positionToolbarDropZone === "both"),
-    animate
+    zoneMotion
   )
 
   // The paper div feeds `refs.tablePaperRef` and, when given, the consumer's
@@ -344,6 +350,7 @@ export function DataTable<TData extends RowData>({
           table={table}
           config={dt(table)}
           presenceRef={zoneTop.ref}
+          leaving={zoneTop.leaving}
         />
       )}
 
@@ -526,6 +533,7 @@ export function DataTable<TData extends RowData>({
           table={table}
           config={dt(table)}
           presenceRef={zoneBottom.ref}
+          leaving={zoneBottom.leaving}
         />
       )}
     </>

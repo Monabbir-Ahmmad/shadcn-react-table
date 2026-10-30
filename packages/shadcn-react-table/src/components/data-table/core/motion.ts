@@ -46,6 +46,40 @@ export const LEAVE_COPY_SLOT = "data-table-leave-copy"
 /** Selector suffix that keeps a query out of the leave copies. */
 export const NOT_IN_LEAVE_COPY = `:not([data-slot="${LEAVE_COPY_SLOT}"] *)`
 
+/** `data-slot` of the short-lived copy a toolbar item leaves behind as it
+ *  turns into another (the search button and box, see `useLayoutGlide`). */
+export const GLIDE_COPY_SLOT = "data-table-glide-copy"
+
+/**
+ * Selector suffix that keeps a query out of everything motion leaves on
+ * screen for a moment: the row leave copies, the toolbar glide copies, and
+ * inert strips fading out (see `usePresence`). For focus queries (the full
+ * screen Tab trap): none of them can take focus.
+ */
+export const NOT_IN_MOTION_COPY = [
+  NOT_IN_LEAVE_COPY,
+  `:not([data-slot="${GLIDE_COPY_SLOT}"])`,
+  `:not([data-slot="${GLIDE_COPY_SLOT}"] *)`,
+  ":not([inert])",
+  ":not([inert] *)",
+].join("")
+
+/**
+ * Whether a cell or row is being edited or a new row created: the table's
+ * motion pauses meanwhile (nothing moves under an open editor).
+ */
+export function isEditingOrCreating(state: {
+  editingCell?: unknown
+  editingRowId?: unknown
+  isCreating?: boolean
+}): boolean {
+  return (
+    state.editingCell != null ||
+    state.editingRowId != null ||
+    Boolean(state.isCreating)
+  )
+}
+
 const QUERY = "(prefers-reduced-motion: reduce)"
 
 /** Whether the user asked for reduced motion (false where unknown). */

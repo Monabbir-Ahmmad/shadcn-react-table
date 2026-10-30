@@ -1363,6 +1363,31 @@ describe("toolbar motion", () => {
     expect(copies()).toHaveLength(0)
   })
 
+  it("closes a half-open search box from where it is", async () => {
+    render(<Harness />)
+    await nextFrame()
+    fireEvent.click(searchButton())
+    const buttonCopy = copies()[0]!
+    pauseAt(MOTION_DEFAULTS.duration / 2)
+    const box = searchBox()
+    const clip = getComputedStyle(box).clipPath
+    // Half grown: still clipped, not open.
+    expect(clip).toMatch(/^inset\(/)
+    expect(clip).not.toMatch(/^inset\(0px( round|\))/)
+    fireEvent.blur(box.querySelector("input")!)
+    // The box's copy starts clipped as the box showed, not open.
+    const boxCopy = [...copies()].find((c) => c.querySelector("input"))!
+    const [shrink] = animating(boxCopy, "clipPath")
+    const [first] = (shrink!.effect as KeyframeEffect).getKeyframes()
+    expect(first!.clipPath).toBe(clip)
+    // The button's copy is still there, fading out from where it was.
+    expect(buttonCopy.isConnected).toBe(true)
+    const [fade] = animating(buttonCopy, "opacity")
+    expect(timing(fade!).duration).toBe(MOTION_DEFAULTS.durationFast)
+    await settle()
+    expect(copies()).toHaveLength(0)
+  })
+
   it("glides the toolbar items when the search box opens", async () => {
     render(<Harness positionGlobalFilter="left" title="People" />)
     await nextFrame()

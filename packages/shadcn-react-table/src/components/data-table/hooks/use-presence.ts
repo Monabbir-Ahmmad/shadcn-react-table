@@ -51,6 +51,7 @@ function placeIn(el: HTMLElement) {
  * never unless `active`: then `present` just follows `show`.
  *
  * Attach `ref` to the strip's root element; render it while `present`.
+ * `leaving` is true while it fades out (it should take no drops or clicks).
  */
 export function usePresence<T extends HTMLElement = HTMLElement>(
   show: boolean,
@@ -91,7 +92,14 @@ export function usePresence<T extends HTMLElement = HTMLElement>(
     if (was === null || was === show) return
     stop()
     const el = ref.current
-    if (!el) return
+    if (!el) {
+      // Nothing to play the exit on: go at once. A guard (the strip is
+      // attached by now); the element is only known after the commit, so
+      // this cannot be derived during render.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (!show) setPresent(false)
+      return
+    }
     const { duration, durationFast, ease } = readMotionTokens(el)
     const live = running.current
     const track = (animation: Animation) => {
@@ -170,5 +178,5 @@ export function usePresence<T extends HTMLElement = HTMLElement>(
     }
   }, [])
 
-  return { present, ref }
+  return { present, leaving: present && !show, ref }
 }

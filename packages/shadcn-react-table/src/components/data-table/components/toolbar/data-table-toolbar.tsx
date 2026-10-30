@@ -14,7 +14,7 @@ import {
 import { DataTableGlobalFilter } from "./data-table-global-filter"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { dt } from "../../core/internal"
-import { useAnimationsActive } from "../../core/motion"
+import { isEditingOrCreating, useAnimationsActive } from "../../core/motion"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import { useLayoutGlide } from "../../hooks/use-layout-glide"
 
@@ -75,7 +75,10 @@ export function DataTableToolbar<TData extends RowData>({
   } = dt(table)
   const startRef = React.useRef<HTMLDivElement>(null)
   const actionsRef = React.useRef<HTMLDivElement>(null)
-  const active = useAnimationsActive(enableAnimations)
+  // Still while a cell or row is edited or created, as the rows are.
+  const active =
+    useAnimationsActive(enableAnimations) &&
+    !isEditingOrCreating(table.getState())
 
   const anyFilterable = table
     .getAllColumns()
