@@ -353,6 +353,9 @@ export function DataTable<TData extends RowData>({
               // <Table> wrapper's own overflow so it doesn't become a second
               // (unbounded) scroll container that breaks sticky positioning.
               "relative overflow-auto rounded-md border bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
+              // No scroll anchoring: on a sort or filter the browser would
+              // follow one reordered row and scroll the table after it.
+              "[overflow-anchor:none]",
               "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
               // MRT-parity default bound: with a sticky header the surface
               // caps near the viewport height, so tall content (long groups,

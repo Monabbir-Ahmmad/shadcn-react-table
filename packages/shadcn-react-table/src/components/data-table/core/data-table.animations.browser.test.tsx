@@ -497,11 +497,7 @@ describe("row animations", () => {
             rowPinning: { top: ["r0"], bottom: [] },
           }}
           defaultColumn={{ size: 400 }}
-          // Scroll anchoring would follow a reordered row and move the
-          // scroll during the sort; keep it still to look at the glide alone.
-          slotProps={{
-            surface: { style: { maxHeight: 240, overflowAnchor: "none" } },
-          }}
+          slotProps={{ surface: { style: { maxHeight: 240 } } }}
         />
       </div>
     )
@@ -883,6 +879,25 @@ describe("control animations", () => {
       fireEvent.click(
         document.querySelectorAll<HTMLElement>("th button[data-sorted]")[0]!
       )
+      expect(document.getAnimations()).toHaveLength(0)
+    } finally {
+      await session.send("Emulation.setEmulatedMedia", { features: [] })
+    }
+  })
+
+  it("leaves no transition running after a selection under reduced motion", async () => {
+    const session = cdp()
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+    })
+    try {
+      render(<Harness enableRowSelection />)
+      await nextFrame()
+      // The selected row's tint fade is off too.
+      fireEvent.click(
+        screen.getAllByRole("checkbox", { name: /select row/i })[0]!
+      )
+      await nextFrame()
       expect(document.getAnimations()).toHaveLength(0)
     } finally {
       await session.send("Emulation.setEmulatedMedia", { features: [] })

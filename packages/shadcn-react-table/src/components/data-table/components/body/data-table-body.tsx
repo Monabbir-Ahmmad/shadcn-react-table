@@ -354,6 +354,8 @@ export function DataTableBody<TData extends RowData>({
       {
         // The row's key for the row animations (see useRowAnimations).
         "data-row-id": row.id,
+        // No tint fade (selection, hover) for people who prefer less motion.
+        className: "motion-reduce:transition-none",
         ...gridRowProps(row, rowIndex),
         onClick: onRowClick
           ? (event: React.MouseEvent<HTMLTableRowElement>) =>
