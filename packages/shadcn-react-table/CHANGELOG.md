@@ -6,6 +6,19 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 Changes waiting for a release are in [`.changeset/`](../../.changeset), and
 move here when the next version is cut.
 
+## 1.1.0
+
+### Minor Changes
+
+- **New:** `positionToolbarAlertBanner: "head-overlay"` shows the selection banner over the header row (as in Material React Table), so selecting rows doesn't move the table.
+- **New:** `createDataTableColumnHelper<TData>()`, TanStack's column helper with the table's features filled in: `accessor` infers each column's value type, and `meta` takes the table's column options.
+- **New:** `layoutMode` (`"semantic"`, `"grid"`, `"grid-no-grow"`) and per-column `meta.grow`: in grid mode columns keep their size and the spare width goes to the growing columns, by weight (as in Material React Table).
+- **New:** rows can be dragged (`enableRowOrdering`, `enableRowDragging`) with row virtualization on: the dragged row stays rendered while it is dragged past the rendered window.
+
+### Patch Changes
+
+- **Changed:** on phone-sized screens the rows-per-page control is the native picker, easier to use by touch than a popover.
+
 ## 1.0.0
 
 The first stable release. The API below is what 1.x keeps; see the
