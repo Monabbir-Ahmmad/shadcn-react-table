@@ -3,7 +3,30 @@
 import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
+import { MOTION_TIMING_CLASS } from "../../core/motion"
 import { mergeProps } from "../../helpers/slot-props"
+
+/**
+ * A glyph path that draws itself in (stroke-dashoffset 1 → 0 over a
+ * `pathLength` of 1). Only showing transitions; hiding is instant.
+ */
+function GlyphPath({ d, shown }: { d: string; shown: boolean }) {
+  return (
+    <path
+      d={d}
+      pathLength={1}
+      strokeDasharray={1}
+      className={
+        shown
+          ? cn(
+              "[stroke-dashoffset:0] group-data-[animations]/table:transition-[stroke-dashoffset]",
+              MOTION_TIMING_CLASS
+            )
+          : "opacity-0 [stroke-dashoffset:1]"
+      }
+    />
+  )
+}
 
 interface SelectionCheckboxProps extends Omit<
   React.ComponentProps<"button">,
@@ -71,7 +94,10 @@ function SelectionCheckbox({
       {active && radio && (
         <span aria-hidden="true" className="size-2 rounded-full bg-current" />
       )}
-      {active && !radio && (
+      {!radio && (
+        // Always mounted (hidden while unchecked) so checking transitions it
+        // in under `[data-animations]` — never on mount, e.g. a row scrolled
+        // into a virtual window or a leaving row's copy.
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -79,10 +105,20 @@ function SelectionCheckbox({
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="size-3.5"
+          data-shown={active ? "" : undefined}
+          className={cn(
+            "size-3.5",
+            active
+              ? cn(
+                  "scale-100 opacity-100 group-data-[animations]/table:transition-[opacity,scale]",
+                  MOTION_TIMING_CLASS
+                )
+              : "invisible scale-75 opacity-0"
+          )}
           aria-hidden="true"
         >
-          {indeterminate ? <path d="M5 12h14" /> : <path d="M20 6 9 17l-5-5" />}
+          <GlyphPath d="M20 6 9 17l-5-5" shown={checked && !indeterminate} />
+          <GlyphPath d="M5 12h14" shown={indeterminate} />
         </svg>
       )}
     </button>

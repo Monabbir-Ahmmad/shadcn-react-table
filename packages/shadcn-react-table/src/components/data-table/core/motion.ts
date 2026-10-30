@@ -77,3 +77,11 @@ export function useAnimationsActive(enabled: boolean): boolean {
   )
   return enabled && !reduced
 }
+
+/**
+ * Tailwind classes that time a control's CSS transition with the motion
+ * tokens. They only apply under the root's `[data-animations]`, so with
+ * animations off (or reduced motion) controls change instantly.
+ */
+export const MOTION_TIMING_CLASS =
+  "group-data-[animations]/table:duration-[var(--dt-motion-duration,280ms)] group-data-[animations]/table:ease-[var(--dt-motion-ease,cubic-bezier(0.22,1,0.36,1))]"

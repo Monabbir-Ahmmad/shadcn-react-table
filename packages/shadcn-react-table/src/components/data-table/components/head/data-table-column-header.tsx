@@ -1,5 +1,7 @@
 "use client"
 
+import type * as React from "react"
+
 import { flexRender, type RowData } from "@tanstack/react-table"
 
 import { Badge } from "@workspace/ui/components/badge"
@@ -16,6 +18,8 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { defaultIcons } from "../../core/icons"
+import { MOTION_TIMING_CLASS } from "../../core/motion"
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import {
@@ -174,6 +178,23 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   )
 }
 
+/** One stacked icon layer; only the shown one is visible. */
+const SORT_LAYER_CLASS = cn(
+  "col-start-1 row-start-1 flex items-center justify-center group-data-[animations]/table:transition-[opacity,visibility]",
+  MOTION_TIMING_CLASS
+)
+
+/** The today-look of the unsorted icon (faded, brighter on header hover). */
+const UNSORTED_ICON_CLASS =
+  "size-3.5 shrink-0 opacity-50 transition-opacity group-hover/th:opacity-70"
+
+/**
+ * The sort state icon. Every state's icon stays mounted, stacked in one grid
+ * cell, and only the current one is visible, so a change fades between them
+ * (under `[data-animations]`) instead of swapping nodes. With the default
+ * icons, one arrow serves both directions and turns 180° for descending.
+ * Custom icons are shown as given and only fade.
+ */
 function SortIndicator({
   sorted,
   icons,
@@ -181,11 +202,59 @@ function SortIndicator({
   sorted: false | "asc" | "desc"
   icons: DataTableInstance["dataTable"]["icons"]
 }) {
-  if (sorted === "asc")
-    return <icons.sortAscending className="size-3.5 shrink-0" />
-  if (sorted === "desc")
-    return <icons.sortDescending className="size-3.5 shrink-0" />
+  const direction = sorted || "none"
+  const defaultArrows =
+    icons.sortAscending === defaultIcons.sortAscending &&
+    icons.sortDescending === defaultIcons.sortDescending
+
+  const layer = (shown: boolean, icon: React.ReactNode, key: string) => (
+    <span
+      key={key}
+      data-shown={shown ? "" : undefined}
+      className={cn(SORT_LAYER_CLASS, !shown && "invisible opacity-0")}
+    >
+      {icon}
+    </span>
+  )
+
   return (
-    <icons.sortUnsorted className="size-3.5 shrink-0 opacity-50 transition-opacity group-hover/th:opacity-70" />
+    <span
+      data-slot="data-table-sort-indicator"
+      data-direction={direction}
+      aria-hidden="true"
+      className="inline-grid shrink-0 place-items-center"
+    >
+      {layer(
+        direction === "none",
+        <icons.sortUnsorted className={UNSORTED_ICON_CLASS} />,
+        "none"
+      )}
+      {defaultArrows ? (
+        layer(
+          direction !== "none",
+          <icons.sortAscending
+            className={cn(
+              "size-3.5 shrink-0 group-data-[animations]/table:transition-[rotate]",
+              MOTION_TIMING_CLASS,
+              direction === "desc" && "rotate-180"
+            )}
+          />,
+          "arrow"
+        )
+      ) : (
+        <>
+          {layer(
+            direction === "asc",
+            <icons.sortAscending className="size-3.5 shrink-0" />,
+            "asc"
+          )}
+          {layer(
+            direction === "desc",
+            <icons.sortDescending className="size-3.5 shrink-0" />,
+            "desc"
+          )}
+        </>
+      )}
+    </span>
   )
 }

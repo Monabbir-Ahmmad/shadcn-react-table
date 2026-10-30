@@ -519,3 +519,52 @@ describe("row animations", () => {
     }
   })
 })
+
+describe("control animations", () => {
+  const sortArrow = () =>
+    document.querySelector<HTMLElement>(
+      '[data-slot="data-table-sort-indicator"] [data-shown] svg'
+    )!
+
+  it("turns the sort arrow with the motion timing", async () => {
+    render(<Harness />)
+    const sortName = document.querySelector<HTMLElement>(
+      "th button[data-sorted]"
+    )!
+    fireEvent.click(sortName)
+    fireEvent.click(sortName)
+    await settle()
+    const style = getComputedStyle(sortArrow())
+    expect(style.transitionDuration).toBe(`${MOTION_DEFAULTS.duration / 1000}s`)
+    expect(style.transitionTimingFunction).toBe(MOTION_DEFAULTS.ease)
+    expect(style.rotate).toBe("180deg")
+    // Same 14px box as the single icon it replaces: no header layout shift.
+    const box = document
+      .querySelector('[data-slot="data-table-sort-indicator"]')!
+      .getBoundingClientRect()
+    expect([box.width, box.height]).toEqual([14, 14])
+    cleanup()
+
+    render(<Harness enableAnimations={false} />)
+    const off = document.querySelector<HTMLElement>("th button[data-sorted]")!
+    fireEvent.click(off)
+    fireEvent.click(off)
+    const offStyle = getComputedStyle(sortArrow())
+    expect(offStyle.transitionDuration).toBe("0s")
+    expect(offStyle.rotate).toBe("180deg")
+  })
+
+  it("draws the check in when a row is selected", async () => {
+    render(<Harness enableRowSelection />)
+    const box = document.querySelector<HTMLElement>('tbody [role="checkbox"]')!
+    fireEvent.click(box)
+    const glyph = box.querySelector("svg")!
+    const path = glyph.querySelector("path")!
+    expect(getComputedStyle(glyph).transitionDuration).toBe(
+      `${MOTION_DEFAULTS.duration / 1000}s`
+    )
+    expect(animating(path, "strokeDashoffset")).toHaveLength(1)
+    await settle()
+    expect(getComputedStyle(path).strokeDashoffset).toBe("0px")
+  })
+})

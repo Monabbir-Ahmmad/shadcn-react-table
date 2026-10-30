@@ -1,11 +1,12 @@
 "use client"
 
-import type * as React from "react"
+import * as React from "react"
 
 import type { RowData } from "@tanstack/react-table"
 
 import type { DataTableInstance } from "../../core/types"
 import { dt } from "../../core/internal"
+import { readMotionTokens } from "../../core/motion"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 /**
@@ -18,9 +19,12 @@ export function DataTableAlertBanner<TData extends RowData>({
   table: DataTableInstance<TData>
 }) {
   const { localization, enableRowSelection } = dt(table)
-  if (!enableRowSelection) return null
+  const selectedCount = enableRowSelection
+    ? table.getSelectedRowModel().rows.length
+    : 0
+  const countRef = React.useRef<HTMLSpanElement>(null)
+  useCountAnimation(countRef, selectedCount)
 
-  const selectedCount = table.getSelectedRowModel().rows.length
   if (selectedCount === 0) return null
 
   const totalCount = table.getPrePaginatedRowModel().rows.length
@@ -37,7 +41,13 @@ export function DataTableAlertBanner<TData extends RowData>({
         getSlotProps(table, "alertBanner", {})
       )}
     >
-      <span>{localization.rowsSelected(selectedCount, totalCount)}</span>
+      <span
+        key={selectedCount}
+        ref={countRef}
+        data-slot="data-table-selected-count"
+      >
+        {localization.rowsSelected(selectedCount, totalCount)}
+      </span>
       <button
         type="button"
         onClick={() => table.resetRowSelection()}
@@ -47,4 +57,33 @@ export function DataTableAlertBanner<TData extends RowData>({
       </button>
     </div>
   )
+}
+
+/**
+ * Fades the (re-keyed) count in when the number changes. Not when the banner
+ * first appears (from 0), and never unless the table animates: the root's
+ * `[data-animations]` already folds in `enableAnimations` and reduced motion,
+ * so reading it here needs no extra prop or media-query subscription.
+ */
+function useCountAnimation(
+  ref: React.RefObject<HTMLSpanElement | null>,
+  count: number
+) {
+  const prev = React.useRef(count)
+  React.useLayoutEffect(() => {
+    const before = prev.current
+    prev.current = count
+    const el = ref.current
+    if (!el || before === 0 || before === count) return
+    const root = el.closest("[data-animations]")
+    if (!root || typeof el.animate !== "function") return
+    const { durationFast, ease } = readMotionTokens(root)
+    el.animate(
+      [
+        { opacity: 0, transform: "translateY(4px)" },
+        { opacity: 1, transform: "translateY(0)" },
+      ],
+      { duration: durationFast, easing: ease }
+    )
+  }, [ref, count])
 }

@@ -519,7 +519,8 @@ export function DataTable<TData extends RowData>({
             ref: paperRef,
             "data-slot": "data-table",
             className: cn(
-              "relative flex w-full flex-col gap-2",
+              // `group/table` lets controls animate under `[data-animations]`.
+              "group/table relative flex w-full flex-col gap-2",
               DENSITY_PADDING_VARS,
               isFullscreen &&
                 "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4"
