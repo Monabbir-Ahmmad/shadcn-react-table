@@ -145,6 +145,23 @@ function copyRow(tr: HTMLTableRowElement) {
  */
 const MAX_BORDER_LINES = 100
 
+/**
+ * The layers gliding rows paint on: above the rows they cross (whose pinned
+ * cells sit at z 2), under the pinned row groups (z 10) and the sticky header
+ * (z 20). The farther a row travels, the higher its layer, so a long glide
+ * passes over the short ones instead of sliding under them.
+ */
+const GLIDE_Z = { min: 3, levels: 7 }
+
+/** Each glide's layer, by its distance (equal distances share one). */
+function glideLayers(dys: number[]) {
+  const distances = dys.map(Math.abs).sort((a, b) => a - b)
+  return dys.map((dy) => {
+    const rank = distances.indexOf(Math.abs(dy))
+    return GLIDE_Z.min + Math.floor((rank * GLIDE_Z.levels) / dys.length)
+  })
+}
+
 /** A gliding row's bottom border, drawn by its cells (see `moveBorder`). */
 type BorderLine = {
   tr: HTMLTableRowElement
@@ -386,10 +403,17 @@ export function useRowAnimations({
       glides.length <= MAX_BORDER_LINES
         ? glides.map(({ tr }) => readBorder(tr))
         : null
+    const layers = glideLayers(glides.map(({ dy }) => dy))
     glides.forEach(({ tr, dy }, i) => {
+      // Positioned only while it glides, so its z-index applies; sticky
+      // pinned cells inside it stay sticky.
+      const layer = { position: "relative", zIndex: layers[i] }
       track(
         tr.animate(
-          [{ transform: `translateY(${dy}px)` }, { transform: "none" }],
+          [
+            { transform: `translateY(${dy}px)`, ...layer },
+            { transform: "none", ...layer },
+          ],
           { duration, easing: ease }
         )
       )

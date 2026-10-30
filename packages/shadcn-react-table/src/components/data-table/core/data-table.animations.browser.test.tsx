@@ -446,6 +446,102 @@ describe("row animations", () => {
     expect(Number(first.opacity)).toBe(0)
   })
 
+  it("raises gliding rows over the rows they cross, farthest on top", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness data={rows(12)} onTable={(t) => (table = t)} />)
+    await nextFrame()
+    act(() => table.setSorting([{ id: "n", desc: false }]))
+    const moved = bodyRows().filter((tr) => animating(tr, "transform").length)
+    expect(moved.length).toBeGreaterThan(2)
+    // How far it glides: the start offset of its glide.
+    const distance = (tr: HTMLTableRowElement) => {
+      const glide = animating(tr, "transform")[0]!
+      const from = (glide.effect as KeyframeEffect).getKeyframes()[0]!
+      return Math.abs(parseFloat(String(from.transform).slice(11)))
+    }
+    const z = (tr: HTMLTableRowElement) => Number(getComputedStyle(tr).zIndex)
+    for (const tr of moved) {
+      expect(getComputedStyle(tr).position).toBe("relative")
+      // Above pinned cells (z 2) of the rows it crosses, under the pinned
+      // row groups (z 10) and the sticky header (z 20).
+      expect(z(tr)).toBeGreaterThanOrEqual(3)
+      expect(z(tr)).toBeLessThan(10)
+    }
+    const byDistance = [...moved].sort((a, b) => distance(a) - distance(b))
+    for (let i = 1; i < byDistance.length; i++) {
+      expect(z(byDistance[i]!)).toBeGreaterThanOrEqual(z(byDistance[i - 1]!))
+    }
+    expect(z(byDistance.at(-1)!)).toBeGreaterThan(z(byDistance[0]!))
+    await settle()
+    for (const tr of moved) {
+      expect(getComputedStyle(tr).position).toBe("static")
+      expect(getComputedStyle(tr).zIndex).toBe("auto")
+    }
+  })
+
+  it("keeps pinned columns and rows in place while rows glide", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <div style={{ width: 300 }}>
+        <Harness
+          data={rows(40)}
+          onTable={(t) => (table = t)}
+          enableColumnPinning
+          enableColumnResizing
+          enableRowPinning
+          initialState={{
+            columnPinning: { left: ["name"] },
+            rowPinning: { top: ["r0"], bottom: [] },
+          }}
+          defaultColumn={{ size: 400 }}
+          // Scroll anchoring would follow a reordered row and move the
+          // scroll during the sort; keep it still to look at the glide alone.
+          slotProps={{
+            surface: { style: { maxHeight: 240, overflowAnchor: "none" } },
+          }}
+        />
+      </div>
+    )
+    await nextFrame()
+    surface().scrollLeft = 200
+    surface().scrollTop = 300
+    await nextFrame()
+    // Stuck under the header (scrolled past its place in the table).
+    const stuck = findRow("r0")!.getBoundingClientRect().top
+    act(() => table.setSorting([{ id: "n", desc: true }]))
+    expect(surface().scrollTop).toBe(300)
+    // Halfway through the glide.
+    for (const a of document.getAnimations()) {
+      a.pause()
+      a.currentTime = MOTION_DEFAULTS.duration / 2
+    }
+    expect(running()).toBeGreaterThan(0)
+    const nameCell = (tr: HTMLTableRowElement) =>
+      [...tr.cells].find((td) => td.textContent?.startsWith("Name"))!
+    const pinned = findRow("r0")!
+    const pinnedLeft = nameCell(pinned).getBoundingClientRect().left
+    // The surface is scrolled sideways, yet the pinned column stays on screen.
+    expect(pinnedLeft).toBeLessThan(surface().getBoundingClientRect().left + 80)
+    // Pinned column: every gliding row's name cell stays in it.
+    const gliding = bodyRows().filter((tr) => animating(tr, "transform").length)
+    expect(gliding.length).toBeGreaterThan(0)
+    for (const tr of gliding) {
+      const left = nameCell(tr).getBoundingClientRect().left
+      expect(Math.abs(left - pinnedLeft)).toBeLessThan(2)
+    }
+    // Pinned row: still stuck in place, and painted over the rows gliding
+    // beneath it.
+    const rect = pinned.getBoundingClientRect()
+    expect(Math.abs(rect.top - stuck)).toBeLessThan(1)
+    // Over the unpinned part of the row (the surface is 300px wide).
+    const hit = document.elementFromPoint(
+      surface().getBoundingClientRect().left + 250,
+      rect.top + rect.height / 2
+    )
+    expect(pinned.contains(hit)).toBe(true)
+    for (const a of document.getAnimations()) a.finish()
+  })
+
   it("keeps pinned cells sticky once the glide finishes", async () => {
     let table!: DataTableInstance<Row>
     render(
