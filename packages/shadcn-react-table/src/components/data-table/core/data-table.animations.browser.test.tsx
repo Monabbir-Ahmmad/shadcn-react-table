@@ -1656,8 +1656,6 @@ describe("column glide", () => {
     const th = copy!.querySelector("th")!
     expect(th.getBoundingClientRect().left).toBeCloseTo(was.get("b")!, 0)
     expect(animating(copy!, "opacity")).toHaveLength(1)
-    // Above the sticky header, which would hide it.
-    expect(Number(getComputedStyle(copy!).zIndex)).toBeGreaterThan(20)
     await finishAll()
     expect(copies()).toHaveLength(0)
     expect(scripted()).toHaveLength(0)
@@ -1669,6 +1667,118 @@ describe("column glide", () => {
         expect(start).toBeCloseTo(was.get(id)! - now.get(id)!, 0)
       }
     }
+  })
+
+  it.each([true, false])(
+    "draws the hidden column's header copy under the gliding headers (sticky header: %s)",
+    async (sticky) => {
+      let table!: DataTableInstance<Wide>
+      // Narrower than the columns: they keep their widths, so only the
+      // gliding ones cross the copy.
+      render(
+        <Columns
+          onTable={(t) => (table = t)}
+          width={300}
+          enableStickyHeader={sticky}
+        />
+      )
+      await nextFrame()
+      const thead = document.querySelector(`${OWN} > thead`)!
+      expect(getComputedStyle(thead).position).toBe(
+        sticky ? "sticky" : "static"
+      )
+      act(() => table.getColumn("b")!.toggleVisibility(false))
+      pauseAt(MOTION_DEFAULTS.duration / 2)
+      const [copy] = copies()
+      // Hit-testable for the probe only (it is inert, without pointer events).
+      copy!.inert = false
+      copy!.style.pointerEvents = "auto"
+      const from = copy!.getBoundingClientRect()
+      const c = head("c").getBoundingClientRect()
+      const y = from.top + from.height / 2
+      // `c` glides in from the right over the copy: still on its way.
+      expect(c.left - from.left).toBeGreaterThan(2)
+      expect(c.left).toBeLessThan(from.right - 2)
+      // Where `c` has arrived, it covers the copy…
+      const over = document.elementFromPoint((c.left + from.right) / 2, y)
+      expect(head("c").contains(over)).toBe(true)
+      // …and where it has not yet, the copy shows: above the header's own
+      // background, never hidden by it.
+      const under = document.elementFromPoint((from.left + c.left) / 2, y)
+      expect(copy!.contains(under)).toBe(true)
+      await finishAll()
+      expect(copies()).toHaveLength(0)
+    }
+  )
+
+  /** Whether a computed color is fully opaque. */
+  const opaque = (color: string) =>
+    color !== "transparent" &&
+    !/\/\s*(0?\.\d+|\d+(\.\d+)?%)\s*\)$/.test(color) &&
+    !/^rgba\(.*,\s*0?(\.\d+)?\)$/.test(color)
+
+  it("keeps gliding cells opaque, row tints included", async () => {
+    let table!: DataTableInstance<Wide>
+    render(
+      <Columns
+        onTable={(t) => (table = t)}
+        enableRowSelection
+        initialState={{ rowSelection: { w1: true } }}
+      />
+    )
+    await nextFrame()
+    act(() => table.getColumn("b")!.toggleVisibility(false))
+    pauseAt(MOTION_DEFAULTS.duration / 2)
+    const cells = [...cellsOf("c"), ...cellsOf("d")]
+    expect(cells.length).toBeGreaterThan(0)
+    for (const cell of cells) {
+      expect(animating(cell, "transform")).toHaveLength(1)
+      expect(opaque(getComputedStyle(cell).backgroundColor)).toBe(true)
+    }
+    await finishAll()
+  })
+
+  it("fills a translucent gliding cell with its row over the card", async () => {
+    let table!: DataTableInstance<Wide>
+    render(
+      <Columns
+        onTable={(t) => (table = t)}
+        slotProps={{
+          bodyCell: {
+            style: { backgroundColor: "transparent", backgroundImage: "none" },
+          },
+        }}
+      />
+    )
+    await nextFrame()
+    const card = getComputedStyle(surface()).backgroundColor
+    const cell = cellsOf("c")[1]!
+    expect(cell.tagName).toBe("TD")
+    expect(getComputedStyle(cell).backgroundColor).toBe("rgba(0, 0, 0, 0)")
+    act(() => table.getColumn("b")!.toggleVisibility(false))
+    pauseAt(MOTION_DEFAULTS.duration / 2)
+    const fill = getComputedStyle(cell).backgroundColor
+    expect(opaque(fill)).toBe(true)
+    // The card under a clear row: the card's own color.
+    const probe = document.createElement("div")
+    probe.style.backgroundColor = card
+    document.body.append(probe)
+    const canvas = document.createElement("canvas").getContext("2d")!
+    canvas.fillStyle = card
+    canvas.fillRect(0, 0, 1, 1)
+    const [r, g, b] = canvas.getImageData(0, 0, 1, 1).data
+    probe.remove()
+    expect(fill).toBe(`rgb(${r}, ${g}, ${b})`)
+    // Header cells are opaque on their own: no fill.
+    expect(
+      animating(head("c"), "backgroundColor").length +
+        (animating(head("c"), "transform")[0]!.effect as KeyframeEffect)
+          .getKeyframes()
+          .filter((k) => "backgroundColor" in k).length
+    ).toBe(0)
+    await finishAll()
+    // The fill ends with the glide.
+    expect(getComputedStyle(cell).backgroundColor).toBe("rgba(0, 0, 0, 0)")
   })
 
   it("fades a shown column in while the columns after it glide aside", async () => {

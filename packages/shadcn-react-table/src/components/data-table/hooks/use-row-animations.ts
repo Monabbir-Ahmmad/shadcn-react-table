@@ -145,8 +145,7 @@ function pinnedEdges(table: HTMLTableElement): PinnedEdge[] {
   return edges
 }
 
-/** The surface's motion layer, where leave copies are drawn. */
-export function motionLayer(table: HTMLTableElement) {
+function motionLayer(table: HTMLTableElement) {
   return table
     .closest('[data-slot="data-table-surface"]')
     ?.querySelector<HTMLElement>(
@@ -163,7 +162,7 @@ export function motionLayer(table: HTMLTableElement) {
  * go. The trade-off: in a scrolled surface, a leaving row that sat below the
  * table's new bottom is clipped instead of fading out. Reads only.
  */
-export function layerClip(layer: HTMLElement, table: HTMLTableElement) {
+function layerClip(layer: HTMLElement, table: HTMLTableElement) {
   const top = layer.getBoundingClientRect().top
   const bottom = table.getBoundingClientRect().bottom - top
   return Math.max(bottom, layer.parentElement?.clientHeight ?? 0)
@@ -343,13 +342,10 @@ export function useRowAnimations({
   /** The motion layer, while it is sized to show copies (see `layerClip`). */
   const sized = React.useRef<HTMLElement | null>(null)
 
-  /** Back to an empty, zero-height layer once no copy is left (the column
-   *  motion's header copies may still be there: it unclips then). */
+  /** Back to an empty, zero-height layer once no copy is left. */
   const unclip = () => {
     if (ghosts.current.size > 0 || !sized.current) return
-    if (sized.current.childElementCount === 0) {
-      sized.current.style.removeProperty("height")
-    }
+    sized.current.style.removeProperty("height")
     sized.current = null
   }
 

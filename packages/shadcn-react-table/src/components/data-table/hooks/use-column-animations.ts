@@ -1,7 +1,6 @@
 import * as React from "react"
 
 import { LEAVE_COPY_SLOT, readMotionTokens } from "../core/motion"
-import { layerClip, motionLayer } from "./use-row-animations"
 
 /**
  * Above this many cells to move or fade (the table's drawn rows, header and
@@ -44,6 +43,11 @@ type Job = {
   leaving: HeadCopy[]
 }
 
+/** One cell's animation, planned in the read pass. */
+type Step =
+  | { cell: HTMLTableCellElement; dx: number; fill: string | null }
+  | { cell: HTMLTableCellElement; delay: number }
+
 // Attributes a header copy drops so nothing mistakes it for the live cell.
 const COPY_DROPS = [
   "id",
@@ -52,6 +56,8 @@ const COPY_DROPS = [
   "tabindex",
   COLUMN,
   "data-dragging",
+  "data-cell-row",
+  "data-cell-col",
   "aria-sort",
   "aria-colindex",
   "aria-describedby",
@@ -109,6 +115,51 @@ function copyHead(cell: HTMLTableCellElement): HeadCopy {
   return { node, rect: cell.getBoundingClientRect() }
 }
 
+/** Whether a computed color is fully opaque (`rgb()`, `oklch(… / a)`…). */
+function isOpaque(color: string) {
+  if (!color || color === "transparent") return false
+  const alpha =
+    /\/\s*([\d.]+%?)\s*\)$/.exec(color)?.[1] ??
+    /^rgba\([^)]*,\s*([\d.]+)\)$/.exec(color)?.[1]
+  if (alpha === undefined) return true
+  const a = alpha.endsWith("%") ? parseFloat(alpha) / 100 : parseFloat(alpha)
+  return a >= 1
+}
+
+let paint: CanvasRenderingContext2D | null | undefined
+
+/**
+ * The opaque color of `layers` painted bottom to top (CSS colors in any
+ * syntax the browser computes, oklch included), or null without a canvas.
+ */
+function flatten(layers: string[]) {
+  if (paint === undefined) {
+    paint = document
+      .createElement("canvas")
+      .getContext("2d", { willReadFrequently: true })
+  }
+  if (!paint) return null
+  paint.clearRect(0, 0, 1, 1)
+  for (const color of layers) {
+    paint.fillStyle = color
+    paint.fillRect(0, 0, 1, 1)
+  }
+  const [r, g, b] = paint.getImageData(0, 0, 1, 1).data
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+/**
+ * The card color the table sits on: the surface's background, else the
+ * `--card` token. Null when neither is opaque. Reads.
+ */
+function cardColor(table: HTMLTableElement) {
+  const surface = table.closest('[data-slot="data-table-surface"]') ?? table
+  const style = getComputedStyle(surface)
+  if (isOpaque(style.backgroundColor)) return style.backgroundColor
+  const token = style.getPropertyValue("--card").trim()
+  return token || null
+}
+
 /**
  * Glides the drawn columns to their new places when they are hidden, shown,
  * pinned or reordered, fades the columns that came in, and fades a copy of a
@@ -120,8 +171,15 @@ function copyHead(cell: HTMLTableCellElement): HeadCopy {
  * `translateX(dx) → none`, measured from the column's header: horizontal
  * offsets on screen, so right to left needs nothing special, and a pinned
  * cell stays sticky under its transform. A pinned column's divider is its
- * edge cell's pseudo-element, so it travels with the cell. Only the header
- * of a leaving column fades out: copying every body cell would cost a clone
+ * edge cell's pseudo-element, so it travels with the cell. The cells are
+ * opaque (the card fill under the row tint, see `BODY_CELL_CLASS`), so a
+ * gliding column covers the ones it crosses; a cell a consumer made
+ * translucent is filled for the glide with its row's look over the card.
+ *
+ * Only the header of a leaving column fades out, from a copy drawn inside
+ * the `<thead>` before its rows: under the header cells (so the columns
+ * gliding in cover it, and pinned headers stay on top), above the body (the
+ * sticky header's own layer). Copying every body cell would cost a clone
  * per drawn row for a 160 ms fade the moving columns mostly cover, while the
  * header copy keeps the cue of what went.
  *
@@ -145,18 +203,6 @@ export function useColumnAnimations({
   const job = React.useRef<Job | null>(null)
   const running = React.useRef(new Set<Animation>())
   const copies = React.useRef(new Set<HTMLElement>())
-  /** The motion layer, while this hook has sized it to show copies. */
-  const sized = React.useRef<HTMLElement | null>(null)
-
-  /** Back to a zero-height layer once no copy is left in it. */
-  const unclip = () => {
-    if (copies.current.size > 0 || !sized.current) return
-    // The row motion's leave copies may still be there: it unclips then.
-    if (sized.current.childElementCount === 0) {
-      sized.current.style.removeProperty("height")
-    }
-    sized.current = null
-  }
 
   /** Drops the motion in flight, so it never plays against a new layout. */
   const stop = () => {
@@ -164,7 +210,6 @@ export function useColumnAnimations({
     running.current.clear()
     for (const copy of copies.current) copy.remove()
     copies.current.clear()
-    unclip()
   }
 
   // Before React touches the cells: where the columns sit, and copies of the
@@ -197,11 +242,9 @@ export function useColumnAnimations({
       stop()
       return
     }
-    const leaving = motionLayer(table)
-      ? headCells(table)
-          .filter((cell) => !next.has(cell.getAttribute(COLUMN)!))
-          .map(copyHead)
-      : []
+    const leaving = headCells(table)
+      .filter((cell) => !next.has(cell.getAttribute(COLUMN)!))
+      .map(copyHead)
     job.current = { prev, lefts: leftsOf(table), leaving }
   })
 
@@ -227,14 +270,44 @@ export function useColumnAnimations({
         moves.set(id, was - left)
       }
     }
-    const cells = moves.size + enters.size
-    if (cells > 0 && table.rows.length * cells > MAX_ANIMATED_CELLS) return
+    const count = moves.size + enters.size
+    if (count > 0 && table.rows.length * count > MAX_ANIMATED_CELLS) return
 
-    // All reads before the first animation.
-    const layer = work.leaving.length > 0 ? motionLayer(table) : null
-    const box = layer?.getBoundingClientRect()
-    const bounds = layer ? table.getBoundingClientRect() : null
-    const clip = layer ? layerClip(layer, table) : 0
+    // All reads before the first animation: a read after a write would
+    // force another style pass, once per cell.
+    const steps: Step[] = []
+    if (count > 0) {
+      let card: string | null | undefined
+      for (const tr of table.rows) {
+        let row: string | undefined
+        for (const cell of tr.cells) {
+          const id = cell.getAttribute(COLUMN)
+          if (id === null) continue
+          const dx = moves.get(id)
+          if (dx === undefined) {
+            const delay = enters.get(id)
+            if (delay !== undefined) steps.push({ cell, delay })
+            continue
+          }
+          // Opaque already (the card fill): nothing to add.
+          const own = getComputedStyle(cell).backgroundColor
+          let fill: string | null = null
+          if (!isOpaque(own)) {
+            if (card === undefined) card = cardColor(table)
+            row ??= getComputedStyle(tr).backgroundColor
+            fill = card ? flatten([card, row, own]) : null
+          }
+          steps.push({ cell, dx, fill })
+        }
+      }
+    }
+    const head = work.leaving.length > 0 ? table.tHead : null
+    const box = head?.getBoundingClientRect()
+    const bounds = head ? table.getBoundingClientRect() : null
+    // The copies are placed in the `<thead>`: it must contain them.
+    const unpositioned = head
+      ? getComputedStyle(head).position === "static"
+      : false
 
     const live = running.current
     const track = (animation: Animation) => {
@@ -242,37 +315,38 @@ export function useColumnAnimations({
       const done = () => live.delete(animation)
       animation.finished.then(done, done)
     }
-    if (cells > 0) {
-      for (const tr of table.rows) {
-        for (const cell of tr.cells) {
-          const id = cell.getAttribute(COLUMN)
-          if (id === null) continue
-          const dx = moves.get(id)
-          if (dx !== undefined) {
-            track(
-              cell.animate(
-                { transform: [`translateX(${dx}px)`, "none"] },
-                { duration, easing: ease }
-              )
-            )
-            continue
-          }
-          const delay = enters.get(id)
-          if (delay === undefined) continue
-          track(
-            cell.animate(
-              { opacity: [0, 1] },
-              { duration: durationFast, easing: ease, delay, fill: "backwards" }
-            )
+    for (const step of steps) {
+      if ("dx" in step) {
+        const { cell, dx, fill } = step
+        track(
+          cell.animate(
+            {
+              transform: [`translateX(${dx}px)`, "none"],
+              // Constant, so it clears itself when the glide ends.
+              ...(fill && { backgroundColor: [fill, fill] }),
+            },
+            { duration, easing: ease }
           )
-        }
+        )
+      } else {
+        track(
+          step.cell.animate(
+            { opacity: [0, 1] },
+            {
+              duration: durationFast,
+              easing: ease,
+              delay: step.delay,
+              fill: "backwards",
+            }
+          )
+        )
       }
     }
-    if (!layer || !box || !bounds) return
-    if (clip > (parseFloat(layer.style.height) || 0)) {
-      layer.style.height = `${clip}px`
+    if (!head || !box || !bounds) return
+    const timing = { duration: durationFast, easing: ease }
+    if (unpositioned) {
+      track(head.animate({ position: ["relative", "relative"] }, timing))
     }
-    sized.current = layer
     for (const { node, rect } of work.leaving) {
       // Kept within the table's new width, so a copy past its end never
       // widens the surface's scroll area.
@@ -281,6 +355,7 @@ export function useColumnAnimations({
       if (right - left < 1) continue
       const copy = document.createElement("div")
       copy.setAttribute("data-slot", LEAVE_COPY_SLOT)
+      copy.setAttribute("aria-hidden", "true")
       copy.inert = true
       Object.assign(copy.style, {
         position: "absolute",
@@ -289,8 +364,7 @@ export function useColumnAnimations({
         width: `${right - left}px`,
         height: `${rect.height}px`,
         overflow: "hidden",
-        // Above the sticky header (z 20), which would hide it.
-        zIndex: "21",
+        pointerEvents: "none",
       })
       const ghost = document.createElement("table")
       ghost.className = table.className
@@ -315,31 +389,32 @@ export function useColumnAnimations({
         position: "relative",
         insetInlineStart: "auto",
         insetInlineEnd: "auto",
+        zIndex: "auto",
         transform: "none",
         translate: "none",
         transition: "none",
       })
-      const head = document.createElement("thead")
+      const section = document.createElement("thead")
       const tr = document.createElement("tr")
       tr.append(node)
-      head.append(tr)
-      ghost.append(head)
+      section.append(tr)
+      ghost.append(section)
       copy.append(ghost)
-      layer.append(copy)
+      // First in the `<thead>`: painted before (under) its header cells,
+      // which are positioned too, and inside the sticky header's layer.
+      head.prepend(copy)
       copies.current.add(copy)
       const remove = () => {
         copy.remove()
         copies.current.delete(copy)
-        unclip()
       }
       const fade = copy.animate(
         { opacity: [1, 0] },
-        { duration: durationFast, easing: ease, fill: "forwards" }
+        { ...timing, fill: "forwards" }
       )
       track(fade)
       fade.finished.then(remove, remove)
     }
-    unclip()
   })
 
   React.useEffect(() => {
