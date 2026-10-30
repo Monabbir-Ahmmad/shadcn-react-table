@@ -12,6 +12,7 @@ import { parseDate } from "../../../helpers/parse-date"
 import {
   FilterInputGroup,
   GROUP_CONTROL_CLASS,
+  RANGE_GROUP_CLASS,
   ValuelessLabel,
   type FilterFieldProps,
 } from "./shared"
@@ -71,6 +72,7 @@ export function DateTimeFilterField<TData extends RowData, TValue>({
           table={table}
           onClear={value[0] != null ? () => setBound(0, "") : undefined}
           clearLabel={`${localization.clearFilter} (${localization.min})`}
+          className={RANGE_GROUP_CLASS}
         >
           <InputGroupInput
             type={type}
@@ -87,6 +89,7 @@ export function DateTimeFilterField<TData extends RowData, TValue>({
           modeMenu={false}
           onClear={value[1] != null ? () => setBound(1, "") : undefined}
           clearLabel={`${localization.clearFilter} (${localization.max})`}
+          className={RANGE_GROUP_CLASS}
         >
           <InputGroupInput
             type={type}

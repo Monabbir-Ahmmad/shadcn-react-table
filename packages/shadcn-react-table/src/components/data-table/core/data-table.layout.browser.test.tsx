@@ -379,3 +379,63 @@ describe("pinned row dividers", () => {
     }
   })
 })
+
+type RangeRow = { id: string; amount: number; opens: string }
+
+function RangeFilters() {
+  const table = useDataTable<RangeRow>({
+    columns: [
+      {
+        accessorKey: "amount",
+        header: "Amount",
+        size: 260,
+        meta: { filterVariant: "range" },
+      },
+      {
+        accessorKey: "opens",
+        header: "Opens",
+        size: 260,
+        meta: { filterVariant: "time-range" },
+      },
+    ],
+    data: [{ id: "0", amount: 5, opens: "09:00" }],
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    initialState: {
+      showColumnFilters: true,
+      columnFilters: [
+        { id: "amount", value: [1000, 2000] },
+        { id: "opens", value: ["09:00", "17:30"] },
+      ],
+    },
+  })
+  return <DataTable table={table} />
+}
+
+/** The width an input has for its text. */
+const textWidth = (input: HTMLElement) => {
+  const style = getComputedStyle(input)
+  return (
+    input.getBoundingClientRect().width -
+    parseFloat(style.paddingLeft) -
+    parseFloat(style.paddingRight)
+  )
+}
+
+describe("range filters", () => {
+  it("give both bounds the same room for their value", async () => {
+    render(<RangeFilters />)
+    await nextFrame()
+    const pairs: [string, string][] = [
+      ["Min", "Max"],
+      ["Filter by Opens (Min)", "Filter by Opens (Max)"],
+    ]
+    for (const [min, max] of pairs) {
+      const low = screen.getByLabelText(min)
+      const high = screen.getByLabelText(max)
+      // The mode menu sits inside the first bound's group only; it must not
+      // come out of that bound's text room.
+      expect(Math.abs(textWidth(low) - textWidth(high))).toBeLessThanOrEqual(2)
+    }
+  })
+})

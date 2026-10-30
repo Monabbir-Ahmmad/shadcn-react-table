@@ -29,6 +29,11 @@ type Args = {
    *  in their new places: the offsets the sticky pinned row groups stick at,
    *  which follow the header's height. */
   sync?: (table: HTMLTableElement) => void
+  /** A value whose change re-measures the rows (the density), and whether
+   *  the rows are virtualized. Scrolled away from the top, the virtualizer
+   *  moves its window and the scroll after such a change, so the rows would
+   *  jump mid-glide: they snap instead. */
+  remeasure?: { value: unknown; virtual: boolean }
 }
 
 /** A copy of a leaving row and where it sat, relative to the motion layer. */
@@ -101,6 +106,12 @@ const canAnimate = () =>
 
 function changed(a: unknown[] | null, b: unknown[]) {
   return !a || a.length !== b.length || a.some((v, i) => !Object.is(v, b[i]))
+}
+
+/** Whether the table's scroll surface is scrolled down from its top. */
+function scrolledFromTop(table: HTMLTableElement) {
+  const surface = table.closest<HTMLElement>('[data-slot="data-table-surface"]')
+  return (surface?.scrollTop ?? 0) > 0
 }
 
 /** The drawn rows by key. */
@@ -333,8 +344,10 @@ export function useRowAnimations({
   paused,
   filterRow = false,
   sync,
+  remeasure,
 }: Args) {
   const lastSignal = React.useRef<unknown[] | null>(null)
+  const lastRemeasure = React.useRef<unknown>(remeasure?.value)
   const lastMembers = React.useRef<ReadonlySet<string> | null>(null)
   const job = React.useRef<Job | null>(null)
   const running = React.useRef(new Set<Animation>())
@@ -364,6 +377,8 @@ export function useRowAnimations({
     job.current = null
     const isChange = changed(lastSignal.current, signal)
     lastSignal.current = signal
+    const remeasured = remeasure?.value !== lastRemeasure.current
+    lastRemeasure.current = remeasure?.value
     if (!active || !canAnimate()) {
       lastMembers.current = null
       stop()
@@ -385,6 +400,10 @@ export function useRowAnimations({
     const table = tableRef.current
     if (!prev || !table) return
     if (paused() || table.querySelector(":scope > tbody > tr[data-dragging]")) {
+      stop()
+      return
+    }
+    if (remeasured && remeasure?.virtual && scrolledFromTop(table)) {
       stop()
       return
     }

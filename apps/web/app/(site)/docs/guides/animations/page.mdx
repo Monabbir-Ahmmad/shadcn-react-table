@@ -76,7 +76,7 @@ Each table times its own controls. A table with animations off, nested in an ani
 ## Limits
 
 - Group header widths snap. A group header glides to its new position, but its width changes at once, for example when you hide one of its columns.
-- With [virtualization](/docs/guides/virtualization), a window change in the middle of a glide can shift the cells that are still gliding.
+- With [virtualization](/docs/guides/virtualization), a window change in the middle of a glide can shift the cells that are still gliding. A density change on a virtualized table that is scrolled down from the top just updates: the table measures the new rows and moves the scroll, so a glide would jump.
 - An edit that starts in the middle of a toolbar motion lets that toolbar motion finish. Row and column motion stops at once.
 - Toolbar groups are `position: relative`, so absolutely positioned content in a custom toolbar is placed against its group, not the toolbar.
 

@@ -1063,6 +1063,32 @@ describe("filter row and density glide", () => {
     expect(bodyRows().length).toBeLessThan(200)
   })
 
+  it("snaps a density change on a virtualized table scrolled away from the top", async () => {
+    // The virtualizer re-measures the rows and moves its window (and the
+    // scroll) after the change, so a glide would jump mid-way.
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        data={rows(2000)}
+        enableRowVirtualization
+        onTable={(t) => (table = t)}
+      />
+    )
+    await settle()
+    const surface = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-surface"]'
+    )!
+    surface.scrollTop = 3000
+    await settle()
+    expect(surface.scrollTop).toBeGreaterThan(0)
+    act(() => table.setDensity("compact"))
+    expect(running()).toBe(0)
+    // Other changes still glide there.
+    await settle()
+    act(() => table.setShowColumnFilters(true))
+    expect(running()).toBeGreaterThan(0)
+  })
+
   it("changes the filter row and density at once when animations are off", async () => {
     let table!: DataTableInstance<Row>
     render(<Harness onTable={(t) => (table = t)} enableAnimations={false} />)

@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react"
+import { act, cleanup, render, screen } from "@testing-library/react"
 import * as React from "react"
 import { afterEach, describe, expect, it } from "vitest"
 import { userEvent } from "vitest/browser"
@@ -6,7 +6,7 @@ import { userEvent } from "vitest/browser"
 import { dragMouse, nextFrame } from "../../../../test/browser/pointer"
 import { DataTable } from "./data-table"
 import type { DataTableColumnDef } from "./table-types"
-import type { UseDataTableOptions } from "./types"
+import type { DataTableInstance, UseDataTableOptions } from "./types"
 import { useDataTable } from "./use-data-table"
 
 afterEach(cleanup)
@@ -158,4 +158,68 @@ describe("right-to-left tables", () => {
     const box = s.getBoundingClientRect()
     expect(Math.abs(rect("H39", "th").left - box.left)).toBeLessThanOrEqual(2)
   })
+})
+
+describe("column glide in a fixed layout", () => {
+  function Hideable({
+    dir,
+    onTable,
+  }: {
+    dir: "rtl" | "ltr"
+    onTable: (table: DataTableInstance<Row>) => void
+  }) {
+    // Uneven widths: a fixed layout that lost them would show.
+    const [columns] = React.useState(() =>
+      makeColumns(10).map((column, i) => ({ ...column, size: 80 + i * 20 }))
+    )
+    const [data] = React.useState(() => makeRows(5, 10))
+    const table = useDataTable<Row>({
+      columns,
+      data,
+      getRowId: (row) => row.id,
+      enablePagination: false,
+      enableColumnPinning: true,
+      enableColumnResizing: true,
+      initialState: { columnPinning: { left: ["c0"] } },
+    })
+    onTable(table)
+    return (
+      <div dir={dir} style={{ width: 600 }}>
+        <DataTable table={table} />
+      </div>
+    )
+  }
+
+  // A fixed-layout table (resizable columns) takes its widths from the first
+  // row; the hidden header's copy must not stand in front of it.
+  it.each(["rtl", "ltr"] as const)(
+    "keeps the columns before a hidden one still while its copy fades (%s)",
+    async (dir) => {
+      let table!: DataTableInstance<Row>
+      render(<Hideable dir={dir} onTable={(t) => (table = t)} />)
+      await settle()
+      surface().scrollLeft = dir === "rtl" ? -400 : 400
+      await settle()
+      const still = ["H0", "H1", "H2", "H3"]
+      const before = still.map((h) => rect(h, "th").left)
+      act(() => table.getColumn("c4")!.toggleVisibility(false))
+      for (const a of document.getAnimations()) {
+        a.pause()
+        a.currentTime = 70
+      }
+      expect(
+        document.querySelector('[data-slot="data-table-leave-copy"]')
+      ).not.toBeNull()
+      const during = still.map((h) => {
+        const th = [...document.querySelectorAll("th")].find(
+          (el) =>
+            el.textContent?.trim().startsWith(h) &&
+            !el.closest('[data-slot="data-table-leave-copy"]')
+        )!
+        return th.getBoundingClientRect().left
+      })
+      during.forEach((left, i) => expect(left).toBeCloseTo(before[i]!, 0))
+      for (const a of document.getAnimations()) a.finish()
+    }
+  )
 })

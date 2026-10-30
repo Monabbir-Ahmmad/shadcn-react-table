@@ -32,6 +32,13 @@ export const FIELD_CLASS =
 export const GROUP_CONTROL_CLASS =
   "h-full text-xs font-normal tracking-normal normal-case"
 
+/**
+ * Each bound's group in a min–max pair. The groups size from their content
+ * and split the spare room evenly, so the mode menu inside the first one
+ * doesn't come out of that bound's room for its value.
+ */
+export const RANGE_GROUP_CLASS = "w-auto flex-auto"
+
 const GREGORIAN = "gregory"
 
 /**

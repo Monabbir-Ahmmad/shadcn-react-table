@@ -11,6 +11,7 @@ import {
   BETWEEN_MODES,
   FilterInputGroup,
   GROUP_CONTROL_CLASS,
+  RANGE_GROUP_CLASS,
   ValuelessLabel,
   type FilterFieldProps,
 } from "./shared"
@@ -59,6 +60,7 @@ export function NumberFilterField<TData extends RowData, TValue>({
               : undefined
           }
           clearLabel={`${localization.clearFilter} (${localization.min})`}
+          className={RANGE_GROUP_CLASS}
         >
           <InputGroupInput
             type="number"
@@ -81,6 +83,7 @@ export function NumberFilterField<TData extends RowData, TValue>({
               : undefined
           }
           clearLabel={`${localization.clearFilter} (${localization.max})`}
+          className={RANGE_GROUP_CLASS}
         >
           <InputGroupInput
             type="number"

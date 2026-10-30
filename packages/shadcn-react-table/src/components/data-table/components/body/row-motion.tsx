@@ -69,7 +69,7 @@ export function DataTableRowMotion<TData extends RowData>({
   tableRef: React.RefObject<HTMLTableElement | null>
   active: boolean
 }) {
-  const { renderDetailPanel, density } = dt(table)
+  const { renderDetailPanel, density, enableRowVirtualization } = dt(table)
   const hasDetailPanel = !!renderDetailPanel
   const filterRow = isFilterRowVisible(table)
   // Its own subscription: the table root does not re-render when an edit
@@ -100,6 +100,7 @@ export function DataTableRowMotion<TData extends RowData>({
     members: () => rowKeys(table, hasDetailPanel),
     paused: () => editing,
     filterRow,
+    remeasure: { value: density, virtual: !!enableRowVirtualization },
     // The pinned row groups stick under the header at `--dt-head-h`, which
     // must follow the filter row before the rows are measured.
     sync: (el) => {

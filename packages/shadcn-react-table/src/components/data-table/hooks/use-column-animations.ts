@@ -344,9 +344,18 @@ export function useColumnAnimations({
     }
     if (!head || !box || !bounds) return
     const timing = { duration: durationFast, easing: ease }
-    if (unpositioned) {
-      track(head.animate({ position: ["relative", "relative"] }, timing))
-    }
+    // The copies sit under the header cells (`z-index: -1`), so the head is
+    // its own stacking context while they fade, or they would fall behind
+    // the table's background.
+    track(
+      head.animate(
+        {
+          ...(unpositioned && { position: ["relative", "relative"] }),
+          isolation: ["isolate", "isolate"],
+        },
+        timing
+      )
+    )
     for (const { node, rect } of work.leaving) {
       // Kept within the table's new width, so a copy past its end never
       // widens the surface's scroll area.
@@ -365,6 +374,7 @@ export function useColumnAnimations({
         height: `${rect.height}px`,
         overflow: "hidden",
         pointerEvents: "none",
+        zIndex: "-1",
       })
       const ghost = document.createElement("table")
       ghost.className = table.className
@@ -400,9 +410,11 @@ export function useColumnAnimations({
       section.append(tr)
       ghost.append(section)
       copy.append(ghost)
-      // First in the `<thead>`: painted before (under) its header cells,
-      // which are positioned too, and inside the sticky header's layer.
-      head.prepend(copy)
+      // Last in the `<thead>`: a fixed-layout table takes its column widths
+      // from the first row, and a copy in front of it would lose them. The
+      // negative z-index paints it under the header cells (positioned too),
+      // still inside the header's layer.
+      head.append(copy)
       copies.current.add(copy)
       const remove = () => {
         copy.remove()
