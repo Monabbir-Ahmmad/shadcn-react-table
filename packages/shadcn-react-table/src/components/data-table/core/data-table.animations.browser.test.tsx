@@ -918,9 +918,16 @@ describe("control animations", () => {
     const [from, to] = (fadeOut[0]!.effect as KeyframeEffect).getKeyframes()
     expect([Number(from!.opacity), Number(to!.opacity)]).toEqual([1, 0])
     expect(timing(fadeOut[0]!).duration).toBe(MOTION_DEFAULTS.durationFast)
-    const at = old.getBoundingClientRect()
-    expect(Math.abs(at.left - box.left)).toBeLessThan(1)
-    expect(Math.abs(at.top - box.top)).toBeLessThan(1)
+    // The text itself (not the boxes) sits in the same place.
+    const glyphs = (el: Element) => {
+      const range = document.createRange()
+      range.selectNodeContents(el)
+      return range.getClientRects()[0]!
+    }
+    const at = glyphs(old)
+    const live = glyphs(now)
+    expect(Math.abs(at.left - live.left)).toBeLessThan(0.5)
+    expect(Math.abs(at.top - live.top)).toBeLessThan(0.5)
     expect(Math.abs(now.getBoundingClientRect().top - box.top)).toBeLessThan(1)
     await settle()
     expect(old.isConnected).toBe(false)
