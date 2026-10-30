@@ -1,8 +1,9 @@
-/* global document, window, getComputedStyle -- used inside page.evaluate() callbacks, which run in the browser */
+/* global document -- used inside page.evaluate() callbacks, which run in the browser */
 // Drives the home page in a real browser against the served static export and
-// checks the four things that only work live: the anatomy stage, the command
-// driven table (including the large dataset), and the style deck — once in
-// light and once in dark mode. Page errors and console errors fail the check.
+// checks the things that only work live: the hero's table demo (and that it
+// holds still under reduced motion), the features section, the command driven
+// table (including the large dataset), and the style deck — once in light and
+// once in dark mode. Page errors and console errors fail the check.
 //   GITHUB_PAGES=true pnpm --filter shadcn-react-table-web build
 //   node apps/web/scripts/preview-server.mjs
 //   node apps/web/scripts/check-home.mjs [baseUrl]
@@ -64,6 +65,16 @@ const isPrefetch404 = (message) =>
 
 const browser = await chromium.launch()
 const failures = []
+
+const CAPTION = "[data-auto-demo] [data-demo-caption]"
+// The caption as read on screen ("01 Sort enableSorting").
+const captionText = (page) =>
+  page.evaluate(
+    (selector) =>
+      document.querySelector(selector)?.innerText.replace(/\s+/g, " "),
+    CAPTION
+  )
+
 async function checkHome(colorScheme) {
   scheme = colorScheme
   const context = await browser.newContext({
@@ -88,49 +99,66 @@ async function checkHome(colorScheme) {
   }
 
   await page.goto(`${BASE}/`, { waitUntil: "load" })
-  // The sticky header's height, as the page sets it (--site-header-h).
-  const header = await page.evaluate(() =>
-    parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue(
-        "--site-header-h"
-      )
-    )
-  )
-  assert(header > 0, "the page sets no --site-header-h")
 
-  await step("anatomy: one layer panel with a Guide link at 50%", async () => {
-    await page.waitForSelector("[data-anatomy-stage]", { state: "visible" })
-    await page.evaluate((header) => {
-      const section = document.querySelector("[data-anatomy-stage]")
-      const rect = section.getBoundingClientRect()
-      const distance = rect.height - window.innerHeight + header
-      window.scrollTo({
-        top: rect.top + window.scrollY - header + 0.5 * distance,
-        behavior: "instant",
-      })
-    }, header)
-    // Panels cross-fade over 200 ms.
-    await page.waitForTimeout(600)
-    const shown = await page.evaluate(() =>
-      [...document.querySelectorAll("[data-anatomy-panel]")]
-        .filter((panel) => Number(getComputedStyle(panel).opacity) > 0.9)
-        .map((panel) => ({
-          title: panel.querySelector("h2")?.textContent,
-          guides: [...panel.querySelectorAll("a")].filter(
-            (a) => /Guide/.test(a.textContent) && a.getClientRects().length
-          ).length,
-        }))
+  await step("hero: the table demo moves on its own", async () => {
+    const demo = page.locator("[data-auto-demo]")
+    await demo.waitFor({ state: "visible" })
+    const box = await demo.boundingBox()
+    assert(box && box.height > 200, "the demo card did not render")
+    const first = await captionText(page)
+    assert(first, "the demo has no caption")
+    // Scenes last 2.5 s, so the caption moves on within 4 s.
+    await page.waitForFunction(
+      ([selector, was]) =>
+        document.querySelector(selector)?.innerText.replace(/\s+/g, " ") !==
+        was,
+      [CAPTION, first],
+      { timeout: 4000 }
     )
+    results.push(`    caption: ${first} -> ${await captionText(page)}`)
+  })
+
+  await step("hero: the demo holds still under reduced motion", async () => {
+    const still = await browser.newContext({
+      viewport: { width: 1280, height: 900 },
+      colorScheme,
+      reducedMotion: "reduce",
+    })
+    try {
+      const stillPage = await still.newPage()
+      await stillPage.goto(`${BASE}/`, { waitUntil: "load" })
+      await stillPage.locator("[data-auto-demo]").waitFor({ state: "visible" })
+      // Let hydration swap in the still frame, then watch for 4 s.
+      await stillPage.waitForTimeout(500)
+      const before = await captionText(stillPage)
+      await stillPage.waitForTimeout(4000)
+      const after = await captionText(stillPage)
+      assert(before === after, `caption moved: ${before} -> ${after}`)
+    } finally {
+      await still.close()
+    }
+  })
+
+  await step("features: five parts with guide links", async () => {
+    const section = page.locator("#features")
+    await section.scrollIntoViewIfNeeded()
+    const parts = await section
+      .locator("h3")
+      .evaluateAll((headings) =>
+        headings
+          .filter((h) => h.getClientRects().length)
+          .map((h) => h.textContent)
+      )
     assert(
-      shown.length === 1,
-      `expected one visible layer panel, found ${shown.length}`
+      parts.length === 5,
+      `expected five visible parts, found ${parts.length}: ${parts.join(", ")}`
     )
-    // 50% of the walk-through is the third part, "Rows".
-    assert(
-      shown[0].title === "Rows",
-      `expected the "Rows" panel at 50%, found "${shown[0].title}"`
-    )
-    assert(shown[0].guides > 0, `panel "${shown[0].title}" has no Guide link`)
+    const guides = await section
+      .getByRole("link", { name: /^Guide/ })
+      .evaluateAll(
+        (links) => links.filter((a) => a.getClientRects().length).length
+      )
+    assert(guides > 0, "the features section has no Guide link")
   })
 
   await step("live table: commands drive the table", async () => {

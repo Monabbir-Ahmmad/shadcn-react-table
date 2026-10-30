@@ -20,7 +20,7 @@ export function InstallSection() {
   return (
     <ProofSection
       id="install"
-      index="10"
+      index="07"
       label="Install"
       title="Three steps."
       lead="One command installs the table source, the primitives it uses in your style, and its dependencies."

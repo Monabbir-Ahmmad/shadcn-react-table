@@ -20,7 +20,7 @@ export function ForAgents() {
   return (
     <ProofSection
       id="agents"
-      index="09"
+      index="06"
       label="For coding agents"
       title="Paste one line into your agent."
       lead="The skill teaches your agent the install, the API and the patterns, so it builds the table the way the docs do."

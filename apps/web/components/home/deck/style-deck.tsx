@@ -349,7 +349,7 @@ export function StyleDeck() {
       <div className="mx-auto max-w-6xl px-4 pt-16 sm:px-6 md:pt-24 lg:px-8">
         <div className="grid gap-x-12 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
           <div>
-            <SectionLabel index="→">Every shadcn style</SectionLabel>
+            <SectionLabel index="03">Every shadcn style</SectionLabel>
             <h2
               id="styles-title"
               className="mt-4 font-heading text-4xl font-semibold tracking-tight text-balance md:text-5xl"

@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 
 import { SiteHeader } from "@/components/site-header"
-import { AnatomyStage } from "@/components/home/anatomy/anatomy-stage"
-import { AnatomyStatic } from "@/components/home/anatomy/anatomy-static"
+import { HeroSection } from "@/components/home/hero/hero-section"
+import { FeaturesSection } from "@/components/home/features-section"
 import { LiveTableSection } from "@/components/home/live/live-table-section"
 import { StyleDeck } from "@/components/home/deck/style-deck"
 import { Compared } from "@/components/home/proof/compared"
@@ -22,8 +22,8 @@ export default function HomePage() {
     <div className="flex min-h-svh flex-col">
       <SiteHeader />
       <main className="flex-1 [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px)] [background-size:calc(100%/6)_100%] [background-position:center] md:[background-size:calc(100%/12)_100%] dark:[background-image:linear-gradient(to_right,color-mix(in_oklch,var(--border),transparent_40%)_1px,transparent_1px)]">
-        <AnatomyStage />
-        <AnatomyStatic />
+        <HeroSection />
+        <FeaturesSection />
         <LiveTableSection />
         <StyleDeck />
         <Compared />

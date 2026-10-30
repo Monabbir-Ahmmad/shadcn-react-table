@@ -61,7 +61,7 @@ export function LiveTableSection() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
         <div className="grid gap-x-12 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
           <div>
-            <SectionLabel index="→">Try it</SectionLabel>
+            <SectionLabel index="02">Try it</SectionLabel>
             <h2
               id="try-title"
               className="mt-4 font-heading text-4xl font-semibold tracking-tight text-balance md:text-5xl"

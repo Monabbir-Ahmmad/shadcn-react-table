@@ -27,7 +27,7 @@ export function ExamplesIndex() {
   return (
     <ProofSection
       id="examples"
-      index="08"
+      index="05"
       label="Examples"
       title={`${EXAMPLE_META.length} examples to copy.`}
       lead="Every guide runs its examples live next to their source. Copy one, or point your agent at it."

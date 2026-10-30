@@ -38,7 +38,7 @@ export function Compared() {
   return (
     <ProofSection
       id="compared"
-      index="07"
+      index="04"
       label="Compared"
       title="Material React Table's features, shadcn's way."
       lead="The feature set people reach for Material React Table for, built from your own shadcn/ui components."

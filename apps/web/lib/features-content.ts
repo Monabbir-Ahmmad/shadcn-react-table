@@ -1,16 +1,16 @@
 /** One feature of a table part, with the options that turn it on. */
-export type AnatomyFeature = { name: string; options: string[]; href: string }
+export type Feature = { name: string; options: string[]; href: string }
 
-/** One part of the table in the anatomy section. */
-export type AnatomyLayer = {
+/** One part of the table in the home page features section. */
+export type FeaturePart = {
   id: "toolbar" | "header" | "rows" | "cells" | "footer"
   title: string
   /** The slotProps key for this part. */
   slot: string
-  features: AnatomyFeature[]
+  features: Feature[]
 }
 
-export const ANATOMY: AnatomyLayer[] = [
+export const FEATURES: FeaturePart[] = [
   {
     id: "toolbar",
     title: "Toolbar",
