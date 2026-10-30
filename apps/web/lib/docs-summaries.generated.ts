@@ -58,7 +58,7 @@ export const DOCS_SUMMARIES: Record<string, string> = {
   "/docs/guides/density":
     "Density controls the vertical padding of table rows.",
   "/docs/guides/animations":
-    "The table animates rows, detail panels and a few controls so changes are easy to follow.",
+    "The table animates rows, columns, detail panels, the toolbar and a few controls so changes are easy to follow.",
   "/docs/guides/sticky":
     "The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.",
   "/docs/guides/toolbar":

@@ -57,7 +57,7 @@ useDataTable({
 })
 ```
 
-Sticky pinned rows need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
+Sticky pinned rows have a solid line and a soft shadow on the edge that faces the other rows. They need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
 
 Example (`row-pinning-modes`):
 

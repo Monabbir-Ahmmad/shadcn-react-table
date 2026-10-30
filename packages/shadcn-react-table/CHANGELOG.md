@@ -182,8 +182,23 @@ for every rename.
   from the page).
 - **New:** animations. Rows glide when their order changes and fade in and
   out, detail panels open smoothly, and the sort arrow, checkboxes and selected
-  count transition. On by default and off for reduced motion;
-  `enableAnimations: false` turns it off.
+  count transition. Rows also glide when the filter row or the density
+  changes, columns glide when they are hidden, shown, pinned or reordered, the
+  search box opens out of its button, the toolbar buttons glide, and the
+  selection banner and grouping drop zone slide in and out. On by default and
+  off for reduced motion; `enableAnimations: false` turns it off.
+- **New:** icon slots `pinLeft`, `pinRight`, `pinTop`, `pinBottom`,
+  `clearSort` and `clearFilter`. Pinning to the left and right, and to the top
+  and bottom, no longer share one icon, and "Clear sort" no longer shares
+  `clearAll`. Overrides keep working: the pin slots fall back to `pin`,
+  `clearSort` to `clearAll` and `clearFilter` to `filterOff`. Code that types
+  a full `DataTableIcons` object must add the six keys.
+- **Changed:** the filter-mode menu and a clear button sit inside the filter
+  inputs (an input group) and in the global search box. Number, date and
+  date-time filters gain a clear button, and each side of a range has its own.
+- **Changed:** pinned columns and sticky pinned rows have a solid line on their
+  inner edge, besides the shadow. A group header over a pinned edge column gets
+  the line too.
 
 ### Changed
 

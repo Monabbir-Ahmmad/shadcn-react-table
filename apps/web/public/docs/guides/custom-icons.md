@@ -57,6 +57,17 @@ import { RiSearchLine } from "@remixicon/react"
 </DataTableConfigProvider>
 ```
 
+## Pin and clear icons
+
+Pinning and clearing have their own slots: `pinLeft`, `pinRight` (column menu), `pinTop`, `pinBottom` (row pin button), `clearSort` and `clearFilter` (column menu). The defaults are the Lucide pin turned to point into the edge it pins to, `ListX` and `FilterX`.
+
+If you only set the older slots, the new ones follow them, so existing overrides keep working:
+
+- `pinLeft`, `pinRight`, `pinTop` and `pinBottom` fall back to your `pin`, without rotation.
+- `clearSort` falls back to your `clearAll`, and `clearFilter` to your `filterOff`.
+
+Set the new slots to tell the two pin directions apart. Code that types a full `DataTableIcons` object (not a `Partial`) must add the six new keys.
+
 > **Precedence:** Values resolve in this order: built-in defaults → `DataTableConfigProvider` →
 >   per-call options. Per-call `icons` always win.
 

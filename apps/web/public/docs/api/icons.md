@@ -27,9 +27,15 @@ See the [Custom icons guide](/docs/guides/custom-icons) for swapping the whole s
 | `filter` | `IconComponent` | `Filter` | Filter toggle and filter menu items. |
 | `filterOff` | `IconComponent` | `FilterX` | Hide-filters state of the filter toggle and clear-filter items. |
 | `advancedFilter` | `IconComponent` | `ListFilter` | Advanced filter panel toggle. |
-| `clearAll` | `IconComponent` | `RotateCcw` | Clear-sort / show-all reset action. |
+| `clearAll` | `IconComponent` | `RotateCcw` | Show-all-columns reset action in the column menu. |
+| `clearSort` | `IconComponent` | `ListX` | Clear-sort item in the column menu. When not overridden but `clearAll` is, it uses your `clearAll`. |
+| `clearFilter` | `IconComponent` | `FilterX` | Clear-filter item in the column menu. When not overridden but `filterOff` is, it uses your `filterOff`. |
 | `hide` | `IconComponent` | `EyeOff` | Hide-column menu item. |
-| `pin` | `IconComponent` | `Pin` | Pin column and pin row actions. |
+| `pin` | `IconComponent` | `Pin` | Generic pin glyph. Any of `pinLeft`, `pinRight`, `pinTop` and `pinBottom` you don't override falls back to this one, unrotated. |
+| `pinLeft` | `IconComponent` | `PinLeft` | Pin-column-to-the-left menu item. The default needle points left. |
+| `pinRight` | `IconComponent` | `PinRight` | Pin-column-to-the-right menu item. The default needle points right. |
+| `pinTop` | `IconComponent` | `PinTop` | Pin-row-to-the-top button while the row is unpinned. The default needle points up. |
+| `pinBottom` | `IconComponent` | `Pin` | Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default needle points down. |
 | `pinnedRow` | `IconComponent` | `Pin` | Shown on a pinned row's pin button. |
 | `unpin` | `IconComponent` | `PinOff` | Unpin column and unpin row actions. |
 | `group` | `IconComponent` | `Group` | Group-by menu item and grouping chips. |

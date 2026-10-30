@@ -2899,7 +2899,23 @@ export const iconSlots: ApiMember[] = [
     type: "IconComponent",
     required: true,
     default: "RotateCcw",
-    description: "Clear-sort / show-all reset action.",
+    description: "Show-all-columns reset action in the column menu.",
+  },
+  {
+    name: "clearSort",
+    type: "IconComponent",
+    required: true,
+    default: "ListX",
+    description:
+      "Clear-sort item in the column menu. When not overridden but `clearAll` is, it uses your `clearAll`.",
+  },
+  {
+    name: "clearFilter",
+    type: "IconComponent",
+    required: true,
+    default: "FilterX",
+    description:
+      "Clear-filter item in the column menu. When not overridden but `filterOff` is, it uses your `filterOff`.",
   },
   {
     name: "hide",
@@ -2913,7 +2929,40 @@ export const iconSlots: ApiMember[] = [
     type: "IconComponent",
     required: true,
     default: "Pin",
-    description: "Pin column and pin row actions.",
+    description:
+      "Generic pin glyph. Any of `pinLeft`, `pinRight`, `pinTop` and `pinBottom` you don't override falls back to this one, unrotated.",
+  },
+  {
+    name: "pinLeft",
+    type: "IconComponent",
+    required: true,
+    default: "PinLeft",
+    description:
+      "Pin-column-to-the-left menu item. The default needle points left.",
+  },
+  {
+    name: "pinRight",
+    type: "IconComponent",
+    required: true,
+    default: "PinRight",
+    description:
+      "Pin-column-to-the-right menu item. The default needle points right.",
+  },
+  {
+    name: "pinTop",
+    type: "IconComponent",
+    required: true,
+    default: "PinTop",
+    description:
+      "Pin-row-to-the-top button while the row is unpinned. The default needle points up.",
+  },
+  {
+    name: "pinBottom",
+    type: "IconComponent",
+    required: true,
+    default: "Pin",
+    description:
+      'Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default needle points down.',
   },
   {
     name: "pinnedRow",
@@ -3132,6 +3181,13 @@ export const slots: ApiMember[] = [
     description: "Outermost wrapper element.",
   },
   {
+    name: "data-table-alert-banner",
+    type: "",
+    required: true,
+    default: null,
+    description: "Selection alert banner.",
+  },
+  {
     name: "data-table-create-row",
     type: "",
     required: true,
@@ -3145,6 +3201,22 @@ export const slots: ApiMember[] = [
     default: null,
     description:
       "Floating preview of a row dragged inside a DataTableDndProvider.",
+  },
+  {
+    name: "data-table-glide-copy",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Inert copy of a toolbar element that shrinks away during a toolbar motion.",
+  },
+  {
+    name: "data-table-group-zone",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Grouping drop zone above or below the table (animated in and out).",
   },
   {
     name: "data-table-infinite-loader",
@@ -3221,6 +3293,13 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: "The scroll container for the table (both axes).",
+  },
+  {
+    name: "data-table-toolbar",
+    type: "",
+    required: true,
+    default: null,
+    description: "Top toolbar root.",
   },
   {
     name: "data-table-toolbar-actions",

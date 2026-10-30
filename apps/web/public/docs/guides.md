@@ -46,7 +46,7 @@ One page per feature, each with live examples you can copy.
 ## Display & customization
 
 - [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
-- [Animations](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/animations): The table animates rows, detail panels and a few controls so changes are easy to follow.
+- [Animations](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/animations): The table animates rows, columns, detail panels, the toolbar and a few controls so changes are easy to follow.
 - [Sticky header & footer](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/sticky): The header row (enableStickyHeader, default true) sticks to the top of the scroll surface.
 - [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
 - [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the slotProps option.

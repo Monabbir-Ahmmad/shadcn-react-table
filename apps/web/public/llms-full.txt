@@ -780,6 +780,8 @@ function ColumnFiltersExample() {
 }
 ```
 
+The filter-mode menu and a clear button sit inside the input. The menu leads and the clear button shows while there is a value. Range filters have one clear button per side. Dropdown, checkbox and slider filters keep the menu beside the control.
+
 ## Choosing a filter control
 
 The UI for each filter is chosen by the column's `meta.filterVariant`:
@@ -1131,7 +1133,7 @@ function GlobalSearchExample() {
 
 ## Search modes
 
-When `enableGlobalFilterModes: true` (the default), the search box shows a mode menu — fuzzy, contains, and more. The initial mode comes from `initialState.globalFilterMode`, which defaults to `"fuzzy"`.
+When `enableGlobalFilterModes: true` (the default), the search icon at the start of the box opens a mode menu — fuzzy, contains, and more. A clear button sits at the end of the box while it has text. The initial mode comes from `initialState.globalFilterMode`, which defaults to `"fuzzy"`.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"
@@ -1480,7 +1482,7 @@ const table = useDataTable({
 
 # Column pinning
 
-Set `enableColumnPinning: true` to let users pin columns left or right from the column-actions menu. Pinned columns stay sticky while the table scrolls horizontally.
+Set `enableColumnPinning: true` to let users pin columns left or right from the column-actions menu. Pinned columns stay sticky while the table scrolls horizontally, with a solid line and a soft shadow on their inner edge.
 
 Example (`column-pinning`):
 
@@ -2090,7 +2092,7 @@ useDataTable({
 })
 ```
 
-Sticky pinned rows need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
+Sticky pinned rows have a solid line and a soft shadow on the edge that faces the other rows. They need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
 
 Example (`row-pinning-modes`):
 
@@ -3980,7 +3982,7 @@ The other toolbar options have their own flags too: `enableGlobalFilter`, `enabl
 
 # Animations
 
-The table animates rows, detail panels and a few controls so changes are easy to follow. It is on by default and turns itself off for people who prefer reduced motion.
+The table animates rows, columns, detail panels, the toolbar and a few controls so changes are easy to follow. It is on by default and turns itself off for people who prefer reduced motion.
 
 Example (`animations`):
 
@@ -4021,12 +4023,16 @@ function AnimationsExample() {
 
 - **Row order:** rows glide to their new position when you sort, filter, pin, group or expand.
 - **New and removed rows:** new rows fade in with a small rise. Removed rows fade out. With [virtualization](/docs/guides/virtualization), rows that a sort or filter brings into the drawn window fade in too.
+- **Filter row and density:** rows glide when the filter row opens or closes and when the density changes, so the new spacing does not jump.
+- **Columns:** hiding, showing, pinning or reordering a column glides the columns that move. A shown column fades in, and a hidden column's header fades out where it was.
+- **Search box:** the search button opens into the box and the box shrinks back into the button. The toolbar buttons around it glide to their new place.
+- **Selection banner and grouping drop zone:** the "N selected" banner and the drop zone slide and fade in and out, and the table below glides to make room.
 - **Detail panels:** a panel opens from the top down while the rows below glide. It closes from the bottom up.
 - **Sort arrow:** the sort icon fades and scales between states. The default arrow also turns around for descending order, and when the sort is cleared it fades out without turning back. A custom sort icon never turns.
 - **Selection checkbox:** the tick draws itself in.
 - **Selected count:** the old "N selected" text fades out as the new one fades in, in the same place.
 
-A row that glides past others is drawn above them, and the row that moves farthest is on top. Motion pauses while a row is being dragged, while a cell or row is being edited and while a new row is being created. Starting an edit stops any motion still running.
+A row that glides past others is drawn above them, and the row that moves farthest is on top. Motion pauses while a row is being dragged, while a cell or row is being edited and while a new row is being created. Starting an edit stops any row or column motion still running.
 
 ## Turning it off
 
@@ -4051,8 +4057,8 @@ Three CSS variables set the timing. The table has built-in fallbacks, so you onl
 
 | Variable                    | Default                          | Used for                                          |
 | --------------------------- | -------------------------------- | ------------------------------------------------- |
-| `--dt-motion-duration`      | `280ms`                          | Row glide, detail panels, sort arrow, checkbox    |
-| `--dt-motion-duration-fast` | `160ms`                          | Rows fading in and out, selected count            |
+| `--dt-motion-duration`      | `280ms`                          | Row and column glide, search box, toolbar, detail panels, sort arrow, checkbox |
+| `--dt-motion-duration-fast` | `160ms`                          | Rows and columns fading in and out, banner, selected count |
 | `--dt-motion-ease`          | `cubic-bezier(0.22, 1, 0.36, 1)` | Every animation                                   |
 
 Set them with a class on the table. `className` goes on the table's root.
@@ -4077,7 +4083,15 @@ Each table times its own controls. A table with animations off, nested in an ani
 - Only rows that are drawn animate. With [virtualization](/docs/guides/virtualization), rows outside the window are not touched.
 - Scrolling never animates.
 - A change that would animate more than 300 rows just updates, with no motion. Above 100 gliding rows, row separators are hidden for the length of the glide.
+- Columns follow the same rule: only drawn columns glide. A change that would animate more than 3,000 cells (the table's rows times the columns that move or enter) just updates, with no motion.
 - Removed rows never make the table scroll further than its content. In a scrolled table, a removed row that sat below the table's new bottom disappears at once instead of fading, so the scroll position does not jump when the fade ends.
+
+## Limits
+
+- Group header widths snap. A group header glides to its new position, but its width changes at once, for example when you hide one of its columns.
+- With [virtualization](/docs/guides/virtualization), a window change in the middle of a glide can shift the cells that are still gliding.
+- An edit that starts in the middle of a toolbar motion lets that toolbar motion finish. Row and column motion stops at once.
+- Toolbar groups are `position: relative`, so absolutely positioned content in a custom toolbar is placed against its group, not the toolbar.
 
 ## Related
 
@@ -4275,7 +4289,9 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 
 | Slot | Type | Default | Description |
 | --- | --- | --- | --- |
+| `data-table-toolbar` |  |  | Top toolbar root. |
 | `data-table-toolbar-actions` |  |  | Internal actions cluster (search, filters, density, full screen, …). |
+| `data-table-alert-banner` |  |  | Selection alert banner. |
 
 ```tsx
 <DataTable table={table} className="[&_[data-slot=data-table-toolbar]]:px-2" />
@@ -5012,6 +5028,17 @@ import { RiSearchLine } from "@remixicon/react"
   {children}
 </DataTableConfigProvider>
 ```
+
+## Pin and clear icons
+
+Pinning and clearing have their own slots: `pinLeft`, `pinRight` (column menu), `pinTop`, `pinBottom` (row pin button), `clearSort` and `clearFilter` (column menu). The defaults are the Lucide pin turned to point into the edge it pins to, `ListX` and `FilterX`.
+
+If you only set the older slots, the new ones follow them, so existing overrides keep working:
+
+- `pinLeft`, `pinRight`, `pinTop` and `pinBottom` fall back to your `pin`, without rotation.
+- `clearSort` falls back to your `clearAll`, and `clearFilter` to your `filterOff`.
+
+Set the new slots to tell the two pin directions apart. Code that types a full `DataTableIcons` object (not a `Partial`) must add the six new keys.
 
 > **Precedence:** Values resolve in this order: built-in defaults → `DataTableConfigProvider` →
 >   per-call options. Per-call `icons` always win.
@@ -7229,9 +7256,15 @@ See the [Custom icons guide](/docs/guides/custom-icons) for swapping the whole s
 | `filter` | `IconComponent` | `Filter` | Filter toggle and filter menu items. |
 | `filterOff` | `IconComponent` | `FilterX` | Hide-filters state of the filter toggle and clear-filter items. |
 | `advancedFilter` | `IconComponent` | `ListFilter` | Advanced filter panel toggle. |
-| `clearAll` | `IconComponent` | `RotateCcw` | Clear-sort / show-all reset action. |
+| `clearAll` | `IconComponent` | `RotateCcw` | Show-all-columns reset action in the column menu. |
+| `clearSort` | `IconComponent` | `ListX` | Clear-sort item in the column menu. When not overridden but `clearAll` is, it uses your `clearAll`. |
+| `clearFilter` | `IconComponent` | `FilterX` | Clear-filter item in the column menu. When not overridden but `filterOff` is, it uses your `filterOff`. |
 | `hide` | `IconComponent` | `EyeOff` | Hide-column menu item. |
-| `pin` | `IconComponent` | `Pin` | Pin column and pin row actions. |
+| `pin` | `IconComponent` | `Pin` | Generic pin glyph. Any of `pinLeft`, `pinRight`, `pinTop` and `pinBottom` you don't override falls back to this one, unrotated. |
+| `pinLeft` | `IconComponent` | `PinLeft` | Pin-column-to-the-left menu item. The default needle points left. |
+| `pinRight` | `IconComponent` | `PinRight` | Pin-column-to-the-right menu item. The default needle points right. |
+| `pinTop` | `IconComponent` | `PinTop` | Pin-row-to-the-top button while the row is unpinned. The default needle points up. |
+| `pinBottom` | `IconComponent` | `Pin` | Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default needle points down. |
 | `pinnedRow` | `IconComponent` | `Pin` | Shown on a pinned row's pin button. |
 | `unpin` | `IconComponent` | `PinOff` | Unpin column and unpin row actions. |
 | `group` | `IconComponent` | `Group` | Group-by menu item and grouping chips. |

@@ -126,7 +126,9 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 
 | Slot | Type | Default | Description |
 | --- | --- | --- | --- |
+| `data-table-toolbar` |  |  | Top toolbar root. |
 | `data-table-toolbar-actions` |  |  | Internal actions cluster (search, filters, density, full screen, …). |
+| `data-table-alert-banner` |  |  | Selection alert banner. |
 
 ```tsx
 <DataTable table={table} className="[&_[data-slot=data-table-toolbar]]:px-2" />

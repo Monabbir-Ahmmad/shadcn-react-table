@@ -21,7 +21,7 @@ function GlobalSearchExample() {
 
 ## Search modes
 
-When `enableGlobalFilterModes: true` (the default), the search box shows a mode menu — fuzzy, contains, and more. The initial mode comes from `initialState.globalFilterMode`, which defaults to `"fuzzy"`.
+When `enableGlobalFilterModes: true` (the default), the search icon at the start of the box opens a mode menu — fuzzy, contains, and more. A clear button sits at the end of the box while it has text. The initial mode comes from `initialState.globalFilterMode`, which defaults to `"fuzzy"`.
 
 ```tsx
 import { DataTable, useDataTable } from "@/components/ui/data-table"

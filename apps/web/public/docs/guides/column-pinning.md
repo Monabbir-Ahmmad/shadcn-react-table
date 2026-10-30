@@ -1,6 +1,6 @@
 # Column pinning
 
-Set `enableColumnPinning: true` to let users pin columns left or right from the column-actions menu. Pinned columns stay sticky while the table scrolls horizontally.
+Set `enableColumnPinning: true` to let users pin columns left or right from the column-actions menu. Pinned columns stay sticky while the table scrolls horizontally, with a solid line and a soft shadow on their inner edge.
 
 Example (`column-pinning`):
 

@@ -18,6 +18,8 @@ function ColumnFiltersExample() {
 }
 ```
 
+The filter-mode menu and a clear button sit inside the input. The menu leads and the clear button shows while there is a value. Range filters have one clear button per side. Dropdown, checkbox and slider filters keep the menu beside the control.
+
 ## Choosing a filter control
 
 The UI for each filter is chosen by the column's `meta.filterVariant`:
