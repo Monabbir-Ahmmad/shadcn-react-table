@@ -3203,14 +3203,6 @@ export const slots: ApiMember[] = [
       "Floating preview of a row dragged inside a DataTableDndProvider.",
   },
   {
-    name: "data-table-glide-copy",
-    type: "",
-    required: true,
-    default: null,
-    description:
-      "Inert copy of a toolbar element that shrinks away during a toolbar motion.",
-  },
-  {
     name: "data-table-group-zone",
     type: "",
     required: true,
@@ -3265,6 +3257,14 @@ export const slots: ApiMember[] = [
     description: "The moving bar inside `data-table-progress`.",
   },
   {
+    name: "data-table-search",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "The global search box beside the search button (slides out of it and back in).",
+  },
+  {
     name: "data-table-selected-count",
     type: "",
     required: true,
@@ -3293,13 +3293,6 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: "The scroll container for the table (both axes).",
-  },
-  {
-    name: "data-table-toolbar",
-    type: "",
-    required: true,
-    default: null,
-    description: "Top toolbar root.",
   },
   {
     name: "data-table-toolbar-actions",

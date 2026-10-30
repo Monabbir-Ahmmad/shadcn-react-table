@@ -70,7 +70,6 @@ export function DataTableToolbar<TData extends RowData>({
     enableColumnActions,
     enableDensityToggle,
     enableFullscreenToggle,
-    showGlobalFilter: searchOpen,
     enableAnimations,
   } = dt(table)
   const startRef = React.useRef<HTMLDivElement>(null)
@@ -96,12 +95,11 @@ export function DataTableToolbar<TData extends RowData>({
         start={startRef}
         actions={actionsRef}
         active={active}
-        // What adds, removes or resizes an item: the buttons slide when the
-        // search box opens or closes, or when an item comes or goes.
+        // What adds or removes an item: the buttons slide when an item comes
+        // or goes. Not the search box: its own slide pushes them aside.
         signal={[
           showGlobalFilter,
           positionGlobalFilter,
-          searchOpen,
           title != null,
           showFilterToggle,
           enableAdvancedFilter,

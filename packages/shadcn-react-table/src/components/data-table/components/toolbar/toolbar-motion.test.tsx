@@ -84,56 +84,71 @@ const banner = () =>
   document.querySelector<HTMLElement>('[data-slot="data-table-alert-banner"]')
 const zone = () =>
   document.querySelector<HTMLElement>('[data-slot="data-table-group-zone"]')
-const copies = () =>
-  document.querySelectorAll('[data-slot="data-table-glide-copy"]')
+const searchBox = () =>
+  document.querySelector<HTMLElement>('[data-slot="data-table-search"]')
 const rowCheckboxes = () => [
   ...document.querySelectorAll<HTMLElement>('tbody [role="checkbox"]'),
 ]
 const searchButton = () => screen.getByRole("button", { name: "Search" })
 
 describe("search box motion", () => {
-  it("keys the search button and the search box as one item", () => {
+  it("keeps the search button while the box is open", () => {
     render(<Harness />)
-    expect(searchButton().dataset.glideKey).toBe("search")
     fireEvent.click(searchButton())
-    const box = screen.getByRole("textbox").closest('[data-slot="input-group"]')
-    expect((box as HTMLElement).dataset.glideKey).toBe("search")
+    expect(screen.getByRole("textbox", { name: "Search" })).toBeDefined()
+    expect(searchButton().getAttribute("aria-expanded")).toBe("true")
   })
 
-  it("grows the box from the button and fades a copy of the button out", async () => {
+  it("slides the box out of the button", () => {
     render(<Harness />)
     fireEvent.click(searchButton())
-    const box = screen
-      .getByRole("textbox")
-      .closest<HTMLElement>('[data-slot="input-group"]')!
-    expect(fakes.some((f) => f.el === box)).toBe(true)
-    // The copy is inert and out of the accessibility tree.
-    const [copy] = copies()
-    expect(copy).toBeDefined()
-    expect(copy!.getAttribute("aria-hidden")).toBe("true")
-    expect(copy!.hasAttribute("inert")).toBe(true)
-    await finishAll()
-    expect(copies()).toHaveLength(0)
+    const slide = fakes.find(
+      (f) => f.el === searchBox() && "width" in f.keyframes
+    )
+    expect(slide).toBeDefined()
   })
 
-  it("keeps a copy of the box until it has shrunk into the button", async () => {
+  it("slides the box back into the button, then unmounts it", async () => {
     render(<Harness />)
     fireEvent.click(searchButton())
     await finishAll()
-    fireEvent.blur(screen.getByRole("textbox"))
-    // The button is back at once; the box's copy plays the close.
-    expect(searchButton()).toBeDefined()
-    expect(copies()).toHaveLength(1)
-    expect(copies()[0]!.querySelector("input")).not.toBeNull()
+    fireEvent.click(searchButton())
+    // Still there while it slides, out of reach.
+    const box = searchBox()!
+    expect(box.hasAttribute("inert")).toBe(true)
+    expect(searchButton().getAttribute("aria-expanded")).toBe("false")
     await finishAll()
-    expect(copies()).toHaveLength(0)
+    expect(searchBox()).toBeNull()
+  })
+
+  it("comes back if the button is clicked while it slides in", async () => {
+    render(<Harness />)
+    fireEvent.click(searchButton())
+    await finishAll()
+    fireEvent.click(searchButton())
+    const box = searchBox()!
+    fireEvent.click(searchButton())
+    await finishAll()
+    expect(searchBox()).toBe(box)
+    expect(box.hasAttribute("inert")).toBe(false)
+  })
+
+  it("drops the search when the button hides the box", () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} />)
+    act(() => table.setGlobalFilter("Ada"))
+    // A search opens the box.
+    expect(searchButton().getAttribute("aria-expanded")).toBe("true")
+    fireEvent.click(searchButton())
+    expect(table.getState().globalFilter).toBeFalsy()
   })
 
   it("opens and closes at once with animations off", () => {
     render(<Harness enableAnimations={false} />)
     fireEvent.click(searchButton())
-    fireEvent.blur(screen.getByRole("textbox"))
-    expect(copies()).toHaveLength(0)
+    expect(searchBox()).not.toBeNull()
+    fireEvent.click(searchButton())
+    expect(searchBox()).toBeNull()
     expect(HTMLElement.prototype.animate).not.toHaveBeenCalled()
   })
 })
@@ -216,45 +231,14 @@ describe("group drop zone presence", () => {
 })
 
 describe("motion copies and focus", () => {
-  it("leaves nothing behind when the search box is toggled twice quickly", async () => {
+  it("never offers the leaving search box to Tab", () => {
     render(<Harness />)
     fireEvent.click(searchButton())
-    const box = screen
-      .getByRole("textbox")
-      .closest<HTMLElement>('[data-slot="input-group"]')!
-    fireEvent.blur(screen.getByRole("textbox"))
-    // The first swap's copy (the button) is still there, fading from where
-    // it is, beside the box's copy.
-    const first = fakes.find(
-      (f) => f.el.dataset.slot === "data-table-glide-copy"
-    )
-    expect(first?.cancelled).toBe(true)
-    expect(copies().length).toBeGreaterThan(0)
     fireEvent.click(searchButton())
-    await finishAll()
-    expect(copies()).toHaveLength(0)
-    const live = screen
-      .getByRole("textbox")
-      .closest<HTMLElement>('[data-slot="input-group"]')!
-    expect(live).not.toBe(box)
-    expect(live.getAttribute("style")).toBeNull()
-    fireEvent.blur(screen.getByRole("textbox"))
-    await finishAll()
-    expect(searchButton().getAttribute("style")).toBeNull()
-    expect(copies()).toHaveLength(0)
-  })
-
-  it("never offers a copy's controls to Tab", () => {
-    render(<Harness />)
-    fireEvent.click(searchButton())
-    fireEvent.blur(screen.getByRole("textbox"))
-    // The button's copy (from opening) and the box's copy (from closing).
-    const held = [...copies()]
-    expect(held.some((c) => c.querySelector("input"))).toBe(true)
+    const box = searchBox()!
     const tabbable = [...document.querySelectorAll(TABBABLE)]
-    expect(tabbable.length).toBeGreaterThan(0)
-    expect(tabbable.some((el) => held.some((c) => c.contains(el)))).toBe(false)
-    // The live button is still offered.
+    expect(tabbable.some((el) => box.contains(el))).toBe(false)
+    // The button is still offered.
     expect(tabbable).toContain(searchButton())
   })
 
@@ -319,36 +303,6 @@ describe("motion copies and focus", () => {
       vi.unstubAllGlobals()
     }
   })
-
-  it("places an item that mounts while a copy is on screen", async () => {
-    const { rerender } = render(<Harness enableDensityToggle={false} />)
-    fireEvent.click(searchButton())
-    expect(copies()).toHaveLength(1)
-    rerender(<Harness />)
-    const actions = document.querySelector(
-      '[data-slot="data-table-toolbar-actions"]'
-    )!
-    const labels = () =>
-      [...actions.children]
-        .filter(
-          (el) => el.getAttribute("data-slot") !== "data-table-glide-copy"
-        )
-        .map(
-          (el) =>
-            el.getAttribute("aria-label") ??
-            el.getAttribute("data-slot") ??
-            el.tagName
-        )
-    const order = labels()
-    const density = order.findIndex((l) => l.startsWith("Toggle density"))
-    const fullscreen = order.indexOf("Enter full screen")
-    expect(density).toBeGreaterThan(-1)
-    expect(fullscreen).toBe(density + 1)
-    expect(fullscreen).toBe(order.length - 1)
-    await finishAll()
-    expect(copies()).toHaveLength(0)
-    expect(labels()).toEqual(order)
-  })
 })
 
 describe("motion while editing", () => {
@@ -369,7 +323,7 @@ describe("motion while editing", () => {
     expect(HTMLElement.prototype.animate).not.toHaveBeenCalled()
   })
 
-  it("swaps the search box without motion while a new row is created", () => {
+  it("opens the search box without motion while a new row is created", () => {
     let table!: DataTableInstance<Row>
     render(<Harness {...editableOptions} onTable={(t) => (table = t)} />)
     act(() => dt(table).beginCreate())
@@ -377,7 +331,7 @@ describe("motion while editing", () => {
     fireEvent.click(
       document.querySelector<HTMLElement>('button[aria-label="Search"]')!
     )
-    expect(copies()).toHaveLength(0)
+    expect(searchBox()).not.toBeNull()
     expect(HTMLElement.prototype.animate).not.toHaveBeenCalled()
   })
 

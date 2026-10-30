@@ -233,8 +233,8 @@ const SLOT_DESCRIPTIONS = {
     "Floating preview of a row dragged inside a DataTableDndProvider.",
   "data-table-group-zone":
     "Grouping drop zone above or below the table (animated in and out).",
-  "data-table-glide-copy":
-    "Inert copy of a toolbar element that shrinks away during a toolbar motion.",
+  "data-table-search":
+    "The global search box beside the search button (slides out of it and back in).",
 }
 const slotValues = new Set()
 // data-slot markers live in .tsx files spread across the feature subfolders, so

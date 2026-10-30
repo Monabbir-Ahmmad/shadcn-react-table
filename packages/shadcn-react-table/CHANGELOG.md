@@ -184,7 +184,7 @@ for every rename.
   out, detail panels open smoothly, and the sort arrow, checkboxes and selected
   count transition. Rows also glide when the filter row or the density
   changes, columns glide when they are hidden, shown, pinned or reordered, the
-  search box opens out of its button, the toolbar buttons glide, and the
+  search box slides out beside its button and back in, the toolbar buttons glide, and the
   selection banner and grouping drop zone slide in and out. On by default and
   off for reduced motion; `enableAnimations: false` turns it off.
 - **New:** icon slots `pinLeft`, `pinRight`, `pinTop`, `pinBottom`,
@@ -202,6 +202,9 @@ for every rename.
 
 ### Changed
 
+- **Changed:** the search button stays in the toolbar while the search box is
+  open, and toggles it: a second click closes the box and clears the search.
+  The box no longer closes when it loses focus while empty.
 - **Changed:** pinned rows stay in view while scrolling (above the other rows
   under the sticky header, or below them). New `rowPinningDisplayMode`:
   `"top-and-bottom"` (default), `"top"`, `"bottom"`, `"static"` (the previous
@@ -268,6 +271,9 @@ for every rename.
 
 ### Fixed
 
+- **Fixed:** with cell editing on, an editable cell in a column with
+  `meta.align` set to `"right"` or `"center"` keeps that alignment; its
+  click-to-edit button aligned the value to the start.
 - **Fixed:** a change to controlled UI state (`state.density`,
   `state.showColumnFilters`, …) shows on the next render; parts of the table
   could keep the previous value until another change.

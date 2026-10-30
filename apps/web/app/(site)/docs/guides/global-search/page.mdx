@@ -26,7 +26,7 @@ return <DataTable table={table} />
 
 ## Opening the search box
 
-The search box starts closed (a search button) unless a search is set. Its open state is table state, `showGlobalFilter`: start it open with `initialState: { showGlobalFilter: true }`, control it with `state.showGlobalFilter` and `onShowGlobalFilterChange`, or open it from code with `table.setShowGlobalFilter(true)`. Setting a search value from outside opens it too.
+The search box starts closed unless a search is set. The search button opens it and stays beside it; clicking the button again closes the box and clears the search. Its open state is table state, `showGlobalFilter`: start it open with `initialState: { showGlobalFilter: true }`, control it with `state.showGlobalFilter` and `onShowGlobalFilterChange`, or open it from code with `table.setShowGlobalFilter(true)`. Setting a search value from outside opens it too.
 
 ## Custom search modes
 
