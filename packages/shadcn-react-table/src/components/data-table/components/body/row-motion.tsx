@@ -5,8 +5,8 @@ import type * as React from "react"
 
 import { dt } from "../../core/internal"
 import type { DataTableInstance } from "../../core/types"
-import { getUiState } from "../../core/ui-state"
 import { useRowAnimations } from "../../hooks/use-row-animations"
+import { useTableState } from "../../hooks/use-table-state"
 
 /** Every row key: row ids, plus "<id>:detail" for open detail panels. */
 function rowKeys<TData extends RowData>(
@@ -48,6 +48,15 @@ export function DataTableRowMotion<TData extends RowData>({
   active: boolean
 }) {
   const hasDetailPanel = !!dt(table).renderDetailPanel
+  // Its own subscription: the table root does not re-render when an edit
+  // starts, and starting one must stop the motion in flight.
+  const editing = useTableState(
+    table,
+    (state) =>
+      state.editingCell != null ||
+      state.editingRowId != null ||
+      state.isCreating
+  )
   useRowAnimations({
     tableRef,
     active,
@@ -61,10 +70,7 @@ export function DataTableRowMotion<TData extends RowData>({
       hasDetailPanel,
     ],
     members: () => rowKeys(table, hasDetailPanel),
-    paused: () => {
-      const { editingCell, editingRowId } = getUiState(table)
-      return editingCell != null || editingRowId != null
-    },
+    paused: () => editing,
   })
   return null
 }

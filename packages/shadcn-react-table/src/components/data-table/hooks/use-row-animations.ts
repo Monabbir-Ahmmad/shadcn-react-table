@@ -17,8 +17,9 @@ type Args = {
   /** Every row key now (row ids + "<id>:detail" for open panels). Built only
    *  when `signal` changes. */
   members: () => ReadonlySet<string>
-  /** True while rows must not move (a cell or row is being edited). A row
-   *  drag in progress is detected by the hook itself (`tr[data-dragging]`). */
+  /** True while rows must not move (a cell or row is being edited, or a new
+   *  row created). Motion in flight stops when it turns true. A row drag in
+   *  progress is detected by the hook itself (`tr[data-dragging]`). */
   paused: () => boolean
 }
 
@@ -271,8 +272,13 @@ export function useRowAnimations({
       return
     }
     // Unchanged rows: nothing to do, unless animations just turned on and
-    // the next change needs a baseline.
-    if (!isChange && lastMembers.current) return
+    // the next change needs a baseline, or an edit just started under motion
+    // still in flight.
+    if (!isChange && lastMembers.current) {
+      const moving = running.current.size > 0 || ghosts.current.size > 0
+      if (moving && paused()) stop()
+      return
+    }
     const next = members()
     const prev = lastMembers.current
     lastMembers.current = next

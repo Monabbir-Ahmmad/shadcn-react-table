@@ -443,6 +443,41 @@ describe("row animations", () => {
     expect(running()).toBe(0)
   })
 
+  it("animates nothing while a new row is being created", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        onTable={(t) => (table = t)}
+        enableEditing
+        createDisplayMode="row"
+      />
+    )
+    await nextFrame()
+    act(() => table.beginCreate())
+    act(() => table.setSorting([{ id: "n", desc: false }]))
+    act(() => table.setGlobalFilter("Name 1"))
+    expect(running()).toBe(0)
+    expect(layer()!.children.length).toBe(0)
+  })
+
+  it("stops the motion in flight when an edit starts", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        onTable={(t) => (table = t)}
+        enableEditing
+        editDisplayMode="cell"
+      />
+    )
+    await nextFrame()
+    act(() => table.setGlobalFilter("Name 1"))
+    act(() => table.setGlobalFilter(""))
+    expect(running()).toBeGreaterThan(0)
+    act(() => table.setEditingCell({ rowId: "r0", columnId: "name" }))
+    expect(running()).toBe(0)
+    expect(layer()!.children.length).toBe(0)
+  })
+
   it("animates nothing while a row is being dragged", async () => {
     let table!: DataTableInstance<Row>
     render(<Harness onTable={(t) => (table = t)} enableRowOrdering />)
