@@ -4,7 +4,9 @@ export interface ThemePrefs {
   accent: string
   base: string
   font: string
+  heading: string
   radius: string
+  menuAccent: string
   icons: IconLibrary
 }
 
@@ -14,7 +16,9 @@ export const DEFAULT_PREFS: ThemePrefs = {
   accent: "lime",
   base: "neutral",
   font: "raleway",
+  heading: "serif",
   radius: "0rem",
+  menuAccent: "subtle",
   icons: "lucide",
 }
 

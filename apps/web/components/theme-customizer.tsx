@@ -3,19 +3,34 @@
 import * as React from "react"
 import { useTheme } from "next-themes"
 import {
+  RiArrowUpDownLine,
   RiComputerLine,
   RiMoonLine,
   RiPaletteLine,
+  RiResetLeftLine,
+  RiShuffleLine,
   RiSunLine,
 } from "@remixicon/react"
+import { ArrowUpDown } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { Label } from "@workspace/ui/components/label"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@workspace/ui/components/popover"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@workspace/ui/components/sheet"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { IconLibrary } from "@/components/examples/icon-sets"
@@ -24,16 +39,57 @@ import {
   BASE_COLORS,
   FONTS,
   ICON_LIBS,
+  MENU_ACCENTS,
   RADII,
   themeVars,
 } from "@/lib/theme-presets"
-import { readPrefs, writePrefs } from "@/lib/theme-store"
+import { DEFAULT_PREFS, readPrefs, writePrefs } from "@/lib/theme-store"
 
 function setVars(vars: Record<string, string>) {
   const root = document.documentElement
   for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v)
 }
 
+/** The picks that restyle the site through CSS variables. */
+type Picks = {
+  accent: string
+  base: string
+  font: string
+  heading: string
+  radius: string
+  menuAccent: string
+}
+
+const pickOf = (prefs: typeof DEFAULT_PREFS): Picks => ({
+  accent: prefs.accent,
+  base: prefs.base,
+  font: prefs.font,
+  heading: prefs.heading,
+  radius: prefs.radius,
+  menuAccent: prefs.menuAccent,
+})
+
+const random = <T,>(list: readonly T[]) =>
+  list[Math.floor(Math.random() * list.length)]!
+
+const baseSwatch = (b: (typeof BASE_COLORS)[number]) =>
+  `oklch(0.55 ${(b.chroma * 4).toFixed(3)} ${b.hue})`
+
+const MODES = [
+  { value: "light", icon: RiSunLine, label: "Light" },
+  { value: "dark", icon: RiMoonLine, label: "Dark" },
+  { value: "system", icon: RiComputerLine, label: "System" },
+] as const
+
+const ICON_SAMPLES: Record<IconLibrary, React.ReactNode> = {
+  lucide: <ArrowUpDown />,
+  remix: <RiArrowUpDownLine />,
+}
+
+/**
+ * The header's theme panel: the site behind it is the live preview. Every
+ * pick restyles the whole site at once and is remembered in this browser.
+ */
 export function ThemeCustomizer({
   iconLibrary,
   onIconLibraryChange,
@@ -43,10 +99,8 @@ export function ThemeCustomizer({
 }) {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
-  const [accent, setAccent] = React.useState(() => readPrefs().accent)
-  const [base, setBase] = React.useState(() => readPrefs().base)
-  const [font, setFont] = React.useState(() => readPrefs().font)
-  const [radius, setRadius] = React.useState(() => readPrefs().radius)
+  const [picks, setPicks] = React.useState(() => pickOf(readPrefs()))
+  const dark = resolvedTheme === "dark"
 
   React.useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -55,20 +109,16 @@ export function ThemeCustomizer({
 
   React.useEffect(() => {
     if (!mounted) return
-    const isDark = resolvedTheme === "dark"
-    setVars(themeVars({ accent, base, font, radius }, isDark))
-    writePrefs({ accent, base, font, radius, icons: iconLibrary })
-  }, [mounted, accent, base, font, radius, resolvedTheme, iconLibrary])
+    setVars(themeVars(picks, dark))
+    writePrefs({ ...picks, icons: iconLibrary })
+  }, [mounted, picks, dark, iconLibrary])
 
-  const MODES = [
-    { value: "light", icon: RiSunLine, label: "Light" },
-    { value: "dark", icon: RiMoonLine, label: "Dark" },
-    { value: "system", icon: RiComputerLine, label: "System" },
-  ] as const
+  const pick = (key: keyof Picks) => (value: string) =>
+    setPicks((prev) => ({ ...prev, [key]: value }))
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <Sheet modal={false}>
+      <SheetTrigger asChild>
         <Button
           variant="outline"
           size="icon"
@@ -77,93 +127,22 @@ export function ThemeCustomizer({
         >
           <RiPaletteLine />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="max-h-[80vh] w-72 overflow-y-auto p-4"
+      </SheetTrigger>
+      <SheetContent
+        side="right"
+        className="w-full gap-0 sm:max-w-80"
+        // Non-modal: the page stays visible and usable as the preview.
+        onInteractOutside={(event) => event.preventDefault()}
       >
-        <div className="flex flex-col gap-4">
-          <Section label="Accent">
-            <div className="grid grid-cols-7 gap-2">
-              {ACCENTS.map((c) => (
-                <Swatch
-                  key={c.name}
-                  color={c.light.primary}
-                  active={mounted && accent === c.name}
-                  title={c.label}
-                  onClick={() => setAccent(c.name)}
-                />
-              ))}
-            </div>
-          </Section>
+        <SheetHeader className="border-b">
+          <SheetTitle>Customize</SheetTitle>
+          <SheetDescription>
+            Restyles the whole site as you pick. Saved in this browser.
+          </SheetDescription>
+        </SheetHeader>
 
-          <Section label="Base color">
-            <div className="grid grid-cols-5 gap-2">
-              {BASE_COLORS.map((b) => (
-                <Swatch
-                  key={b.name}
-                  color={`oklch(0.55 ${(b.chroma * 4).toFixed(3)} ${b.hue})`}
-                  active={mounted && base === b.name}
-                  title={b.label}
-                  onClick={() => setBase(b.name)}
-                />
-              ))}
-            </div>
-          </Section>
-
-          <Section label="Font">
-            <div className="grid grid-cols-2 gap-2">
-              {FONTS.map((f) => (
-                <Button
-                  key={f.name}
-                  type="button"
-                  variant={mounted && font === f.name ? "default" : "outline"}
-                  size="sm"
-                  className="h-8 justify-start text-xs"
-                  style={{ fontFamily: f.value }}
-                  onClick={() => setFont(f.name)}
-                >
-                  {f.label}
-                </Button>
-              ))}
-            </div>
-          </Section>
-
-          <Section label="Radius">
-            <div className="grid grid-cols-5 gap-2">
-              {RADII.map((r) => (
-                <Button
-                  key={r}
-                  type="button"
-                  variant={mounted && radius === r ? "default" : "outline"}
-                  size="sm"
-                  className="h-8 px-0 text-xs"
-                  onClick={() => setRadius(r)}
-                >
-                  {parseFloat(r)}
-                </Button>
-              ))}
-            </div>
-          </Section>
-
-          <Section label="Icon library">
-            <div className="grid grid-cols-2 gap-2">
-              {ICON_LIBS.map((l) => (
-                <Button
-                  key={l.name}
-                  type="button"
-                  variant={iconLibrary === l.name ? "default" : "outline"}
-                  size="sm"
-                  className="h-8 text-xs"
-                  onClick={() => onIconLibraryChange(l.name)}
-                >
-                  {l.label}
-                </Button>
-              ))}
-            </div>
-          </Section>
-
-          <Section label="Mode">
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
+          <Row label="Mode">
             <div className="grid grid-cols-3 gap-2">
               {MODES.map((m) => (
                 <Button
@@ -172,6 +151,7 @@ export function ThemeCustomizer({
                   variant={mounted && theme === m.value ? "default" : "outline"}
                   size="sm"
                   className="h-8 gap-1.5 text-xs"
+                  aria-pressed={mounted && theme === m.value}
                   onClick={() => setTheme(m.value)}
                 >
                   <m.icon className="size-3.5" />
@@ -179,52 +159,204 @@ export function ThemeCustomizer({
                 </Button>
               ))}
             </div>
-          </Section>
+          </Row>
+
+          <Picker
+            label="Accent"
+            value={picks.accent}
+            onChange={pick("accent")}
+            options={ACCENTS.map((a) => ({
+              value: a.name,
+              label: a.label,
+              preview: <Dot color={a[dark ? "dark" : "light"].primary} />,
+            }))}
+          />
+          <Picker
+            label="Base color"
+            value={picks.base}
+            onChange={pick("base")}
+            options={BASE_COLORS.map((b) => ({
+              value: b.name,
+              label: b.label,
+              preview: <Dot color={baseSwatch(b)} />,
+            }))}
+          />
+          <Picker
+            label="Font"
+            value={picks.font}
+            onChange={pick("font")}
+            options={FONTS.map((f) => ({
+              value: f.name,
+              label: f.label,
+              preview: <Aa font={f.value} />,
+            }))}
+          />
+          <Picker
+            label="Heading font"
+            value={picks.heading}
+            onChange={pick("heading")}
+            options={FONTS.map((f) => ({
+              value: f.name,
+              label: f.label,
+              preview: <Aa font={f.value} />,
+            }))}
+          />
+          <Picker
+            label="Radius"
+            value={picks.radius}
+            onChange={pick("radius")}
+            options={RADII.map((r) => ({
+              value: r,
+              label: `${parseFloat(r)} rem`,
+              preview: <Corner radius={r} />,
+            }))}
+          />
+          <Picker
+            label="Menu accent"
+            value={picks.menuAccent}
+            onChange={pick("menuAccent")}
+            options={MENU_ACCENTS.map((m) => ({
+              value: m.name,
+              label: m.label,
+              preview: (
+                <span
+                  className={cn(
+                    "h-3 w-5 rounded-[3px]",
+                    m.name === "bold" ? "bg-primary" : "bg-muted"
+                  )}
+                />
+              ),
+            }))}
+          />
+          <Picker
+            label="Icons"
+            value={iconLibrary}
+            onChange={(lib) => onIconLibraryChange(lib as IconLibrary)}
+            options={ICON_LIBS.map((l) => ({
+              value: l.name,
+              label: l.label,
+              preview: (
+                <span className="flex [&_svg]:size-3.5">
+                  {ICON_SAMPLES[l.name]}
+                </span>
+              ),
+            }))}
+          />
         </div>
-      </PopoverContent>
-    </Popover>
+
+        <SheetFooter className="grid grid-cols-2 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setPicks({
+                accent: random(ACCENTS).name,
+                base: random(BASE_COLORS).name,
+                font: random(FONTS).name,
+                heading: random(FONTS).name,
+                radius: random(RADII),
+                menuAccent: random(MENU_ACCENTS).name,
+              })
+              onIconLibraryChange(random(ICON_LIBS).name)
+            }}
+          >
+            <RiShuffleLine />
+            Randomize
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setPicks(pickOf(DEFAULT_PREFS))
+              onIconLibraryChange(DEFAULT_PREFS.icons)
+            }}
+          >
+            <RiResetLeftLine />
+            Reset
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }
 
-function Section({
+function Row({
   label,
+  id,
   children,
 }: {
   label: string
+  id?: string
   children: React.ReactNode
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="text-xs">{label}</Label>
+      <Label htmlFor={id} className="text-xs text-muted-foreground">
+        {label}
+      </Label>
       {children}
     </div>
   )
 }
 
-function Swatch({
-  color,
-  active,
-  title,
-  onClick,
+/** One option row: the current pick with its preview, opening the list. */
+function Picker({
+  label,
+  value,
+  onChange,
+  options,
 }: {
-  color: string
-  active: boolean
-  title: string
-  onClick: () => void
+  label: string
+  value: string
+  onChange: (value: string) => void
+  options: { value: string; label: string; preview: React.ReactNode }[]
 }) {
+  const id = React.useId()
   return (
-    <button
-      type="button"
-      aria-label={title}
-      title={title}
-      onClick={onClick}
-      className={cn(
-        "size-7 rounded-md border transition-colors",
-        active
-          ? "border-foreground ring-2 ring-foreground/20"
-          : "border-border hover:border-foreground/40"
-      )}
+    <Row label={label} id={id}>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id={id} size="sm" className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent position="popper">
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              <span className="flex w-5 shrink-0 justify-center">
+                {o.preview}
+              </span>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Row>
+  )
+}
+
+function Dot({ color }: { color: string }) {
+  return (
+    <span
+      className="size-3.5 rounded-full border border-foreground/10"
       style={{ backgroundColor: color }}
+    />
+  )
+}
+
+function Aa({ font }: { font: string }) {
+  return (
+    <span className="text-sm leading-none" style={{ fontFamily: font }}>
+      Aa
+    </span>
+  )
+}
+
+function Corner({ radius }: { radius: string }) {
+  return (
+    <span
+      className="size-3.5 border-s-2 border-t-2 border-foreground/70"
+      style={{ borderTopLeftRadius: `calc(${radius} * 1.2)` }}
     />
   )
 }

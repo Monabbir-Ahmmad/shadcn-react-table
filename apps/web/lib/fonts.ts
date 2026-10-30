@@ -1,5 +1,12 @@
 import type { CSSProperties } from "react"
-import { Geist, Geist_Mono, Raleway, Noto_Serif } from "next/font/google"
+import {
+  DM_Sans,
+  Geist,
+  Geist_Mono,
+  Inter,
+  Noto_Serif,
+  Raleway,
+} from "next/font/google"
 
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -13,6 +20,17 @@ const notoSerif = Noto_Serif({
   variable: "--font-noto-serif",
 })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
+// Only picked in the customizer: not preloaded, downloaded when first used.
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  preload: false,
+})
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  preload: false,
+})
 
 /** Classes for `<html>`: the font variables plus the base text styles. */
 export const htmlFontClassName = cn(
@@ -20,7 +38,9 @@ export const htmlFontClassName = cn(
   geist.variable,
   raleway.variable,
   notoSerif.variable,
-  geistMono.variable
+  geistMono.variable,
+  inter.variable,
+  dmSans.variable
 )
 
 /** Defaults the customizer can override on `<html>`. */

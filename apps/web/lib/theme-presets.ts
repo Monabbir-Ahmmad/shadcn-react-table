@@ -100,6 +100,48 @@ export const ACCENTS: ColorPreset[] = [
     },
   },
   {
+    name: "teal",
+    label: "Teal",
+    light: {
+      primary: "oklch(0.60 0.12 185)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.60 0.12 185)",
+    },
+    dark: {
+      primary: "oklch(0.70 0.14 183)",
+      primaryForeground: "oklch(0.20 0.03 185)",
+      ring: "oklch(0.70 0.14 183)",
+    },
+  },
+  {
+    name: "amber",
+    label: "Amber",
+    light: {
+      primary: "oklch(0.67 0.18 58)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.67 0.18 58)",
+    },
+    dark: {
+      primary: "oklch(0.77 0.17 70)",
+      primaryForeground: "oklch(0.22 0.05 60)",
+      ring: "oklch(0.77 0.17 70)",
+    },
+  },
+  {
+    name: "red",
+    label: "Red",
+    light: {
+      primary: "oklch(0.58 0.22 27)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.58 0.22 27)",
+    },
+    dark: {
+      primary: "oklch(0.64 0.21 25)",
+      primaryForeground: WHITE,
+      ring: "oklch(0.64 0.21 25)",
+    },
+  },
+  {
     name: "zinc",
     label: "Zinc",
     light: {
@@ -171,8 +213,16 @@ export const FONTS = [
     label: "System",
     value: "ui-sans-serif, system-ui, sans-serif",
   },
+  { name: "inter", label: "Inter", value: "var(--font-inter)" },
+  { name: "dm-sans", label: "DM Sans", value: "var(--font-dm-sans)" },
   { name: "serif", label: "Serif", value: "var(--font-noto-serif)" },
   { name: "mono", label: "Geist Mono", value: "var(--font-mono)" },
+] as const
+
+/** How menus and hovers highlight: the base color's quiet tint, or the accent. */
+export const MENU_ACCENTS = [
+  { name: "subtle", label: "Subtle" },
+  { name: "bold", label: "Bold" },
 ] as const
 
 export const RADII = ["0rem", "0.3rem", "0.45rem", "0.625rem", "1rem"]
@@ -184,13 +234,22 @@ export const ICON_LIBS: { name: IconLibrary; label: string }[] = [
 
 /** The CSS variables for a set of theme choices (what the customizer applies). */
 export function themeVars(
-  prefs: { accent: string; base: string; font: string; radius: string },
+  prefs: {
+    accent: string
+    base: string
+    font: string
+    radius: string
+    /** Unset: headings keep the site's default heading font. */
+    heading?: string
+    menuAccent?: string
+  },
   dark: boolean
 ): Record<string, string> {
   const mode = dark ? "dark" : "light"
   const a = (ACCENTS.find((x) => x.name === prefs.accent) ?? ACCENTS[0]!)[mode]
   const b = BASE_COLORS.find((x) => x.name === prefs.base) ?? BASE_COLORS[0]!
   const f = FONTS.find((x) => x.name === prefs.font) ?? FONTS[0]!
+  const h = FONTS.find((x) => x.name === prefs.heading)
   return {
     ...ramp(b.hue, b.chroma)[mode],
     "--primary": a.primary,
@@ -199,5 +258,10 @@ export function themeVars(
     "--sidebar-primary": a.primary,
     "--radius": prefs.radius,
     "--font-sans": f.value,
+    ...(h && { "--font-heading": h.value }),
+    ...(prefs.menuAccent === "bold" && {
+      "--accent": a.primary,
+      "--accent-foreground": a.primaryForeground,
+    }),
   }
 }
