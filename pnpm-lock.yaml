@@ -41,9 +41,6 @@ importers:
       '@mdx-js/loader':
         specifier: ^3.1.1
         version: 3.1.1
-      '@mdx-js/react':
-        specifier: ^3.1.1
-        version: 3.1.1(@types/react@19.2.15)(react@19.2.4)
       '@monabbir/shadcn-react-table':
         specifier: workspace:*
         version: link:../../packages/shadcn-react-table
@@ -5875,6 +5872,7 @@ snapshots:
       '@types/mdx': 2.0.14
       '@types/react': 19.2.15
       react: 19.2.4
+    optional: true
 
   '@modelcontextprotocol/sdk@1.29.0(zod@3.25.76)':
     dependencies:

@@ -7,9 +7,9 @@ import { ProofLine } from "@/components/home/hero/proof-line"
 import { CopyInstall } from "@/components/home/copy-install"
 
 /** The hero copy: headline, pitch, install and the proof line. */
-export function HeroCopy({ className }: { className?: string }) {
+export function HeroCopy() {
   return (
-    <div className={className}>
+    <div>
       <h1
         id="hero-title"
         className="font-heading text-4xl leading-[1.04] font-semibold tracking-tight text-balance sm:text-5xl xl:text-[3.5rem]"
