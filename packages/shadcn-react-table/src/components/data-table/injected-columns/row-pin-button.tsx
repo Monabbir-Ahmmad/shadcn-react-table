@@ -45,8 +45,10 @@ export function RowPinButton<TData extends RowData>({
     >
       {pinned ? (
         <icons.pinnedRow className="size-3.5" />
+      ) : side === "bottom" ? (
+        <icons.pinBottom className="size-3.5" />
       ) : (
-        <icons.pin className="size-3.5" />
+        <icons.pinTop className="size-3.5" />
       )}
     </button>
   )

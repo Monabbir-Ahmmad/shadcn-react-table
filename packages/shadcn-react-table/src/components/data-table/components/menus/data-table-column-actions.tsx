@@ -83,7 +83,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
             onClick={() => column.clearSorting()}
             disabled={!sorted}
           >
-            <icons.clearAll />
+            <icons.clearSort />
             {localization.clearSort}
           </DropdownMenuItem>
         </>
@@ -102,7 +102,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
             onClick={() => column.setFilterValue(undefined)}
             disabled={!hasFilter}
           >
-            <icons.filterOff />
+            <icons.clearFilter />
             {localization.clearFilter}
           </DropdownMenuItem>
         </>
@@ -143,14 +143,14 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
             onClick={() => pinColumn(column, "left")}
             disabled={pinned === "left"}
           >
-            <icons.pin />
+            <icons.pinLeft />
             {localization.pinToLeft}
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => pinColumn(column, "right")}
             disabled={pinned === "right"}
           >
-            <icons.pin />
+            <icons.pinRight />
             {localization.pinToRight}
           </DropdownMenuItem>
           <DropdownMenuItem

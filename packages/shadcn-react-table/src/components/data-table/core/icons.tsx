@@ -1,3 +1,4 @@
+import { cn } from "@workspace/ui/lib/utils"
 import {
   ArrowDown,
   ArrowUp,
@@ -17,6 +18,7 @@ import {
   GripVertical,
   Group,
   ListFilter,
+  ListX,
   Maximize2,
   Minimize2,
   MoreVertical,
@@ -31,6 +33,30 @@ import {
 
 /** Any component that renders an icon and accepts a `className`. */
 export type IconComponent = React.ComponentType<{ className?: string }>
+
+/**
+ * Wraps an icon so it renders rotated. Lucide's `Pin` is upright with the
+ * needle pointing down, so turning it makes the needle point at the edge a
+ * pin goes into.
+ */
+function rotated(
+  Icon: IconComponent,
+  rotation: string,
+  displayName: string
+): IconComponent {
+  const Rotated: IconComponent = ({ className }) => (
+    <Icon className={cn(rotation, className)} />
+  )
+  Rotated.displayName = displayName
+  return Rotated
+}
+
+/** Needle points left (turned a quarter clockwise). */
+const PinLeft = rotated(Pin, "rotate-90", "PinLeft")
+/** Needle points right, the mirror of `PinLeft`. */
+const PinRight = rotated(Pin, "-rotate-90", "PinRight")
+/** Needle points up (turned half a turn). */
+const PinBottom = rotated(Pin, "rotate-180", "PinBottom")
 
 /**
  * Every icon the data table renders, by semantic name. Defaults are Lucide
@@ -54,12 +80,30 @@ export interface DataTableIcons {
   filterOff: IconComponent
   /** Advanced filter panel toggle. */
   advancedFilter: IconComponent
-  /** Clear-sort / show-all reset action. */
+  /** Show-all-columns reset action in the column menu. */
   clearAll: IconComponent
+  /** Clear-sort item in the column menu. */
+  clearSort: IconComponent
+  /** Clear-filter item in the column menu. */
+  clearFilter: IconComponent
   /** Hide-column menu item. */
   hide: IconComponent
-  /** Pin column and pin row actions. */
+  /**
+   * Generic pin glyph. Any of `pinLeft`, `pinRight`, `pinTop` and `pinBottom`
+   * you don't override falls back to this one, unrotated.
+   */
   pin: IconComponent
+  /** Pin-column-to-the-left menu item. The default needle points left. */
+  pinLeft: IconComponent
+  /** Pin-column-to-the-right menu item. The default needle points right. */
+  pinRight: IconComponent
+  /** Pin-row-to-the-top button while the row is unpinned. */
+  pinTop: IconComponent
+  /**
+   * Pin-row-to-the-bottom button while the row is unpinned (used when
+   * `rowPinningDisplayMode` is `"bottom"`). The default needle points up.
+   */
+  pinBottom: IconComponent
   /** Shown on a pinned row's pin button. */
   pinnedRow: IconComponent
   /** Unpin column and unpin row actions. */
@@ -113,8 +157,14 @@ export const defaultIcons: DataTableIcons = {
   filterOff: FilterX,
   advancedFilter: ListFilter,
   clearAll: RotateCcw,
+  clearSort: ListX,
+  clearFilter: FilterX,
   hide: EyeOff,
   pin: Pin,
+  pinLeft: PinLeft,
+  pinRight: PinRight,
+  pinTop: Pin,
+  pinBottom: PinBottom,
   pinnedRow: Pin,
   unpin: PinOff,
   group: Group,
@@ -136,4 +186,25 @@ export const defaultIcons: DataTableIcons = {
   save: Check,
   cancel: X,
   calendar: Calendar,
+}
+
+/** Slots that fall back to the consumer's `pin` when not overridden. */
+const PIN_SLOTS = ["pinLeft", "pinRight", "pinTop", "pinBottom"] as const
+
+/**
+ * Merges the icon layers over the defaults (later layers win). A consumer who
+ * overrides `pin` but none of the directional pin slots gets their `pin` on
+ * all of them, so the library never mixes their set with its own rotated pins.
+ */
+export function resolveIcons(
+  ...layers: (Partial<DataTableIcons> | undefined)[]
+): DataTableIcons {
+  const overrides: Partial<DataTableIcons> = Object.assign({}, ...layers)
+  const resolved = { ...defaultIcons, ...overrides }
+  if (overrides.pin) {
+    for (const slot of PIN_SLOTS) {
+      if (!overrides[slot]) resolved[slot] = overrides.pin
+    }
+  }
+  return resolved
 }

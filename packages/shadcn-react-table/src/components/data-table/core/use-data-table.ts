@@ -44,7 +44,7 @@ import {
   type DataTableFeatures,
   type RowModelGates,
 } from "./features"
-import { defaultIcons } from "./icons"
+import { resolveIcons } from "./icons"
 import { defaultLocalization } from "./localization"
 import { NOT_IN_LEAVE_COPY } from "./motion"
 import {
@@ -267,7 +267,7 @@ export function useDataTable<TData extends RowData>(
     [configCtx.localization, localizationProp]
   )
   const icons = React.useMemo(
-    () => ({ ...defaultIcons, ...configCtx.icons, ...iconsProp }),
+    () => resolveIcons(configCtx.icons, iconsProp),
     [configCtx.icons, iconsProp]
   )
 
