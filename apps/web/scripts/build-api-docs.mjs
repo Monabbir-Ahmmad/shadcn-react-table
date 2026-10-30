@@ -212,6 +212,8 @@ const SLOT_DESCRIPTIONS = {
     "The sort arrow in a column header; it turns around for descending order.",
   "data-table-selected-count":
     'The "N selected" text in the selection alert banner.',
+  "data-table-selected-count-previous":
+    "Short-lived copy of the previous selected count that fades out over the new one (only when animations are on).",
   "data-table-progress":
     "Indeterminate progress bar shown while loading or saving.",
   "data-table-progress-bar": "The moving bar inside `data-table-progress`.",

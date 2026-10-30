@@ -3200,6 +3200,14 @@ export const slots: ApiMember[] = [
     description: 'The "N selected" text in the selection alert banner.',
   },
   {
+    name: "data-table-selected-count-previous",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Short-lived copy of the previous selected count that fades out over the new one (only when animations are on).",
+  },
+  {
     name: "data-table-sort-indicator",
     type: "",
     required: true,
