@@ -3188,6 +3188,13 @@ export const slots: ApiMember[] = [
     description: "Selection alert banner.",
   },
   {
+    name: "data-table-bottom-toolbar",
+    type: "",
+    required: true,
+    default: null,
+    description: "Bottom toolbar (custom actions and/or pagination).",
+  },
+  {
     name: "data-table-create-row",
     type: "",
     required: true,
@@ -3243,6 +3250,13 @@ export const slots: ApiMember[] = [
       "Invisible overlay inside the surface where row enter and leave animations play (only when animations are on).",
   },
   {
+    name: "data-table-pagination",
+    type: "",
+    required: true,
+    default: null,
+    description: "Pagination controls.",
+  },
+  {
     name: "data-table-progress",
     type: "",
     required: true,
@@ -3293,6 +3307,13 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: "The scroll container for the table (both axes).",
+  },
+  {
+    name: "data-table-toolbar",
+    type: "",
+    required: true,
+    default: null,
+    description: "Top toolbar root.",
   },
   {
     name: "data-table-toolbar-actions",

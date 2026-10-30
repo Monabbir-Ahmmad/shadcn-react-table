@@ -237,21 +237,28 @@ const SLOT_DESCRIPTIONS = {
     "The global search box beside the search button (slides out of it and back in).",
 }
 const slotValues = new Set()
-// data-slot markers live in .tsx files spread across the feature subfolders, so
+// data-slot markers live in .ts/.tsx files spread across the feature subfolders, so
 // walk the tree rather than just the top level.
 function walkTsx(dir) {
   const out = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name)
     if (entry.isDirectory()) out.push(...walkTsx(abs))
-    else if (entry.name.endsWith(".tsx")) out.push(abs)
+    else if (/\.tsx?$/.test(entry.name)) out.push(abs)
   }
   return out
 }
-for (const file of walkTsx(DT)) {
+// Source only (tests query slots too): a JSX attribute (data-slot="…"), an
+// object key ("data-slot": "…"), a setAttribute("data-slot", "…") call, or a
+// `*_SLOT` constant.
+const SLOT_PATTERNS = [
+  /data-slot"?\s*[=:,]\s*"(data-table[^"]*)"/g,
+  /_SLOT\s*=\s*"(data-table[^"]*)"/g,
+]
+for (const file of walkTsx(DT).filter((f) => !/\.test\.tsx?$/.test(f))) {
   const text = readFileSync(file, "utf8")
-  for (const m of text.matchAll(/data-slot="(data-table[^"]*)"/g)) {
-    slotValues.add(m[1])
+  for (const pattern of SLOT_PATTERNS) {
+    for (const m of text.matchAll(pattern)) slotValues.add(m[1])
   }
 }
 const slots = [...slotValues].sort().map((name) => ({
