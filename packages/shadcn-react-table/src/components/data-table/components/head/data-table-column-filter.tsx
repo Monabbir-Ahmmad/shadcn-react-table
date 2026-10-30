@@ -1,12 +1,14 @@
 "use client"
 
-import type { Header, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { DataTableFilterModeMenu } from "../menus/data-table-filter-mode-menu"
 import {
+  AutocompleteFilterField,
   CheckboxFilterField,
   DateFilterField,
   DateRangeFilterField,
+  DateTimeFilterField,
   MultiSelectFilterField,
   NumberFilterField,
   RangeSliderFilterField,
@@ -14,16 +16,27 @@ import {
   TextFilterField,
   type FilterFieldProps,
 } from "./filter-variants"
-import type { DataTableInstance } from "../../core/types"
+import type { DataTableInstance, FilterVariant } from "../../core/types"
+import type { DataTableHeader } from "../../core/table-types"
+
+/** Variants without a text-like input keep the mode menu beside the field;
+ *  the rest render it inside their input group. */
+const MENU_BESIDE_VARIANTS = new Set<FilterVariant>([
+  "select",
+  "multi-select",
+  "checkbox",
+  "range-slider",
+])
 
 interface DataTableColumnFilterProps<TData extends RowData, TValue> {
-  header: Header<TData, TValue>
+  header: DataTableHeader<TData, TValue>
   table: DataTableInstance<TData>
 }
 
 /**
- * One filter-row field. Reads `column.meta.variant` and renders the matching
- * control, preceded by the filter-mode menu (where the variant supports modes).
+ * One filter-row field. Reads `column.meta.filterVariant` and renders the matching
+ * control with its filter-mode menu (where the variant supports modes): inside
+ * the input group for text-like variants, beside the field for the rest.
  * `meta.renderColumnFilter` is an escape hatch for fully custom UI. Returns an
  * empty placeholder for non-filterable columns so the grid stays aligned.
  */
@@ -42,9 +55,13 @@ export function DataTableColumnFilter<TData extends RowData, TValue>({
     return <>{custom({ column, table })}</>
   }
 
+  const variant = column.columnDef.meta?.filterVariant ?? "text"
+
   return (
     <div className="flex items-center gap-0.5">
-      <DataTableFilterModeMenu column={column} table={table} />
+      {MENU_BESIDE_VARIANTS.has(variant) && (
+        <DataTableFilterModeMenu column={column} table={table} />
+      )}
       <div className="min-w-0 flex-1">
         <FilterField column={column} table={table} />
       </div>
@@ -56,7 +73,7 @@ function FilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const variant = column.columnDef.meta?.variant ?? "text"
+  const variant = column.columnDef.meta?.filterVariant ?? "text"
   switch (variant) {
     case "select":
       return <SelectFilterField column={column} table={table} />
@@ -72,6 +89,16 @@ function FilterField<TData extends RowData, TValue>({
       return <DateFilterField column={column} table={table} />
     case "date-range":
       return <DateRangeFilterField column={column} table={table} />
+    case "datetime":
+    case "datetime-range":
+      return (
+        <DateTimeFilterField column={column} table={table} kind="datetime" />
+      )
+    case "time":
+    case "time-range":
+      return <DateTimeFilterField column={column} table={table} kind="time" />
+    case "autocomplete":
+      return <AutocompleteFilterField column={column} table={table} />
     default:
       return <TextFilterField column={column} table={table} />
   }

@@ -4,7 +4,9 @@ export interface ThemePrefs {
   accent: string
   base: string
   font: string
+  heading: string
   radius: string
+  menuAccent: string
   icons: IconLibrary
 }
 
@@ -14,17 +16,25 @@ export const DEFAULT_PREFS: ThemePrefs = {
   accent: "lime",
   base: "neutral",
   font: "raleway",
+  heading: "serif",
   radius: "0rem",
+  menuAccent: "subtle",
   icons: "lucide",
+}
+
+/** Radii saved by earlier versions, mapped to the current presets. */
+const RADIUS_RENAMES: Record<string, string> = { "0.65rem": "0.625rem" }
+
+/** Saved prefs over the defaults, with old values moved to current ones. */
+export function migratePrefs(saved: Partial<ThemePrefs>): ThemePrefs {
+  const prefs = { ...DEFAULT_PREFS, ...saved }
+  return { ...prefs, radius: RADIUS_RENAMES[prefs.radius] ?? prefs.radius }
 }
 
 export function readPrefs(): ThemePrefs {
   if (typeof window === "undefined") return DEFAULT_PREFS
   try {
-    return {
-      ...DEFAULT_PREFS,
-      ...JSON.parse(localStorage.getItem(KEY) || "{}"),
-    }
+    return migratePrefs(JSON.parse(localStorage.getItem(KEY) || "{}"))
   } catch {
     return DEFAULT_PREFS
   }

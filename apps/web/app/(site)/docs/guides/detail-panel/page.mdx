@@ -1,0 +1,62 @@
+export const metadata = { title: "Detail panel" }
+
+# Detail panel
+
+Provide `renderDetailPanel` to render an expandable panel beneath each row. An expand chevron column is added automatically, and row expansion is enabled for you.
+
+<Example slug="detail-panel" />
+
+## Usage
+
+`renderDetailPanel` receives `{ row, table }`. Return any React node — here a small definition list built from `row.original`.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  renderDetailPanel: ({ row }) => (
+    <dl className="grid grid-cols-2 gap-2 p-4">
+      <dt className="text-muted-foreground">Email</dt>
+      <dd>{row.original.email}</dd>
+      <dt className="text-muted-foreground">Phone</dt>
+      <dd>{row.original.phone}</dd>
+      <dt className="text-muted-foreground">Address</dt>
+      <dd>{row.original.address}</dd>
+    </dl>
+  ),
+})
+
+return <DataTable table={table} />
+```
+
+<Callout variant="note" title="Expansion is automatic">
+  You don't need to configure `getExpandedRowModel` or add a chevron column
+  yourself — defining `renderDetailPanel` turns on row expansion and inserts the
+  expander column.
+</Callout>
+
+## Charts and lazy content
+
+The panel renders only while the row is expanded, so it can hold anything — a chart, or content that loads when the row opens.
+
+<Example slug="chart-detail-panel" />
+
+<Example slug="lazy-detail-panel" />
+
+## Positioning the expander
+
+The expander column leads the data columns by default. Set `positionExpandColumn: "last"` to move it to the trailing edge.
+
+```tsx
+useDataTable({
+  renderDetailPanel: ({ row }) => <Detail row={row} />,
+  positionExpandColumn: "last", // "first" | "last"
+})
+```
+
+## Related
+
+<Cards>
+  <Card href="/docs/guides/tree" title="Tree data" />
+</Cards>

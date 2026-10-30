@@ -5,8 +5,16 @@
 // `@/lib/*` aliases (the CLI then maps `@/` to the consumer's own aliases),
 // and writes the registry-item JSON. Run from the repo root:
 //   node apps/web/scripts/build-registry.mjs
-import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs"
+import {
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  rmSync,
+} from "node:fs"
 import { join, dirname, relative } from "node:path"
+import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 // Anchor to the repo root from this file (apps/web/scripts/), so the script
@@ -24,50 +32,23 @@ const PKG = JSON.parse(
 const UI_SRC = join(REPO, "packages/shadcn-react-table/src")
 const OUT = join(REPO, "apps/web/public/r")
 
-// npm packages the data-table source imports directly. The shadcn primitives
-// (below) bring their own deps (radix, cmdk, react-day-picker, cva, …) when the
-// consumer's CLI installs them, so those are intentionally NOT listed here.
-const NPM_DEPENDENCIES = [
-  "@tanstack/react-table",
-  "@tanstack/match-sorter-utils",
-  "@tanstack/react-virtual",
-  "@dnd-kit/core",
-  "@dnd-kit/sortable",
-  "@dnd-kit/utilities",
-  "date-fns",
-  // NOT radix-ui: the module has no direct radix import. The primitive blocks
-  // in registryDependencies bring the right headless library for the
-  // consumer's flavor (radix-ui or @base-ui/react) on their own.
-  "lucide-react",
-]
+// npm packages and shadcn primitives the shipped source imports are derived
+// from an import scan (see `scanImports` below), so a new import can't ship
+// without its dependency. Versions come from this package's own
+// package.json — the ranges the tests run against. The shadcn primitives
+// bring their own deps (radix-ui or @base-ui/react, cmdk, react-day-picker,
+// cva, …) when the consumer's CLI installs them, so those are not listed.
+const PROVIDED_BY_CONSUMER = new Set(["react", "react-dom"])
 
 // Type-only packages for deps that don't ship their own declarations. Without
 // these the consumer's `tsc --noEmit` fails. shadcn installs these into the
 // consumer's devDependencies.
 const DEV_DEPENDENCIES = []
 
-// shadcn primitives the table imports. Declared as registryDependencies (bare
-// names) so the consumer's `shadcn add` installs them from the shadcn registry
-// in THEIR configured style/baseColor — and skips any they already have. The
-// table only uses standard primitive APIs, so it adapts to any style.
-const REGISTRY_DEPENDENCIES = [
-  "badge",
-  "button",
-  "calendar",
-  "checkbox",
-  "command",
-  "context-menu",
-  "dialog",
-  "dropdown-menu",
-  "input",
-  "label",
-  "popover",
-  "select",
-  "skeleton",
-  "slider",
-  "table",
-  "tooltip",
-]
+// The shadcn primitives the table imports become registryDependencies (bare
+// names), so the consumer's `shadcn add` installs them from the shadcn
+// registry in THEIR configured style/baseColor — and skips any they already
+// have. The table only uses standard primitive APIs, so it adapts to any style.
 
 // New design tokens this component introduces (shipped via cssVars so the CLI
 // injects them into the consumer's globals.css; fall back to --accent).
@@ -89,12 +70,14 @@ const cssVars = {
 
 /** Rewrite internal package imports to the portable shadcn `@/` aliases. */
 function rewrite(content) {
-  return content
-    // Normalize CRLF from Windows checkouts (git autocrlf) so the embedded
-    // file contents — and therefore the artifact — are machine-independent.
-    .replaceAll("\r\n", "\n")
-    .replaceAll("@workspace/ui/components/", "@/components/ui/")
-    .replaceAll("@workspace/ui/lib/", "@/lib/")
+  return (
+    content
+      // Normalize CRLF from Windows checkouts (git autocrlf) so the embedded
+      // file contents — and therefore the artifact — are machine-independent.
+      .replaceAll("\r\n", "\n")
+      .replaceAll("@workspace/ui/components/", "@/components/ui/")
+      .replaceAll("@workspace/ui/lib/", "@/lib/")
+  )
 }
 
 function read(relPath) {
@@ -116,8 +99,11 @@ function walk(dir) {
   const out = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name)
-    if (entry.isDirectory()) out.push(...walk(abs))
-    else if (
+    // Locales ship as their own registry items (one per language), never as
+    // part of the main item.
+    if (entry.isDirectory()) {
+      if (entry.name !== "locales") out.push(...walk(abs))
+    } else if (
       (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) &&
       // In-repo test files are not part of the shipped block.
       !entry.name.includes(".test.")
@@ -139,13 +125,57 @@ for (const abs of walk(DT_DIR).sort()) {
   })
 }
 
+/**
+ * The npm packages and shadcn primitives the shipped files import. Fails the
+ * build for a package the block's package.json doesn't declare, since the
+ * registry could not give it a version.
+ */
+function scanImports(contents) {
+  const packages = new Set()
+  const primitives = new Set()
+  for (const content of contents) {
+    for (const [, spec] of content.matchAll(
+      /(?:^|\n)\s*(?:import|export)\s[^"']*?from\s+["']([^"']+)["']/g
+    )) {
+      if (spec.startsWith(".")) continue
+      const primitive = /^@\/components\/ui\/([\w-]+)$/.exec(spec)
+      if (primitive) {
+        primitives.add(primitive[1])
+        continue
+      }
+      if (spec.startsWith("@/")) continue
+      const parts = spec.split("/")
+      const name = spec.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0]
+      if (!PROVIDED_BY_CONSUMER.has(name)) packages.add(name)
+    }
+  }
+  const missing = [...packages].filter((name) => !PKG.dependencies?.[name])
+  if (missing.length > 0) {
+    console.error(
+      `registry: imported but not in packages/shadcn-react-table/package.json dependencies: ${missing.join(", ")}`
+    )
+    process.exit(1)
+  }
+  return {
+    dependencies: [...packages]
+      .sort()
+      .map((name) => `${name}@${PKG.dependencies[name]}`),
+    registryDependencies: [...primitives].sort(),
+  }
+}
+
+const {
+  dependencies: NPM_DEPENDENCIES,
+  registryDependencies: REGISTRY_DEPENDENCIES,
+} = scanImports(files.map((file) => file.content))
+
 const item = {
   $schema: "https://ui.shadcn.com/schema/registry-item.json",
   name: "data-table",
   type: "registry:block",
   title: "Data Table",
   description:
-    "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
+    "An MRT-complete data table for shadcn/ui (TanStack Table v9): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
   meta: { version: PKG.version },
   dependencies: NPM_DEPENDENCIES,
   devDependencies: DEV_DEPENDENCIES,
@@ -153,6 +183,74 @@ const item = {
   files,
   cssVars,
 }
+
+// One registry item per locale file (locales/<id>.ts). Each is a single file
+// with no npm/registry dependencies: it only type-imports from the data-table
+// item, which the consumer adds first.
+const LOCALES_DIR = join(DT_DIR, "locales")
+const localeIds = existsSync(LOCALES_DIR)
+  ? readdirSync(LOCALES_DIR)
+      .filter((f) => f.endsWith(".ts") && !f.includes(".test."))
+      .map((f) => f.slice(0, -".ts".length))
+      .sort()
+  : []
+
+const LANGUAGE_NAMES = {
+  ar: "Arabic",
+  az: "Azerbaijani",
+  bg: "Bulgarian",
+  cs: "Czech",
+  da: "Danish",
+  de: "German",
+  el: "Greek",
+  es: "Spanish",
+  et: "Estonian",
+  fa: "Persian",
+  fi: "Finnish",
+  fr: "French",
+  he: "Hebrew",
+  hr: "Croatian",
+  hu: "Hungarian",
+  hy: "Armenian",
+  id: "Indonesian",
+  it: "Italian",
+  ja: "Japanese",
+  ko: "Korean",
+  ne: "Nepali",
+  nl: "Dutch",
+  no: "Norwegian",
+  pl: "Polish",
+  pt: "Portuguese",
+  "pt-BR": "Portuguese (Brazil)",
+  ro: "Romanian",
+  ru: "Russian",
+  sk: "Slovak",
+  "sr-Cyrl-RS": "Serbian (Cyrillic)",
+  "sr-Latn-RS": "Serbian (Latin)",
+  sv: "Swedish",
+  tr: "Turkish",
+  uk: "Ukrainian",
+  vi: "Vietnamese",
+  "zh-Hans": "Chinese (Simplified)",
+  "zh-Hant": "Chinese (Traditional)",
+}
+
+const localeItems = localeIds.map((lang) => ({
+  $schema: "https://ui.shadcn.com/schema/registry-item.json",
+  name: `data-table-locale-${lang}`,
+  type: "registry:ui",
+  title: `Data Table locale: ${LANGUAGE_NAMES[lang] ?? lang} (${lang})`,
+  description: `The data table's interface text in ${LANGUAGE_NAMES[lang] ?? lang}. Add the data-table item first.`,
+  meta: { version: PKG.version },
+  files: [
+    {
+      path: `ui/data-table/locales/${lang}.ts`,
+      type: "registry:ui",
+      target: `components/ui/data-table/locales/${lang}.ts`,
+      content: read(`components/data-table/locales/${lang}.ts`),
+    },
+  ],
+}))
 
 const registry = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
@@ -166,15 +264,35 @@ const registry = {
       description: item.description,
       meta: { version: PKG.version },
     },
+    ...localeItems.map(({ name, type, title, description, meta }) => ({
+      name,
+      type,
+      title,
+      description,
+      meta,
+    })),
   ],
 }
 
 mkdirSync(OUT, { recursive: true })
 writeFileSync(join(OUT, "data-table.json"), JSON.stringify(item, null, 2))
+for (const locale of localeItems) {
+  writeFileSync(
+    join(OUT, `${locale.name}.json`),
+    JSON.stringify(locale, null, 2)
+  )
+}
+// Drop locale items whose source file no longer exists.
+const liveNames = new Set(localeItems.map((l) => `${l.name}.json`))
+for (const f of readdirSync(OUT)) {
+  if (f.startsWith("data-table-locale-") && !liveNames.has(f))
+    rmSync(join(OUT, f))
+}
 writeFileSync(join(OUT, "registry.json"), JSON.stringify(registry, null, 2))
 
 console.log(
   `registry built → apps/web/public/r/data-table.json (${files.length} files, ` +
     `${item.dependencies.length} npm deps, ${item.devDependencies.length} dev deps, ` +
-    `${item.registryDependencies.length} registry deps, v${PKG.version})`
+    `${item.registryDependencies.length} registry deps, v${PKG.version}) + ` +
+    `${localeItems.length} locale items`
 )

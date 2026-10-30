@@ -33,9 +33,11 @@ class MockIntersectionObserver {
   takeRecords() {
     return []
   }
-  trigger(isIntersecting: boolean) {
+  trigger(...states: boolean[]) {
     this.callback(
-      [{ isIntersecting } as IntersectionObserverEntry],
+      states.map(
+        (isIntersecting) => ({ isIntersecting }) as IntersectionObserverEntry
+      ),
       this as unknown as IntersectionObserver
     )
   }
@@ -82,6 +84,14 @@ describe("useInfiniteScroll", () => {
   it("calls onLoadMore when the sentinel intersects", () => {
     const { onLoadMore } = setup()
     act(() => latestObserver().trigger(true))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+  })
+
+  it("uses the newest entry when the browser batches several", () => {
+    // A quick scroll right after mount can deliver the initial "not visible"
+    // and the current "visible" record in one callback.
+    const { onLoadMore } = setup()
+    act(() => latestObserver().trigger(false, true))
     expect(onLoadMore).toHaveBeenCalledTimes(1)
   })
 

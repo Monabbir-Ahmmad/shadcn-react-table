@@ -1,15 +1,19 @@
 "use client"
 
 import * as React from "react"
-import type { Row, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
 import { TableRow } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { mergeProps } from "../../../helpers/slot-props"
+
 import { BODY_ROW_CLASS } from "../../../core/constants"
 import { RowDragContext } from "../../../injected-columns/injected-columns"
+import type { DataTableRow } from "../../../core/table-types"
+import { DndKeyContext, useDndId } from "../../../core/dnd-scope"
 
 /**
  * Body row. `useSortable` is always called (disabled when row ordering is off).
@@ -23,14 +27,17 @@ export function DataTableBodyRow<TData extends RowData>({
   className,
   onClick,
   onDoubleClick,
-}: {
-  row: Row<TData>
+  ...rest
+}: Omit<React.ComponentProps<"tr">, "children"> & {
+  row: DataTableRow<TData>
   draggable: boolean
   children: React.ReactNode
   className?: string
   onClick?: React.MouseEventHandler<HTMLTableRowElement>
   onDoubleClick?: React.MouseEventHandler<HTMLTableRowElement>
 }) {
+  const tableKey = React.useContext(DndKeyContext)
+  const dndId = useDndId()
   const {
     attributes,
     listeners,
@@ -39,13 +46,21 @@ export function DataTableBodyRow<TData extends RowData>({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: row.id, disabled: !draggable, data: { type: "row" } })
+  } = useSortable({
+    id: dndId(row.id),
+    disabled: !draggable,
+    data: { type: "row", tableKey, rowId: row.id },
+  })
 
+  // Inside a DataTableDndProvider a floating preview follows the pointer, so
+  // the dragged row stays in place, dimmed.
+  const previewed = isDragging && tableKey != null
   const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+    transform: previewed ? undefined : CSS.Transform.toString(transform),
     transition,
     position: isDragging ? "relative" : undefined,
     zIndex: isDragging ? 1 : undefined,
+    opacity: previewed ? 0.5 : undefined,
   }
 
   const dragProps = React.useMemo(
@@ -60,16 +75,18 @@ export function DataTableBodyRow<TData extends RowData>({
   return (
     <RowDragContext.Provider value={dragProps}>
       <TableRow
-        ref={setNodeRef}
-        style={style}
-        data-state={row.getIsSelected() ? "selected" : undefined}
-        data-dragging={isDragging || undefined}
-        onClick={onClick}
-        onDoubleClick={onDoubleClick}
-        className={cn(
-          BODY_ROW_CLASS,
-          (onClick || onDoubleClick) && "cursor-pointer",
-          className
+        {...mergeProps(
+          {
+            ref: setNodeRef,
+            style,
+            "data-state": row.getIsSelected() ? "selected" : undefined,
+            "data-dragging": isDragging || undefined,
+            className: cn(
+              BODY_ROW_CLASS,
+              (onClick || onDoubleClick) && "cursor-pointer"
+            ),
+          } as React.ComponentProps<"tr">,
+          { ...rest, onClick, onDoubleClick, className }
         )}
       >
         {children}

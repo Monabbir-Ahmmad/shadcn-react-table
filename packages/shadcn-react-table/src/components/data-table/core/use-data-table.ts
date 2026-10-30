@@ -1,21 +1,23 @@
 "use client"
 
 import {
-  getCoreRowModel,
-  getExpandedRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getPaginationRowModel,
-  useReactTable,
+  setStateSlice,
+  useTable,
   type RowData,
+  type TableState,
+  type Updater,
 } from "@tanstack/react-table"
 import * as React from "react"
 
-import { VALUELESS_MODES, type FilterMode } from "../fns/filter-fns"
+import {
+  GLOBAL_FILTER_MODES,
+  VALUELESS_MODES,
+  type FilterMode,
+  type GlobalFilterMode,
+} from "../fns/filter-fns"
 import { columnKey } from "../helpers/column-key"
+import { flattenLeafColumns } from "../helpers/flatten-leaf-columns"
+import { mapPinningUpdater, toCorePinning } from "../helpers/column-pinning"
 import { getColumnLabel } from "../helpers/column-label"
 import {
   getColumnDefMinWidth,
@@ -25,27 +27,58 @@ import {
   type HeaderControlsOptions,
 } from "../helpers/header-controls"
 import { measureColumnWidth } from "../helpers/measure-column-width"
+import { toDataTableState } from "../helpers/table-state"
 import { useAdvancedFilter } from "../hooks/use-advanced-filter"
 import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
-import { useControllableState } from "../hooks/use-controllable-state"
-import { useEditingState } from "../hooks/use-editing-state"
+import { DefaultAggregatedCell } from "../components/body/render-body-cell"
+import { createEditingActions } from "../hooks/use-editing-state"
 import { useGlobalFilterMode } from "../hooks/use-global-filter-mode"
+import { usePageIndexClamp } from "../hooks/use-page-index-clamp"
+import { useTableStateListener } from "../hooks/use-table-state"
 import { usePageResetOnFilterChange } from "../hooks/use-page-reset-on-filter-change"
 import { useResolvedColumns } from "../hooks/use-resolved-columns"
 import { useDataTableConfigContext } from "./config-context"
-import { defaultIcons } from "./icons"
+import {
+  createDataTableFeatures,
+  DATA_TABLE_METHODS,
+  type DataTableFeatures,
+  type RowModelGates,
+} from "./features"
+import { resolveIcons } from "./icons"
 import { defaultLocalization } from "./localization"
+import { NOT_IN_LEAVE_COPY } from "./motion"
+import {
+  changeHandlerKey,
+  EMPTY_ADVANCED_FILTER,
+  getUiState,
+  makeUiStateHandler,
+  withLiveUiState,
+  UI_STATE_KEYS,
+  type DataTableUiState,
+  type DataTableUiStateKey,
+} from "./ui-state"
 import type {
   DataTableConfig,
   DataTableInstance,
-  Density,
   UseDataTableOptions,
 } from "./types"
+import type { DataTableRow } from "./table-types"
+
+type CoreTableState = Partial<TableState<DataTableFeatures>>
+type CoreStoreState = TableState<DataTableFeatures>
+
+/** The default `useTable` selector: the calling component re-renders on no
+ *  table state change. */
+const selectNothing = () => null
+
+const DEFAULT_PAGE_SIZE_OPTIONS = [5, 10, 25, 50, 100]
+const NO_FILTER_FNS = {}
 
 /**
- * Core hook. Wraps `useReactTable` with MRT-flavoured defaults (row models,
+ * Core hook. Wraps `useTable` with MRT-flavoured defaults (row models,
  * auto-injected selection column, localization) and attaches our presentation
- * state + feature flags to the instance as `table.tableInstance`. Returns the
+ * feature flags to the instance as `table.dataTable` (with the UI state in
+ * `table.getState()` and its setters on `table`). Returns the
  * enriched instance to hand to `<DataTable table={table} />`.
  *
  * Controlled data state (sorting/filtering/pagination/selection/visibility),
@@ -61,8 +94,6 @@ export function useDataTable<TData extends RowData>(
   const {
     localization: localizationProp,
     icons: iconsProp,
-    defaultDensity = "comfortable",
-    defaultShowColumnFilters = false,
     isLoading = false,
     isSaving = false,
     showProgressBars: showProgressBarsProp,
@@ -79,6 +110,16 @@ export function useDataTable<TData extends RowData>(
     infiniteScrollThreshold = 200,
     positionPagination = "bottom",
     paginationDisplayMode = "default",
+    pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+    slotProps,
+    displayColumnDefOptions,
+    defaultDisplayColumn,
+    enableBatchRowSelection = true,
+    onEditingRowCancel,
+    onCreatingRowCancel,
+    renderEditRowDialogContent,
+    renderCreateRowDialogContent,
+    positionCreatingRow = "top",
     columnFilterDisplayMode = "subheader",
     positionGlobalFilter = "right",
     positionToolbarAlertBanner = "top",
@@ -92,24 +133,30 @@ export function useDataTable<TData extends RowData>(
     enableDensityToggle = true,
     enableFullscreenToggle = true,
     enableKeyboardNavigation = true,
+    enableAnimations = true,
     enableColumnFilterModes = true,
     enableFilterMatchHighlighting = true,
     enableGlobalFilter = true,
     enableGlobalFilterModes = true,
     enableGlobalFilterRankedResults = false,
-    defaultGlobalFilterMode = "fuzzy",
-    density: densityProp,
+    filterFns: customFilterFns = NO_FILTER_FNS,
+    sortFns: customSortFns,
+    aggregationFns: customAggregationFns,
+    columnFilterModeOptions,
+    globalFilterModeOptions = GLOBAL_FILTER_MODES as GlobalFilterMode[],
     onDensityChange,
-    isFullscreen: isFullscreenProp,
     onIsFullscreenChange,
-    showColumnFilters: showColumnFiltersProp,
     onShowColumnFiltersChange,
+    onShowGlobalFilterChange,
     enableAdvancedFilter = false,
-    advancedFilter: advancedFilterProp,
-    defaultAdvancedFilter,
     onAdvancedFilterChange,
-    globalFilterMode: globalFilterModeProp,
     onGlobalFilterModeChange,
+    onColumnFilterModesChange,
+    onShowAdvancedFilterPanelChange,
+    onEditingCellChange,
+    onEditingRowIdChange,
+    onIsCreatingChange,
+    onRowDraftChange,
     enableColumnOrdering = false,
     enableColumnPinning = false,
     enableColumnResizing = false,
@@ -122,15 +169,22 @@ export function useDataTable<TData extends RowData>(
     enableGrouping = false,
     enableExpanding: enableExpandingProp,
     enableStickyFooter = false,
+    enableTableHead = true,
+    rowPinningDisplayMode = "top-and-bottom",
+    enableRowDragging = false,
+    onRowDragEnd,
+    enableTableFooter = true,
+    enableExpandAll = true,
     renderDetailPanel,
-    enableEditing = false,
+    enableEditing: enableEditingProp = false,
     editDisplayMode = "cell",
     createDisplayMode = "modal",
     createRowDefaults,
     enableClickToCopy = false,
-    onEditCellSave,
-    onSaveRow,
-    onCreateRow,
+    enableCellActions = false,
+    onEditingCellSave,
+    onEditingRowSave,
+    onCreatingRowSave,
     renderRowActions,
     renderCellActionMenuItems,
     renderRowActionMenuItems,
@@ -154,15 +208,36 @@ export function useDataTable<TData extends RowData>(
     columnVirtualizerInstanceRef,
     enableToolbarInternalActions = true,
     title,
-    renderToolbarActions,
+    renderTopToolbarCustomActions,
     renderTopToolbar,
     renderBottomToolbar,
     renderToolbarInternalActions,
     renderBottomToolbarCustomActions,
     renderEmpty,
+    stateSelector,
     columns,
     ...tableOptions
   } = options
+
+  // A per-row function turns editing on; it then decides row by row.
+  const enableEditing = enableEditingProp !== false
+  // Stable identities (rows re-render when a config member changes); they
+  // read the latest options through this ref.
+  const editingOptionsRef = React.useRef({
+    enableEditingProp,
+    onEditingRowCancel,
+    onCreatingRowCancel,
+  })
+  // eslint-disable-next-line react-hooks/refs
+  editingOptionsRef.current = {
+    enableEditingProp,
+    onEditingRowCancel,
+    onCreatingRowCancel,
+  }
+  const getCanEditRow = React.useCallback((row: DataTableRow<TData>) => {
+    const enabled = editingOptionsRef.current.enableEditingProp
+    return typeof enabled === "function" ? enabled(row) : enabled
+  }, [])
 
   // Infinite scroll implies a single growing page: hide the pager and drop the
   // pagination row model so every appended row renders.
@@ -176,11 +251,23 @@ export function useDataTable<TData extends RowData>(
       ...defaultLocalization,
       ...configCtx.localization,
       ...localizationProp,
+      // Merged by key, so labelling a custom filter function keeps the
+      // built-in labels.
+      filterModes: {
+        ...defaultLocalization.filterModes,
+        ...configCtx.localization?.filterModes,
+        ...localizationProp?.filterModes,
+      },
+      aggregationFns: {
+        ...defaultLocalization.aggregationFns,
+        ...configCtx.localization?.aggregationFns,
+        ...localizationProp?.aggregationFns,
+      },
     }),
     [configCtx.localization, localizationProp]
   )
   const icons = React.useMemo(
-    () => ({ ...defaultIcons, ...configCtx.icons, ...iconsProp }),
+    () => resolveIcons(configCtx.icons, iconsProp),
     [configCtx.icons, iconsProp]
   )
 
@@ -197,68 +284,205 @@ export function useDataTable<TData extends RowData>(
   // for the initial data load).
   const showProgressBars = showProgressBarsProp ?? (isLoading || isSaving)
   const showSkeletons = showSkeletonsProp ?? isLoading
-  const showLoadingOverlay = showLoadingOverlayProp ?? isLoading
+  // An explicit `showSkeletons: true` also covers rows already shown, and
+  // then replaces the dimming overlay.
+  const showSkeletonsOverRows = showSkeletonsProp === true
+  const showLoadingOverlay =
+    showLoadingOverlayProp ?? (isLoading && !showSkeletonsOverRows)
 
-  const [density, setDensity] = useControllableState<Density>(
-    densityProp,
-    defaultDensity,
-    onDensityChange
+  // The hook's stable instance (assigned after `useTable` below).
+  const tableRef = React.useRef<DataTableInstance<TData> | null>(null)
+
+  // UI state (density, full screen, editing, filter modes…) is table state in
+  // the store (see core/ui-state.ts). These are its defaults, under any
+  // `initialState`.
+  const [uiDefaults] = React.useState<DataTableUiState>(() => ({
+    density: "comfortable",
+    isFullscreen: false,
+    showColumnFilters: false,
+    showGlobalFilter: false,
+    columnFilterModes: {},
+    globalFilterMode: "fuzzy",
+    advancedFilter: EMPTY_ADVANCED_FILTER,
+    showAdvancedFilterPanel: false,
+    editingCell: null,
+    editingRowId: null,
+    isCreating: false,
+    rowDraft: {},
+    direction: "ltr",
+  }))
+  // The live UI state, for row-model getters and actions that run outside
+  // this render.
+  const getUi = React.useCallback(
+    () => (tableRef.current ? getUiState(tableRef.current) : uiDefaults),
+    [uiDefaults]
   )
-  const [isFullscreen, setIsFullscreen] = useControllableState(
-    isFullscreenProp,
-    false,
-    onIsFullscreenChange
-  )
-  const [showColumnFilters, setShowColumnFilters] = useControllableState(
-    showColumnFiltersProp,
-    defaultShowColumnFilters,
-    onShowColumnFiltersChange
-  )
 
-  const {
-    editingCell,
-    setEditingCell,
-    editingRowId,
-    isCreating,
-    rowDraft,
-    setRowDraftValue,
-    beginRowEdit,
-    beginCreate,
-    cancelEdit,
-  } = useEditingState<TData>(createRowDefaults)
-
-  const { columnFilterModes, setColumnFilterModes, dynamicFilterFn } =
-    useColumnFilterModes<TData>(columns)
-
-  const isManualFiltering = !!tableOptions.manualFiltering
-
-  const {
-    globalFilterMode,
-    setGlobalFilterMode,
-    dynamicGlobalFilterFn,
-    rankedSortedRowModel,
-  } = useGlobalFilterMode<TData>({
-    globalFilterMode: globalFilterModeProp,
-    defaultGlobalFilterMode,
-    onGlobalFilterModeChange,
-    enableGlobalFilterRankedResults,
-    manualSorting: !!tableOptions.manualSorting,
-    manualFiltering: isManualFiltering,
-    enableGrouping,
+  // Setters and editing transitions go through each slice's change handler,
+  // like TanStack's own setters. Created once: they read the table lazily.
+  const createRowDefaultsRef = React.useRef(createRowDefaults)
+  // eslint-disable-next-line react-hooks/refs
+  createRowDefaultsRef.current = createRowDefaults
+  // eslint-disable-next-line react-hooks/refs
+  const [uiActions] = React.useState(() => {
+    const setter =
+      <K extends DataTableUiStateKey>(key: K) =>
+      (updater: Updater<DataTableUiState[K]>) => {
+        const table = tableRef.current
+        if (table) setStateSlice(table as never, key as never, updater as never)
+      }
+    return {
+      setDensity: setter("density"),
+      setIsFullscreen: setter("isFullscreen"),
+      setDirection: setter("direction"),
+      setShowColumnFilters: setter("showColumnFilters"),
+      setShowGlobalFilter: setter("showGlobalFilter"),
+      setColumnFilterModes: setter("columnFilterModes"),
+      setGlobalFilterMode: setter("globalFilterMode"),
+      setAdvancedFilter: setter("advancedFilter"),
+      setShowAdvancedFilterPanel: setter("showAdvancedFilterPanel"),
+      ...createEditingActions<TData>(
+        () => tableRef.current,
+        () => createRowDefaultsRef.current
+      ),
+    }
   })
 
-  const {
-    advancedFilter,
-    setAdvancedFilter,
-    showAdvancedFilterPanel,
-    setShowAdvancedFilterPanel,
-    advancedFilteredRowModel,
-  } = useAdvancedFilter<TData>({
+  const { dynamicFilterFn } = useColumnFilterModes<TData>(
+    columns,
+    () => getUi().columnFilterModes,
+    () => customFilterFns
+  )
+
+  // `enableFilters: false` forces manual filtering into TanStack below; the
+  // ranked-sort and faceting gates must see the same switch.
+  const isManualFiltering =
+    !!tableOptions.manualFiltering || tableOptions.enableFilters === false
+
+  const { dynamicGlobalFilterFn, rankedSortedRowModel } =
+    useGlobalFilterMode<TData>({
+      getMode: () => getUi().globalFilterMode,
+      getCustomFns: () => customFilterFns,
+      enableGlobalFilterRankedResults,
+      manualSorting: !!tableOptions.manualSorting,
+      manualFiltering: isManualFiltering,
+      enableGrouping,
+    })
+
+  const advancedFilteredRowModel = useAdvancedFilter<TData>({
     enableAdvancedFilter,
-    advancedFilter: advancedFilterProp,
-    defaultAdvancedFilter,
-    onAdvancedFilterChange,
+    getGroup: () => getUi().advancedFilter,
+    getGlobalFilterMode: () => getUi().globalFilterMode,
   })
+
+  // Custom functions are registered once by name; the registered entries
+  // call the latest versions through this ref.
+  const customFnsRef = React.useRef({
+    filterFns: customFilterFns,
+    sortFns: customSortFns,
+    aggregationFns: customAggregationFns,
+  })
+  // eslint-disable-next-line react-hooks/refs
+  customFnsRef.current = {
+    filterFns: customFilterFns,
+    sortFns: customSortFns,
+    aggregationFns: customAggregationFns,
+  }
+
+  // Row-model stages our options can switch off. Read through a ref inside the
+  // (cached-once) factories so toggling an option takes effect immediately.
+  const gatesRef = React.useRef<RowModelGates>(null!)
+  // eslint-disable-next-line react-hooks/refs
+  gatesRef.current = {
+    pagination: enablePagination,
+    grouping: enableGrouping,
+    expanding: enableExpanding,
+    faceting: enableFacetedValues && !isManualFiltering,
+  }
+  // The getters run inside TanStack's row-model computation and render
+  // contexts, not during this render.
+  // eslint-disable-next-line react-hooks/refs
+  const [features] = React.useState(() =>
+    createDataTableFeatures({
+      gates: () => gatesRef.current,
+      getTableInstance: () => tableRef.current?.dataTable,
+      // Typed for this hook's `TData`; the slots take TanStack's own
+      // custom-row-model type, which any `TData` fits (see `features.ts`).
+      filteredRowModel: advancedFilteredRowModel,
+      sortedRowModel: rankedSortedRowModel,
+      uiDefaults: () => uiDefaults,
+      getCustomFns: () => customFnsRef.current,
+    })
+  )
+
+  // Consumer pinning speaks left/right; TanStack speaks start/end. Memoize on
+  // the consumer's slice so the controlled state handed to TanStack keeps a
+  // stable reference (TanStack republishes controlled state on shallow change;
+  // a fresh object every render would loop).
+  //
+  // The React Compiler skips this hook: the memoized values below flow into the
+  // mutable TanStack instance. Expected (TanStack v8's `useReactTable` was a
+  // known-incompatible library and bailed the same way); the memos are for
+  // TanStack, not the compiler.
+  /* eslint-disable react-hooks/preserve-manual-memoization */
+  const {
+    initialState,
+    state: stateProp,
+    onColumnPinningChange,
+    ...coreOptions
+  } = tableOptions
+  const controlledPinning = stateProp?.columnPinning
+  const corePinning = React.useMemo(
+    () => (controlledPinning ? toCorePinning(controlledPinning) : undefined),
+    [controlledPinning]
+  )
+  const state = React.useMemo(
+    () =>
+      stateProp &&
+      // Only set `columnPinning` when the consumer controls it (an own key
+      // holding `undefined` would pin TanStack to its initial pinning).
+      ({
+        ...stateProp,
+        ...(corePinning && { columnPinning: corePinning }),
+      } as CoreTableState),
+    [stateProp, corePinning]
+  )
+
+  // One change handler per UI slice: stores the value unless the slice is
+  // controlled, and reports it to the consumer's callback either way.
+  const uiCallbacks: {
+    [K in DataTableUiStateKey]?: (value: DataTableUiState[K]) => void
+  } = {
+    density: onDensityChange,
+    isFullscreen: onIsFullscreenChange,
+    showColumnFilters: onShowColumnFiltersChange,
+    showGlobalFilter: onShowGlobalFilterChange,
+    advancedFilter: onAdvancedFilterChange,
+    globalFilterMode: onGlobalFilterModeChange,
+    columnFilterModes: onColumnFilterModesChange,
+    showAdvancedFilterPanel: onShowAdvancedFilterPanelChange,
+    editingCell: onEditingCellChange,
+    editingRowId: onEditingRowIdChange,
+    isCreating: onIsCreatingChange,
+    rowDraft: onRowDraftChange,
+  }
+  const uiHandlers = Object.fromEntries(
+    // The handlers read the table when they run, not during this render.
+    // eslint-disable-next-line react-hooks/refs
+    UI_STATE_KEYS.map((key) => [
+      changeHandlerKey(key),
+      makeUiStateHandler(
+        () => tableRef.current,
+        key,
+        (state as Record<string, unknown> | undefined)?.[key] !== undefined,
+        uiCallbacks[key] as never
+      ),
+    ])
+  )
+  const pinningChange = React.useMemo(
+    () => onColumnPinningChange && mapPinningUpdater(onColumnPinningChange),
+    [onColumnPinningChange]
+  )
 
   const enableRowSelection =
     tableOptions.enableRowSelection != null
@@ -269,7 +493,7 @@ export function useDataTable<TData extends RowData>(
   // auto-highlighting (the consumer owns their markup).
   const columnsWithCustomCell = React.useMemo(() => {
     const set = new Set<string>()
-    for (const def of columns) {
+    for (const def of flattenLeafColumns(columns)) {
       const key = columnKey(def as { id?: string; accessorKey?: unknown })
       if (key && "cell" in def && def.cell != null) set.add(key)
     }
@@ -278,7 +502,7 @@ export function useDataTable<TData extends RowData>(
 
   const resolvedColumns = useResolvedColumns<TData>({
     columns,
-    enableRowOrdering,
+    enableRowOrdering: enableRowOrdering || enableRowDragging,
     enableRowSelection,
     selectAllMode,
     enableSelectAll,
@@ -286,7 +510,9 @@ export function useDataTable<TData extends RowData>(
     positionExpandColumn,
     enableRowNumbers,
     rowNumberMode,
-    enableRowPinning,
+    // Select modes pin by selection, so they show no pin buttons.
+    enableRowPinning:
+      enableRowPinning && !rowPinningDisplayMode.startsWith("select"),
     renderRowActions,
     renderRowActionMenuItems,
     positionActionsColumn,
@@ -294,6 +520,7 @@ export function useDataTable<TData extends RowData>(
     editDisplayMode,
     localization,
     icons,
+    displayColumnOptions: { defaultDisplayColumn, displayColumnDefOptions },
   })
 
   // Which header affordances render — shared by the column sizing below, the
@@ -349,70 +576,97 @@ export function useDataTable<TData extends RowData>(
     [resolvedColumns, headerControlsOptions, baseColumnSize]
   )
 
-  // The React Compiler bails on TanStack Table's mutable instance; expected.
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable<TData>({
-    ...tableOptions,
-    columns: sizedColumns,
-    // Default page-reset off: TanStack's auto-reset runs a state update during
-    // render (warns in React 19 dev). We reset on filter changes via an effect
-    // below instead. Consumers can re-enable by passing the option explicitly.
-    autoResetPageIndex: tableOptions.autoResetPageIndex ?? false,
-    defaultColumn: {
-      filterFn: dynamicFilterFn,
-      ...tableOptions.defaultColumn,
-    },
-    enableGlobalFilter,
-    globalFilterFn: tableOptions.globalFilterFn ?? dynamicGlobalFilterFn,
-    enableColumnPinning,
-    enableColumnResizing,
-    columnResizeMode: tableOptions.columnResizeMode ?? "onChange",
-    enableRowPinning,
-    keepPinnedRows: tableOptions.keepPinnedRows ?? true,
-    enableGrouping,
-    enableExpanding,
-    // Detail panels expand arbitrary rows; tree data uses getSubRows' own logic.
-    getRowCanExpand:
-      tableOptions.getRowCanExpand ??
-      (renderDetailPanel ? () => true : undefined),
-    getGroupedRowModel: enableGrouping
-      ? (tableOptions.getGroupedRowModel ?? getGroupedRowModel())
-      : tableOptions.getGroupedRowModel,
-    getExpandedRowModel: enableExpanding
-      ? (tableOptions.getExpandedRowModel ?? getExpandedRowModel())
-      : tableOptions.getExpandedRowModel,
-    getCoreRowModel: tableOptions.getCoreRowModel ?? getCoreRowModel(),
-    getSortedRowModel: tableOptions.manualSorting
-      ? tableOptions.getSortedRowModel
-      : (tableOptions.getSortedRowModel ?? rankedSortedRowModel),
-    getFilteredRowModel: isManualFiltering
-      ? tableOptions.getFilteredRowModel
-      : (tableOptions.getFilteredRowModel ??
-        (enableAdvancedFilter
-          ? advancedFilteredRowModel
-          : getFilteredRowModel())),
-    // Client-side faceting powers select/multi-select option lists + counts and
-    // range-slider bounds. Skipped in manual mode (server supplies facets) or
-    // when `enableFacetedValues` is off.
-    getFacetedRowModel:
-      isManualFiltering || !enableFacetedValues
-        ? tableOptions.getFacetedRowModel
-        : (tableOptions.getFacetedRowModel ?? getFacetedRowModel()),
-    getFacetedUniqueValues:
-      isManualFiltering || !enableFacetedValues
-        ? tableOptions.getFacetedUniqueValues
-        : (tableOptions.getFacetedUniqueValues ?? getFacetedUniqueValues()),
-    getFacetedMinMaxValues:
-      isManualFiltering || !enableFacetedValues
-        ? tableOptions.getFacetedMinMaxValues
-        : (tableOptions.getFacetedMinMaxValues ?? getFacetedMinMaxValues()),
-    getPaginationRowModel:
-      !enablePagination || tableOptions.manualPagination
-        ? tableOptions.getPaginationRowModel
-        : (tableOptions.getPaginationRowModel ?? getPaginationRowModel()),
-  }) as DataTableInstance<TData>
+  /* eslint-enable react-hooks/preserve-manual-memoization */
 
+  // Subscribes the calling component to nothing by default (DataTable
+  // subscribes to what it shows), or to what `stateSelector` picks.
+  const selectState = stateSelector
+    ? (state: CoreStoreState) => stateSelector(toDataTableState(state))
+    : selectNothing
+  const reactTable = useTable<DataTableFeatures, TData, unknown>(
+    {
+      ...coreOptions,
+      features,
+      // Only set `columnPinning` when given: TanStack spreads `initialState`
+      // over its defaults, so an own `undefined` key would erase the default.
+      initialState:
+        initialState &&
+        ({
+          ...initialState,
+          ...(initialState.columnPinning && {
+            columnPinning: toCorePinning(initialState.columnPinning),
+          }),
+        } as CoreTableState),
+      state,
+      // Only when the consumer handles pinning: TanStack merges these options
+      // over its feature defaults, so an own `undefined` key would replace the
+      // default internal state updater and make pinning a no-op.
+      ...(pinningChange && { onColumnPinningChange: pinningChange }),
+      ...uiHandlers,
+      columns: sizedColumns,
+      // Default page-reset off: TanStack's auto-reset runs a state update during
+      // render (warns in React 19 dev). We reset on filter changes via an effect
+      // below instead. Consumers can re-enable by passing the option explicitly.
+      autoResetPageIndex: tableOptions.autoResetPageIndex ?? false,
+      // `enableFilters: false` is the master switch; TanStack v9 still applies
+      // filters handed in through state, so hand the (no-op) filtering to us.
+      // Spread conditionally: an own `undefined` key would override a consumer
+      // `manualFiltering`.
+      ...(tableOptions.enableFilters === false && { manualFiltering: true }),
+      defaultColumn: {
+        filterFn: dynamicFilterFn,
+        aggregatedCell: DefaultAggregatedCell,
+        ...tableOptions.defaultColumn,
+      },
+      enableGlobalFilter,
+      globalFilterFn: tableOptions.globalFilterFn ?? dynamicGlobalFilterFn,
+      enableColumnPinning,
+      enableColumnResizing,
+      columnResizeMode: tableOptions.columnResizeMode ?? "onChange",
+      // Dragging a right-to-left column's edge to the left widens it.
+      columnResizeDirection:
+        // eslint-disable-next-line react-hooks/refs
+        tableOptions.columnResizeDirection ?? getUi().direction,
+      enableRowPinning,
+      keepPinnedRows: tableOptions.keepPinnedRows ?? true,
+      enableGrouping,
+      enableExpanding,
+      // Detail panels expand arbitrary rows; tree data uses getSubRows' own logic.
+      getRowCanExpand:
+        tableOptions.getRowCanExpand ??
+        (renderDetailPanel ? () => true : undefined),
+    },
+    selectState
+  )
+
+  // v9's useTable returns a fresh wrapper every render; keep one instance for
+  // the hook's lifetime (v8 semantics: consumers and our memos rely on a stable
+  // `table`) and refresh its fields from the latest wrapper.
+  const table = Object.assign(
+    // eslint-disable-next-line react-hooks/refs
+    tableRef.current ?? ({} as DataTableInstance<TData>),
+    reactTable,
+    { getState: () => toDataTableState(reactTable.store.state) }
+  )
+  // eslint-disable-next-line react-hooks/refs
+  tableRef.current = table
+
+  const ui = getUiState(table)
   const enableColumnFilters = tableOptions.enableColumnFilters !== false
+
+  // The measured direction reaches column resizing through the options, which
+  // the calling component no longer refreshes on state changes.
+  const ownResizeDirection = tableOptions.columnResizeDirection
+  useTableStateListener(table, () => {
+    if (ownResizeDirection) return
+    const { direction } = getUiState(table)
+    if (table.options.columnResizeDirection !== direction) {
+      table.setOptions((prev) => ({
+        ...prev,
+        columnResizeDirection: direction,
+      }))
+    }
+  })
 
   usePageResetOnFilterChange(table, {
     enablePagination,
@@ -420,43 +674,38 @@ export function useDataTable<TData extends RowData>(
     autoResetPageIndex: tableOptions.autoResetPageIndex,
   })
 
-  // Advanced filter edits can shrink the result set; jump back to the first
-  // page so the user isn't stranded on an out-of-range page (mirrors the
-  // column-filter reset above).
-  const advancedFilterResetRef = React.useRef(advancedFilter)
-  React.useEffect(() => {
-    if (advancedFilterResetRef.current === advancedFilter) return
-    advancedFilterResetRef.current = advancedFilter
-    if (
-      enableAdvancedFilter &&
-      enablePagination &&
-      !tableOptions.manualPagination
-    ) {
-      table.setPageIndex(0)
-    }
-  }, [
-    advancedFilter,
-    enableAdvancedFilter,
+  usePageIndexClamp(table, {
     enablePagination,
-    tableOptions.manualPagination,
-    table,
-  ])
+    manualPagination: tableOptions.manualPagination,
+    isLoading,
+    showSkeletons,
+  })
 
+  // The callbacks below end up on the instance config, which gets live UI
+  // getters attached (see `withLiveUiState`); the compiler cannot keep them
+  // memoized across that, and skips this hook as noted above.
+  /* eslint-disable react-hooks/preserve-manual-memoization */
   // Switching a column's mode resets its value so a stale value (e.g. a
   // numeric range left over from "between") can't break the new mode. Valueless
   // modes (empty/notEmpty) get a truthy sentinel so they stay active. Lives here
   // (not in useColumnFilterModes) because it needs the table instance.
   const setColumnFilterMode = React.useCallback(
     (columnId: string, mode: FilterMode) => {
-      setColumnFilterModes((prev) => ({ ...prev, [columnId]: mode }))
+      uiActions.setColumnFilterModes((prev) => ({ ...prev, [columnId]: mode }))
       const column = table.getColumn(columnId)
       if (!column) return
-      column.setFilterValue(VALUELESS_MODES.has(mode) ? mode : undefined)
+      if (VALUELESS_MODES.has(mode)) {
+        column.setFilterValue(mode)
+      } else if (column.getFilterValue() !== undefined) {
+        // Only clear when a value exists: TanStack always builds a new
+        // `columnFilters` array, which would fire a consumer refetch for nothing.
+        column.setFilterValue(undefined)
+      }
     },
-    [table, setColumnFilterModes]
+    [table, uiActions]
   )
 
-  // Structural DOM refs, exposed on `table.tableInstance.refs` and attached to the
+  // Structural DOM refs, exposed on `table.dataTable.refs` and attached to the
   // corresponding elements in DataTable / toolbar / global-filter.
   const tablePaperRef = React.useRef<HTMLDivElement>(null)
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
@@ -479,7 +728,9 @@ export function useDataTable<TData extends RowData>(
       // matches the actual type scale and density; fall back to sane defaults.
       const containerEl = tableContainerRef.current
       const sampleCell =
-        containerEl?.querySelector<HTMLElement>("tbody td") ??
+        containerEl?.querySelector<HTMLElement>(
+          `tbody td${NOT_IN_LEAVE_COPY}`
+        ) ??
         containerEl?.querySelector<HTMLElement>("thead th") ??
         null
       let font = "14px sans-serif"
@@ -527,6 +778,21 @@ export function useDataTable<TData extends RowData>(
     }
   }, [table, autoSizeColumn])
 
+  const cancelEditing = React.useCallback(() => {
+    const { onCreatingRowCancel, onEditingRowCancel } =
+      editingOptionsRef.current
+    const { isCreating, editingRowId } = table.getState()
+    if (isCreating) {
+      onCreatingRowCancel?.({ table })
+    } else if (editingRowId != null) {
+      const row = table.getCoreRowModel().rowsById[editingRowId]
+      if (row) onEditingRowCancel?.({ row, table })
+    }
+    uiActions.cancelEdit()
+  }, [table, uiActions])
+
+  /* eslint-enable react-hooks/preserve-manual-memoization */
+
   const config: DataTableConfig<TData> = {
     localization,
     icons,
@@ -539,33 +805,43 @@ export function useDataTable<TData extends RowData>(
       tableFooterRef,
       searchInputRef,
     },
-    density,
-    setDensity,
-    isFullscreen,
-    setIsFullscreen,
-    showColumnFilters,
-    setShowColumnFilters,
-    columnFilterModes,
+    density: ui.density,
+    setDensity: uiActions.setDensity,
+    isFullscreen: ui.isFullscreen,
+    setIsFullscreen: uiActions.setIsFullscreen,
+    direction: ui.direction,
+    setDirection: uiActions.setDirection,
+    showColumnFilters: ui.showColumnFilters,
+    setShowColumnFilters: uiActions.setShowColumnFilters,
+    showGlobalFilter: ui.showGlobalFilter,
+    setShowGlobalFilter: uiActions.setShowGlobalFilter,
+    columnFilterModes: ui.columnFilterModes,
     setColumnFilterMode,
-    globalFilterMode,
-    setGlobalFilterMode,
+    globalFilterMode: ui.globalFilterMode,
+    setGlobalFilterMode: uiActions.setGlobalFilterMode,
+    filterFns: customFilterFns,
+    columnFilterModeOptions,
+    globalFilterModeOptions,
     enableGlobalFilter,
     enableGlobalFilterModes,
     enableAdvancedFilter,
-    advancedFilter,
-    setAdvancedFilter,
-    showAdvancedFilterPanel,
-    setShowAdvancedFilterPanel,
+    advancedFilter: ui.advancedFilter,
+    setAdvancedFilter: uiActions.setAdvancedFilter,
+    showAdvancedFilterPanel: ui.showAdvancedFilterPanel,
+    setShowAdvancedFilterPanel: uiActions.setShowAdvancedFilterPanel,
     isLoading,
     isSaving,
     showProgressBars,
     showSkeletons,
+    showSkeletonsOverRows,
     showLoadingOverlay,
     enableFacetedValues,
     enableColumnActions,
     enableColumnFilters,
     enableColumnFilterModes,
-    enableFilterMatchHighlighting,
+    // With filtering switched off, filter values in state match nothing.
+    enableFilterMatchHighlighting:
+      enableFilterMatchHighlighting && tableOptions.enableFilters !== false,
     columnsWithCustomCell,
     enableColumnOrdering,
     enableColumnPinning,
@@ -581,23 +857,39 @@ export function useDataTable<TData extends RowData>(
     enableGrouping,
     enableExpanding,
     enableStickyFooter,
+    enableTableHead,
+    rowPinningDisplayMode,
+    enableRowDragging,
+    onRowDragEnd,
+    enableTableFooter,
+    enableExpandAll,
     renderDetailPanel,
     enableEditing,
+    getCanEditRow,
+    displayColumnDefOptions,
+    defaultDisplayColumn,
     editDisplayMode,
     createDisplayMode,
-    editingCell,
-    setEditingCell,
-    editingRowId,
-    isCreating,
-    rowDraft,
-    setRowDraftValue,
-    beginRowEdit,
-    beginCreate,
-    cancelEdit,
+    editingCell: ui.editingCell,
+    setEditingCell: uiActions.setEditingCell,
+    editingRowId: ui.editingRowId,
+    isCreating: ui.isCreating,
+    rowDraft: ui.rowDraft,
+    setRowDraftValue: uiActions.setRowDraftValue,
+    beginRowEdit: uiActions.beginRowEdit,
+    beginCreate: uiActions.beginCreate,
+    cancelEdit: uiActions.cancelEdit,
+    cancelEditing,
+    onEditingRowCancel,
+    onCreatingRowCancel,
+    renderEditRowDialogContent,
+    renderCreateRowDialogContent,
+    positionCreatingRow,
     enableClickToCopy,
-    onEditCellSave,
-    onSaveRow,
-    onCreateRow,
+    enableCellActions,
+    onEditingCellSave,
+    onEditingRowSave,
+    onCreatingRowSave,
     renderRowActions,
     renderCellActionMenuItems,
     onRowClick,
@@ -623,19 +915,23 @@ export function useDataTable<TData extends RowData>(
     infiniteScrollThreshold,
     positionPagination,
     paginationDisplayMode,
+    pageSizeOptions,
+    slotProps,
     columnFilterDisplayMode,
     positionGlobalFilter,
     positionToolbarAlertBanner,
     positionToolbarDropZone,
     enableRowSelection,
+    enableBatchRowSelection,
     enableTopToolbar,
     enableBottomToolbar,
     enableDensityToggle,
     enableFullscreenToggle,
     enableToolbarInternalActions,
     enableKeyboardNavigation,
+    enableAnimations,
     title,
-    renderToolbarActions,
+    renderTopToolbarCustomActions,
     renderTopToolbar,
     renderBottomToolbar,
     renderToolbarInternalActions,
@@ -648,7 +944,20 @@ export function useDataTable<TData extends RowData>(
     renderEmpty,
   }
 
-  table.tableInstance = config
+  // UI state members read the store when accessed, so they are current even
+  // where the component calling this hook has not re-rendered. (The config
+  // holds the DOM ref objects, which are only handed on, not read.)
+  // eslint-disable-next-line react-hooks/refs
+  withLiveUiState(config, reactTable.store)
+
+  // The instance is TanStack's mutable object; attaching our config and
+  // methods is the contract (`table.dataTable`, `table.setDensity`…).
+  // eslint-disable-next-line react-hooks/immutability
+  table.dataTable = config
+  for (const key of DATA_TABLE_METHODS) {
+    // eslint-disable-next-line react-hooks/immutability, react-hooks/refs
+    ;(table as unknown as Record<string, unknown>)[key] = config[key]
+  }
 
   return table
 }

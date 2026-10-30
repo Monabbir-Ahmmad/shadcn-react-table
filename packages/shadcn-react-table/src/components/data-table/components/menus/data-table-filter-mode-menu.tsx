@@ -1,6 +1,6 @@
 "use client"
 
-import type { Column, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import {
   DropdownMenu,
@@ -13,6 +13,10 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 import {
+  InputGroupAddon,
+  InputGroupButton,
+} from "@workspace/ui/components/input-group"
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -22,19 +26,27 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableInstance } from "../../core/types"
 import { modeOptionsForVariant, type FilterMode } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
+import type { DataTableColumn } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 /**
  * The `Filter` adornment that opens a mode menu (contains/equals/…; numeric and
  * date variants get their own sets). Swapping the mode changes the column's
  * `filterFn` and resets the stale value. Hidden when the variant has a single
- * fixed mode or modes are disabled.
+ * fixed mode or modes are disabled. With `addon`, it renders as the leading
+ * addon of the filter's `InputGroup` (text-like filters), else as a standalone
+ * button beside the field.
  */
 export function DataTableFilterModeMenu<TData extends RowData, TValue>({
   column,
   table,
+  addon = false,
 }: {
-  column: Column<TData, TValue>
+  column: DataTableColumn<TData, TValue>
   table: DataTableInstance<TData>
+  /** Render inside an `InputGroup`: an inline-start addon with an
+   *  `InputGroupButton` trigger. */
+  addon?: boolean
 }) {
   const {
     localization,
@@ -42,36 +54,54 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
     setColumnFilterMode,
     enableColumnFilterModes,
     renderColumnFilterModeMenuItems,
-  } = table.tableInstance
-  const variant = column.columnDef.meta?.variant ?? "text"
+    filterFns,
+    columnFilterModeOptions,
+  } = dt(table)
+  const variant = column.columnDef.meta?.filterVariant ?? "text"
   const perColumn = column.columnDef.meta?.enableColumnFilterModes
   const enabled = perColumn ?? enableColumnFilterModes
-  // Restrict (and order) to the column's allowed subset when provided.
-  const allowed = column.columnDef.meta?.columnFilterModeOptions
   const variantModes = modeOptionsForVariant(variant)
+  // Restrict (and order) to the column's allowed subset, else the table's
+  // (which leaves single-mode variants alone). Custom functions are kept
+  // whatever the variant.
+  const allowed =
+    column.columnDef.meta?.columnFilterModeOptions ??
+    (variantModes.length > 0 ? columnFilterModeOptions : undefined)
   const modes = allowed
-    ? allowed.filter((mode) => variantModes.includes(mode))
+    ? allowed.filter(
+        (mode) => variantModes.includes(mode) || Object.hasOwn(filterFns, mode)
+      )
     : variantModes
 
   if (!enabled || modes.length === 0) return null
 
   const current = getEffectiveMode(column, table)
 
-  return (
+  const trigger = addon ? (
+    <InputGroupButton
+      size="icon-xs"
+      aria-label={localization.changeFilterMode}
+      className="text-muted-foreground"
+    >
+      <icons.filter className="size-3.5" />
+    </InputGroupButton>
+  ) : (
+    <button
+      type="button"
+      aria-label={localization.changeFilterMode}
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 aria-expanded:text-foreground"
+      )}
+    >
+      <icons.filter className="size-3.5" />
+    </button>
+  )
+
+  const menu = (
     <DropdownMenu>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label={localization.changeFilterMode}
-              className={cn(
-                "flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 aria-expanded:text-foreground"
-              )}
-            >
-              <icons.filter className="size-3.5" />
-            </button>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent>{localization.filterMode}</TooltipContent>
       </Tooltip>
@@ -84,7 +114,7 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
         <DropdownMenuSeparator />
         {renderColumnFilterModeMenuItems ? (
           renderColumnFilterModeMenuItems({
-            column: column as Column<TData, unknown>,
+            column: column as DataTableColumn<TData, unknown>,
             modes,
             currentMode: current,
             onSelect: (mode) => setColumnFilterMode(column.id, mode),
@@ -106,5 +136,13 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
         )}
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+
+  return addon ? (
+    <InputGroupAddon align="inline-start" className="py-0">
+      {menu}
+    </InputGroupAddon>
+  ) : (
+    menu
   )
 }

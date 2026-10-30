@@ -65,3 +65,30 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # The live site serves this commit's registry and docs: the block's
+  # version, the registry index and llms.txt all answer.
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Live registry matches this commit
+        run: |
+          SITE="https://monabbir-ahmmad.github.io/shadcn-react-table"
+          expected=$(node -p "require('./packages/shadcn-react-table/package.json').version")
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            live=$(curl -fsSL "$SITE/r/data-table.json?run=$GITHUB_RUN_ID" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).meta.version)}catch{console.log("")}})' || true)
+            if [ "$live" = "$expected" ]; then break; fi
+            echo "Live version '$live', expected '$expected'; retrying in 30s"
+            sleep 30
+          done
+          if [ "$live" != "$expected" ]; then
+            echo "::error::The deployed registry serves version '$live', expected '$expected'."
+            exit 1
+          fi
+          curl -fsSL "$SITE/r/registry.json" > /dev/null
+          curl -fsSL "$SITE/llms.txt" | head -1 | grep -q "shadcn-react-table"
+          curl -fsSL "$SITE/docs/" > /dev/null

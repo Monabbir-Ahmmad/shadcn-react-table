@@ -35,7 +35,7 @@ const container = (
 
 // Group zone sits at the origin; one header and one row elsewhere.
 const targets = [
-  container(GROUP_DROPZONE_ID, undefined, rect(0, 0, 100)),
+  container(GROUP_DROPZONE_ID, "group-zone", rect(0, 0, 100)),
   container("name", "column", rect(200, 0)),
   container("row-1", "row", rect(200, 200)),
 ]
@@ -60,7 +60,7 @@ const detect = (
 
 const setup = () =>
   renderHook(() =>
-    useTableDnd({ tableInstance: {} } as DataTableInstance<unknown>)
+    useTableDnd({ dataTable: {} } as unknown as DataTableInstance)
   ).result.current.collisionDetection
 
 describe("useTableDnd collisionDetection", () => {

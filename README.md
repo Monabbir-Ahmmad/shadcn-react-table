@@ -2,7 +2,7 @@
 
 # shadcn-react-table
 
-**A fully featured shadcn/ui implementation of TanStack React Table V8, with Material React Table (MRT V3) feature parity — shipped as a shadcn registry block, not a library.**
+**A fully featured shadcn/ui implementation of TanStack React Table V9, with Material React Table (MRT V3) feature parity — shipped as a shadcn registry block, not a library.**
 
 [![Release](https://img.shields.io/github/v/release/Monabbir-Ahmmad/shadcn-react-table)](https://github.com/Monabbir-Ahmmad/shadcn-react-table/releases)
 [![CI](https://github.com/Monabbir-Ahmmad/shadcn-react-table/actions/workflows/ci.yml/badge.svg)](https://github.com/Monabbir-Ahmmad/shadcn-react-table/actions/workflows/ci.yml)
@@ -18,7 +18,7 @@
 Quickly create high-quality React data tables that look and feel like the rest
 of your shadcn/ui project.
 
-Built with [shadcn/ui](https://ui.shadcn.com), [TanStack Table <sup>V8</sup>](https://tanstack.com/table/v8),
+Built with [shadcn/ui](https://ui.shadcn.com), [TanStack Table <sup>V9</sup>](https://tanstack.com/table/latest),
 and [Tailwind CSS <sup>V4</sup>](https://tailwindcss.com). The API and feature
 set are modeled on [Material React Table <sup>V3</sup>](https://www.material-react-table.com)
 — all of MRT V3's feature guides are implemented.
@@ -37,16 +37,18 @@ project: no library to version-match, nothing hidden, every file yours to edit.
 
 _All features can be enabled or disabled per table._
 
-- [x] Sorting (multi-sort, per-column config)
-- [x] Column filtering with filter **modes** (contains, between, empty, …) and
-      **variants** (`text`, `select`, `multi-select`, `checkbox`, `range`,
-      `range-slider`, `date`, `date-range`) + faceted values
+- [x] Sorting (multi-sort, per-column config, custom `sortFns`)
+- [x] Column filtering with filter **modes** (contains, between, empty, …,
+      plus your own `filterFns`) and **variants** (`text`, `select`,
+      `multi-select`, `autocomplete`, `checkbox`, `range`, `range-slider`,
+      `date`, `date-range`, `datetime`, `datetime-range`, `time`,
+      `time-range`) + faceted values
 - [x] Advanced filter panel (compound and/or rules)
 - [x] Fuzzy global search (`@tanstack/match-sorter-utils`) with search modes
-- [x] Filter match highlighting
+- [x] Filter match highlighting, kept in custom cells via `renderedCellValue`
 - [x] Column ordering (drag & drop), pinning (freeze columns), resizing, visibility
-- [x] Row selection (multi / single), select-all, alert banner
-- [x] Row ordering (drag & drop), row pinning, row numbers
+- [x] Row selection (multi / single, shift-click ranges), select-all, alert banner
+- [x] Row ordering (drag & drop, also between tables), row pinning, row numbers
 - [x] Grouping + aggregation (drop zone, group menu, aggregated cells, footers)
 - [x] Expansion: detail panels and tree data (`getSubRows`)
 - [x] Inline editing (`cell` / `row` / `table` / `modal`) + row creation
@@ -55,7 +57,12 @@ _All features can be enabled or disabled per table._
 - [x] Sticky header / footer, density toggle, full-screen toggle
 - [x] Pagination (default or numbered pages) + keyboard grid navigation
 - [x] Localization (full string table) and custom icons (any icon library)
+- [x] 38 languages, each an optional registry item
 - [x] Server-side / manual mode (`manualPagination` / `manualSorting` / `manualFiltering`)
+- [x] Animations (Web Animations API, no dependency): rows glide on sort,
+      filter, group and pin, detail panels open smoothly, the toolbar moves;
+      off under reduced motion or with `enableAnimations: false`
+- [x] `slotProps` for every part, composition parts, and the full TanStack v9 API
 - [x] Theming via shadcn tokens only — inherits your style, base color, and dark mode
 - [x] Radix UI **and** Base UI flavors supported from the same registry URL
 
@@ -100,14 +107,14 @@ also pulls their own deps like `react-day-picker`, `cmdk`, and your flavor's
 headless library — `radix-ui` or `@base-ui/react`):
 
 ```bash
-npx shadcn@latest add badge button calendar checkbox command context-menu dialog dropdown-menu input label popover select skeleton slider table tooltip
+npx shadcn@latest add badge button calendar checkbox command context-menu dialog dropdown-menu input input-group label popover select skeleton slider table tooltip
 ```
 
 Copy `packages/shadcn-react-table/src/components/data-table/` into your `@/components/ui/data-table/`,
 then add the table's own npm deps:
 
 ```bash
-pnpm add @tanstack/react-table @tanstack/match-sorter-utils @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns lucide-react
+pnpm add @tanstack/react-table@^9 @tanstack/match-sorter-utils@^9 @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities date-fns lucide-react
 ```
 
 Only `@tanstack/react-table` is strictly required; the rest are per-feature:
@@ -159,9 +166,12 @@ aggregation, click-to-copy, …) is configured via `columnDef.meta`.
 "use client"
 
 import * as React from "react"
-import type { ColumnDef } from "@tanstack/react-table"
 // after `shadcn add` it lands here; inside this monorepo it's @monabbir/shadcn-react-table/components/data-table
-import { DataTable, useDataTable } from "@/components/ui/data-table"
+import {
+  DataTable,
+  useDataTable,
+  type DataTableColumnDef,
+} from "@/components/ui/data-table"
 
 type Payment = {
   id: string
@@ -171,7 +181,7 @@ type Payment = {
   amount: number
 }
 
-const columns: ColumnDef<Payment>[] = [
+const columns: DataTableColumnDef<Payment>[] = [
   { accessorKey: "customer", header: "Customer" },
   {
     accessorKey: "email",
@@ -182,8 +192,8 @@ const columns: ColumnDef<Payment>[] = [
     accessorKey: "status",
     header: "Status",
     meta: {
-      variant: "multi-select",
-      options: [
+      filterVariant: "multi-select",
+      filterSelectOptions: [
         { label: "Paid", value: "paid" },
         { label: "Pending", value: "pending" },
         { label: "Failed", value: "failed" },
@@ -193,7 +203,7 @@ const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "amount",
     header: "Amount",
-    meta: { align: "right", variant: "range-slider" },
+    meta: { align: "right", filterVariant: "range-slider" },
     cell: ({ getValue }) =>
       new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -212,7 +222,7 @@ export function PaymentsTable({ data }: { data: Payment[] }) {
     getRowId: (row) => row.id, // recommended whenever selection/expansion is on
     enableRowSelection: true,
     enableColumnPinning: true,
-    defaultShowColumnFilters: true,
+    initialState: { showColumnFilters: true },
   })
 
   return <DataTable table={table} />
@@ -221,7 +231,10 @@ export function PaymentsTable({ data }: { data: Payment[] }) {
 
 `useDataTable` extends the full TanStack `TableOptions`, so `state` +
 `onChange`, `manual*` server-side flags, row models, `getRowId`, etc. all pass
-straight through. Our extras + UI state live on `table.tableInstance`.
+straight through. The table's own methods live on `table` (`table.setDensity`,
+`table.beginRowEdit`, …) and its UI state (density, full screen, filter row,
+editing, …) in `table.getState()`, controlled like any TanStack state with
+`initialState` / `state` + `on…Change`.
 
 ### Feature flags (the common ones)
 
@@ -230,19 +243,20 @@ Pass these to `useDataTable`:
 | Want…                         | Option(s)                                                                                                       |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Row selection                 | `enableRowSelection`, `enableMultiRowSelection`                                                                 |
-| Filter row visible by default | `defaultShowColumnFilters: true`                                                                                |
-| Per-column filter UI          | `columnDef.meta.variant` (`text`/`select`/`multi-select`/`range`/`range-slider`/`date`/`date-range`/`checkbox`) |
+| Filter row visible by default | `initialState: { showColumnFilters: true }`                                                                     |
+| Per-column filter UI          | `columnDef.meta.filterVariant` (`text`/`select`/`multi-select`/`autocomplete`/`range`/`date`/`time`/…)          |
 | Global fuzzy search           | on by default; `enableGlobalFilter: false` to hide                                                              |
 | Column drag / pin / resize    | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing`                                           |
 | Row drag / pin / numbers      | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers`                                |
 | Grouping + aggregation        | `enableGrouping` + column `footer`/`aggregationFn`                                                              |
 | Sticky header / footer        | on by default; scrolls within a bounded surface (`max-h`) or virtualized list                                   |
 | Detail panel / tree           | `renderDetailPanel` / `getSubRows`                                                                              |
-| Inline editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`) + `onEditCellSave`/`onSaveRow`/`onCreateRow`  |
+| Inline editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`) + `onEditingCellSave`/`onEditingRowSave`/`onCreatingRowSave` |
 | Row / cell actions            | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy`                                            |
 | Virtualization                | `enableRowVirtualization`, `enableColumnVirtualization` (give the surface a bounded height)                     |
 | Row/cell clicks               | `onRowClick` / `onCellClick` (+ double-click)                                                                   |
 | Custom icons / i18n           | `icons`, `localization`                                                                                         |
+| Animations                    | on by default; `enableAnimations: false` to turn off                                                            |
 | Server-side data              | `manualPagination` / `manualSorting` / `manualFiltering` + `rowCount` + controlled `state`                      |
 
 The component-level [data-table README](packages/shadcn-react-table/src/components/data-table/README.md)
@@ -251,12 +265,16 @@ stability requirements.
 
 ## Versioning & Changelog
 
-The registry block carries its version in `meta.version` (from
+The block follows [semantic versioning](https://semver.org): a major version
+for breaking changes, a minor for new features, a patch for fixes. The registry
+block carries its version in `meta.version` (from
 `packages/shadcn-react-table/package.json`). Every version is documented in the
 [changelog](packages/shadcn-react-table/CHANGELOG.md) and published as a
 [GitHub release](https://github.com/Monabbir-Ahmmad/shadcn-react-table/releases);
 see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/updating)
-for pulling a new version into your project.
+for pulling a new version into your project. **1.0.0** is the first stable
+release (TanStack Table v9, one table API); the updating guide lists every
+rename from 0.x with a before/after.
 
 ## Development
 
@@ -275,6 +293,8 @@ pnpm build       # build all workspaces
 pnpm lint        # eslint
 pnpm typecheck   # tsc --noEmit
 pnpm format      # prettier --write
+pnpm test        # unit tests (Vitest + Testing Library)
+pnpm test:browser  # browser tests (Vitest browser mode, Chromium)
 ```
 
 To add a shadcn/ui primitive, run from the repo root (components land in
@@ -291,5 +311,6 @@ Import shared primitives with `import { Foo } from "@workspace/ui/components/foo
 The API surface, option names, and feature set are openly modeled on
 [Material React Table](https://www.material-react-table.com) by
 [Kevin Van Cott](https://github.com/KevinVandy) — years of API design iteration
-this project gratefully stands on. Powering everything underneath:
-[TanStack Table](https://tanstack.com/table/v8) and [shadcn/ui](https://ui.shadcn.com).
+this project gratefully stands on. The translations are adapted from its
+locales (MIT License). Powering everything underneath:
+[TanStack Table](https://tanstack.com/table/latest) and [shadcn/ui](https://ui.shadcn.com).

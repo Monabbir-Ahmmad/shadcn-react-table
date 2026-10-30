@@ -18,10 +18,12 @@ import {
 } from "@workspace/ui/components/tooltip"
 
 import type { DataTableInstance } from "../../core/types"
+import { formatInteger } from "../../helpers/format-integer"
+import { dt } from "../../core/internal"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 interface DataTablePaginationProps<TData extends RowData> {
   table: DataTableInstance<TData>
-  pageSizeOptions?: number[]
 }
 
 /**
@@ -31,9 +33,9 @@ interface DataTablePaginationProps<TData extends RowData> {
  */
 export function DataTablePagination<TData extends RowData>({
   table,
-  pageSizeOptions = [5, 10, 25, 50, 100],
 }: DataTablePaginationProps<TData>) {
-  const { localization, icons, paginationDisplayMode } = table.tableInstance
+  const { localization, icons, paginationDisplayMode, pageSizeOptions } =
+    dt(table)
   if (paginationDisplayMode === "custom") return null
 
   const { pageIndex, pageSize } = table.getState().pagination
@@ -43,8 +45,13 @@ export function DataTablePagination<TData extends RowData>({
 
   return (
     <div
-      data-slot="data-table-pagination"
-      className="flex flex-wrap items-center justify-between gap-4 py-1"
+      {...mergeProps(
+        {
+          "data-slot": "data-table-pagination",
+          className: "flex flex-wrap items-center justify-between gap-4 py-1",
+        } as React.ComponentProps<"div">,
+        getSlotProps(table, "pagination", {})
+      )}
     >
       <div className="flex items-center gap-2">
         <span className="text-xs font-medium tracking-wide text-muted-foreground">
@@ -59,12 +66,14 @@ export function DataTablePagination<TData extends RowData>({
             className="h-8 w-18"
             aria-label={localization.rowsPerPage}
           >
-            <SelectValue placeholder={`${pageSize}`} />
+            <SelectValue
+              placeholder={formatInteger(pageSize, localization.language)}
+            />
           </SelectTrigger>
           <SelectContent>
             {pageSizeOptions.map((size) => (
               <SelectItem key={size} value={`${size}`}>
-                {size}
+                {formatInteger(size, localization.language)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -78,7 +87,7 @@ export function DataTablePagination<TData extends RowData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <icons.pagePrev />
+            <icons.pagePrev className="rtl:rotate-180" />
           </PaginationButton>
           {getPageList(pageIndex + 1, table.getPageCount()).map((item, i) =>
             item === "ellipsis" ? (
@@ -99,7 +108,7 @@ export function DataTablePagination<TData extends RowData>({
                 onClick={() => table.setPageIndex(item - 1)}
                 className="size-8 text-xs tabular-nums"
               >
-                {item}
+                {formatInteger(item, localization.language)}
               </Button>
             )
           )}
@@ -108,7 +117,7 @@ export function DataTablePagination<TData extends RowData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <icons.pageNext />
+            <icons.pageNext className="rtl:rotate-180" />
           </PaginationButton>
         </div>
       ) : (
@@ -122,28 +131,28 @@ export function DataTablePagination<TData extends RowData>({
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <icons.pageFirst />
+              <icons.pageFirst className="rtl:rotate-180" />
             </PaginationButton>
             <PaginationButton
               label={localization.goToPreviousPage}
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <icons.pagePrev />
+              <icons.pagePrev className="rtl:rotate-180" />
             </PaginationButton>
             <PaginationButton
               label={localization.goToNextPage}
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <icons.pageNext />
+              <icons.pageNext className="rtl:rotate-180" />
             </PaginationButton>
             <PaginationButton
               label={localization.goToLastPage}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <icons.pageLast />
+              <icons.pageLast className="rtl:rotate-180" />
             </PaginationButton>
           </div>
         </div>

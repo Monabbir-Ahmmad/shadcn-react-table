@@ -10,6 +10,7 @@ import {
 } from "@workspace/ui/components/tooltip"
 
 import type { DataTableInstance } from "../../../core/types"
+import { dt } from "../../../core/internal"
 
 /** Full-screen toggle (state-driven; the surface fixes itself to the viewport). */
 export function DataTableFullscreenToggle<TData extends RowData>({
@@ -17,8 +18,7 @@ export function DataTableFullscreenToggle<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, icons, isFullscreen, setIsFullscreen } =
-    table.tableInstance
+  const { localization, icons, isFullscreen, setIsFullscreen } = dt(table)
   const label = isFullscreen
     ? localization.exitFullscreen
     : localization.enterFullscreen

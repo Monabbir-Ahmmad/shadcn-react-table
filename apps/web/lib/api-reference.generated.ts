@@ -11,11 +11,44 @@ export interface ApiMember {
 
 export const useDataTableOptions: ApiMember[] = [
   {
+    name: "initialState",
+    type: 'Omit< NonNullable<CoreTableOptions<TData>["initialState"]>, "columnPinning" | "pagination" > & { columnPinning?: DataTableColumnPinningState pagination?: Partial<PaginationState> }',
+    required: false,
+    default: null,
+    description:
+      "Initial values for uncontrolled table state. `pagination` may be partial (TanStack fills the rest from its defaults); column pinning uses `left` / `right`.",
+  },
+  {
+    name: "state",
+    type: 'Omit< NonNullable<CoreTableOptions<TData>["state"]>, "columnPinning" > & { columnPinning?: DataTableColumnPinningState }',
+    required: false,
+    default: null,
+    description:
+      "Controlled table state slices. Column pinning uses `left` / `right` (not TanStack v9's `start` / `end`).",
+  },
+  {
+    name: "onColumnPinningChange",
+    type: "OnChangeFn<DataTableColumnPinningState>",
+    required: false,
+    default: null,
+    description:
+      "Called with an updater over the `left` / `right` pinning state when the user pins or unpins a column.",
+  },
+  {
+    name: "stateSelector",
+    type: "(state: DataTableState) => unknown",
+    required: false,
+    default: null,
+    description:
+      'Re-render the component that calls `useDataTable` when the selected part of the table state changes (compared shallowly). By default it does not re-render on table state changes at all: `<DataTable>` subscribes to what it shows. Select what your own render reads, e.g. `(state) => state.rowSelection` for a "3 selected" label.',
+  },
+  {
     name: "localization",
     type: "Partial<DataTableLocalization>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Text for every label, message and screen-reader string. Partial: missing keys fall back to English (or to `DataTableConfigProvider`). Install a locale item for a full language.",
   },
   {
     name: "icons",
@@ -23,20 +56,6 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description: "Override any subset of the table's icons.",
-  },
-  {
-    name: "defaultDensity",
-    type: "Density",
-    required: false,
-    default: '"comfortable"',
-    description: "Initial density. Uncontrolled.",
-  },
-  {
-    name: "defaultShowColumnFilters",
-    type: "boolean",
-    required: false,
-    default: "false",
-    description: "Initially show the filter row. Uncontrolled.",
   },
   {
     name: "isLoading",
@@ -67,7 +86,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Replace the body with skeleton rows while empty. Default: `isLoading`.",
+      "Show skeleton rows while the body is empty. Default: `isLoading`. Passing `true` also covers rows already shown with skeletons (e.g. while refetching), instead of dimming them.",
   },
   {
     name: "showLoadingOverlay",
@@ -90,7 +109,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Shows the column-actions menu in each header (sort, filter, pin, hide, group…). Default `true`.",
   },
   {
     name: "enableColumnFilterModes",
@@ -124,6 +144,46 @@ export const useDataTableOptions: ApiMember[] = [
       "Show the global search mode menu (fuzzy/contains/…). Default true.",
   },
   {
+    name: "filterFns",
+    type: "Record<string, DataTableFilterFn<TData>>",
+    required: false,
+    default: "NO_FILTER_FNS",
+    description:
+      "Your own filter functions, by name (TanStack's filter function signature). Name one on a column's `filterFn`, as a column's `meta.filterMode`, or in `columnFilterModeOptions` / `globalFilterModeOptions` to offer it in the mode menus (labelled by `localization.filterModes[name]`, else the name). The names are read when the table is created; the functions stay current.",
+  },
+  {
+    name: "sortFns",
+    type: "Record<string, DataTableSortFn<TData>>",
+    required: false,
+    default: null,
+    description:
+      'Your own sort functions, by name; a column uses one with `sortFn: "name"`. The names are read when the table is created; the functions stay current.',
+  },
+  {
+    name: "aggregationFns",
+    type: "Record<string, DataTableAggregationFn<TData>>",
+    required: false,
+    default: null,
+    description:
+      'Your own aggregation functions, by name; a column uses one with `aggregationFn: "name"`. The names are read when the table is created; the functions stay current.',
+  },
+  {
+    name: "columnFilterModeOptions",
+    type: "FilterMode[]",
+    required: false,
+    default: null,
+    description:
+      "Restrict (and order) every column's filter-mode menu to these modes — built-in ones (kept where the column's variant supports them) and custom `filterFns` names. A column's `meta.columnFilterModeOptions` wins.",
+  },
+  {
+    name: "globalFilterModeOptions",
+    type: "GlobalFilterMode[]",
+    required: false,
+    default: "GLOBAL_FILTER_MODES as GlobalFilterMode[]",
+    description:
+      "Restrict (and order) the global search mode menu: built-in modes and custom `filterFns` names.",
+  },
+  {
     name: "enableGlobalFilterRankedResults",
     type: "boolean",
     required: false,
@@ -132,19 +192,44 @@ export const useDataTableOptions: ApiMember[] = [
       "While the global search is in fuzzy mode, order rows by best match (most relevant first) until the user applies their own sort. Default false — MRT defaults this on, but the data table keeps it off so searching never silently reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping or expanded, or under manual sorting/filtering.",
   },
   {
-    name: "defaultGlobalFilterMode",
-    type: "GlobalFilterMode",
+    name: "enableBatchRowSelection",
+    type: "boolean",
     required: false,
-    default: '"fuzzy"',
-    description: 'Initial global search mode. Default "fuzzy".',
+    default: "true",
+    description:
+      "Shift-click a row's checkbox to select (or clear) every row since the last one clicked. Default true.",
   },
   {
-    name: "density",
-    type: "Density",
+    name: "displayColumnDefOptions",
+    type: "Partial< Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>> >",
     required: false,
     default: null,
     description:
-      "Controlled density. Pair with `onDensityChange`; omit for uncontrolled (seed the initial value with `defaultDensity`).",
+      'Column options for the columns the table adds itself (selection, expand, row actions, row number, row pin, drag handle), by id — e.g. `{ "cn-select": { size: 48 } }`. `meta` merges with the column\'s own.',
+  },
+  {
+    name: "defaultDisplayColumn",
+    type: "Partial<DataTableColumnDef<TData, unknown>>",
+    required: false,
+    default: null,
+    description:
+      "Column options applied to every column the table adds itself, under `displayColumnDefOptions`.",
+  },
+  {
+    name: "slotProps",
+    type: "DataTableSlots<TData>",
+    required: false,
+    default: null,
+    description:
+      "Props for the table's parts (cells, rows, toolbars, …), as an object or a function of the part's context. `className` is combined with the table's, `style` merged, event handlers both run; other props replace the table's. See `DataTableSlots`.",
+  },
+  {
+    name: "pageSizeOptions",
+    type: "number[]",
+    required: false,
+    default: "DEFAULT_PAGE_SIZE_OPTIONS",
+    description:
+      "Choices in the rows-per-page select. Default `[5, 10, 25, 50, 100]`.",
   },
   {
     name: "onDensityChange",
@@ -152,37 +237,31 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Called whenever the density changes (toolbar toggle or programmatic).",
-  },
-  {
-    name: "isFullscreen",
-    type: "boolean",
-    required: false,
-    default: null,
-    description:
-      "Controlled full-screen state. Pair with `onIsFullscreenChange`.",
+      "Called whenever the density changes (toolbar toggle or programmatic). Set it with `initialState.density`, control it with `state.density`.",
   },
   {
     name: "onIsFullscreenChange",
     type: "(isFullscreen: boolean) => void",
     required: false,
     default: null,
-    description: "Called whenever the full-screen state is toggled.",
-  },
-  {
-    name: "showColumnFilters",
-    type: "boolean",
-    required: false,
-    default: null,
     description:
-      "Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`; omit for uncontrolled (seed with `defaultShowColumnFilters`).",
+      "Called whenever the full-screen state is toggled. Control it with `state.isFullscreen`.",
   },
   {
     name: "onShowColumnFiltersChange",
     type: "(showColumnFilters: boolean) => void",
     required: false,
     default: null,
-    description: "Called whenever the filter row is shown or hidden.",
+    description:
+      "Called whenever the filter row is shown or hidden. Set it with `initialState.showColumnFilters`, control it with `state.showColumnFilters`.",
+  },
+  {
+    name: "onShowGlobalFilterChange",
+    type: "(showGlobalFilter: boolean) => void",
+    required: false,
+    default: null,
+    description:
+      "Called whenever the global search box opens or closes. Set it with `initialState.showGlobalFilter`, control it with `state.showGlobalFilter`.",
   },
   {
     name: "enableAdvancedFilter",
@@ -193,41 +272,68 @@ export const useDataTableOptions: ApiMember[] = [
       "Enable the advanced filter panel: compound rules joined by AND/OR, applied on top of the per-column filters. A toolbar button opens the panel and shows the active-rule count. Default false.",
   },
   {
-    name: "advancedFilter",
-    type: "AdvancedFilterGroup",
-    required: false,
-    default: null,
-    description:
-      "Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for uncontrolled (seed with `defaultAdvancedFilter`).",
-  },
-  {
-    name: "defaultAdvancedFilter",
-    type: "AdvancedFilterGroup",
-    required: false,
-    default: null,
-    description: "Initial advanced filter for uncontrolled usage.",
-  },
-  {
     name: "onAdvancedFilterChange",
     type: "(filter: AdvancedFilterGroup) => void",
     required: false,
     default: null,
-    description: "Called whenever the advanced filter changes.",
-  },
-  {
-    name: "globalFilterMode",
-    type: "GlobalFilterMode",
-    required: false,
-    default: null,
     description:
-      "Controlled global search mode. Pair with `onGlobalFilterModeChange`; omit for uncontrolled (seed with `defaultGlobalFilterMode`).",
+      "Called whenever the advanced filter changes. Set it with `initialState.advancedFilter`, control it with `state.advancedFilter`.",
   },
   {
     name: "onGlobalFilterModeChange",
     type: "(mode: GlobalFilterMode) => void",
     required: false,
     default: null,
-    description: "Called whenever the global search mode changes.",
+    description:
+      'Called whenever the global search mode changes (default `"fuzzy"`). Set it with `initialState.globalFilterMode`, control it with `state.globalFilterMode`.',
+  },
+  {
+    name: "onColumnFilterModesChange",
+    type: "(modes: Record<string, FilterMode>) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when a column's filter mode changes, with every column's mode. Control it with `state.columnFilterModes`.",
+  },
+  {
+    name: "onShowAdvancedFilterPanelChange",
+    type: "(open: boolean) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the advanced filter dialog opens or closes. Control it with `state.showAdvancedFilterPanel`.",
+  },
+  {
+    name: "onEditingCellChange",
+    type: "(cell: EditingCell | null) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when cell editing starts or ends (`null`). Control it with `state.editingCell`.",
+  },
+  {
+    name: "onEditingRowIdChange",
+    type: "(rowId: string | null) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when row editing starts or ends (`null`). Control it with `state.editingRowId`.",
+  },
+  {
+    name: "onIsCreatingChange",
+    type: "(isCreating: boolean) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the new-row editor opens or closes. Control it with `state.isCreating`.",
+  },
+  {
+    name: "onRowDraftChange",
+    type: "(draft: Record<string, unknown>) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the draft of the row being edited or created changes. Control it with `state.rowDraft`.",
   },
   {
     name: "enableColumnOrdering",
@@ -290,6 +396,22 @@ export const useDataTableOptions: ApiMember[] = [
       '"static" tracks the current view (page-aware); "original" uses source index.',
   },
   {
+    name: "enableRowDragging",
+    type: "boolean",
+    required: false,
+    default: "false",
+    description:
+      "Adds a drag handle to each row for moving rows out of the table — to another table or a drop zone in the same `DataTableDndProvider` — without reordering inside it (combine with `enableRowOrdering` for both). Default false.",
+  },
+  {
+    name: "onRowDragEnd",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data.",
+  },
+  {
     name: "onRowOrderChange",
     type: "(activeRowId: string, overRowId: string) => void",
     required: false,
@@ -322,18 +444,51 @@ export const useDataTableOptions: ApiMember[] = [
       "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
   },
   {
+    name: "rowPinningDisplayMode",
+    type: "RowPinningDisplayMode",
+    required: false,
+    default: '"top-and-bottom"',
+    description:
+      'Where pinned rows show and how rows get pinned (see {@link RowPinningDisplayMode}). Default `"top-and-bottom"`.',
+  },
+  {
+    name: "enableTableHead",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Render the header rows. Default true; `false` shows the body only.",
+  },
+  {
+    name: "enableTableFooter",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Render the footer rows when columns define a `footer`. Default true.",
+  },
+  {
+    name: "enableExpandAll",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Show the expand-all toggle in the expand column's header. Default true.",
+  },
+  {
     name: "renderDetailPanel",
-    type: "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
     description: "Render an expanding detail panel for each row.",
   },
   {
     name: "enableEditing",
-    type: "boolean",
+    type: "boolean | ((row: DataTableRow<TData>) => boolean)",
     required: false,
     default: "false",
-    description: "Enable inline editing.",
+    description:
+      "Enable inline editing, or decide per row with a function (rows it returns false for can't be edited; creating rows is still allowed).",
   },
   {
     name: "editDisplayMode",
@@ -359,66 +514,118 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "enableClickToCopy",
-    type: "boolean",
+    type: "ClickToCopyOption<TData>",
     required: false,
     default: "false",
     description:
-      "Show a click-to-copy affordance on all cells (per-column override via meta).",
+      'Copy cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function. Per-column override via meta.',
   },
   {
-    name: "onEditCellSave",
-    type: "(props: { row: Row<TData> column: Column<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
+    name: "enableCellActions",
+    type: "boolean | ((cell: DataTableCell<TData, unknown>) => boolean)",
+    required: false,
+    default: "false",
+    description:
+      "A right-click menu on each cell with built-in Copy (when click-to-copy is on) and Edit (when the cell is editable) items, or a function deciding per cell. `renderCellActionMenuItems` customizes it. Default false.",
+  },
+  {
+    name: "onEditingCellSave",
+    type: "(props: { row: DataTableRow<TData> column: DataTableColumn<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell edit is committed (cell and table editing) with the new `value`. Persist it; the table does not change `data` itself.",
   },
   {
-    name: "onSaveRow",
-    type: "(props: { row: Row<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
+    name: "onEditingRowSave",
+    type: "(props: { row: DataTableRow<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row edit is saved (row and modal editing) with the edited `values`. Call `exit()` to leave editing, e.g. after the save succeeds.",
   },
   {
-    name: "onCreateRow",
+    name: "onCreatingRowSave",
     type: "(props: { values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when the new-row editor is saved with the row's `values`. Call `exit()` to close it.",
+  },
+  {
+    name: "onEditingRowCancel",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the user cancels a row edit (Cancel, closing the dialog).",
+  },
+  {
+    name: "onCreatingRowCancel",
+    type: "(props: { table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description: "Called when the user cancels the create form.",
+  },
+  {
+    name: "renderEditRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> & { row: DataTableRow<TData> } ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the edit dialog's content. You get the built-in fields as `internalEditComponents`, plus `save()` / `cancel()`.",
+  },
+  {
+    name: "renderCreateRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the create dialog's content (same props, without `row`).",
+  },
+  {
+    name: "positionCreatingRow",
+    type: '"top" | "bottom" | number',
+    required: false,
+    default: '"top"',
+    description:
+      'Where the inline create row (`createDisplayMode: "row"`) appears: `"top"` (default), `"bottom"`, or a row index on the current page to insert it before (with row virtualization an index means `"top"`).',
   },
   {
     name: "renderRowActions",
-    type: "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content of the row-actions column, replacing the default edit and menu buttons.",
   },
   {
     name: "renderCellActionMenuItems",
-    type: "(props: { cell: Cell<TData, unknown> row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Copy, Edit) the menu shows for this cell. */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "The contents of the right-click menu on each cell (turns the menu on). Include `internalMenuItems` to keep the built-in Copy / Edit items.",
   },
   {
     name: "renderRowActionMenuItems",
-    type: "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Edit, when the row can be edited). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
     description:
-      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically.",
+      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically. While editing is on, the Edit action moves into this menu: include `internalMenuItems` to keep it.",
   },
   {
     name: "renderColumnActionsMenuItems",
-    type: "(props: { column: Column<TData, unknown> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> /** The built-in items (sort, filter, hide, group, pin). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
     description:
-      "Append custom items to the bottom of every column-actions menu. Returns the items (e.g. `<DropdownMenuItem>`); a separator is added before them.",
+      "The contents of every column-actions menu. Return your items (e.g. `<DropdownMenuItem>`) with `internalMenuItems` where the built-in ones should go, or leave it out to replace them.",
   },
   {
     name: "renderColumnFilterModeMenuItems",
-    type: "(props: { column: Column<TData, unknown> modes: FilterMode[] currentMode: FilterMode onSelect: (mode: FilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { column: DataTableColumn<TData, unknown> modes: FilterMode[] currentMode: FilterMode onSelect: (mode: FilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
     description:
@@ -444,7 +651,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "(props: RowEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row is double-clicked. Double-clicks on controls inside the row (edit, expand, pin…) are ignored.",
   },
   {
     name: "onCellClick",
@@ -458,7 +666,8 @@ export const useDataTableOptions: ApiMember[] = [
     type: "(props: CellEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored.",
   },
   {
     name: "enableRowVirtualization",
@@ -474,7 +683,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "false",
     description:
-      "Virtualize columns for very wide tables. Applies fixed column widths and is not combined with column pinning/ordering.",
+      "Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers.",
   },
   {
     name: "estimateRowHeight",
@@ -500,7 +709,7 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "getRowHeight",
-    type: '(row: Row<TData>) => number | "auto" | null',
+    type: '(row: DataTableRow<TData>) => number | "auto" | null',
     required: false,
     default: null,
     description:
@@ -544,14 +753,15 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "true",
     description:
-      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `surfaceClassName`. Default true.",
+      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `slotProps.surface`. Default true.",
   },
   {
     name: "enablePagination",
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Splits rows into pages with pagination controls. Default `true`; turn it off for virtualization or infinite scroll.",
   },
   {
     name: "enableInfiniteScroll",
@@ -676,14 +886,16 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Shows the toolbar above the table (title, search, filters, view options). Default `true`.",
   },
   {
     name: "enableBottomToolbar",
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Shows the toolbar below the table (pagination, custom actions). Default `true`.",
   },
   {
     name: "enableDensityToggle",
@@ -712,18 +924,27 @@ export const useDataTableOptions: ApiMember[] = [
     type: "boolean",
     required: false,
     default: "true",
-    description: "",
+    description:
+      "Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`.",
+  },
+  {
+    name: "enableAnimations",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Animate the table: rows glide when their order changes, fade in and out when they enter or leave the data, detail panels open and close smoothly, and the sort arrow, selection checkboxes and selected count transition. Always off when the user prefers reduced motion. Retime it with the CSS variables `--dt-motion-duration`, `--dt-motion-duration-fast` and `--dt-motion-ease` on the table.",
   },
   {
     name: "title",
     type: "React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Heading shown at the start of the top toolbar.",
   },
   {
-    name: "renderToolbarActions",
-    type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    name: "renderTopToolbarCustomActions",
+    type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
     description:
@@ -773,13 +994,14 @@ export const useDataTableOptions: ApiMember[] = [
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content shown when there are no rows. Defaults to `localization.noRecordsToDisplay`.",
   },
 ]
 
 export const columnOptions: ApiMember[] = [
   {
-    name: "variant",
+    name: "filterVariant",
     type: "FilterVariant",
     required: false,
     default: null,
@@ -787,7 +1009,7 @@ export const columnOptions: ApiMember[] = [
       'Filter UI variant rendered in the filter row. Defaults to "text".',
   },
   {
-    name: "options",
+    name: "filterSelectOptions",
     type: "DataTableFilterOption[]",
     required: false,
     default: null,
@@ -812,7 +1034,7 @@ export const columnOptions: ApiMember[] = [
   },
   {
     name: "renderColumnFilter",
-    type: "(props: { column: Column<TData, TValue> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { column: Column<TFeatures, TData, TValue> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
     description:
@@ -824,15 +1046,15 @@ export const columnOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Restrict (and order) the filter-mode menu for this column to this subset of modes. Include the column's default mode.",
+      "Restrict (and order) the filter-mode menu for this column to this subset of modes (built-in ones and custom `filterFns` names). Include the column's default mode.",
   },
   {
     name: "enableEditing",
-    type: "boolean",
+    type: "boolean | ((row: DataTableRow<TData>) => boolean)",
     required: false,
     default: null,
     description:
-      "Allow editing this column (defaults to true when table editing is on).",
+      "Allow editing this column (defaults to true when table editing is on), or decide per row with a function.",
   },
   {
     name: "editVariant",
@@ -843,10 +1065,11 @@ export const columnOptions: ApiMember[] = [
   },
   {
     name: "editSelectOptions",
-    type: "DataTableFilterOption[]",
+    type: "| DataTableFilterOption[] | ((props: { row?: DataTableRow<TData> column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> }) => DataTableFilterOption[])",
     required: false,
     default: null,
-    description: 'Options for the "select" edit variant.',
+    description:
+      'Options for the "select" edit variant, or a function returning them for the row being edited (`row` is undefined in the create form).',
   },
   {
     name: "renderEditCell",
@@ -854,7 +1077,7 @@ export const columnOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; drive the value via `table.tableInstance` (`rowDraft`/`setRowDraftValue` or `onEditCellSave`).",
+      "Custom inline editor for this column (escape hatch). Replaces the built-in editor while the cell/row is editing; read the draft from `table.getState().rowDraft` and write it with `table.setRowDraftValue` (row editing), or save with `onEditingCellSave` (cell editing).",
   },
   {
     name: "renderGroupedCell",
@@ -890,10 +1113,11 @@ export const columnOptions: ApiMember[] = [
   },
   {
     name: "enableClickToCopy",
-    type: "boolean",
+    type: "ClickToCopyOption<TData>",
     required: false,
     default: null,
-    description: "Show a click-to-copy affordance on this column's cells.",
+    description:
+      'Copy this column\'s cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function.',
   },
   {
     name: "align",
@@ -904,18 +1128,27 @@ export const columnOptions: ApiMember[] = [
       "Horizontal alignment applied to the header label and body cells.",
   },
   {
-    name: "disableHighlight",
+    name: "enableFilterMatchHighlighting",
     type: "boolean",
     required: false,
     default: null,
-    description: "Opt this column out of match highlighting.",
+    description:
+      "`false` opts this column out of match highlighting (the table option of the same name turns it on or off for every column).",
   },
   {
-    name: "disableColumnActions",
+    name: "visibleInShowHideMenu",
     type: "boolean",
     required: false,
     default: null,
-    description: "Hide the column-actions menu for this column.",
+    description:
+      "`false` leaves this column out of the show / hide columns menu.",
+  },
+  {
+    name: "enableColumnActions",
+    type: "boolean",
+    required: false,
+    default: null,
+    description: "`false` hides the column-actions menu for this column.",
   },
   {
     name: "label",
@@ -925,107 +1158,68 @@ export const columnOptions: ApiMember[] = [
     description:
       "Human-readable label for menus when the header is not a plain string.",
   },
+  {
+    name: "slotProps",
+    type: 'Pick< DataTableSlots<TData>, "headCell" | "filterCell" | "bodyCell" | "footerCell" | "editField" >',
+    required: false,
+    default: null,
+    description:
+      "Props for this column's cells, applied after the table's `slotProps` for the same part.",
+  },
 ]
 
-export const tableInstance: ApiMember[] = [
+export const dataTableOptions: ApiMember[] = [
   {
     name: "localization",
     type: "DataTableLocalization",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Text for every label, message and screen-reader string. Partial: missing keys fall back to English (or to `DataTableConfigProvider`). Install a locale item for a full language.",
   },
   {
     name: "icons",
     type: "DataTableIcons",
     required: true,
     default: null,
-    description: "",
+    description: "Override any subset of the table's icons.",
   },
   {
-    name: "density",
-    type: "Density",
+    name: "filterFns",
+    type: "Record<string, DataTableFilterFn<TData>>",
     required: true,
     default: null,
-    description: "",
+    description: "The consumer's own filter functions, by name.",
   },
   {
-    name: "setDensity",
-    type: "React.Dispatch<React.SetStateAction<Density>>",
+    name: "columnFilterModeOptions",
+    type: "FilterMode[] | undefined",
     required: true,
     default: null,
-    description: "",
+    description: "Table-wide filter-mode menu modes, if restricted.",
   },
   {
-    name: "isFullscreen",
-    type: "boolean",
+    name: "globalFilterModeOptions",
+    type: "GlobalFilterMode[]",
     required: true,
     default: null,
-    description: "",
-  },
-  {
-    name: "setIsFullscreen",
-    type: "React.Dispatch<React.SetStateAction<boolean>>",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "showColumnFilters",
-    type: "boolean",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "setShowColumnFilters",
-    type: "React.Dispatch<React.SetStateAction<boolean>>",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "columnFilterModes",
-    type: "Record<string, FilterMode>",
-    required: true,
-    default: null,
-    description: "Active filter mode per column id.",
-  },
-  {
-    name: "setColumnFilterMode",
-    type: "(columnId: string, mode: FilterMode) => void",
-    required: true,
-    default: null,
-    description:
-      "Switch a column's filter mode (resets the value when it becomes invalid).",
-  },
-  {
-    name: "globalFilterMode",
-    type: "GlobalFilterMode",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "setGlobalFilterMode",
-    type: "(mode: GlobalFilterMode) => void",
-    required: true,
-    default: null,
-    description: "",
+    description: "The global search mode menu's modes.",
   },
   {
     name: "enableGlobalFilter",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the expandable global search in the toolbar. Default true.",
   },
   {
     name: "enableGlobalFilterModes",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the global search mode menu (fuzzy/contains/…). Default true.",
   },
   {
     name: "enableAdvancedFilter",
@@ -1036,181 +1230,149 @@ export const tableInstance: ApiMember[] = [
       "Compound AND/OR filter panel (independent of, and additive to, the per-column filters and global search).",
   },
   {
-    name: "advancedFilter",
-    type: "AdvancedFilterGroup",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "setAdvancedFilter",
-    type: "React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "showAdvancedFilterPanel",
-    type: "boolean",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "setShowAdvancedFilterPanel",
-    type: "React.Dispatch<React.SetStateAction<boolean>>",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
     name: "isLoading",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the loading affordances (progress bar; skeletons when empty; a dimming overlay over existing rows). Toggle each independently below.",
   },
   {
     name: "isSaving",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the progress bar for an in-flight save/mutation. Defaults the progress bar on without replacing rows with skeletons.",
   },
   {
     name: "showProgressBars",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Show the top progress bar. Default: `isLoading || isSaving`.",
   },
   {
     name: "showSkeletons",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show skeleton rows while the body is empty. Default: `isLoading`. Passing `true` also covers rows already shown with skeletons (e.g. while refetching), instead of dimming them.",
+  },
+  {
+    name: "showSkeletonsOverRows",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether skeletons also cover rows already shown (`showSkeletons: true` was passed explicitly).",
   },
   {
     name: "showLoadingOverlay",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Dim existing rows with an overlay while loading. Default: `isLoading`.",
   },
   {
     name: "enableFacetedValues",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Compute faceted unique values / min-max (auto select options + range bounds). Default true; disable to skip the faceted row models.",
   },
   {
     name: "enableColumnActions",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Shows the column-actions menu in each header (sort, filter, pin, hide, group…). Default `true`.",
   },
   {
     name: "enableColumnFilters",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Whether per-column filters are on.",
   },
   {
     name: "enableColumnFilterModes",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the filter-mode menu adornment on filter fields. Default true.",
   },
   {
     name: "enableFilterMatchHighlighting",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
-  },
-  {
-    name: "columnsWithCustomCell",
-    type: "ReadonlySet<string>",
-    required: true,
-    default: null,
-    description:
-      "Column ids that supply a custom cell renderer (skipped by auto-highlight).",
+    description: "Highlight matched substrings in cells. Default true.",
   },
   {
     name: "enableColumnOrdering",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Drag-and-drop column reordering (adds a grip to each header).",
   },
   {
     name: "enableColumnPinning",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Column pinning (left/right) via the column-actions menu + sticky columns.",
   },
   {
     name: "enableColumnResizing",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Column resizing via an edge drag handle.",
   },
   {
     name: "enableColumnAutosize",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
-  },
-  {
-    name: "autoSizeColumn",
-    type: "(columnId: string) => void",
-    required: true,
-    default: null,
     description:
-      "Resize a single column to fit its widest visible value (header + data).",
-  },
-  {
-    name: "autoSizeAllColumns",
-    type: "() => void",
-    required: true,
-    default: null,
-    description: "Auto-size every resizable visible column.",
+      "Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead.",
   },
   {
     name: "enableRowOrdering",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Drag-and-drop row reordering (adds a drag-handle column).",
   },
   {
     name: "enableRowPinning",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Row pinning (top) via a pin toggle in the row-number column.",
   },
   {
     name: "enableRowNumbers",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Adds a leading row-number column.",
   },
   {
     name: "rowNumberMode",
     type: '"static" | "original"',
     required: true,
     default: null,
-    description: "",
+    description:
+      '"static" tracks the current view (page-aware); "original" uses source index.',
   },
   {
     name: "onRowOrderChange",
@@ -1225,213 +1387,287 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Row grouping (group-by menu + drop-to-group zone + aggregated group rows).",
   },
   {
     name: "enableExpanding",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Row expansion (tree sub-rows and/or detail panels). Auto-on with grouping or when `renderDetailPanel`/`getSubRows` is provided.",
   },
   {
     name: "enableStickyFooter",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Pin the footer (aggregation/footer cells) to the bottom of the surface. Default false.",
+  },
+  {
+    name: "rowPinningDisplayMode",
+    type: "RowPinningDisplayMode",
+    required: true,
+    default: null,
+    description: "Where pinned rows show and how rows get pinned.",
+  },
+  {
+    name: "enableRowDragging",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether rows have a drag handle for moving them out of the table.",
+  },
+  {
+    name: "onRowDragEnd",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> over: RowDropTarget }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when a row is dropped on another table or a drop zone in the same `DataTableDndProvider`. Move the row in your data.",
+  },
+  {
+    name: "enableTableHead",
+    type: "boolean",
+    required: true,
+    default: null,
+    description: "Whether the header rows render.",
+  },
+  {
+    name: "enableTableFooter",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether the footer rows render (when columns define footers).",
+  },
+  {
+    name: "enableExpandAll",
+    type: "boolean",
+    required: true,
+    default: null,
+    description: "Whether the expand column's header toggles every row.",
   },
   {
     name: "renderDetailPanel",
-    type: "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Render an expanding detail panel for each row.",
   },
   {
     name: "enableEditing",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Whether editing is on (a per-row `enableEditing` function counts).",
+  },
+  {
+    name: "displayColumnDefOptions",
+    type: "| Partial< Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>> > | undefined",
+    required: true,
+    default: null,
+    description:
+      "Overrides for the columns the table adds itself, by id. A new object re-renders the rows, so memoize it when you pass functions.",
+  },
+  {
+    name: "defaultDisplayColumn",
+    type: "Partial<DataTableColumnDef<TData, unknown>> | undefined",
+    required: true,
+    default: null,
+    description: "Overrides for every column the table adds itself.",
+  },
+  {
+    name: "getCanEditRow",
+    type: "(row: DataTableRow<TData>) => boolean",
+    required: true,
+    default: null,
+    description:
+      "Whether a row can be edited: the `enableEditing` function's answer, or `enableEditing` itself.",
   },
   {
     name: "editDisplayMode",
     type: "EditDisplayMode",
     required: true,
     default: null,
-    description: "",
+    description: 'How edits are surfaced. Default "cell".',
   },
   {
     name: "createDisplayMode",
     type: "CreateDisplayMode",
     required: true,
     default: null,
-    description: "",
-  },
-  {
-    name: "editingCell",
-    type: "EditingCell | null",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "setEditingCell",
-    type: "React.Dispatch<React.SetStateAction<EditingCell | null>>",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "editingRowId",
-    type: "string | null",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "isCreating",
-    type: "boolean",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "rowDraft",
-    type: "Record<string, unknown>",
-    required: true,
-    default: null,
     description:
-      "Draft values for the row/modal editor + create form, keyed by column id.",
+      'How the create form is surfaced, independent of `editDisplayMode`: `"modal"` (dialog, default), `"row"` (an inline editable row at the top of the table), or `"custom"` (you render it from `isCreating` + `rowDraft`).',
   },
   {
-    name: "setRowDraftValue",
-    type: "(columnId: string, value: unknown) => void",
-    required: true,
-    default: null,
-    description: "",
-  },
-  {
-    name: "beginRowEdit",
-    type: "(row: Row<TData>) => void",
-    required: true,
-    default: null,
-    description:
-      "Enter row/modal editing for a row, seeding the draft from its values.",
-  },
-  {
-    name: "beginCreate",
+    name: "cancelEditing",
     type: "() => void",
     required: true,
     default: null,
     description:
-      "Open the create form, seeding the draft from `createRowDefaults`.",
+      "Cancel as the user does: calls `onEditingRowCancel` / `onCreatingRowCancel`, then `cancelEdit`.",
   },
   {
-    name: "cancelEdit",
-    type: "() => void",
+    name: "onEditingRowCancel",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description:
+      "Called when the user cancels a row edit (Cancel, closing the dialog).",
+  },
+  {
+    name: "onCreatingRowCancel",
+    type: "(props: { table: DataTableInstance<TData> }) => void",
+    required: false,
+    default: null,
+    description: "Called when the user cancels the create form.",
+  },
+  {
+    name: "renderEditRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> & { row: DataTableRow<TData> } ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the edit dialog's content. You get the built-in fields as `internalEditComponents`, plus `save()` / `cancel()`.",
+  },
+  {
+    name: "renderCreateRowDialogContent",
+    type: "( props: EditDialogContentProps<TData> ) => React.ReactNode",
+    required: false,
+    default: null,
+    description:
+      "Replace the create dialog's content (same props, without `row`).",
+  },
+  {
+    name: "positionCreatingRow",
+    type: '"top" | "bottom" | number',
     required: true,
     default: null,
-    description: "Exit any editing/creating state, discarding the draft.",
+    description:
+      'Where the inline create row (`createDisplayMode: "row"`) appears: `"top"` (default), `"bottom"`, or a row index on the current page to insert it before (with row virtualization an index means `"top"`).',
   },
   {
     name: "enableClickToCopy",
-    type: "boolean",
+    type: "ClickToCopyOption<TData>",
     required: true,
     default: null,
-    description: "",
+    description:
+      'Copy cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function. Per-column override via meta.',
   },
   {
-    name: "onEditCellSave",
-    type: "(props: { row: Row<TData> column: Column<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
+    name: "enableCellActions",
+    type: "boolean | ((cell: DataTableCell<TData, unknown>) => boolean)",
+    required: true,
+    default: null,
+    description:
+      "A right-click menu on each cell with built-in Copy (when click-to-copy is on) and Edit (when the cell is editable) items, or a function deciding per cell. `renderCellActionMenuItems` customizes it. Default false.",
+  },
+  {
+    name: "onEditingCellSave",
+    type: "(props: { row: DataTableRow<TData> column: DataTableColumn<TData, unknown> value: unknown table: DataTableInstance<TData> }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell edit is committed (cell and table editing) with the new `value`. Persist it; the table does not change `data` itself.",
   },
   {
-    name: "onSaveRow",
-    type: "(props: { row: Row<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
+    name: "onEditingRowSave",
+    type: "(props: { row: DataTableRow<TData> values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row edit is saved (row and modal editing) with the edited `values`. Call `exit()` to leave editing, e.g. after the save succeeds.",
   },
   {
-    name: "onCreateRow",
+    name: "onCreatingRowSave",
     type: "(props: { values: Record<string, unknown> table: DataTableInstance<TData> exit: () => void }) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when the new-row editor is saved with the row's `values`. Call `exit()` to close it.",
   },
   {
     name: "renderRowActions",
-    type: "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content of the row-actions column, replacing the default edit and menu buttons.",
   },
   {
     name: "renderCellActionMenuItems",
-    type: "(props: { cell: Cell<TData, unknown> row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { cell: DataTableCell<TData, unknown> row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Copy, Edit) the menu shows for this cell. */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "The contents of the right-click menu on each cell (turns the menu on). Include `internalMenuItems` to keep the built-in Copy / Edit items.",
   },
   {
     name: "renderRowActionMenuItems",
-    type: "(props: { row: Row<TData> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { row: DataTableRow<TData> table: DataTableInstance<TData> /** The built-in items (Edit, when the row can be edited). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Render a kebab menu in the row-actions column. Returns the menu items (e.g. `<DropdownMenuItem>`); injects the actions column automatically. While editing is on, the Edit action moves into this menu: include `internalMenuItems` to keep it.",
   },
   {
     name: "renderColumnActionsMenuItems",
-    type: "(props: { column: Column<TData, unknown> table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { column: DataTableColumn<TData, unknown> table: DataTableInstance<TData> /** The built-in items (sort, filter, hide, group, pin). */ internalMenuItems: React.ReactNode closeMenu: () => void }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "The contents of every column-actions menu. Return your items (e.g. `<DropdownMenuItem>`) with `internalMenuItems` where the built-in ones should go, or leave it out to replace them.",
   },
   {
     name: "renderColumnFilterModeMenuItems",
-    type: "(props: { column: Column<TData, unknown> modes: FilterMode[] currentMode: FilterMode onSelect: (mode: FilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
+    type: "(props: { column: DataTableColumn<TData, unknown> modes: FilterMode[] currentMode: FilterMode onSelect: (mode: FilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the radio items in a column's filter-mode menu. Render your own items and call `onSelect(mode)` to switch; `modes` is the allowed set.",
   },
   {
     name: "renderGlobalFilterModeMenuItems",
     type: "(props: { modes: GlobalFilterMode[] currentMode: GlobalFilterMode onSelect: (mode: GlobalFilterMode) => void table: DataTableInstance<TData> }) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the radio items in the global-search mode menu. Render your own items and call `onSelect(mode)` to switch; `modes` is the allowed set.",
   },
   {
     name: "onRowClick",
     type: "(props: RowEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description: "Fired when a body row is clicked / double-clicked.",
   },
   {
     name: "onRowDoubleClick",
     type: "(props: RowEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a row is double-clicked. Double-clicks on controls inside the row (edit, expand, pin…) are ignored.",
   },
   {
     name: "onCellClick",
     type: "(props: CellEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description: "Fired when a body cell is clicked / double-clicked.",
   },
   {
     name: "onCellDoubleClick",
     type: "(props: CellEvent<TData>) => void",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored.",
   },
   {
     name: "refs",
@@ -1446,28 +1682,30 @@ export const tableInstance: ApiMember[] = [
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD.",
   },
   {
     name: "enableColumnVirtualization",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers.",
   },
   {
     name: "estimateRowHeight",
     type: "number",
     required: true,
     default: null,
-    description: "",
+    description: "Estimated row height (px) for the virtualizer. Default 52.",
   },
   {
     name: "virtualOverscan",
     type: "number",
     required: true,
     default: null,
-    description: "",
+    description: "Extra rows rendered above/below the viewport. Default 8.",
   },
   {
     name: "rowHeight",
@@ -1478,7 +1716,7 @@ export const tableInstance: ApiMember[] = [
   },
   {
     name: "getRowHeight",
-    type: '(row: Row<TData>) => number | "auto" | null',
+    type: '(row: DataTableRow<TData>) => number | "auto" | null',
     required: false,
     default: null,
     description:
@@ -1489,42 +1727,48 @@ export const tableInstance: ApiMember[] = [
     type: "RowVirtualizerOptions<TData>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function.",
   },
   {
     name: "columnVirtualizerOptions",
     type: "ColumnVirtualizerOptions<TData>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function.",
   },
   {
     name: "rowVirtualizerInstanceRef",
     type: "React.RefObject<DataTableRowVirtualizer | null>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`.",
   },
   {
     name: "columnVirtualizerInstanceRef",
     type: "React.RefObject<DataTableColumnVirtualizer | null>",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`.",
   },
   {
     name: "enableStickyHeader",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Pin the header rows to the top of the scrollable surface. Also gives the surface a default viewport-bound max-height (`clamp(350px, 100dvh - 200px, 9999px)`) so tall content scrolls internally; override the bound with `slotProps.surface`. Default true.",
   },
   {
     name: "enablePagination",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Splits rows into pages with pagination controls. Default `true`; turn it off for virtualization or infinite scroll.",
   },
   {
     name: "enableInfiniteScroll",
@@ -1568,147 +1812,304 @@ export const tableInstance: ApiMember[] = [
     type: '"top" | "bottom" | "both" | "none"',
     required: true,
     default: null,
-    description: "",
+    description:
+      'Where the pagination controls render. Default "bottom". "none" keeps pagination active but hides the controls.',
   },
   {
     name: "paginationDisplayMode",
     type: "PaginationDisplayMode",
     required: true,
     default: null,
-    description: "",
+    description:
+      'Pagination control style: `"default"` (range label + first/prev/next/last buttons), `"pages"` (numbered page buttons), or `"custom"` (render your own via `renderBottomToolbarCustomActions`). Default "default".',
+  },
+  {
+    name: "pageSizeOptions",
+    type: "number[]",
+    required: true,
+    default: null,
+    description: "Choices in the rows-per-page select.",
+  },
+  {
+    name: "slotProps",
+    type: "DataTableSlots<TData> | undefined",
+    required: true,
+    default: null,
+    description: "Props for the table's parts; see the `slotProps` option.",
   },
   {
     name: "columnFilterDisplayMode",
     type: "ColumnFilterDisplayMode",
     required: true,
     default: null,
-    description: "",
+    description:
+      'Where column filter inputs live: `"subheader"` (a filter row under the header, default), `"popover"` (per-column popovers opened from the column header), or `"custom"` (you render them).',
   },
   {
     name: "positionGlobalFilter",
     type: '"left" | "right" | "none"',
     required: true,
     default: null,
-    description: "",
+    description:
+      'Which toolbar region the global search renders in. Default "right" (the internal-actions cluster). "left" places it next to the title/actions; "none" hides it (same as `enableGlobalFilter: false`).',
   },
   {
     name: "positionToolbarAlertBanner",
     type: '"top" | "bottom" | "none"',
     required: true,
     default: null,
-    description: "",
+    description: 'Where the row-selection alert banner renders. Default "top".',
   },
   {
     name: "positionToolbarDropZone",
     type: '"top" | "bottom" | "both" | "none"',
     required: true,
     default: null,
-    description: "",
+    description:
+      'Where the group-by drop zone renders (grouping only). Default "top".',
   },
   {
     name: "enableRowSelection",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Whether rows can be selected.",
+  },
+  {
+    name: "enableBatchRowSelection",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Shift-click a row's checkbox to select or clear the range since the last click.",
   },
   {
     name: "enableTopToolbar",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Shows the toolbar above the table (title, search, filters, view options). Default `true`.",
   },
   {
     name: "enableBottomToolbar",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Shows the toolbar below the table (pagination, custom actions). Default `true`.",
   },
   {
     name: "enableDensityToggle",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Show the density toggle in the toolbar. Default true.",
   },
   {
     name: "enableFullscreenToggle",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description: "Show the full-screen toggle in the toolbar. Default true.",
   },
   {
     name: "enableToolbarInternalActions",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control.",
   },
   {
     name: "enableKeyboardNavigation",
     type: "boolean",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`.",
+  },
+  {
+    name: "enableAnimations",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Animate the table: rows glide when their order changes, fade in and out when they enter or leave the data, detail panels open and close smoothly, and the sort arrow, selection checkboxes and selected count transition. Always off when the user prefers reduced motion. Retime it with the CSS variables `--dt-motion-duration`, `--dt-motion-duration-fast` and `--dt-motion-ease` on the table.",
   },
   {
     name: "title",
     type: "React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Heading shown at the start of the top toolbar.",
   },
   {
-    name: "renderToolbarActions",
-    type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
+    name: "renderTopToolbarCustomActions",
+    type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Custom content rendered in the top toolbar's left region (next to the title), e.g. bulk-action buttons.",
   },
   {
     name: "renderTopToolbar",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description: "Replace the entire top toolbar with custom content.",
   },
   {
     name: "renderBottomToolbar",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the entire bottom toolbar (pagination region) with custom content.",
   },
   {
     name: "renderToolbarInternalActions",
     type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Replace the top toolbar's internal icon-action cluster with custom content.",
   },
   {
     name: "renderBottomToolbarCustomActions",
     type: "( props: DataTableSlotProps<TData> ) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Custom content rendered in the bottom toolbar's left region (next to pagination), e.g. summary text or actions.",
   },
   {
     name: "renderCaption",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Render a `<caption>` for the table (e.g. an accessible summary).",
   },
   {
     name: "renderEmpty",
     type: "(props: DataTableSlotProps<TData>) => React.ReactNode",
     required: false,
     default: null,
-    description: "",
+    description:
+      "Content shown when there are no rows. Defaults to `localization.noRecordsToDisplay`.",
+  },
+]
+
+export const tableMethods: ApiMember[] = [
+  {
+    name: "setDensity",
+    type: "React.Dispatch<React.SetStateAction<Density>>",
+    required: true,
+    default: null,
+    description: "Updates `density`.",
+  },
+  {
+    name: "setIsFullscreen",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Updates `isFullscreen`.",
+  },
+  {
+    name: "setShowColumnFilters",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Updates `showColumnFilters`.",
+  },
+  {
+    name: "setShowGlobalFilter",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Open or close the global search box.",
+  },
+  {
+    name: "setColumnFilterMode",
+    type: "(columnId: string, mode: FilterMode) => void",
+    required: true,
+    default: null,
+    description:
+      "Switch a column's filter mode (resets the value when it becomes invalid).",
+  },
+  {
+    name: "setGlobalFilterMode",
+    type: "(mode: GlobalFilterMode) => void",
+    required: true,
+    default: null,
+    description: "Updates `globalFilterMode`.",
+  },
+  {
+    name: "setAdvancedFilter",
+    type: "React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>",
+    required: true,
+    default: null,
+    description: "Updates `advancedFilter`.",
+  },
+  {
+    name: "setShowAdvancedFilterPanel",
+    type: "React.Dispatch<React.SetStateAction<boolean>>",
+    required: true,
+    default: null,
+    description: "Updates `showAdvancedFilterPanel`.",
+  },
+  {
+    name: "autoSizeColumn",
+    type: "(columnId: string) => void",
+    required: true,
+    default: null,
+    description:
+      "Resize a single column to fit its widest visible value (header + data).",
+  },
+  {
+    name: "autoSizeAllColumns",
+    type: "() => void",
+    required: true,
+    default: null,
+    description: "Auto-size every resizable visible column.",
+  },
+  {
+    name: "setEditingCell",
+    type: "React.Dispatch<React.SetStateAction<EditingCell | null>>",
+    required: true,
+    default: null,
+    description: "Updates `editingCell`.",
+  },
+  {
+    name: "setRowDraftValue",
+    type: "(columnId: string, value: unknown) => void",
+    required: true,
+    default: null,
+    description: "Updates `rowDraftValue`.",
+  },
+  {
+    name: "beginRowEdit",
+    type: "(row: DataTableRow<TData>) => void",
+    required: true,
+    default: null,
+    description:
+      "Enter row/modal editing for a row, seeding the draft from its values.",
+  },
+  {
+    name: "beginCreate",
+    type: "() => void",
+    required: true,
+    default: null,
+    description:
+      "Open the create form, seeding the draft from `createRowDefaults`.",
+  },
+  {
+    name: "cancelEdit",
+    type: "() => void",
+    required: true,
+    default: null,
+    description: "Exit any editing/creating state, discarding the draft.",
   },
 ]
 
@@ -1718,26 +2119,19 @@ export const dataTableProps: ApiMember[] = [
     type: "DataTableInstance<TData>",
     required: true,
     default: null,
-    description: "",
-  },
-  {
-    name: "pageSizeOptions",
-    type: "number[]",
-    required: false,
-    default: null,
-    description: "Page-size options for the bottom pagination control.",
-  },
-  {
-    name: "surfaceClassName",
-    type: "string",
-    required: false,
-    default: null,
-    description:
-      "Extra classes for the scrollable table surface (e.g. a max-height that overrides the default sticky-header/virtualization bound).",
+    description: "The instance returned by `useDataTable`.",
   },
 ]
 
 export const localizationKeys: ApiMember[] = [
+  {
+    name: "language",
+    type: "string",
+    required: true,
+    default: "en",
+    description:
+      'BCP 47 tag used to format dates (e.g. "en", "de"). Numbers are formatted by the function keys of each localization, with that file\'s own tag.',
+  },
   {
     name: "selectAll",
     type: "string",
@@ -1764,7 +2158,7 @@ export const localizationKeys: ApiMember[] = [
     type: "(selected: number, total: number) => string",
     required: true,
     default:
-      '(selected, total) => `${selected} of ${total} row${total === 1 ? "" : "s"} selected`',
+      '(selected, total) => `${selected.toLocaleString("en")} of ${total.toLocaleString("en")} row${total === 1 ? "" : "s"} selected`',
     description: "",
   },
   {
@@ -2048,6 +2442,20 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
+    name: "true",
+    type: "string",
+    required: true,
+    default: "True",
+    description: "",
+  },
+  {
+    name: "false",
+    type: "string",
+    required: true,
+    default: "False",
+    description: "",
+  },
+  {
     name: "filterModes",
     type: "Record<string, string>",
     required: true,
@@ -2064,11 +2472,12 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
-    name: "advancedFiltersMatchLabel",
-    type: "string",
+    name: "advancedFiltersMatch",
+    type: "(logic: string) => string",
     required: true,
-    default: "Match",
-    description: "",
+    default: "(logic) => `Match ${logic} of the following rules`",
+    description:
+      'The "Match All/Any of the following rules" sentence; `logic` marks where the All/Any picker goes, so each language can order the words.',
   },
   {
     name: "advancedFiltersMatchAll",
@@ -2082,13 +2491,6 @@ export const localizationKeys: ApiMember[] = [
     type: "string",
     required: true,
     default: "Any",
-    description: "",
-  },
-  {
-    name: "advancedFiltersOf",
-    type: "string",
-    required: true,
-    default: "of the following rules",
     description: "",
   },
   {
@@ -2236,7 +2638,8 @@ export const localizationKeys: ApiMember[] = [
     name: "paginationRange",
     type: "(start: number, end: number, total: number) => string",
     required: true,
-    default: "(start, end, total) => `${start}–${end} of ${total}`",
+    default:
+      '(start, end, total) => `${start.toLocaleString("en")}–${end.toLocaleString("en")} of ${total.toLocaleString("en")}`',
     description: "",
   },
   {
@@ -2271,7 +2674,7 @@ export const localizationKeys: ApiMember[] = [
     name: "goToPage",
     type: "(page: number) => string",
     required: true,
-    default: "(page) => `Go to page ${page}`",
+    default: '(page) => `Go to page ${page.toLocaleString("en")}`',
     description: "",
   },
   {
@@ -2366,6 +2769,22 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
+    name: "noResultsFound",
+    type: "string",
+    required: true,
+    default: "No results found",
+    description:
+      "Shown instead of `noRecordsToDisplay` when filters or the search hide every row.",
+  },
+  {
+    name: "aggregationFns",
+    type: "Record<string, string>",
+    required: false,
+    default: null,
+    description:
+      'Labels for aggregation function names, shown when a column lists several (`aggregationFn: ["sum", "mean"]`). Merged with the English defaults by key; unknown names show as written.',
+  },
+  {
     name: "loading",
     type: "string",
     required: true,
@@ -2379,6 +2798,49 @@ export const localizationKeys: ApiMember[] = [
     default: "Loading more…",
     description: "",
   },
+  {
+    name: "dragStart",
+    type: "(label: string) => string",
+    required: true,
+    default: "(label) => `Picked up ${label}.`",
+    description: "",
+  },
+  {
+    name: "dragOver",
+    type: "(label: string, over: string) => string",
+    required: true,
+    default: "(label, over) => `${label} is over ${over}.`",
+    description: "",
+  },
+  {
+    name: "dragEnd",
+    type: "(label: string, over: string) => string",
+    required: true,
+    default: "(label, over) => `${label} was dropped on ${over}.`",
+    description: "",
+  },
+  {
+    name: "dragCancel",
+    type: "(label: string) => string",
+    required: true,
+    default: "(label) => `Dragging was cancelled. ${label} was dropped.`",
+    description: "",
+  },
+  {
+    name: "dragInstructions",
+    type: "string",
+    required: true,
+    default:
+      "To pick up an item, press space or enter. While dragging, use the arrow keys to move it. Press space or enter again to drop it, or press escape to cancel.",
+    description: "",
+  },
+  {
+    name: "dragRowLabel",
+    type: "(position: number) => string",
+    required: true,
+    default: '(position) => `Row ${position.toLocaleString("en")}`',
+    description: "",
+  },
 ]
 
 export const iconSlots: ApiMember[] = [
@@ -2387,42 +2849,43 @@ export const iconSlots: ApiMember[] = [
     type: "IconComponent",
     required: true,
     default: "ArrowUp",
-    description: "",
+    description: "Header sort indicator: sorted ascending.",
   },
   {
     name: "sortDescending",
     type: "IconComponent",
     required: true,
     default: "ArrowDown",
-    description: "",
+    description: "Header sort indicator: sorted descending.",
   },
   {
     name: "sortUnsorted",
     type: "IconComponent",
     required: true,
     default: "ChevronsUpDown",
-    description: "",
+    description: "Header sort indicator: sortable but not sorted.",
   },
   {
     name: "columnActions",
     type: "IconComponent",
     required: true,
     default: "MoreVertical",
-    description: "",
+    description: "Column-actions menu trigger in each header.",
   },
   {
     name: "filter",
     type: "IconComponent",
     required: true,
     default: "Filter",
-    description: "",
+    description: "Filter toggle and filter menu items.",
   },
   {
     name: "filterOff",
     type: "IconComponent",
     required: true,
     default: "FilterX",
-    description: "",
+    description:
+      "Hide-filters state of the filter toggle and clear-filter items.",
   },
   {
     name: "advancedFilter",
@@ -2436,161 +2899,218 @@ export const iconSlots: ApiMember[] = [
     type: "IconComponent",
     required: true,
     default: "RotateCcw",
-    description: "Clear-sort / show-all reset action.",
+    description: "Show-all-columns reset action in the column menu.",
+  },
+  {
+    name: "clearSort",
+    type: "IconComponent",
+    required: true,
+    default: "ListX",
+    description:
+      "Clear-sort item in the column menu. When not overridden but `clearAll` is, it uses your `clearAll`.",
+  },
+  {
+    name: "clearFilter",
+    type: "IconComponent",
+    required: true,
+    default: "FilterX",
+    description:
+      "Clear-filter item in the column menu. When not overridden but `filterOff` is, it uses your `filterOff`.",
   },
   {
     name: "hide",
     type: "IconComponent",
     required: true,
     default: "EyeOff",
-    description: "",
+    description: "Hide-column menu item.",
   },
   {
     name: "pin",
     type: "IconComponent",
     required: true,
     default: "Pin",
-    description: "",
+    description:
+      "Generic pin glyph. Any of `pinLeft`, `pinRight`, `pinTop` and `pinBottom` you don't override falls back to this one, unrotated.",
+  },
+  {
+    name: "pinLeft",
+    type: "IconComponent",
+    required: true,
+    default: "PinLeft",
+    description:
+      "Pin-column-to-the-left menu item. The default needle points left.",
+  },
+  {
+    name: "pinRight",
+    type: "IconComponent",
+    required: true,
+    default: "PinRight",
+    description:
+      "Pin-column-to-the-right menu item. The default needle points right.",
+  },
+  {
+    name: "pinTop",
+    type: "IconComponent",
+    required: true,
+    default: "Pin",
+    description:
+      "Pin-row-to-the-top button while the row is unpinned. The default is the plain pin.",
+  },
+  {
+    name: "pinBottom",
+    type: "IconComponent",
+    required: true,
+    default: "Pin",
+    description:
+      'Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default is the plain pin.',
   },
   {
     name: "pinnedRow",
     type: "IconComponent",
     required: true,
     default: "Pin",
-    description: "",
+    description: "Shown on a pinned row's pin button.",
   },
   {
     name: "unpin",
     type: "IconComponent",
     required: true,
     default: "PinOff",
-    description: "",
+    description: "Unpin column and unpin row actions.",
   },
   {
     name: "group",
     type: "IconComponent",
     required: true,
     default: "Group",
-    description: "",
+    description: "Group-by menu item and grouping chips.",
   },
   {
     name: "columnVisibility",
     type: "IconComponent",
     required: true,
     default: "Columns3",
-    description: "",
+    description: "Column-visibility (show/hide columns) toolbar button.",
   },
   {
     name: "density",
     type: "IconComponent",
     required: true,
     default: "Rows3",
-    description: "",
+    description: "Density toggle toolbar button.",
   },
   {
     name: "fullscreenEnter",
     type: "IconComponent",
     required: true,
     default: "Maximize2",
-    description: "",
+    description: "Full-screen toggle while not full screen.",
   },
   {
     name: "fullscreenExit",
     type: "IconComponent",
     required: true,
     default: "Minimize2",
-    description: "",
+    description: "Full-screen toggle while full screen.",
   },
   {
     name: "search",
     type: "IconComponent",
     required: true,
     default: "Search",
-    description: "",
+    description: "Global search button and search-mode menu.",
   },
   {
     name: "clear",
     type: "IconComponent",
     required: true,
     default: "X",
-    description: "",
+    description: "Clear buttons (search box, filter inputs, grouping chips).",
   },
   {
     name: "pageFirst",
     type: "IconComponent",
     required: true,
     default: "ChevronsLeft",
-    description: "",
+    description: "Pagination: first page. Mirrored in right-to-left tables.",
   },
   {
     name: "pagePrev",
     type: "IconComponent",
     required: true,
     default: "ChevronLeft",
-    description: "",
+    description: "Pagination: previous page. Mirrored in right-to-left tables.",
   },
   {
     name: "pageNext",
     type: "IconComponent",
     required: true,
     default: "ChevronRight",
-    description: "",
+    description: "Pagination: next page. Mirrored in right-to-left tables.",
   },
   {
     name: "pageLast",
     type: "IconComponent",
     required: true,
     default: "ChevronsRight",
-    description: "",
+    description: "Pagination: last page. Mirrored in right-to-left tables.",
   },
   {
     name: "expanded",
     type: "IconComponent",
     required: true,
     default: "ChevronDown",
-    description: "",
+    description: "Expand control of an expanded row or group.",
   },
   {
     name: "collapsed",
     type: "IconComponent",
     required: true,
     default: "ChevronRight",
-    description: "",
+    description:
+      "Expand control of a collapsed row or group. Mirrored in right-to-left tables.",
   },
   {
     name: "dragHandle",
     type: "IconComponent",
     required: true,
     default: "GripVertical",
-    description: "",
+    description: "Drag grip for column and row reordering.",
   },
   {
     name: "edit",
     type: "IconComponent",
     required: true,
     default: "Pencil",
-    description: "",
+    description: "Edit row / edit cell action.",
+  },
+  {
+    name: "copy",
+    type: "IconComponent",
+    required: true,
+    default: "Copy",
+    description: "Copy action in the cell menu.",
   },
   {
     name: "save",
     type: "IconComponent",
     required: true,
     default: "Check",
-    description: "",
+    description: "Save action while editing a row.",
   },
   {
     name: "cancel",
     type: "IconComponent",
     required: true,
     default: "X",
-    description: "",
+    description: "Cancel action while editing a row.",
   },
   {
     name: "calendar",
     type: "IconComponent",
     required: true,
     default: "Calendar",
-    description: "",
+    description: "Date filter field trigger.",
   },
 ]
 
@@ -2682,18 +3202,52 @@ export const slots: ApiMember[] = [
     description: 'Inline create row (createDisplayMode: "row").',
   },
   {
+    name: "data-table-drag-preview",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Floating preview of a row dragged inside a DataTableDndProvider.",
+  },
+  {
+    name: "data-table-group-zone",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Grouping drop zone above or below the table (animated in and out).",
+  },
+  {
     name: "data-table-infinite-loader",
     type: "",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Loading-more indicator shown while infinite scroll fetches the next rows.",
   },
   {
     name: "data-table-infinite-sentinel",
     type: "",
     required: true,
     default: null,
-    description: "",
+    description:
+      "Invisible marker after the last row; infinite scroll loads more when it nears the viewport.",
+  },
+  {
+    name: "data-table-leave-copy",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Copy of a removed row that fades out inside `data-table-motion-layer` (only when animations are on).",
+  },
+  {
+    name: "data-table-motion-layer",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Invisible overlay inside the surface where row enter and leave animations play (only when animations are on).",
   },
   {
     name: "data-table-pagination",
@@ -2714,7 +3268,38 @@ export const slots: ApiMember[] = [
     type: "",
     required: true,
     default: null,
-    description: "",
+    description: "The moving bar inside `data-table-progress`.",
+  },
+  {
+    name: "data-table-search",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "The global search box beside the search button (slides out of it and back in).",
+  },
+  {
+    name: "data-table-selected-count",
+    type: "",
+    required: true,
+    default: null,
+    description: 'The "N selected" text in the selection alert banner.',
+  },
+  {
+    name: "data-table-selected-count-previous",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Short-lived copy of the previous selected count that fades out over the new one (only when animations are on).",
+  },
+  {
+    name: "data-table-sort-indicator",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "The sort arrow in a column header; it turns around for descending order.",
   },
   {
     name: "data-table-surface",
@@ -2737,5 +3322,173 @@ export const slots: ApiMember[] = [
     default: null,
     description:
       "Internal actions cluster (search, filters, density, full screen, …).",
+  },
+]
+
+export const slotParts: ApiMember[] = [
+  {
+    name: "root",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description:
+      "The outer wrapper (`<DataTable>`'s own props also land here).",
+  },
+  {
+    name: "surface",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description:
+      "The scroll container around the table. Bound its height here.",
+  },
+  {
+    name: "table",
+    type: "<table> props · { table }",
+    required: false,
+    default: null,
+    description: "The `<table>` element.",
+  },
+  {
+    name: "head",
+    type: "<thead> props · { table }",
+    required: false,
+    default: null,
+    description: "`<thead>`.",
+  },
+  {
+    name: "headRow",
+    type: "<tr> props · { headerGroup, table }",
+    required: false,
+    default: null,
+    description: "Each header row.",
+  },
+  {
+    name: "headCell",
+    type: "<th> props · { header, column, table }",
+    required: false,
+    default: null,
+    description: "Each header cell.",
+  },
+  {
+    name: "filterCell",
+    type: "<th> props · { header, column, table }",
+    required: false,
+    default: null,
+    description: "Each cell of the column filter row.",
+  },
+  {
+    name: "body",
+    type: "<tbody> props · { table }",
+    required: false,
+    default: null,
+    description: "`<tbody>`.",
+  },
+  {
+    name: "bodyRow",
+    type: "<tr> props · { row, rowIndex, table }",
+    required: false,
+    default: null,
+    description: "Each body row.",
+  },
+  {
+    name: "bodyCell",
+    type: "<td> props · { cell, row, column, table }",
+    required: false,
+    default: null,
+    description: "Each body cell.",
+  },
+  {
+    name: "detailPanel",
+    type: "<td> props · { row, table }",
+    required: false,
+    default: null,
+    description: "The cell holding an expanded row's detail panel.",
+  },
+  {
+    name: "footer",
+    type: "<tfoot> props · { table }",
+    required: false,
+    default: null,
+    description: "`<tfoot>`.",
+  },
+  {
+    name: "footerRow",
+    type: "<tr> props · { footerGroup, table }",
+    required: false,
+    default: null,
+    description: "Each footer row.",
+  },
+  {
+    name: "footerCell",
+    type: "<td> props · { header, column, table }",
+    required: false,
+    default: null,
+    description: "Each footer cell.",
+  },
+  {
+    name: "topToolbar",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The toolbar above the table.",
+  },
+  {
+    name: "bottomToolbar",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The toolbar below the table.",
+  },
+  {
+    name: "pagination",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The pagination controls.",
+  },
+  {
+    name: "alertBanner",
+    type: "<div> props · { table }",
+    required: false,
+    default: null,
+    description: "The selection banner.",
+  },
+  {
+    name: "searchInput",
+    type: "<input> props · { table }",
+    required: false,
+    default: null,
+    description: "The global search input.",
+  },
+  {
+    name: "editField",
+    type: "<input> props · { column, row?, table }",
+    required: false,
+    default: null,
+    description:
+      "Each inline / dialog edit field (the input, or the select's trigger).",
+  },
+  {
+    name: "editDialog",
+    type: "<div> props · { row?, isCreating, table }",
+    required: false,
+    default: null,
+    description: "The edit / create dialog's content.",
+  },
+  {
+    name: "skeleton",
+    type: "<div> props · { column, rowIndex, table }",
+    required: false,
+    default: null,
+    description: "Each loading skeleton (bar or square) in a body cell.",
+  },
+  {
+    name: "selectCheckbox",
+    type: "<button> props · { row?, table }",
+    required: false,
+    default: null,
+    description:
+      "Each row selection checkbox (and the select-all one, without `row`).",
   },
 ]

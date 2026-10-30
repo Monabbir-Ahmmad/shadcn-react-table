@@ -5,6 +5,7 @@
 //   node apps/web/scripts/build-api-docs.mjs
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
+import process from "node:process"
 import { fileURLToPath } from "node:url"
 import prettier from "prettier"
 import { Project, SyntaxKind } from "ts-morph"
@@ -88,7 +89,7 @@ const optionDefaults = destructureDefaults(
 )
 const useDataTableOptions = membersOf(
   typesSf.getInterfaceOrThrow("UseDataTableOptions"),
-  { defaults: optionDefaults, omit: ["getCoreRowModel"] }
+  { defaults: optionDefaults, omit: [] }
 )
 
 // --- Column options (the ColumnMeta augmentation)
@@ -97,8 +98,40 @@ const colMetaModule = typesSf
   .find((m) => m.getName().includes("@tanstack/react-table"))
 const columnOptions = membersOf(colMetaModule.getInterfaceOrThrow("ColumnMeta"))
 
-// --- Table instance API (table.tableInstance = DataTableConfig)
-const tableInstance = membersOf(typesSf.getInterfaceOrThrow("DataTableConfig"))
+// --- `table.dataTable` (resolved options) and the methods on `table`, both
+// from `DataTableConfig`: its key unions in types.ts say which members are
+// methods, UI state (read with `getState()`) or internal. Most members are the
+// resolved form of a same-named option, so an undocumented member borrows
+// that option's description; `setX` setters describe themselves.
+const keyUnion = (name) =>
+  typesSf
+    .getTypeAliasOrThrow(name)
+    .getTypeNodeOrThrow()
+    .getText()
+    .match(/"(\w+)"/g)
+    .map((s) => s.slice(1, -1))
+const methodKeys = new Set(keyUnion("DataTableMethodKey"))
+const hiddenKeys = new Set([
+  ...keyUnion("DataTableUiStateKey"),
+  ...keyUnion("DataTableInternalKey"),
+])
+const optionDescriptions = Object.fromEntries(
+  useDataTableOptions.map((o) => [o.name, o.description])
+)
+const configMembers = membersOf(
+  typesSf.getInterfaceOrThrow("DataTableConfig")
+).map((member) => {
+  if (member.description) return member
+  const setter = /^set([A-Z]\w*)$/.exec(member.name)
+  const description = setter
+    ? `Updates \`${setter[1][0].toLowerCase()}${setter[1].slice(1)}\`.`
+    : (optionDescriptions[member.name] ?? "")
+  return { ...member, description }
+})
+const dataTableOptions = configMembers.filter(
+  (m) => !methodKeys.has(m.name) && !hiddenKeys.has(m.name)
+)
+const tableMethods = configMembers.filter((m) => methodKeys.has(m.name))
 
 // --- <DataTable /> component props
 const dataTableProps = membersOf(
@@ -141,8 +174,29 @@ const iconSlots = iconsSf
     description: describe(p),
   }))
 
-// --- Instance refs (table.tableInstance.refs = DataTableRefs)
+// --- Instance refs (table.dataTable.refs = DataTableRefs)
 const tableRefs = membersOf(typesSf.getInterfaceOrThrow("DataTableRefs"))
+
+// --- slotProps parts (DataTableSlots): the element each one reaches and the
+// context a function form receives.
+const slotParts = typesSf
+  .getInterfaceOrThrow("DataTableSlots")
+  .getProperties()
+  .map((p) => {
+    const text = oneLine(p.getTypeNode().getText())
+    const element = text.match(/ComponentProps<"(\w+)">/)?.[1]
+    const ctx = text.match(/WithTable<\s*TData,\s*\{(.*)\}\s*>/)?.[1]
+    const keys = ctx
+      ? [...ctx.matchAll(/(\w+)(\?)?:/g)].map((m) => m[1] + (m[2] ?? ""))
+      : []
+    return {
+      name: p.getName(),
+      type: `<${element}> props · { ${[...keys, "table"].join(", ")} }`,
+      required: false,
+      default: null,
+      description: describe(p),
+    }
+  })
 
 // --- Structural `data-slot` attributes (scanned from the component source so
 // the list can't drift). Descriptions are curated here since the source can't
@@ -150,8 +204,23 @@ const tableRefs = membersOf(typesSf.getInterfaceOrThrow("DataTableRefs"))
 const SLOT_DESCRIPTIONS = {
   "data-table": "Outermost wrapper element.",
   "data-table-surface": "The scroll container for the table (both axes).",
+  "data-table-motion-layer":
+    "Invisible overlay inside the surface where row enter and leave animations play (only when animations are on).",
+  "data-table-leave-copy":
+    "Copy of a removed row that fades out inside `data-table-motion-layer` (only when animations are on).",
+  "data-table-sort-indicator":
+    "The sort arrow in a column header; it turns around for descending order.",
+  "data-table-selected-count":
+    'The "N selected" text in the selection alert banner.',
+  "data-table-selected-count-previous":
+    "Short-lived copy of the previous selected count that fades out over the new one (only when animations are on).",
   "data-table-progress":
     "Indeterminate progress bar shown while loading or saving.",
+  "data-table-progress-bar": "The moving bar inside `data-table-progress`.",
+  "data-table-infinite-sentinel":
+    "Invisible marker after the last row; infinite scroll loads more when it nears the viewport.",
+  "data-table-infinite-loader":
+    "Loading-more indicator shown while infinite scroll fetches the next rows.",
   "data-table-toolbar": "Top toolbar root.",
   "data-table-toolbar-actions":
     "Internal actions cluster (search, filters, density, full screen, …).",
@@ -160,23 +229,36 @@ const SLOT_DESCRIPTIONS = {
     "Bottom toolbar (custom actions and/or pagination).",
   "data-table-pagination": "Pagination controls.",
   "data-table-create-row": 'Inline create row (createDisplayMode: "row").',
+  "data-table-drag-preview":
+    "Floating preview of a row dragged inside a DataTableDndProvider.",
+  "data-table-group-zone":
+    "Grouping drop zone above or below the table (animated in and out).",
+  "data-table-search":
+    "The global search box beside the search button (slides out of it and back in).",
 }
 const slotValues = new Set()
-// data-slot markers live in .tsx files spread across the feature subfolders, so
+// data-slot markers live in .ts/.tsx files spread across the feature subfolders, so
 // walk the tree rather than just the top level.
 function walkTsx(dir) {
   const out = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name)
     if (entry.isDirectory()) out.push(...walkTsx(abs))
-    else if (entry.name.endsWith(".tsx")) out.push(abs)
+    else if (/\.tsx?$/.test(entry.name)) out.push(abs)
   }
   return out
 }
-for (const file of walkTsx(DT)) {
+// Source only (tests query slots too): a JSX attribute (data-slot="…"), an
+// object key ("data-slot": "…"), a setAttribute("data-slot", "…") call, or a
+// `*_SLOT` constant.
+const SLOT_PATTERNS = [
+  /data-slot"?\s*[=:,]\s*"(data-table[^"]*)"/g,
+  /_SLOT\s*=\s*"(data-table[^"]*)"/g,
+]
+for (const file of walkTsx(DT).filter((f) => !/\.test\.tsx?$/.test(f))) {
   const text = readFileSync(file, "utf8")
-  for (const m of text.matchAll(/data-slot="(data-table[^"]*)"/g)) {
-    slotValues.add(m[1])
+  for (const pattern of SLOT_PATTERNS) {
+    for (const m of text.matchAll(pattern)) slotValues.add(m[1])
   }
 }
 const slots = [...slotValues].sort().map((name) => ({
@@ -202,18 +284,45 @@ const body =
   [
     ["useDataTableOptions", useDataTableOptions],
     ["columnOptions", columnOptions],
-    ["tableInstance", tableInstance],
+    ["dataTableOptions", dataTableOptions],
+    ["tableMethods", tableMethods],
     ["dataTableProps", dataTableProps],
     ["localizationKeys", localizationKeys],
     ["iconSlots", iconSlots],
     ["tableRefs", tableRefs],
     ["slots", slots],
+    ["slotParts", slotParts],
   ]
     .map(
       ([name, rows]) =>
         `export const ${name}: ApiMember[] = ${JSON.stringify(rows, null, 2)}\n`
     )
     .join("\n")
+
+// Every documented member needs a description, so a new option cannot ship
+// without one. Localization keys are exempt: their table shows each key's
+// English text, which says what it is.
+const undocumented = [
+  ["useDataTable option", useDataTableOptions],
+  ["column option", columnOptions],
+  ["dataTable member", dataTableOptions],
+  ["table method", tableMethods],
+  ["DataTable prop", dataTableProps],
+  ["icon slot", iconSlots],
+  ["ref", tableRefs],
+  ["data-slot", slots],
+  ["slotProps part", slotParts],
+].flatMap(([kind, rows]) =>
+  rows.filter((row) => !row.description).map((row) => `${kind} ${row.name}`)
+)
+if (undocumented.length > 0) {
+  console.error(
+    `api reference: ${undocumented.length} without a description ` +
+      `(add a JSDoc comment, or a SLOT_DESCRIPTIONS entry):\n  ` +
+      undocumented.join("\n  ")
+  )
+  process.exit(1)
+}
 
 mkdirSync(dirname(OUT), { recursive: true })
 // Normalize CRLF that JSON.stringify escaped into the string literals when
@@ -232,7 +341,8 @@ writeFileSync(OUT, formatted)
 console.log(
   `api reference built → apps/web/lib/api-reference.generated.ts ` +
     `(options ${useDataTableOptions.length}, column ${columnOptions.length}, ` +
-    `instance ${tableInstance.length}, props ${dataTableProps.length}, ` +
+    `dataTable ${dataTableOptions.length}, methods ${tableMethods.length}, ` +
+    `props ${dataTableProps.length}, ` +
     `localization ${localizationKeys.length}, icons ${iconSlots.length}, ` +
     `refs ${tableRefs.length}, slots ${slots.length})`
 )

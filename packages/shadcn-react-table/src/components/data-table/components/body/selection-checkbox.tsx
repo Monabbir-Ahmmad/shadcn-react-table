@@ -3,6 +3,30 @@
 import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
+import { MOTION_TIMING_CLASS } from "../../core/motion"
+import { mergeProps } from "../../helpers/slot-props"
+
+/**
+ * A glyph path that draws itself in (stroke-dashoffset 1 → 0 over a
+ * `pathLength` of 1). Only showing transitions; hiding is instant.
+ */
+function GlyphPath({ d, shown }: { d: string; shown: boolean }) {
+  return (
+    <path
+      d={d}
+      pathLength={1}
+      strokeDasharray={1}
+      className={
+        shown
+          ? cn(
+              "transition-[stroke-dashoffset] [stroke-dashoffset:0]",
+              MOTION_TIMING_CLASS
+            )
+          : "opacity-0 [stroke-dashoffset:1]"
+      }
+    />
+  )
+}
 
 interface SelectionCheckboxProps extends Omit<
   React.ComponentProps<"button">,
@@ -10,7 +34,13 @@ interface SelectionCheckboxProps extends Omit<
 > {
   checked?: boolean
   indeterminate?: boolean
-  onCheckedChange?: (checked: boolean) => void
+  /** Called with the new value and the click (for its modifier keys). */
+  onCheckedChange?: (
+    checked: boolean,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => void
+  /** A radio button (single-row selection) instead of a checkbox. */
+  variant?: "checkbox" | "radio"
 }
 
 /**
@@ -32,26 +62,42 @@ function SelectionCheckbox({
   indeterminate = false,
   checked = false,
   onCheckedChange,
+  variant = "checkbox",
   ...props
 }: SelectionCheckboxProps) {
   const active = checked || indeterminate
+  const radio = variant === "radio"
   return (
     <button
-      type="button"
-      role="checkbox"
-      data-slot="checkbox"
-      aria-checked={indeterminate ? "mixed" : checked}
-      onClick={() => onCheckedChange?.(!checked)}
-      className={cn(
-        "peer relative flex size-4.5 shrink-0 items-center justify-center rounded-none border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-input",
-        className
+      {...mergeProps(
+        {
+          type: "button",
+          role: radio ? "radio" : "checkbox",
+          "data-slot": radio ? "radio" : "checkbox",
+          "aria-checked": indeterminate ? "mixed" : checked,
+          // A radio only ever selects; another row's radio moves it.
+          onClick: (event: React.MouseEvent<HTMLButtonElement>) =>
+            onCheckedChange?.(radio ? true : !checked, event),
+          className: cn(
+            "peer relative flex size-4.5 shrink-0 items-center justify-center border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
+            radio ? "rounded-full" : "rounded-none",
+            active && !radio
+              ? "border-primary bg-primary text-primary-foreground"
+              : active
+                ? "border-primary text-primary"
+                : "border-input"
+          ),
+        } as React.ComponentProps<"button">,
+        { ...props, className }
       )}
-      {...props}
     >
-      {active && (
+      {active && radio && (
+        <span aria-hidden="true" className="size-2 rounded-full bg-current" />
+      )}
+      {!radio && (
+        // Always mounted (hidden while unchecked) so checking transitions it
+        // in when the table animates — never on mount, e.g. a row scrolled
+        // into a virtual window or a leaving row's copy.
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -59,10 +105,20 @@ function SelectionCheckbox({
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="size-3.5"
+          data-shown={active ? "" : undefined}
+          className={cn(
+            "size-3.5",
+            active
+              ? cn(
+                  "scale-100 opacity-100 transition-[opacity,scale]",
+                  MOTION_TIMING_CLASS
+                )
+              : "invisible scale-75 opacity-0"
+          )}
           aria-hidden="true"
         >
-          {indeterminate ? <path d="M5 12h14" /> : <path d="M20 6 9 17l-5-5" />}
+          <GlyphPath d="M20 6 9 17l-5-5" shown={checked && !indeterminate} />
+          <GlyphPath d="M5 12h14" shown={indeterminate} />
         </svg>
       )}
     </button>

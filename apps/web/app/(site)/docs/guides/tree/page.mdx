@@ -1,0 +1,59 @@
+export const metadata = { title: "Tree data" }
+
+# Tree data
+
+For hierarchical data, provide TanStack Table's `getSubRows` to tell the table where each row's children live. Expansion turns on automatically.
+
+<Example slug="tree" />
+
+## Usage
+
+Return the children array from each row. Set `initialState.expanded: true` to start fully expanded, and usually disable pagination so the tree isn't split across pages.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  getSubRows: (row) => row.subRows,
+  enablePagination: false,
+  initialState: {
+    expanded: true,
+  },
+})
+
+return <DataTable table={table} />
+```
+
+<Callout variant="tip" title="Indentation">
+Use `row.depth` inside a cell renderer to indent child rows so the hierarchy reads clearly.
+</Callout>
+
+## From a flat list
+
+APIs often return trees as a flat list with parent ids. Build `subRows` once with `useMemo` and pass `getSubRows` as usual.
+
+<Example slug="tree-from-flat" />
+
+## Loading children on expand
+
+Let rows expand before their children exist with TanStack's `getRowCanExpand`, and load the children when the row expands (control `expanded` and watch it in `onExpandedChange`).
+
+<Example slug="lazy-sub-rows" />
+
+## Editing tree rows
+
+Editing works at any depth: `onEditingRowSave` gets the row, and you update the matching node in your nested data.
+
+<Example slug="editing-tree" />
+
+## Expand-all toggle
+
+The expand column's header toggles every row. Hide it with `enableExpandAll: false`.
+
+## Related
+
+<Cards>
+  <Card href="/docs/guides/detail-panel" title="Detail panel" />
+  <Card href="/docs/guides/grouping" title="Grouping & aggregation" />
+</Cards>

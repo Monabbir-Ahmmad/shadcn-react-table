@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { Header, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
@@ -9,13 +9,22 @@ import { Button } from "@workspace/ui/components/button"
 import { TableHead } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { getSlotProps, mergeProps } from "../../../helpers/slot-props"
+
 import {
   getColumnPinningClass,
   getColumnPinningStyle,
 } from "../../../utils/column-styles"
 import type { IconComponent } from "../../../core/icons"
 import type { DataTableInstance } from "../../../core/types"
+import { getPinSide } from "../../../helpers/column-pinning"
 import { ColumnResizeHandle } from "./column-resize-handle"
+import type {
+  DataTableColumn,
+  DataTableHeader,
+} from "../../../core/table-types"
+import { setColumnDragVars } from "../../../utils/column-styles"
+import { DndKeyContext, useDndId } from "../../../core/dnd-scope"
 
 /** dnd-kit activator props for the current column's drag handle. */
 export interface ColumnDragHandleProps {
@@ -43,39 +52,91 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
   resizable,
   widthStyle,
   padding,
+  colSpan = header.colSpan,
   children,
 }: {
-  header: Header<TData, TValue>
+  header: DataTableHeader<TData, TValue>
   table: DataTableInstance<TData>
   draggable: boolean
   resizable: boolean
   widthStyle: React.CSSProperties
   padding: string
+  /** Overrides `header.colSpan` (column virtualization renders part of a group). */
+  colSpan?: number
   children: React.ReactNode
 }) {
   const column = header.column
+  const tableKey = React.useContext(DndKeyContext)
+  const dndId = useDndId()
   const {
     attributes,
     listeners,
     setNodeRef,
     setActivatorNodeRef,
     transform,
+    transition: sortTransition,
     isDragging,
   } = useSortable({
-    id: column.id,
+    id: dndId(column.id),
     disabled: !draggable,
-    data: { type: "column" },
+    data: { type: "column", tableKey, columnId: column.id },
   })
 
+  // While a column is dragged, its header follows the pointer and the others
+  // slide aside; the same offsets go to CSS variables on the scroll surface so
+  // the body, filter and footer cells move with their headers (no row
+  // re-renders). Reduced motion: no slide animation.
+  const offsetX = transform?.x ?? 0
+  // The surface is found from this cell, not from `refs.tableContainerRef`,
+  // which is briefly detached while the table commits a re-render.
+  const cellRef = React.useRef<HTMLTableCellElement | null>(null)
+  const setCellRef = React.useCallback(
+    (node: HTMLTableCellElement | null) => {
+      cellRef.current = node
+      setNodeRef(node)
+    },
+    [setNodeRef]
+  )
+  const surfaceOf = () =>
+    cellRef.current?.closest<HTMLElement>('[data-slot="data-table-surface"]')
+  const written = React.useRef("0:false")
+  React.useLayoutEffect(() => {
+    const surface = surfaceOf()
+    const key = `${offsetX}:${isDragging}`
+    if (!surface || written.current === key) return
+    written.current = key
+    setColumnDragVars(
+      surface,
+      column.id,
+      offsetX,
+      isDragging,
+      !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    )
+  })
+  React.useEffect(() => {
+    const surface = surfaceOf()
+    return () => {
+      if (surface) setColumnDragVars(surface, column.id, 0, false, false)
+    }
+    // Clean up once, when the column's header goes away.
+  }, [column.id])
+
+  const pinningStyle = getColumnPinningStyle(column)
   const style: React.CSSProperties = {
     ...widthStyle,
-    ...getColumnPinningStyle(column),
+    ...pinningStyle,
     transform: CSS.Translate.toString(transform),
     // Animate width for programmatic changes (autosize, pinning) but not during
-    // an active drag, where the easing makes the header lag behind the cursor.
-    transition: column.getIsResizing() ? undefined : "width 0.15s ease",
-    opacity: isDragging ? 0.7 : undefined,
-    zIndex: isDragging ? 30 : undefined,
+    // an active drag, where the easing makes the header lag behind the cursor;
+    // the other headers slide aside with dnd-kit's own transition.
+    transition: column.getIsResizing()
+      ? undefined
+      : ["width 0.15s ease", !isDragging && offsetX !== 0 && sortTransition]
+          .filter(Boolean)
+          .join(", "),
+    opacity: isDragging ? 0.85 : undefined,
+    // A pinned header keeps its pinning layer, above the headers under it.
+    zIndex: isDragging ? 30 : pinningStyle.zIndex,
   }
 
   // Hand the drag-activator props to the header (via context) so the grip can
@@ -91,18 +152,37 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
 
   return (
     <TableHead
-      ref={setNodeRef}
-      colSpan={header.colSpan}
-      style={style}
-      data-pinned={column.getIsPinned() || undefined}
-      aria-sort={ariaSort(column.getIsSorted())}
-      className={cn(
-        "relative bg-card",
-        padding,
-        // Match the body: under fixed layout, keep long header labels from
-        // bleeding past the (resizable) column edge.
-        resizable && "overflow-hidden",
-        getColumnPinningClass(column)
+      {...mergeProps(
+        // The ref callback is handed to the cell, not read during render.
+        // eslint-disable-next-line react-hooks/refs
+        {
+          ref: setCellRef,
+          colSpan,
+          style,
+          "data-pinned": getPinSide(column) || undefined,
+          // Found by the column motion, which leaves a dragged column's drop
+          // to dnd-kit's own animation.
+          "data-column-id": column.id,
+          "data-dragging": isDragging || undefined,
+          "aria-sort": ariaSort(column.getIsSorted()),
+          className: cn(
+            "relative bg-card",
+            padding,
+            // Match the body: under fixed layout, keep long header labels from
+            // bleeding past the (resizable) column edge.
+            resizable && "overflow-hidden",
+            getColumnPinningClass(column)
+          ),
+        } as React.ComponentProps<"th">,
+        getSlotProps(
+          table,
+          "headCell",
+          {
+            header: header as DataTableHeader<TData, unknown>,
+            column: column as DataTableColumn<TData, unknown>,
+          },
+          column.columnDef.meta?.slotProps?.headCell
+        )
       )}
     >
       <ColumnDragContext.Provider value={draggable ? dragProps : null}>

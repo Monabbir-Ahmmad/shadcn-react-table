@@ -2,7 +2,9 @@
 
 import * as React from "react"
 
-import { DataTableConfigProvider } from "@monabbir/shadcn-react-table/components/data-table"
+// From its own module, not the barrel: the barrel would pull the whole table
+// into every page's initial JS.
+import { DataTableConfigProvider } from "@monabbir/shadcn-react-table/components/data-table/core/config-context"
 
 import { remixIcons, type IconLibrary } from "@/components/examples/icon-sets"
 import { readPrefs } from "@/lib/theme-store"

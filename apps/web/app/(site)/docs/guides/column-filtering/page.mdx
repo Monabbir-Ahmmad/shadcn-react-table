@@ -1,0 +1,131 @@
+export const metadata = { title: "Column filtering" }
+
+# Column filtering
+
+Each column can expose its own filter control in a per-column filter row. Toggle the row with the funnel icon in the toolbar, or have it open from the start with `initialState: { showColumnFilters: true }`.
+
+<Example slug="column-filters" />
+
+The filter-mode menu and a clear button sit inside the input. The menu leads and the clear button shows while there is a value. Range filters have one clear button per side. Dropdown, checkbox and slider filters keep the menu beside the control.
+
+## Choosing a filter control
+
+The UI for each filter is chosen by the column's `meta.filterVariant`:
+
+| Variant | Control | Values |
+| --- | --- | --- |
+| `"text"` (default) | Text box | Any |
+| `"autocomplete"` | Text box suggesting the column's values | Any |
+| `"select"` / `"multi-select"` | Dropdown / checklist | Strings |
+| `"checkbox"` | Checkbox | Booleans |
+| `"range"` / `"range-slider"` | Number boxes / slider | Numbers |
+| `"date"` / `"date-range"` | Calendar | Dates, compared by day |
+| `"datetime"` / `"datetime-range"` | Date-time box | Dates, compared to the minute |
+| `"time"` / `"time-range"` | Time box | `"HH:mm"` strings or Dates, compared by time of day |
+
+The date, date-time and time variants share the same modes (equals, before, after, between, empty…); the `-range` variants start in "between".
+
+For `select`, `multi-select` and `autocomplete`, supply `meta.filterSelectOptions` as an array of `{ label, value }`. If you omit them, the options are derived from the column's faceted unique values.
+
+```tsx
+import { DataTable, useDataTable } from "@/components/ui/data-table"
+
+const columns = [
+  { accessorKey: "title", header: "Title", meta: { filterVariant: "text" } },
+  {
+    accessorKey: "status",
+    header: "Status",
+    meta: {
+      filterVariant: "select",
+      filterSelectOptions: [
+        { label: "Active", value: "active" },
+        { label: "Archived", value: "archived" },
+      ],
+    },
+  },
+  { accessorKey: "score", header: "Score", meta: { filterVariant: "range" } },
+]
+
+const table = useDataTable({ data, columns, getRowId: (row) => row.id })
+return <DataTable table={table} />
+```
+
+<Example slug="datetime-filters" />
+
+## Open the filter row by default
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  initialState: { showColumnFilters: true },
+})
+```
+
+## Custom filter UI
+
+Use `meta.renderColumnFilter` as an escape hatch to render your own filter control for a column.
+
+## Match highlighting
+
+Matched substrings in cells are highlighted by default. Disable it for the whole table with `enableFilterMatchHighlighting: false`, or for a single column with `meta.enableFilterMatchHighlighting: false`.
+
+A column with its own `cell` renderer gets the highlighted value as `renderedCellValue` (as in Material React Table). Render it where the value goes to keep the highlighting:
+
+```tsx
+{
+  accessorKey: "team",
+  header: "Team",
+  cell: ({ renderedCellValue }) => <Badge>{renderedCellValue}</Badge>,
+}
+```
+
+## Disabling a column's filter
+
+Set `enableColumnFilter: false` on a column to remove its filter control entirely.
+
+## Faceted values
+
+Select / multi-select filters auto-derive their options, and range filters their min/max bounds, from the data's faceted values. This is on by default; set `enableFacetedValues: false` to skip computing the faceted row models (e.g. for very large client-side datasets) — then provide `meta.filterSelectOptions` explicitly for select-style filters.
+
+<Example slug="faceted-values" />
+
+## Relevant options
+
+`useDataTable` options that affect column filtering:
+
+<ApiTable
+  of="useDataTableOptions"
+  only={[
+    "onShowColumnFiltersChange",
+    "enableColumnFilterModes",
+    "enableFilterMatchHighlighting",
+    "enableFacetedValues",
+    "columnFilterDisplayMode",
+  ]}
+/>
+
+Per-column, via `columnDef.meta`:
+
+<ApiTable
+  of="columnOptions"
+  propLabel="meta key"
+  only={[
+    "filterVariant",
+    "filterSelectOptions",
+    "filterMode",
+    "enableColumnFilterModes",
+    "renderColumnFilter",
+    "columnFilterModeOptions",
+    "enableFilterMatchHighlighting",
+  ]}
+/>
+
+## Related
+
+<Cards>
+  <Card href="/docs/guides/filter-modes" title="Filter modes" />
+  <Card href="/docs/guides/display-modes" title="Display modes" />
+  <Card href="/docs/api/column-options" title="Column options" />
+</Cards>

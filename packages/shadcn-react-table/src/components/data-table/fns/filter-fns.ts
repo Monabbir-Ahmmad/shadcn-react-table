@@ -8,12 +8,20 @@
 
 export {
   MODE_FNS,
+  GLOBAL_FILTER_MODES,
   VALUELESS_MODES,
   SUBSTRING_MODES,
+  getModeFn,
   isInactive,
+  type BuiltInFilterMode,
+  type BuiltInGlobalFilterMode,
   type FilterMode,
   type GlobalFilterMode,
 } from "./filter-modes"
-export { createDynamicFilterFn, createGlobalFilterFn } from "./filter-factories"
+export {
+  createDynamicFilterFn,
+  createGlobalFilterFn,
+  type CustomFilterFns,
+} from "./filter-factories"
 export { rankGlobalFuzzy, createRankedSortedRowModel } from "./ranked-row-model"
 export { defaultModeForVariant, modeOptionsForVariant } from "./variant-modes"

@@ -20,6 +20,7 @@ import {
 
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
+import { dt } from "../../core/internal"
 
 /**
  * Column visibility menu (toolbar icon cluster). Lists every hideable column
@@ -30,10 +31,14 @@ export function DataTableViewOptions<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const hideableColumns = table
     .getAllColumns()
-    .filter((column) => column.getCanHide())
+    .filter(
+      (column) =>
+        column.getCanHide() &&
+        column.columnDef.meta?.visibleInShowHideMenu !== false
+    )
 
   if (hideableColumns.length === 0) return null
 

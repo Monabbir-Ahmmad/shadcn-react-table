@@ -11,6 +11,7 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../../core/types"
+import { dt } from "../../../core/internal"
 
 /** Funnel toggle that shows/hides the filter row. */
 export function DataTableFilterToggle<TData extends RowData>({
@@ -19,7 +20,7 @@ export function DataTableFilterToggle<TData extends RowData>({
   table: DataTableInstance<TData>
 }) {
   const { localization, icons, showColumnFilters, setShowColumnFilters } =
-    table.tableInstance
+    dt(table)
   const label = showColumnFilters
     ? localization.hideColumnFilters
     : localization.showColumnFilters

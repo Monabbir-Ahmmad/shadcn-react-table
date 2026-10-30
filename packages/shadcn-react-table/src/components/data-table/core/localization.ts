@@ -6,6 +6,13 @@
  * Default is English. Override per instance via `useDataTable({ localization })`.
  */
 export interface DataTableLocalization {
+  // Language
+  /**
+   * BCP 47 tag used to format dates (e.g. "en", "de"). Numbers are formatted
+   * by the function keys of each localization, with that file's own tag.
+   */
+  language: string
+
   // Selection
   selectAll: string
   selectRow: string
@@ -61,15 +68,18 @@ export interface DataTableLocalization {
   max: string
   pickDate: string
   pickDateRange: string
+  true: string
+  false: string
   /** Labels for each filter mode, keyed by the `FilterMode` string. */
   filterModes: Record<string, string>
 
   // Advanced filter panel
   advancedFilters: string
-  advancedFiltersMatchLabel: string
+  /** The "Match All/Any of the following rules" sentence; `logic` marks where
+   *  the All/Any picker goes, so each language can order the words. */
+  advancedFiltersMatch: (logic: string) => string
   advancedFiltersMatchAll: string
   advancedFiltersMatchAny: string
-  advancedFiltersOf: string
   advancedFiltersAddRule: string
   advancedFiltersApply: string
   advancedFiltersClearAll: string
@@ -122,16 +132,48 @@ export interface DataTableLocalization {
 
   // Empty / loading
   noRecordsToDisplay: string
+  /** Shown instead of `noRecordsToDisplay` when filters or the search hide
+   *  every row. */
+  noResultsFound: string
+  /** Labels for aggregation function names, shown when a column lists several
+   *  (`aggregationFn: ["sum", "mean"]`). Merged with the English defaults by
+   *  key; unknown names show as written. */
+  aggregationFns?: Record<string, string>
   loading: string
   loadingMore: string
+
+  // Drag and drop (screen readers)
+  dragStart: (label: string) => string
+  dragOver: (label: string, over: string) => string
+  dragEnd: (label: string, over: string) => string
+  dragCancel: (label: string) => string
+  dragInstructions: string
+  dragRowLabel: (position: number) => string
+}
+
+/** English labels for the built-in aggregation functions. */
+export const DEFAULT_AGGREGATION_LABELS: Record<string, string> = {
+  sum: "Sum",
+  mean: "Mean",
+  median: "Median",
+  min: "Min",
+  max: "Max",
+  count: "Count",
+  unique: "Unique",
+  uniqueCount: "Unique count",
+  extent: "Range",
+  first: "First",
+  last: "Last",
 }
 
 export const defaultLocalization: DataTableLocalization = {
+  language: "en",
+
   selectAll: "Select all",
   selectRow: "Select row",
   clearSelection: "Clear selection",
   rowsSelected: (selected, total) =>
-    `${selected} of ${total} row${total === 1 ? "" : "s"} selected`,
+    `${selected.toLocaleString("en")} of ${total.toLocaleString("en")} row${total === 1 ? "" : "s"} selected`,
 
   sortByColumnAsc: (column) => `Sort by ${column} ascending`,
   sortByColumnDesc: (column) => `Sort by ${column} descending`,
@@ -177,6 +219,8 @@ export const defaultLocalization: DataTableLocalization = {
   max: "Max",
   pickDate: "Pick a date",
   pickDateRange: "Pick a date range",
+  true: "True",
+  false: "False",
   filterModes: {
     fuzzy: "Fuzzy",
     contains: "Contains",
@@ -201,10 +245,9 @@ export const defaultLocalization: DataTableLocalization = {
   },
 
   advancedFilters: "Advanced filters",
-  advancedFiltersMatchLabel: "Match",
+  advancedFiltersMatch: (logic) => `Match ${logic} of the following rules`,
   advancedFiltersMatchAll: "All",
   advancedFiltersMatchAny: "Any",
-  advancedFiltersOf: "of the following rules",
   advancedFiltersAddRule: "Add filter",
   advancedFiltersApply: "Apply",
   advancedFiltersClearAll: "Clear all",
@@ -243,12 +286,13 @@ export const defaultLocalization: DataTableLocalization = {
   exitFullscreen: "Exit full screen",
 
   rowsPerPage: "Rows per page",
-  paginationRange: (start, end, total) => `${start}–${end} of ${total}`,
+  paginationRange: (start, end, total) =>
+    `${start.toLocaleString("en")}–${end.toLocaleString("en")} of ${total.toLocaleString("en")}`,
   goToFirstPage: "Go to first page",
   goToPreviousPage: "Go to previous page",
   goToNextPage: "Go to next page",
   goToLastPage: "Go to last page",
-  goToPage: (page) => `Go to page ${page}`,
+  goToPage: (page) => `Go to page ${page.toLocaleString("en")}`,
 
   rowActions: "Row actions",
   edit: "Edit",
@@ -264,6 +308,15 @@ export const defaultLocalization: DataTableLocalization = {
   cellActions: "Cell actions",
 
   noRecordsToDisplay: "No records to display",
+  noResultsFound: "No results found",
   loading: "Loading…",
   loadingMore: "Loading more…",
+
+  dragStart: (label) => `Picked up ${label}.`,
+  dragOver: (label, over) => `${label} is over ${over}.`,
+  dragEnd: (label, over) => `${label} was dropped on ${over}.`,
+  dragCancel: (label) => `Dragging was cancelled. ${label} was dropped.`,
+  dragInstructions:
+    "To pick up an item, press space or enter. While dragging, use the arrow keys to move it. Press space or enter again to drop it, or press escape to cancel.",
+  dragRowLabel: (position) => `Row ${position.toLocaleString("en")}`,
 }

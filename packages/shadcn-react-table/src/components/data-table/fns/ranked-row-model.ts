@@ -1,11 +1,12 @@
-import {
-  getSortedRowModel,
-  type Row,
-  type RowData,
-  type RowModel,
-  type Table,
-} from "@tanstack/react-table"
+import { createSortedRowModel, type RowData } from "@tanstack/react-table"
 import type { RankingInfo } from "@tanstack/match-sorter-utils"
+import type {
+  DataTableCoreTable,
+  DataTableFeatures,
+  DataTableRow,
+  DataTableRowModel,
+  DataTableRowModelFactory,
+} from "../core/table-types"
 
 /**
  * Descending comparator over the best fuzzy rank a row earned across the
@@ -15,10 +16,10 @@ import type { RankingInfo } from "@tanstack/match-sorter-utils"
  * per-column filter state.
  */
 export function rankGlobalFuzzy<TData extends RowData>(
-  rowA: Row<TData>,
-  rowB: Row<TData>
+  rowA: DataTableRow<TData>,
+  rowB: DataTableRow<TData>
 ): number {
-  const best = (row: Row<TData>): number => {
+  const best = (row: DataTableRow<TData>): number => {
     let max = -Infinity
     for (const meta of Object.values(row.columnFiltersMeta)) {
       const rank = (meta as RankingInfo | undefined)?.rank
@@ -39,13 +40,13 @@ export function rankGlobalFuzzy<TData extends RowData>(
  * re-runs when filtering/sorting/data actually change.
  */
 export function createRankedSortedRowModel<TData extends RowData>(
-  isActive: (table: Table<TData>) => boolean
-): (table: Table<TData>) => () => RowModel<TData> {
-  const base = getSortedRowModel<TData>()
+  isActive: (table: DataTableCoreTable<TData>) => boolean
+): DataTableRowModelFactory<TData> {
+  const base = createSortedRowModel<DataTableFeatures, TData>()
   return (table) => {
     const delegate = base(table)
-    let cachedFor: RowModel<TData> | null = null
-    let cached: RowModel<TData> | null = null
+    let cachedFor: DataTableRowModel<TData> | null = null
+    let cached: DataTableRowModel<TData> | null = null
     return () => {
       const model = delegate()
       if (!isActive(table)) return model

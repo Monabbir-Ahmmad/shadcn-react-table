@@ -23,15 +23,19 @@ describe("text modes", () => {
     expect(MODE_FNS[mode](cell, val)).toBe(expected)
   })
 
+  it("fuzzy matches out-of-order / gapped characters, contains does not", () => {
+    expect(MODE_FNS.fuzzy("Joanna", "jna")).toBe(true)
+    expect(MODE_FNS.contains("Joanna", "jna")).toBe(false)
+    expect(MODE_FNS.fuzzy("Joanna", "xyz")).toBe(false)
+  })
+
+  it("fuzzy still matches plain substrings and ignores case", () => {
+    expect(MODE_FNS.fuzzy("Hello World", "WORLD")).toBe(true)
+  })
+
   it("coerces non-string cells to strings", () => {
     expect(MODE_FNS.contains(12345, "234")).toBe(true)
     expect(MODE_FNS.equals(null, "")).toBe(true)
-  })
-
-  // KNOWN QUIRK: per-column fuzzy is a plain substring match, not ranked.
-  it("fuzzy behaves exactly like contains", () => {
-    expect(MODE_FNS.fuzzy("Hello World", "world")).toBe(true)
-    expect(MODE_FNS.fuzzy("Hello World", "wrld")).toBe(false)
   })
 })
 
@@ -115,10 +119,10 @@ describe("date modes", () => {
     expect(MODE_FNS.before(jan5Midnight, jan5Morning)).toBe(false)
   })
 
-  // KNOWN QUIRK: only the filter side is floored to start-of-day, so a cell
-  // WITH a time-of-day on the same date still counts as "after" that date.
-  it("after: same-day cell with a later clock time matches", () => {
-    expect(MODE_FNS.after(jan5Morning, jan5Midnight)).toBe(true)
+  // The filter date is a whole day, so a cell later on the same date is not
+  // "after" it; only a later date is.
+  it("after: same-day cell with a later clock time does not match", () => {
+    expect(MODE_FNS.after(jan5Morning, jan5Midnight)).toBe(false)
     expect(MODE_FNS.after(jan6, jan5Morning)).toBe(true)
     expect(MODE_FNS.after(jan4, jan5Morning)).toBe(false)
   })
@@ -186,5 +190,42 @@ describe("mode sets and isInactive", () => {
     [["", "5"], false],
   ])("isInactive(%j) -> %j", (value, expected) => {
     expect(isInactive(value)).toBe(expected)
+  })
+})
+
+// Bounds use full local datetimes: date-only ISO strings parse as UTC while
+// startOfDay/endOfDay are local, which would make these zone-dependent.
+describe("date modes treat the boundary as a whole day", () => {
+  it("betweenDates includes a datetime later on the end day", () => {
+    expect(
+      MODE_FNS.betweenDates("2025-01-10T15:00:00", [
+        "2025-01-01T00:00:00",
+        "2025-01-10T00:00:00",
+      ])
+    ).toBe(true)
+    expect(
+      MODE_FNS.betweenDates("2025-01-11T00:00:01", [
+        "2025-01-01T00:00:00",
+        "2025-01-10T00:00:00",
+      ])
+    ).toBe(false)
+  })
+
+  it("after excludes datetimes on the same day", () => {
+    expect(MODE_FNS.after("2025-01-10T15:00:00", "2025-01-10T00:00:00")).toBe(
+      false
+    )
+    expect(MODE_FNS.after("2025-01-11T00:00:01", "2025-01-10T00:00:00")).toBe(
+      true
+    )
+  })
+
+  it("before excludes datetimes on the same day", () => {
+    expect(MODE_FNS.before("2025-01-10T15:00:00", "2025-01-10T00:00:00")).toBe(
+      false
+    )
+    expect(MODE_FNS.before("2025-01-09T23:59:59", "2025-01-10T00:00:00")).toBe(
+      true
+    )
   })
 })

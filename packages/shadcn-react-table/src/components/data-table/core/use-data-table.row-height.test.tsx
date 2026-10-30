@@ -1,4 +1,3 @@
-import { getCoreRowModel } from "@tanstack/react-table"
 import { renderHook } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
@@ -17,7 +16,6 @@ function render(options: Record<string, unknown> = {}) {
       columns,
       data,
       getRowId: (row) => row.id,
-      getCoreRowModel: getCoreRowModel(),
       ...options,
     })
   )
@@ -27,14 +25,14 @@ describe("useDataTable — row height wiring", () => {
   it("exposes rowHeight and getRowHeight on the instance", () => {
     const getRowHeight = () => "auto" as const
     const { result } = render({ rowHeight: 64, getRowHeight })
-    expect(result.current.tableInstance.rowHeight).toBe(64)
-    expect(result.current.tableInstance.getRowHeight).toBe(getRowHeight)
+    expect(result.current.dataTable.rowHeight).toBe(64)
+    expect(result.current.dataTable.getRowHeight).toBe(getRowHeight)
   })
 
   it("leaves both undefined by default", () => {
     const { result } = render()
-    expect(result.current.tableInstance.rowHeight).toBeUndefined()
-    expect(result.current.tableInstance.getRowHeight).toBeUndefined()
+    expect(result.current.dataTable.rowHeight).toBeUndefined()
+    expect(result.current.dataTable.getRowHeight).toBeUndefined()
   })
 
   it("resolves real rows through the exposed options", () => {
@@ -42,7 +40,7 @@ describe("useDataTable — row height wiring", () => {
       getRowHeight: (row: { original: { name: string } }) =>
         row.original.name === "a" ? "auto" : 40,
     })
-    const instance = result.current.tableInstance
+    const instance = result.current.dataTable
     const rows = result.current.getRowModel().rows
     expect(
       resolveRowHeight(rows[0]!, {

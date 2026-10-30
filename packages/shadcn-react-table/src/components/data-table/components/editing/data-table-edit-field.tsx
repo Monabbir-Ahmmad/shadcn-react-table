@@ -13,6 +13,8 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableFilterOption, EditVariant } from "../../core/types"
+import { stopPropagation } from "../../helpers/stop-propagation"
+import { mergeProps } from "../../helpers/slot-props"
 
 const FIELD_CLASS =
   "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
@@ -20,7 +22,8 @@ const FIELD_CLASS =
 /**
  * A controlled inline edit field (text / number / select). The parent owns the
  * draft value; this renders the input, surfaces validation errors, and wires
- * Enter (commit) / Escape (cancel) / blur (commit) for text inputs.
+ * Enter (commit) / Escape (cancel) / blur (commit) for text inputs; select
+ * commits on pick with the picked value.
  */
 export function DataTableEditField({
   value,
@@ -32,10 +35,13 @@ export function DataTableEditField({
   error,
   ariaLabel,
   autoFocus,
+  fieldProps,
 }: {
+  /** Extra props for the input (or the select's trigger): `slotProps.editField`. */
+  fieldProps?: Record<string, unknown>
   value: unknown
   onChange: (value: unknown) => void
-  onCommit?: () => void
+  onCommit?: (value?: unknown) => void
   onCancel?: () => void
   variant?: EditVariant
   options?: DataTableFilterOption[]
@@ -45,21 +51,40 @@ export function DataTableEditField({
 }) {
   if (variant === "select") {
     return (
-      <div className="flex flex-col gap-0.5">
+      <div
+        className="flex flex-col gap-0.5"
+        onClick={stopPropagation}
+        onDoubleClick={stopPropagation}
+      >
         <Select
           // Always controlled: "" shows the placeholder in both Radix and
           // Base UI, while `undefined` would flip to uncontrolled.
           value={value == null ? "" : String(value)}
-          onValueChange={(next) => {
+          onValueChange={(picked) => {
+            // Options carry strings; a numeric value stays a number.
+            const next =
+              typeof value === "number" &&
+              typeof picked === "string" &&
+              picked.trim() !== "" &&
+              !Number.isNaN(Number(picked))
+                ? Number(picked)
+                : picked
             onChange(next)
-            onCommit?.()
+            // Select commits on pick. Pass the value: the parent's draft
+            // state has not updated yet in this tick.
+            onCommit?.(next)
           }}
         >
           <SelectTrigger
-            size="sm"
-            className={cn(FIELD_CLASS, "w-full px-2")}
-            aria-label={ariaLabel}
-            aria-invalid={!!error}
+            {...mergeProps(
+              {
+                size: "sm",
+                className: cn(FIELD_CLASS, "w-full px-2"),
+                "aria-label": ariaLabel,
+                "aria-invalid": !!error,
+              } as React.ComponentProps<typeof SelectTrigger>,
+              fieldProps
+            )}
           >
             <SelectValue placeholder="—" />
           </SelectTrigger>
@@ -77,34 +102,42 @@ export function DataTableEditField({
   }
 
   return (
-    <div className="flex flex-col gap-0.5">
+    <div
+      className="flex flex-col gap-0.5"
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
+    >
       <Input
-        autoFocus={autoFocus}
-        type={variant === "number" ? "number" : "text"}
-        inputMode={variant === "number" ? "decimal" : undefined}
-        value={value == null ? "" : String(value)}
-        aria-label={ariaLabel}
-        aria-invalid={!!error}
-        onChange={(e) =>
-          onChange(
-            variant === "number"
-              ? e.target.value === ""
-                ? ""
-                : Number(e.target.value)
-              : e.target.value
-          )
-        }
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault()
-            onCommit?.()
-          } else if (e.key === "Escape") {
-            e.preventDefault()
-            onCancel?.()
-          }
-        }}
-        onBlur={() => onCommit?.()}
-        className={FIELD_CLASS}
+        {...mergeProps(
+          {
+            autoFocus,
+            type: variant === "number" ? "number" : "text",
+            inputMode: variant === "number" ? "decimal" : undefined,
+            value: value == null ? "" : String(value),
+            "aria-label": ariaLabel,
+            "aria-invalid": !!error,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange(
+                variant === "number"
+                  ? e.target.value === ""
+                    ? ""
+                    : Number(e.target.value)
+                  : e.target.value
+              ),
+            onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                onCommit?.()
+              } else if (e.key === "Escape") {
+                e.preventDefault()
+                onCancel?.()
+              }
+            },
+            onBlur: () => onCommit?.(),
+            className: FIELD_CLASS,
+          } as React.ComponentProps<"input">,
+          fieldProps
+        )}
       />
       {error && <FieldError>{error}</FieldError>}
     </div>

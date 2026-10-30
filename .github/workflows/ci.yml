@@ -5,6 +5,10 @@ on:
     branches: [main]
   push:
     branches: [main]
+  # Weekly run on main: the install smoke test tracks `shadcn@latest` and
+  # floating dependency ranges, which can break without a commit here.
+  schedule:
+    - cron: "0 6 * * 1"
 
 # Cancel superseded runs on the same ref (e.g. new pushes to a PR branch).
 concurrency:
@@ -15,6 +19,41 @@ permissions:
   contents: read
 
 jobs:
+  # A PR that changes the table's source must say what changed for users: a
+  # changeset (`pnpm changeset`), or the no-changelog label.
+  changelog:
+    if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'no-changelog')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Version comes from the root package.json "packageManager" field.
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Fails when the table's source (not its tests, see `changedFilePatterns`
+      # in .changeset/config.json) changed with no changeset.
+      - name: Changeset for source changes
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if ! pnpm changeset status --since="$BASE"; then
+            echo "::error::The table's source changed without a changeset. Run 'pnpm changeset', or add the no-changelog label."
+            exit 1
+          fi
+
   verify:
     runs-on: ubuntu-latest
     steps:
@@ -47,11 +86,76 @@ jobs:
         run: pnpm build
 
       # The build regenerates the committed artifacts (registry JSON, API
-      # reference); a diff here means source changed without regenerating.
+      # reference, example sources, llms.txt and the Markdown pages); any
+      # change or new file here means source changed without regenerating.
       - name: Generated artifacts are fresh
-        run: git diff --exit-code -- apps/web/public/r apps/web/lib/api-reference.generated.ts
+        run: |
+          paths="apps/web/public/r apps/web/lib/api-reference.generated.ts apps/web/lib/example-source.generated.ts apps/web/lib/example-meta.generated.ts apps/web/lib/docs-summaries.generated.ts apps/web/public/llms.txt apps/web/public/llms-full.txt apps/web/public/docs.md apps/web/public/docs apps/web/public/SKILL.md apps/web/public/skills"
+          git status --porcelain -- $paths
+          test -z "$(git status --porcelain -- $paths)"
 
       # Typechecks the registry output in a consumer-shaped fixture (the `@/`
       # aliases `shadcn add` produces), guarding the exact bytes consumers get.
       - name: Registry output compiles for consumers
         run: pnpm --filter shadcn-react-table-web registry:verify
+
+  # Runs the *.browser.test.tsx files in headless Chromium: real layout,
+  # pointer and keyboard behaviour (sticky/pinned columns, drag-and-drop,
+  # resizing, virtualization, keyboard navigation) that jsdom cannot test.
+  browser-tests:
+    name: browser tests (chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm --filter @monabbir/shadcn-react-table exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: pnpm --filter @monabbir/shadcn-react-table test:browser
+
+  # Installs the PR's own registry block into a fresh shadcn Next.js app for
+  # each base and proves the app typechecks and builds. Catches breakage that
+  # only shows up through the CLI: upstream primitive differences (Radix vs
+  # Base UI), missing registryDependencies, bad import rewrites.
+  install-smoke:
+    name: install smoke (${{ matrix.base }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        base: [radix, base]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      # No workspace install: both scripts use only Node built-ins (the smoke
+      # app installs its own dependencies through pnpm).
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build the registry
+        run: node apps/web/scripts/build-registry.mjs
+
+      - name: Install into a fresh app, typecheck, build
+        run: node apps/web/scripts/smoke-install.mjs --base ${{ matrix.base }}

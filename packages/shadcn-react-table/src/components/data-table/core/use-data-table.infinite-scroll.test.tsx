@@ -1,4 +1,3 @@
-import { getCoreRowModel } from "@tanstack/react-table"
 import { renderHook } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
@@ -12,7 +11,6 @@ function render(options: Record<string, unknown> = {}) {
     useDataTable({
       columns,
       data,
-      getCoreRowModel: getCoreRowModel(),
       ...options,
     })
   )
@@ -21,15 +19,15 @@ function render(options: Record<string, unknown> = {}) {
 describe("useDataTable — infinite scroll wiring", () => {
   it("forces pagination off when enableInfiniteScroll is on", () => {
     const { result } = render({ enableInfiniteScroll: true })
-    expect(result.current.tableInstance.enableInfiniteScroll).toBe(true)
+    expect(result.current.dataTable.enableInfiniteScroll).toBe(true)
     // Auto-hide pager: a single growing page renders every appended row.
-    expect(result.current.tableInstance.enablePagination).toBe(false)
+    expect(result.current.dataTable.enablePagination).toBe(false)
   })
 
   it("leaves pagination on by default (no infinite scroll)", () => {
     const { result } = render()
-    expect(result.current.tableInstance.enableInfiniteScroll).toBe(false)
-    expect(result.current.tableInstance.enablePagination).toBe(true)
+    expect(result.current.dataTable.enableInfiniteScroll).toBe(false)
+    expect(result.current.dataTable.enablePagination).toBe(true)
   })
 
   it("passes the controlled fetch flags and default threshold through", () => {
@@ -38,7 +36,7 @@ describe("useDataTable — infinite scroll wiring", () => {
       hasNextPage: true,
       isFetchingNextPage: true,
     })
-    const instance = result.current.tableInstance
+    const instance = result.current.dataTable
     expect(instance.hasNextPage).toBe(true)
     expect(instance.isFetchingNextPage).toBe(true)
     expect(instance.infiniteScrollThreshold).toBe(200)
@@ -49,6 +47,6 @@ describe("useDataTable — infinite scroll wiring", () => {
       enableInfiniteScroll: true,
       infiniteScrollThreshold: 500,
     })
-    expect(result.current.tableInstance.infiniteScrollThreshold).toBe(500)
+    expect(result.current.dataTable.infiniteScrollThreshold).toBe(500)
   })
 })

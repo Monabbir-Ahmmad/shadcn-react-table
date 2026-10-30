@@ -1,7 +1,7 @@
 # Shadcn React Table
 
 A shadcn/ui data table with Material React Table (MRT V3) parity, built on
-TanStack Table v8. Import from `@monabbir/shadcn-react-table/components/data-table`.
+TanStack Table v9. Import from `@monabbir/shadcn-react-table/components/data-table`.
 
 ```tsx
 const table = useDataTable({ data, columns /* + feature flags */ })
@@ -10,7 +10,8 @@ return <DataTable table={table} />
 
 `useDataTable` extends the full TanStack `TableOptions`, so anything TanStack
 accepts (state, `getRowId`, `manual*` flags, row models) passes straight
-through. Our presentation/feature options and UI state live on `table.tableInstance`.
+through. The UI state is in `table.getState()`, its setters are methods on
+`table` (`table.setDensity`…), and the resolved options live on `table.dataTable`.
 
 ## Feature flags (all opt-in unless noted)
 
@@ -20,14 +21,14 @@ through. Our presentation/feature options and UI state live on `table.tableInsta
 | Selection              | `enableRowSelection`, `enableMultiRowSelection` (auto select column + alert banner)                                             |
 | Density / fullscreen   | on by default                                                                                                                   |
 | Sticky header / footer | on by default (`enableStickyHeader` / `enableStickyFooter`); engages when the surface scrolls (give it a `max-h` or virtualize) |
-| Column filters         | `meta.variant`, `meta.filterMode`, `enableColumnFilterModes`, `enableFilterMatchHighlighting`                                   |
+| Column filters         | `meta.filterVariant`, `meta.filterMode`, `enableColumnFilterModes`, `enableFilterMatchHighlighting`                             |
 | Global search          | `enableGlobalFilter` (fuzzy via match-sorter), `enableGlobalFilterModes`                                                        |
 | Column mgmt            | `enableColumnOrdering`, `enableColumnPinning`, `enableColumnResizing`                                                           |
 | Row mgmt               | `enableRowOrdering` + `onRowOrderChange`, `enableRowPinning`, `enableRowNumbers`                                                |
 | Grouping               | `enableGrouping` (drop-zone + menu + aggregation rows)                                                                          |
 | Expansion              | `renderDetailPanel`, `getSubRows` (tree); `enableExpanding` auto-derives                                                        |
 | Footer row             | per-column `footer` (rendered whenever defined; sticky by default)                                                              |
-| Editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditCellSave`/`onSaveRow`/`onCreateRow`                   |
+| Editing                | `enableEditing`, `editDisplayMode` (`cell`/`row`/`table`/`modal`), `onEditingCellSave`/`onEditingRowSave`/`onCreatingRowSave`   |
 | Actions / copy         | `renderRowActions`, `renderCellActionMenuItems`, `enableClickToCopy`                                                            |
 | Virtualization         | `enableRowVirtualization` and `enableColumnVirtualization` (give the surface a bounded height)                                  |
 | Event listeners        | `onRowClick` / `onRowDoubleClick` / `onCellClick` / `onCellDoubleClick`                                                         |
@@ -42,7 +43,7 @@ For server-driven data, set the TanStack `manual*` flags and feed state back:
 const table = useDataTable({
   data,
   columns,
-  rowCount,                 // total rows on the server (required for paging)
+  rowCount, // total rows on the server (required for paging)
   manualPagination: true,
   manualSorting: true,
   manualFiltering: true,
@@ -60,7 +61,7 @@ Notes:
   firing `onChange` when `manualFiltering` is set, so each keystroke doesn't hit
   the server.
 - **Faceting is client-only.** In manual mode, supply `select`/`multi-select`
-  options via `meta.options` (faceted unique values aren't computed server-side).
+  options via `meta.filterSelectOptions` (faceted unique values aren't computed server-side).
 - **Fuzzy ranking is off** in manual mode — ranking is the server's job.
 
 ## Stability requirements
@@ -80,5 +81,5 @@ token is `--highlight` (match highlighting), shipped with a fallback to
 
 - Column virtualization applies fixed column widths and is not combined with
   column pinning/ordering or grouped (multi-row) headers.
-- React Compiler is disabled around `useReactTable`/`useVirtualizer` (a known
-  TanStack v8 interaction); the lint warning is expected and benign.
+- React Compiler is disabled around `useTable`/`useVirtualizer` (TanStack's
+  mutable instance); the lint warning is expected and benign.

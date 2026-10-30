@@ -1,0 +1,74 @@
+# AI agent setup
+
+Set up the data table with a coding agent — Claude Code, Cursor, Codex, Copilot and the like.
+
+## Ask your agent
+
+Paste this into your agent:
+
+```text
+Install shadcn-react-table in my app: https://monabbir-ahmmad.github.io/shadcn-react-table/SKILL.md
+```
+
+The prompt points the agent at the skill file: how to install the table (running `shadcn init` first when the project has no `components.json`), the rules that keep tables correct, where the option references are, and how to pull a docs example into the project. Every example on this site also has a **Copy prompt** button that asks your agent to add that example.
+
+## Install the skill
+
+The same file installs as a skill, so your agent knows the table before you ask:
+
+```bash
+npx skills add Monabbir-Ahmmad/shadcn-react-table
+```
+
+## Registry address
+
+```bash
+pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+# or: npx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · yarn dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json · bunx --bun shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json
+```
+
+The same address works in Radix UI and Base UI projects; the shadcn CLI adapts the source. Languages are separate items: `…/r/data-table-locale-de.json`. To install by name, register the namespace once in `components.json` (see [Installation](/docs/installation#use-a-namespace-optional)):
+
+```json
+{
+  "registries": {
+    "@shadcn-react-table": "https://monabbir-ahmmad.github.io/shadcn-react-table/r/{name}.json"
+  }
+}
+```
+
+## MCP
+
+The shadcn MCP server lets an agent browse and install from the registries in your `components.json`. Register the namespace above, then set up your client:
+
+```bash
+pnpm dlx shadcn@latest mcp init --client claude   # or cursor, vscode, codex, opencode
+```
+
+The agent can then find and add `@shadcn-react-table/data-table` and its languages.
+
+## Docs as Markdown
+
+- [`/llms.txt`](https://monabbir-ahmmad.github.io/shadcn-react-table/llms.txt) — an index of every page.
+- [`/llms-full.txt`](https://monabbir-ahmmad.github.io/shadcn-react-table/llms-full.txt) — every page in one file.
+- Any page: add `.md` to its URL, for example [`/docs/guides/editing.md`](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/editing.md). **Copy page** at the top of each page copies the same text.
+
+## Project rules
+
+For `CLAUDE.md` or `AGENTS.md` when the skill isn't installed:
+
+```markdown
+## Data table
+- components/ui/data-table is shadcn-react-table (installed from its shadcn registry; edit freely).
+- Before changing table options read https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table.md;
+  column options: https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options.md.
+- Pass `getRowId`, and keep `data` and `columns` stable (useMemo, useState or module scope).
+- Table-specific column options go in `meta`; state goes through `initialState` / `state` + `on…Change`.
+- Reinstall: pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json --overwrite
+  (replaces local edits in components/ui/data-table).
+```
+
+## Related
+
+- [Installation](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/installation): The data table is distributed as a shadcn registry item.
+- [Migrating from Material React Table](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/migrating-from-mrt): The data table follows Material React Table (MRT) closely: the same hook-then-component shape, most of the same options, and the same TanStack Table underneath.

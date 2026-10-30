@@ -1,0 +1,195 @@
+# Composition
+
+`<DataTable />` lays out the whole table for you. When you need a different layout — the search box in your page header, pagination somewhere else, your own toolbar — use the table's parts directly.
+
+## Reading the table from anywhere inside it
+
+Components rendered inside `<DataTable />` (cells, toolbar slots, menu items, detail panels) can get the instance with `useDataTableInstance()` instead of receiving `table` as a prop:
+
+```tsx
+import { useDataTableInstance } from "@/components/ui/data-table"
+
+function SelectedCount() {
+  const table = useDataTableInstance<Person>()
+  return (
+    <table.Subscribe selector={(state) => state.rowSelection}>
+      {(selection) => <span>{Object.keys(selection).length} selected</span>}
+    </table.Subscribe>
+  )
+}
+
+const table = useDataTable({
+  data,
+  columns,
+  enableRowSelection: true,
+  renderTopToolbarCustomActions: () => <SelectedCount />,
+})
+```
+
+The instance itself never changes, so subscribe to the state you show (as above) to re-render when it changes.
+
+## Your own layout
+
+Wrap your layout in `DataTableProvider` and place the parts where you want them. Each part takes the `table`:
+
+```tsx
+import {
+  DataTable,
+  DataTableDensityToggle,
+  DataTableGlobalFilter,
+  DataTablePagination,
+  DataTableProvider,
+  DataTableViewOptions,
+  useDataTable,
+} from "@/components/ui/data-table"
+
+function People() {
+  const table = useDataTable({
+    data,
+    columns,
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+  })
+  return (
+    <DataTableProvider table={table}>
+      <header className="flex items-center gap-2">
+        <h2 className="mr-auto">People</h2>
+        <DataTableGlobalFilter table={table} />
+        <DataTableViewOptions table={table} />
+        <DataTableDensityToggle table={table} />
+      </header>
+      <DataTable table={table} />
+      <footer>
+        <DataTablePagination table={table} />
+      </footer>
+    </DataTableProvider>
+  )
+}
+```
+
+Here the built-in toolbars are turned off and the same controls appear in your own header and footer.
+
+Example (`composition`):
+
+```tsx
+function CompositionExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableTopToolbar: false,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2">
+          <span className="mr-auto text-sm font-medium">Team directory</span>
+          <DataTableGlobalFilter table={table} />
+          <DataTableViewOptions table={table} />
+          <DataTableDensityToggle table={table} />
+        </div>
+        <DataTable table={table} />
+      </div>
+    </DataTableProvider>
+  )
+}
+```
+
+## Fully headless
+
+Render the rows with your own markup and keep only the parts you want from the table — here the search box and pagination. The instance drives both; wrap the part that reads state in `table.Subscribe` so it re-renders.
+
+Example (`headless`):
+
+```tsx
+function HeadlessExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data: data,
+    columns: HEADLESS_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageIndex: 0, pageSize: 5 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium">My own table markup</h3>
+          <DataTableGlobalFilter table={table} />
+        </div>
+        {/* Plain markup driven by the same instance. */}
+        <table.Subscribe selector={(state) => state}>
+          {() => (
+            <table className="w-full text-sm">
+              <thead>
+                {table.getHeaderGroups().map((group) => (
+                  <tr key={group.id} className="border-b text-start">
+                    {group.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className="py-2 text-start font-medium"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="border-b last:border-0">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="py-2">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </table.Subscribe>
+        <DataTablePagination table={table} />
+      </div>
+    </DataTableProvider>
+  )
+}
+```
+
+## The parts
+
+| Part | What it is |
+| --- | --- |
+| `DataTableToolbar` | The whole top toolbar |
+| `DataTableBottomToolbar` | The whole bottom toolbar |
+| `DataTableGlobalFilter` | Search box with its mode menu |
+| `DataTablePagination` | Page size, range and page buttons |
+| `DataTableAlertBanner` | The selection banner |
+| `DataTableViewOptions` | Show / hide / reorder columns menu |
+| `DataTableDensityToggle` | Density menu |
+| `DataTableFullscreenToggle` | Full screen button |
+| `DataTableFilterToggle` | Show / hide the filter row |
+| `DataTableAdvancedFilterToggle` | Opens the advanced filter panel |
+| `DataTableFilterPanel` | The advanced filter panel |
+| `DataTableDropToGroupZone` | Drop zone for grouping by drag |
+| `DataTableColumnActions` | A column's actions menu (takes `column`) |
+| `DataTableColumnFilter` | A column's filter field (takes `column`) |
+| `DataTableFilterModeMenu` | A column's filter-mode menu (takes `column`) |
+| `DataTableEditModal` | The edit / create dialog |
+
+The header, body and footer stay inside `<DataTable />`, which manages their scrolling, virtualization and keyboard navigation. To change how they look, use [`slotProps`](/docs/guides/slot-props).
+
+## Related
+
+- [Toolbar customization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/toolbar): The table renders a top toolbar (title slot + your actions on the left, an icon-action cluster on the right) and a bottom toolbar (pagination).
+- [Part props (slotProps)](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/slot-props): Every part of the table — the scroll surface, rows, cells, toolbars, the search box, edit fields and more — accepts extra props through the slotProps option.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).

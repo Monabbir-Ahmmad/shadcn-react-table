@@ -1,0 +1,443 @@
+import { act, renderHook } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
+
+import { pinColumn } from "../helpers/column-pinning"
+import { getColumnPinningStyle } from "../utils/column-styles"
+import type { DataTableColumnDef } from "./table-types"
+import type { UseDataTableOptions } from "./types"
+import { useDataTable } from "./use-data-table"
+
+// Behaviour lock for the TanStack engine. Uses only our public hook and
+// instance members that keep their names across TanStack majors, so it runs
+// unchanged before and after an engine upgrade.
+
+type Person = {
+  id: string
+  name: string
+  dept: string
+  age: number
+  salary: number
+  children?: Person[]
+}
+
+const people: Person[] = [
+  { id: "1", name: "Joanna", dept: "eng", age: 41, salary: 100 },
+  { id: "2", name: "Annabel", dept: "eng", age: 29, salary: 80 },
+  { id: "3", name: "Ann", dept: "ops", age: 35, salary: 60 },
+  { id: "4", name: "Bob", dept: "ops", age: 52, salary: 40 },
+]
+
+const columns: DataTableColumnDef<Person>[] = [
+  { accessorKey: "name", header: "Name", meta: { filterMode: "contains" } },
+  { accessorKey: "dept", header: "Dept" },
+  { accessorKey: "age", header: "Age" },
+  { accessorKey: "salary", header: "Salary", aggregationFn: "sum" },
+]
+
+type Options = Partial<UseDataTableOptions<Person>>
+
+function setup(options: Options = {}) {
+  return renderHook(() =>
+    useDataTable<Person>({
+      columns,
+      data: people,
+      getRowId: (row) => row.id,
+      ...options,
+    })
+  )
+}
+
+const ids = (rows: { id: string }[]) => rows.map((row) => row.id)
+
+describe("useDataTable engine behaviour", () => {
+  it("renders every row in data order by default", () => {
+    const { result } = setup()
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
+  })
+
+  it("sorts client-side", () => {
+    const { result } = setup()
+    act(() => result.current.setSorting([{ id: "age", desc: false }]))
+    expect(ids(result.current.getRowModel().rows)).toEqual(["2", "3", "1", "4"])
+  })
+
+  it("filters a column by its mode and re-filters when the mode changes", () => {
+    const { result } = setup()
+    act(() => result.current.getColumn("name")!.setFilterValue("ann"))
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3"])
+
+    // Switching mode clears the value, then the new mode applies.
+    act(() => result.current.setColumnFilterMode("name", "startsWith"))
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
+    act(() => result.current.getColumn("name")!.setFilterValue("ann"))
+    expect(ids(result.current.getRowModel().rows)).toEqual(["2", "3"])
+  })
+
+  it("global fuzzy search keeps data order when ranking is off", () => {
+    const { result } = setup()
+    act(() => result.current.setGlobalFilter("ann"))
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3"])
+  })
+
+  it("global fuzzy search orders by match rank when ranking is on", () => {
+    const { result } = setup({ enableGlobalFilterRankedResults: true })
+    act(() => result.current.setGlobalFilter("ann"))
+    // equal > starts-with > contains
+    expect(ids(result.current.getRowModel().rows)).toEqual(["3", "2", "1"])
+  })
+
+  it("re-filters when the global filter mode changes", () => {
+    const { result } = setup()
+    act(() => result.current.setGlobalFilter("ann"))
+    // Warm the cache the way a rendered body does, then switch modes.
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3"])
+    act(() => result.current.setGlobalFilterMode("startsWith"))
+    expect(ids(result.current.getRowModel().rows)).toEqual(["2", "3"])
+  })
+
+  it("re-filters when a consumer swaps globalFilterFn", () => {
+    const only =
+      (name: string) => () => (row: { getValue: (id: string) => unknown }) =>
+        row.getValue("name") === name
+    const { result, rerender } = renderHook(
+      ({ fn }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          globalFilterFn: fn as never,
+          state: { globalFilter: "x" },
+        }),
+      { initialProps: { fn: only("Joanna")() } }
+    )
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1"])
+    rerender({ fn: only("Bob")() })
+    expect(ids(result.current.getRowModel().rows)).toEqual(["4"])
+  })
+
+  it("applies the advanced filter group", () => {
+    const { result } = setup({ enableAdvancedFilter: true })
+    act(() =>
+      result.current.setAdvancedFilter({
+        logic: "and",
+        rules: [
+          { id: "r1", columnId: "age", operator: "greaterThan", value: 40 },
+        ],
+      })
+    )
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "4"])
+  })
+
+  it("paginates client-side, and shows every row when pagination is off", () => {
+    const initialState = { pagination: { pageIndex: 0, pageSize: 2 } }
+    expect(
+      ids(setup({ initialState }).result.current.getRowModel().rows)
+    ).toEqual(["1", "2"])
+    expect(
+      ids(
+        setup({
+          initialState,
+          enablePagination: false,
+        }).result.current.getRowModel().rows
+      )
+    ).toEqual(["1", "2", "3", "4"])
+  })
+
+  it("computes faceted values, and skips them when faceting is off or manual", () => {
+    const on = setup().result.current
+    expect(
+      Object.fromEntries(on.getColumn("dept")!.getFacetedUniqueValues())
+    ).toEqual({
+      eng: 2,
+      ops: 2,
+    })
+    expect(on.getColumn("age")!.getFacetedMinMaxValues()).toEqual([29, 52])
+
+    const off = setup({ enableFacetedValues: false }).result.current
+    expect(off.getColumn("dept")!.getFacetedUniqueValues().size).toBe(0)
+    expect(off.getColumn("age")!.getFacetedMinMaxValues()).toBeUndefined()
+
+    const manual = setup({ manualFiltering: true }).result.current
+    expect(manual.getColumn("dept")!.getFacetedUniqueValues().size).toBe(0)
+  })
+
+  it("groups and aggregates only when grouping is enabled", () => {
+    const initialState = { grouping: ["dept"] }
+    const grouped = setup({ enableGrouping: true, initialState }).result.current
+    const rows = grouped.getRowModel().rows
+    expect(rows).toHaveLength(2)
+    expect(rows.every((row) => row.getIsGrouped())).toBe(true)
+    const eng = rows.find((row) => row.getValue("dept") === "eng")!
+    expect(eng.getValue("salary")).toBe(180)
+
+    const flat = setup({ initialState }).result.current
+    expect(ids(flat.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
+  })
+
+  it("expands tree data from getSubRows", () => {
+    const tree: Person[] = [
+      {
+        id: "t1",
+        name: "Root",
+        dept: "eng",
+        age: 50,
+        salary: 1,
+        children: [{ id: "t2", name: "Leaf", dept: "eng", age: 20, salary: 1 }],
+      },
+      { id: "t3", name: "Solo", dept: "ops", age: 30, salary: 1 },
+    ]
+    const base = { data: tree, getSubRows: (row: Person) => row.children }
+    expect(ids(setup(base).result.current.getRowModel().rows)).toEqual([
+      "t1",
+      "t3",
+    ])
+    expect(
+      ids(
+        setup({
+          ...base,
+          initialState: { expanded: true },
+        }).result.current.getRowModel().rows
+      )
+    ).toEqual(["t1", "t2", "t3"])
+  })
+
+  it("pins rows to the top", () => {
+    const { result } = setup({ enableRowPinning: true })
+    act(() => result.current.getRow("3").pin("top"))
+    expect(ids(result.current.getTopRows())).toEqual(["3"])
+    expect(ids(result.current.getCenterRows())).toEqual(["1", "2", "4"])
+  })
+
+  it("pins columns left/right from initialState and reports left/right state", () => {
+    const { result } = setup({
+      enableColumnPinning: true,
+      initialState: { columnPinning: { left: ["name"], right: ["salary"] } },
+    })
+    const table = result.current
+    expect(getColumnPinningStyle(table.getColumn("name")!)).toMatchObject({
+      position: "sticky",
+      insetInlineStart: 0,
+    })
+    expect(getColumnPinningStyle(table.getColumn("salary")!)).toMatchObject({
+      position: "sticky",
+      insetInlineEnd: 0,
+    })
+    expect(table.getColumn("age")!.getIsPinned()).toBeFalsy()
+    expect(table.getState().columnPinning).toEqual({
+      left: ["name"],
+      right: ["salary"],
+    })
+  })
+
+  it("pins columns from controlled left/right state", () => {
+    const table = setup({
+      enableColumnPinning: true,
+      state: { columnPinning: { left: ["age"], right: [] } },
+    }).result.current
+    expect(getColumnPinningStyle(table.getColumn("age")!)).toMatchObject({
+      position: "sticky",
+      insetInlineStart: 0,
+    })
+  })
+
+  it("sizes columns and exposes resize info under columnSizingInfo", () => {
+    const { result } = setup({ enableColumnResizing: true })
+    act(() => result.current.setColumnSizing({ age: 400 }))
+    expect(result.current.getColumn("age")!.getSize()).toBe(400)
+    expect(result.current.getState().columnSizingInfo.isResizingColumn).toBe(
+      false
+    )
+  })
+
+  it("selects rows", () => {
+    const { result } = setup({ enableRowSelection: true })
+    act(() => result.current.getRow("2").toggleSelected(true))
+    expect(ids(result.current.getSelectedRowModel().rows)).toEqual(["2"])
+  })
+
+  it("follows controlled left/right column pinning across rerenders", () => {
+    const { result, rerender } = renderHook(
+      ({ state }: { state: Options["state"] }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          enableColumnPinning: true,
+          state,
+        }),
+      {
+        initialProps: {
+          state: { columnPinning: { left: ["age"], right: [] } },
+        },
+      }
+    )
+    expect(
+      getColumnPinningStyle(result.current.getColumn("age")!)
+    ).toMatchObject({ position: "sticky", insetInlineStart: 0 })
+
+    rerender({ state: { columnPinning: { left: ["name"], right: [] } } })
+    expect(
+      getColumnPinningStyle(result.current.getColumn("name")!)
+    ).toMatchObject({ position: "sticky", insetInlineStart: 0 })
+    expect(getColumnPinningStyle(result.current.getColumn("age")!)).toEqual({})
+  })
+
+  it("pins a column interactively without a change handler", () => {
+    const { result } = setup({ enableColumnPinning: true })
+    act(() => pinColumn(result.current.getColumn("age")!, "left"))
+    expect(result.current.getState().columnPinning.left).toEqual(["age"])
+    expect(
+      getColumnPinningStyle(result.current.getColumn("age")!)
+    ).toMatchObject({ position: "sticky", insetInlineStart: 0 })
+  })
+
+  it("returns a stable getState() snapshot while state is unchanged", () => {
+    const { result } = setup({ enableColumnPinning: true })
+    const first = result.current.getState()
+    expect(result.current.getState()).toBe(first)
+    expect(result.current.getState().columnPinning).toBe(first.columnPinning)
+    act(() => result.current.setSorting([{ id: "age", desc: false }]))
+    expect(result.current.getState()).not.toBe(first)
+  })
+
+  it("applies the pagination gate when toggled after mount", () => {
+    const initialState = { pagination: { pageIndex: 0, pageSize: 2 } }
+    const { result, rerender } = renderHook(
+      ({ enablePagination }: { enablePagination: boolean }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          initialState,
+          enablePagination,
+        }),
+      { initialProps: { enablePagination: true } }
+    )
+    expect(result.current.getRowModel().rows).toHaveLength(2)
+    rerender({ enablePagination: false })
+    expect(result.current.getRowModel().rows).toHaveLength(4)
+    rerender({ enablePagination: true })
+    expect(result.current.getRowModel().rows).toHaveLength(2)
+  })
+
+  it("applies the faceting gate when toggled after mount", () => {
+    const { result, rerender } = renderHook(
+      ({ enableFacetedValues }: { enableFacetedValues: boolean }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          enableFacetedValues,
+        }),
+      { initialProps: { enableFacetedValues: true } }
+    )
+    expect(
+      result.current.getColumn("dept")!.getFacetedUniqueValues().size
+    ).toBe(2)
+    rerender({ enableFacetedValues: false })
+    expect(
+      result.current.getColumn("dept")!.getFacetedUniqueValues().size
+    ).toBe(0)
+  })
+
+  it("applies the grouping gate when toggled after mount", () => {
+    const initialState = { grouping: ["dept"] }
+    const { result, rerender } = renderHook(
+      ({ enableGrouping }: { enableGrouping: boolean }) =>
+        useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          initialState,
+          enableGrouping,
+        }),
+      { initialProps: { enableGrouping: false } }
+    )
+    expect(result.current.getRowModel().rows).toHaveLength(4)
+    rerender({ enableGrouping: true })
+    expect(result.current.getRowModel().rows).toHaveLength(2)
+  })
+
+  it("reports controlled pinning changes through the left/right handler", () => {
+    const onColumnPinningChange = vi.fn()
+    const { result } = setup({
+      enableColumnPinning: true,
+      state: { columnPinning: { left: [], right: [] } },
+      onColumnPinningChange,
+    })
+    act(() => pinColumn(result.current.getColumn("age")!, "left"))
+    expect(onColumnPinningChange).toHaveBeenCalledTimes(1)
+    const updater = onColumnPinningChange.mock.calls[0]![0]
+    expect(updater({ left: [], right: [] })).toEqual({
+      left: ["age"],
+      right: [],
+    })
+  })
+
+  it("applies a grouped leaf column's variant mode (range inside a header group)", () => {
+    const grouped: DataTableColumnDef<Person>[] = [
+      { accessorKey: "name", header: "Name" },
+      {
+        header: "Details",
+        columns: [
+          {
+            accessorKey: "age",
+            header: "Age",
+            meta: { filterVariant: "range" },
+          },
+        ],
+      },
+    ]
+    const { result } = renderHook(() =>
+      useDataTable<Person>({
+        columns: grouped,
+        data: people,
+        getRowId: (row) => row.id,
+      })
+    )
+    act(() => result.current.getColumn("age")!.setFilterValue([30, 45]))
+    // ages: 41, 29, 35, 52 -> inclusive 30..45 keeps 41 and 35
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "3"])
+  })
+
+  it("ignores column and global filters when enableFilters is false", () => {
+    const { result } = setup({
+      enableFilters: false,
+      state: {
+        columnFilters: [{ id: "name", value: "Joanna" }],
+        globalFilter: "zzz",
+      },
+    })
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
+  })
+
+  it("does not emit onColumnFiltersChange when switching mode on an unfiltered column", () => {
+    const onColumnFiltersChange = vi.fn()
+    const { result } = setup({ onColumnFiltersChange })
+    act(() => result.current.setColumnFilterMode("name", "startsWith"))
+    expect(onColumnFiltersChange).not.toHaveBeenCalled()
+
+    // A valueless mode still activates (it needs a sentinel value).
+    act(() => result.current.setColumnFilterMode("name", "empty"))
+    expect(onColumnFiltersChange).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not rank rows by a global filter when enableFilters is false", () => {
+    const { result } = setup({
+      enableFilters: false,
+      manualFiltering: false,
+      enableGlobalFilterRankedResults: true,
+      state: { globalFilter: "ann" },
+    })
+    // Filtering is off, so neither the filter nor its ranking applies.
+    expect(ids(result.current.getRowModel().rows)).toEqual(["1", "2", "3", "4"])
+  })
+
+  it("skips faceting when enableFilters is false", () => {
+    const { result } = setup({ enableFilters: false })
+    // Same as manual filtering: no filter UI, so no facet values are computed.
+    expect(
+      result.current.getColumn("dept")!.getFacetedUniqueValues().size
+    ).toBe(0)
+  })
+})

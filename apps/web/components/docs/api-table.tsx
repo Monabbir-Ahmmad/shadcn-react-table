@@ -2,12 +2,20 @@
 
 import * as React from "react"
 
+import { cn } from "@workspace/ui/lib/utils"
 import * as generated from "@/lib/api-reference.generated"
 import type { ApiMember } from "@/lib/api-reference.generated"
 
 type SectionKey = keyof typeof generated
 
 const SECTIONS = generated as Record<string, ApiMember[]>
+
+/** A tint per kind of type, so functions, unions and primitives scan apart. */
+function typeTone(type: string): string {
+  if (type.includes("=>")) return "bg-primary/15 text-foreground"
+  if (type.includes("|")) return "bg-secondary text-secondary-foreground"
+  return "bg-muted text-muted-foreground"
+}
 
 /**
  * Renders an auto-generated API reference table. `of` selects one of the
@@ -45,6 +53,8 @@ export function ApiTable({
   const colCount = 2 + (showType ? 1 : 0) + (showDefault ? 1 : 0)
 
   const showSearch = search ?? !only
+  // Only full reference tables get row anchors; guide excerpts can repeat names.
+  const anchored = !only
   const [query, setQuery] = React.useState("")
   const q = query.trim().toLowerCase()
   const filtered = q
@@ -59,7 +69,7 @@ export function ApiTable({
   return (
     <div className="my-6 flex flex-col gap-2">
       {showSearch && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="sticky top-(--site-header-h) z-10 flex items-center justify-between gap-3 bg-background/90 py-2 backdrop-blur">
           <input
             type="search"
             value={query}
@@ -99,7 +109,14 @@ export function ApiTable({
               </tr>
             ) : (
               filtered.map((row) => (
-                <tr key={row.name} className="border-b align-top last:border-0">
+                <tr
+                  key={row.name}
+                  id={anchored ? `api-${row.name}` : undefined}
+                  className={cn(
+                    "group border-b align-top last:border-0",
+                    anchored && "scroll-mt-28 target:bg-primary/5"
+                  )}
+                >
                   <td className="px-3 py-2 whitespace-nowrap">
                     <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
                       {row.name}
@@ -107,10 +124,24 @@ export function ApiTable({
                         <span className="text-muted-foreground">?</span>
                       )}
                     </code>
+                    {anchored && (
+                      <a
+                        href={`#api-${row.name}`}
+                        aria-label={`Link to ${row.name}`}
+                        className="ms-1 text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                      >
+                        #
+                      </a>
+                    )}
                   </td>
                   {showType && (
                     <td className="px-3 py-2">
-                      <code className="font-mono text-xs text-muted-foreground">
+                      <code
+                        className={cn(
+                          "rounded px-1.5 py-0.5 font-mono text-xs",
+                          typeTone(row.type)
+                        )}
+                      >
                         {row.type}
                       </code>
                     </td>

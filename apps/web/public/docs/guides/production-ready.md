@@ -1,0 +1,115 @@
+# Production-ready tables
+
+A table over a real API: data fetched with React Query, paging, sorting and search done on the server, the table's state kept in one hook, and edits saved through a mutation.
+
+Example (`react-query`):
+
+```tsx
+function ReactQueryExample() {
+  const [client] = React.useState(() => new QueryClient())
+  return (
+    <QueryClientProvider client={client}>
+      <PeopleFromServer />
+    </QueryClientProvider>
+  )
+}
+```
+
+## 1. Keep the server-facing state in one hook
+
+```tsx
+import type { PaginationState, SortingState } from "@tanstack/react-table"
+
+function usePeopleTableState() {
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 25,
+  })
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = React.useState("")
+  return {
+    state: { pagination, sorting, globalFilter },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    // What the API needs, derived in one place.
+    query: {
+      page: pagination.pageIndex + 1,
+      size: pagination.pageSize,
+      sort: sorting[0],
+      q: globalFilter,
+    },
+  }
+}
+```
+
+Swap the `useState` calls for your router's search params to make the URL the source of truth.
+
+## 2. Fetch with React Query
+
+```tsx
+const tableState = usePeopleTableState()
+const people = useQuery({
+  queryKey: ["people", tableState.query],
+  queryFn: () => api.people(tableState.query),
+  placeholderData: keepPreviousData, // keep the current page while the next loads
+})
+```
+
+## 3. Hand both to the table
+
+```tsx
+const table = useDataTable({
+  data: people.data?.rows ?? [],
+  columns,
+  getRowId: (row) => row.id,
+  rowCount: people.data?.total ?? 0,
+  manualPagination: true,
+  manualSorting: true,
+  manualFiltering: true,
+  state: tableState.state,
+  onPaginationChange: tableState.onPaginationChange,
+  onSortingChange: tableState.onSortingChange,
+  onGlobalFilterChange: tableState.onGlobalFilterChange,
+  isLoading: people.isPending, // skeletons on the first load
+  showProgressBars: people.isFetching, // a progress bar on later loads
+})
+```
+
+With manual filtering, the search box waits for a pause in typing before it sets `globalFilter`, so each keystroke doesn't send a request.
+
+## 4. Save edits through a mutation
+
+```tsx
+const save = useMutation({
+  mutationFn: api.updatePerson,
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["people"] }),
+})
+
+useDataTable({
+  // …
+  enableEditing: true,
+  editDisplayMode: "modal",
+  isSaving: save.isPending,
+  onEditingRowSave: async ({ row, values, exit }) => {
+    await save.mutateAsync({ id: row.id, ...values })
+    exit()
+  },
+})
+```
+
+`isSaving` shows the progress bar while the request runs; `exit()` closes the editor only once the save succeeds.
+
+## Checklist
+
+- `getRowId` from your API's id.
+- Stable `columns` (module scope).
+- `manual*` for everything the server does, plus `rowCount`.
+- `isLoading` for the first load, `showProgressBars` for refetches, `isSaving` for writes.
+- Show errors (`people.isError`) with `renderEmpty` or above the table.
+
+## Related
+
+- [Server-side data](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/server-side): When your data lives on a server, hand pagination, sorting, and filtering off to it.
+- [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
+- [Best practices](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/best-practices): A few habits keep tables fast, typed and easy to change.

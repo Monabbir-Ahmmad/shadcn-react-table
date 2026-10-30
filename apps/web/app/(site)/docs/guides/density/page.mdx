@@ -1,0 +1,64 @@
+export const metadata = { title: "Density" }
+
+# Density
+
+Density controls the vertical padding of table rows. The data table ships three densities: `"comfortable"` (the default), `"compact"`, and `"spacious"`. A toolbar button cycles through them, so end users can pick the row height that suits them.
+
+<Example slug="density" />
+
+## Usage
+
+Set the initial density with `initialState.density`:
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  initialState: { density: "compact" },
+})
+
+return <DataTable table={table} />
+```
+
+## Reading and setting density
+
+You can read or change the current density at any time through the table instance:
+
+```tsx
+// current density: "comfortable" | "compact" | "spacious"
+const density = table.getState().density
+
+// switch to compact programmatically
+table.setDensity("compact")
+```
+
+This is handy when you want to drive density from your own controls instead of the built-in toolbar button. To show the current density in your component's render, add `stateSelector: (state) => state.density` (see [State management](/docs/guides/state#reading-state-in-your-component)).
+
+## Hiding the toolbar button
+
+Each toolbar control can be hidden individually. Pass `enableDensityToggle: false` to drop the density button (for example when you drive density from your own UI), or `enableFullscreenToggle: false` to drop the full-screen button:
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableDensityToggle: false,
+  enableFullscreenToggle: false,
+})
+```
+
+The other toolbar options have their own flags too: `enableGlobalFilter`, `enableColumnFilters`, and `enableColumnActions`. To remove the entire top toolbar, use `enableTopToolbar: false`.
+
+<Callout variant="tip" title="Persisting density">
+  `density` is table state, so you can mirror it into local storage or a query
+  param (with `onDensityChange`) and restore it via `initialState.density` on
+  the next load, or control it with `state.density`.
+</Callout>
+
+## Related
+
+<Cards>
+  <Card href="/docs/api/table-instance" title="Table instance" />
+</Cards>

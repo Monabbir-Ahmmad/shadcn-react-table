@@ -1,0 +1,142 @@
+export const metadata = { title: "Updating" }
+
+# Updating your copy
+
+`shadcn add` copies this block's source into your project — after that,
+the code is yours, and upstream releases don't reach it automatically.
+This page is the manual update path.
+
+## Know what you have
+
+Every release stamps its version into the registry item. When you
+install, note the `meta.version` of
+[`/r/data-table.json`](/r/data-table.json) somewhere in your project
+(a comment, your PR description). The
+[changelog](https://github.com/Monabbir-Ahmmad/shadcn-react-table/blob/main/packages/shadcn-react-table/CHANGELOG.md)
+lists what changed in each version.
+
+## Update recipe
+
+1. Start from a clean branch.
+2. Re-run the install command with `--overwrite`:
+
+   ```bash
+   npx shadcn@latest add --overwrite <registry-url>/r/data-table.json
+   ```
+
+3. Review the diff. Everything under `components/ui/data-table/` is
+   replaced with the new upstream source — `git diff` shows upstream
+   changes mixed with the loss of any local edits you made.
+4. Re-apply your local edits on top, or cherry-pick hunks with
+   `git checkout -p` against the pre-update commit.
+5. Check the changelog for entries marked as breaking and adjust your
+   usage.
+
+<Callout variant="tip" title="Keep local edits separate">
+  The less you edit the copied files directly — prefer wrapping the table or
+  using the many `render*` slots — the closer step 3's diff is to a pure
+  upstream update.
+</Callout>
+
+## Localization keys and installed locales
+
+When a release adds localization keys, re-add every locale you installed,
+otherwise its typecheck fails on the missing keys:
+
+```bash
+pnpm dlx shadcn@latest add --overwrite <registry-url>/r/data-table-locale-de.json
+```
+
+Do this after re-adding the table, and re-apply any edits you made to a locale
+file.
+
+## Upgrading to 1.0.0
+
+1.0.0 moves the engine to TanStack Table v9 and settles the API. Re-add the block, then:
+
+1. **Type columns with `DataTableColumnDef`.** TanStack v9's `ColumnDef` needs a
+   feature-set type parameter; ours supplies it.
+
+   ```ts
+   import type { DataTableColumnDef } from "@/components/ui/data-table"
+   const columns: DataTableColumnDef<Person>[] = [...]
+   ```
+
+   `DataTableRow`, `DataTableColumn`, `DataTableCell`, and `DataTableHeader` are
+   the matching instance types. Install `@tanstack/react-table@^9` and
+   `@tanstack/match-sorter-utils@^9` (the registry item pins both).
+
+2. **Drop row-model options.** `getCoreRowModel`, `getSortedRowModel`, … are no
+   longer accepted; the table wires every row model itself.
+3. **Custom aggregation functions** use TanStack v9's
+   `constructAggregationFn({ aggregate })` shape. Built-in names (`"sum"`,
+   `"mean"`, …) are unchanged.
+4. **Instance APIs follow TanStack v9:** `column.pin("start" | "end")`,
+   `column.getIsPinned()` returns `"start" | "end"`, `getPrePaginatedRowModel()`.
+   Table options and `table.getState()` keep the `left`/`right` pinning shape,
+   and `table.getState().columnSizingInfo` keeps its name. Other renames:
+   `getLeft*`/`getRight*` are `getStart*`/`getEnd*` (leaf columns, visible
+   cells, header groups, total size), `column.getStart("left")` and
+   `column.getAfter("right")` take `"start"` / `"end"`, and
+   `getPaginationRowModel()` is `getPaginatedRowModel()`.
+5. **Option and column-def renames reach you too.** The column option
+   `sortingFn` is now `sortFn`. `state.columnSizingInfo`,
+   `initialState.columnSizingInfo` and `onColumnSizingInfoChange` are now
+   `columnResizing` and `onColumnResizingChange` (only the value returned by
+   `table.getState()` keeps the `columnSizingInfo` name).
+6. **`filterFns`, `sortingFns` and `aggregationFns` options are gone.** The hook
+   owns the feature set, so pass custom functions inline on the column
+   (`filterFn: myFilterFn`, `sortFn: myCompare`, `aggregationFn: myAgg`). Built-in
+   string names still work. Type inline filter functions with the exported
+   `DataTableFilterFn<TData>`.
+7. **Don't destructure row/column/cell methods** (`const { getValue } = row`); call
+   them on the object. Cell-renderer `({ getValue })` still works.
+8. **Row data must satisfy TanStack's `RowData`** (`Record<string, any> | Array<any>`).
+   `unknown` is no longer accepted, so use a concrete row type for
+   `useDataTable<TData>` and `DataTableInstance<TData>`. `DataTableInstance`
+   with no type argument now defaults to `RowData`.
+9. **Render contexts are unchanged.** Column renderers (`cell`, `header`,
+   `footer`, `aggregatedCell`) still receive the enriched instance, so
+   `({ table }) => table.getState()`, `table.dataTable` and the table's
+   methods type-check. TanStack v9's own contexts don't include `getState`.
+10. **`table.options` is the options object you passed in** on the latest render
+    (TanStack v9's React adapter behavior), not TanStack's internally merged
+    options with feature defaults.
+11. **Two small TanStack features are registered by the block.** Their types
+    add `dataTableInstanceFeature` and `dataTableUiFeature` through TanStack's
+    `Plugins` / `Table_FeatureMap` / `TableState_FeatureMap` interfaces, scoped
+    to tables built with the block's feature set. Other TanStack tables in
+    your app are unaffected, except ones typed `Table<any, …>`.
+12. **The component holding the table no longer re-renders on table state
+    changes.** If it reads the state while rendering (a selection count, the
+    current density), add `stateSelector` for what it reads, or wrap that part
+    in `table.Subscribe`. See
+    [State management](/docs/guides/state#reading-state-in-your-component).
+
+### API renames in 1.0.0
+
+| 0.x                                                                                        | 1.0.0                                                          |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `table.tableInstance.setDensity(…)` (and every setter or action)                           | `table.setDensity(…)`                                          |
+| `table.tableInstance.density` (and other UI state)                                         | `table.getState().density`                                     |
+| `table.tableInstance.isLoading` (and other options, `refs`)                                | `table.dataTable.isLoading`                                    |
+| `DataTableConfig` type                                                                     | `DataTableOptionsResolved` (+ `DataTableMethods`)              |
+| `defaultDensity: "compact"`                                                                | `initialState: { density: "compact" }`                         |
+| `density`, `isFullscreen`, `showColumnFilters`, `advancedFilter`, `globalFilterMode` props | `state: { … }`                                                 |
+| `defaultShowColumnFilters`, `defaultGlobalFilterMode`, `defaultAdvancedFilter`             | `initialState: { … }`                                          |
+| `onEditCellSave` / `onSaveRow` / `onCreateRow`                                             | `onEditingCellSave` / `onEditingRowSave` / `onCreatingRowSave` |
+| `renderToolbarActions`                                                                     | `renderTopToolbarCustomActions`                                |
+| `meta.variant` / `meta.options`                                                            | `meta.filterVariant` / `meta.filterSelectOptions`              |
+| `meta.disableHighlight: true`                                                              | `meta.enableFilterMatchHighlighting: false`                    |
+| `meta.disableColumnActions: true`                                                          | `meta.enableColumnActions: false`                              |
+| `<DataTable pageSizeOptions={…} />`                                                        | `useDataTable({ pageSizeOptions: … })`                         |
+| `<DataTable surfaceClassName="…" />`                                                       | `useDataTable({ slotProps: { surface: { className: "…" } } })` |
+| `renderColumnActionsMenuItems` appended after a separator                                   | return `<>{internalMenuItems}<DropdownMenuSeparator />{yours}</>` |
+| Edit button next to the `renderRowActionMenuItems` menu                                   | Edit is in the menu: render `internalMenuItems` in your items     |
+| `sortingFns` option                                                                         | `sortFns`                                                          |
+
+## Related
+
+<Cards>
+  <Card href="/docs/installation" title="Installation" />
+</Cards>

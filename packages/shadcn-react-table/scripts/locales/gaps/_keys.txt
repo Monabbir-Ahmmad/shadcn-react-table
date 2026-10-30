@@ -1,0 +1,61 @@
+rowsSelected	(selected, total) => `${selected.toLocaleString("en")} of ${total.toLocaleString("en")} row${total===1?"":"s"} selected`
+sortByColumnAsc	column => `Sort by ${column} ascending`
+sortByColumnDesc	column => `Sort by ${column} descending`
+sortAscending	Sort ascending
+sortDescending	Sort descending
+sortedAscending	Sorted ascending
+sortedDescending	Sorted descending
+hideColumn	Hide column
+pinRow	Pin row
+unpinRow	Unpin row
+resizeColumn	Resize column
+groupByColumn	column => `Group by ${column}`
+groupedBy	Grouped by
+dropToGroupBy	Drag a column here to group by it
+toggleRowExpanded	Toggle row expanded
+filterMode	Filter mode
+filterPlaceholder	column => `Filter ${column}…`
+showColumnFilters	Show filters
+hideColumnFilters	Hide filters
+pickDate	Pick a date
+pickDateRange	Pick a date range
+true	True
+false	False
+filterModes.before	Before
+filterModes.after	After
+filterModes.betweenDates	Between
+advancedFilters	Advanced filters
+advancedFiltersMatch	logic => `Match ${logic} of the following rules`
+advancedFiltersMatchAll	All
+advancedFiltersMatchAny	Any
+advancedFiltersAddRule	Add filter
+advancedFiltersApply	Apply
+advancedFiltersClearAll	Clear all
+advancedFiltersColumn	Column
+advancedFiltersOperator	Operator
+advancedFiltersValue	Value
+advancedFiltersEmpty	No filters yet. Add one to get started.
+removeFilterRule	Remove filter
+advancedFilterOperators.notContains	does not contain
+searchPlaceholder	Search…
+densityComfortable	Comfortable
+densityCompact	Compact
+densitySpacious	Spacious
+enterFullscreen	Enter full screen
+exitFullscreen	Exit full screen
+paginationRange	(start, end, total) => `${start.toLocaleString("en")}–${end.toLocaleString("en")} of ${total.toLocaleString("en")}`
+goToPage	page => `Go to page ${page.toLocaleString("en")}`
+delete	Delete
+create	Create
+createNewRow	Create new row
+editRow	Edit row
+required	Required
+cellActions	Cell actions
+loading	Loading…
+loadingMore	Loading more…
+dragStart	label => `Picked up ${label}.`
+dragOver	(label, over) => `${label} is over ${over}.`
+dragEnd	(label, over) => `${label} was dropped on ${over}.`
+dragCancel	label => `Dragging was cancelled. ${label} was dropped.`
+dragInstructions	To pick up an item, press space or enter. While dragging, use the arrow keys to move it. Press space or enter again to drop it, or press escape to cancel.
+dragRowLabel	position => `Row ${position.toLocaleString("en")}`

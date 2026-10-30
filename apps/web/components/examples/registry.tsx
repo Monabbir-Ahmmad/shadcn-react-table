@@ -4,21 +4,40 @@ import {
   RiAddLine,
   RiDeleteBinLine,
   RiEqualizerLine,
+  RiSearch2Line,
   RiMoreFill,
   RiSortAsc,
   RiSortDesc,
 } from "@remixicon/react"
-import type { ColumnDef } from "@tanstack/react-table"
 import * as React from "react"
+
+import type { SortingState } from "@tanstack/react-table"
 
 import {
   DataTable,
+  DataTableConfigProvider,
+  DataTableDensityToggle,
+  DataTableGlobalFilter,
+  DataTableProvider,
+  DataTableViewOptions,
   useDataTable,
+  type DataTableColumnDef,
   type DataTableInstance,
+  type Density,
   type EditDisplayMode,
 } from "@monabbir/shadcn-react-table/components/data-table"
+import { dataTableLocalizationAr } from "@monabbir/shadcn-react-table/components/data-table/locales/ar"
 import { Button } from "@workspace/ui/components/button"
 import { ContextMenuItem } from "@workspace/ui/components/context-menu"
+import {
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog"
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu"
 
 import {
   users as baseUsers,
@@ -28,6 +47,7 @@ import {
   type User,
 } from "@/lib/example-data"
 import { currency, userColumns } from "./columns"
+import { MORE_EXAMPLES } from "./more"
 
 function useUserColumns() {
   return React.useMemo(() => userColumns(), [])
@@ -79,8 +99,7 @@ function ColumnFiltersExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultShowColumnFilters: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -92,9 +111,8 @@ function FilterModesExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultShowColumnFilters: true,
     enableColumnFilterModes: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -120,8 +138,7 @@ function GlobalSearchExample() {
     columns,
     getRowId: (row) => row.id,
     enableGlobalFilter: true,
-    defaultGlobalFilterMode: "fuzzy",
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { globalFilterMode: "fuzzy", pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -198,8 +215,7 @@ function DensityExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultDensity: "compact",
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { density: "compact", pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -208,13 +224,14 @@ function StickyExample() {
   const data = React.useMemo(() => makeUsers(40), [])
   const columns = useUserColumns()
   const table = useDataTable({
+    slotProps: { surface: { className: "max-h-[460px]" } },
     data,
     columns,
     getRowId: (row) => row.id,
     enablePagination: false,
     enableStickyFooter: true,
   })
-  return <DataTable table={table} surfaceClassName="max-h-[460px]" />
+  return <DataTable table={table} />
 }
 
 function LoadingExample() {
@@ -227,7 +244,7 @@ function LoadingExample() {
     getRowId: (row) => row.id,
     isLoading,
     initialState: { pagination: { pageSize: 10 } },
-    renderToolbarActions: () => (
+    renderTopToolbarCustomActions: () => (
       <Button
         variant="outline"
         size="sm"
@@ -366,7 +383,7 @@ function DetailPanelExample() {
   return <DataTable table={table} />
 }
 
-const orgColumns: ColumnDef<OrgNode>[] = [
+const orgColumns: DataTableColumnDef<OrgNode>[] = [
   { accessorKey: "name", header: "Name" },
   { accessorKey: "title", header: "Title" },
   { accessorKey: "department", header: "Department" },
@@ -418,13 +435,13 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       age: 30,
       salary: 50000,
     },
-    onEditCellSave: ({ row, column, value }) =>
+    onEditingCellSave: ({ row, column, value }) =>
       setData((prev) =>
         prev.map((r) =>
           r.id === row.id ? ({ ...r, [column.id]: value } as User) : r
         )
       ),
-    onSaveRow: ({ row, values, exit }) => {
+    onEditingRowSave: ({ row, values, exit }) => {
       setData((prev) =>
         prev.map((r) =>
           r.id === row.id ? { ...r, ...(values as Partial<User>) } : r
@@ -432,7 +449,7 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       )
       exit()
     },
-    onCreateRow: ({ values, exit }) => {
+    onCreatingRowSave: ({ values, exit }) => {
       setData((prev) => [
         {
           ...makeUsers(1)[0]!,
@@ -443,12 +460,8 @@ function EditingExample({ mode }: { mode: EditDisplayMode }) {
       ])
       exit()
     },
-    renderToolbarActions: ({ table }) => (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => table.tableInstance.beginCreate()}
-      >
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button variant="outline" size="sm" onClick={() => table.beginCreate()}>
         <RiAddLine />
         New
       </Button>
@@ -492,17 +505,14 @@ function CellActionsExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    enableClickToCopy: true,
+    // Copy from the right-click menu; it also gets the built-in Edit item.
+    enableClickToCopy: "context-menu",
+    enableCellActions: true,
+    enableEditing: true,
     initialState: { pagination: { pageSize: 10 } },
-    renderCellActionMenuItems: ({ cell }) => (
+    renderCellActionMenuItems: ({ cell, internalMenuItems }) => (
       <>
-        <ContextMenuItem
-          onClick={() =>
-            navigator.clipboard?.writeText(String(cell.getValue() ?? ""))
-          }
-        >
-          Copy value
-        </ContextMenuItem>
+        {internalMenuItems}
         <ContextMenuItem
           onClick={() =>
             navigator.clipboard?.writeText(JSON.stringify(cell.row.original))
@@ -533,17 +543,20 @@ function VirtualizedExample() {
   return <DataTable table={table} />
 }
 
-function wideColumns(): ColumnDef<User>[] {
-  const extra = Array.from({ length: 24 }, (_, i): ColumnDef<User> => ({
-    id: `metric${i}`,
-    header: `Metric ${i + 1}`,
-    accessorFn: (row) => (row.age * (i + 3)) % 100,
-    size: 110,
-    meta: { align: "right" },
-    cell: ({ getValue }) => (
-      <span className="tabular-nums">{getValue<number>()}</span>
-    ),
-  }))
+function wideColumns(): DataTableColumnDef<User>[] {
+  const extra = Array.from(
+    { length: 24 },
+    (_, i): DataTableColumnDef<User> => ({
+      id: `metric${i}`,
+      header: `Metric ${i + 1}`,
+      accessorFn: (row) => (row.age * (i + 3)) % 100,
+      size: 110,
+      meta: { align: "right" },
+      cell: ({ getValue }) => (
+        <span className="tabular-nums">{getValue<number>()}</span>
+      ),
+    })
+  )
   return [...userColumns(), ...extra]
 }
 
@@ -551,6 +564,7 @@ function ColumnVirtualizationExample() {
   const data = React.useMemo(() => makeUsers(300), [])
   const columns = React.useMemo(() => wideColumns(), [])
   const table = useDataTable({
+    slotProps: { surface: { className: "max-h-[600px]" } },
     data,
     columns,
     getRowId: (row) => row.id,
@@ -558,7 +572,7 @@ function ColumnVirtualizationExample() {
     enableRowVirtualization: true,
     enableColumnVirtualization: true,
   })
-  return <DataTable table={table} surfaceClassName="max-h-[600px]" />
+  return <DataTable table={table} />
 }
 
 function EventListenersExample() {
@@ -571,7 +585,7 @@ function EventListenersExample() {
     getRowId: (row) => row.id,
     initialState: { pagination: { pageSize: 10 } },
     onRowClick: ({ row }) => setLast(row.original.email),
-    renderToolbarActions: () => (
+    renderTopToolbarCustomActions: () => (
       <span className="text-xs text-muted-foreground">
         {last ? `Last clicked: ${last}` : "Click any row"}
       </span>
@@ -587,14 +601,13 @@ function CustomIconsExample() {
     data,
     columns,
     getRowId: (row) => row.id,
-    defaultShowColumnFilters: true,
     icons: {
       sortAscending: RiSortAsc,
       sortDescending: RiSortDesc,
       columnActions: RiMoreFill,
       columnVisibility: RiEqualizerLine,
     },
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
 }
@@ -634,7 +647,7 @@ function ExportExample() {
     columns,
     getRowId: (row) => row.id,
     enableRowSelection: true,
-    renderToolbarActions: ({ table }) => (
+    renderTopToolbarCustomActions: ({ table }) => (
       <Button
         variant="outline"
         size="sm"
@@ -671,10 +684,33 @@ function LocalizationExample() {
     columns,
     getRowId: (row) => row.id,
     localization: SPANISH,
-    defaultShowColumnFilters: true,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
   })
   return <DataTable table={table} />
+}
+
+function RtlExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    localization: dataTableLocalizationAr,
+    enableColumnPinning: true,
+    enableColumnResizing: true,
+    initialState: {
+      pagination: { pageSize: 10 },
+      columnPinning: { left: ["firstName"] },
+    },
+  })
+  // The table follows the direction it renders in; set `dir="rtl"` on it or
+  // any ancestor (usually <html>).
+  return (
+    <div dir="rtl">
+      <DataTable table={table} />
+    </div>
+  )
 }
 
 const PAGE_SIZE = 10
@@ -741,6 +777,7 @@ function InfiniteScrollExample() {
 
   const columns = useUserColumns()
   const table = useDataTable({
+    slotProps: { surface: { className: "max-h-[460px]" } },
     data: rows,
     columns,
     getRowId: (row) => row.id,
@@ -748,19 +785,19 @@ function InfiniteScrollExample() {
     hasNextPage,
     isFetchingNextPage,
     onLoadMore: loadMore,
-    renderToolbarActions: () => (
-      <span className="text-xs tabular-nums text-muted-foreground">
+    renderTopToolbarCustomActions: () => (
+      <span className="text-xs text-muted-foreground tabular-nums">
         Loaded {rows.length} of {all.length}
       </span>
     ),
   })
-  return <DataTable table={table} surfaceClassName="max-h-[460px]" />
+  return <DataTable table={table} />
 }
 
 function AutoRowHeightExample() {
   const data = React.useMemo(() => baseUsers, [])
-  const columns = React.useMemo<ColumnDef<User>[]>(() => {
-    const bio: ColumnDef<User> = {
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(() => {
+    const bio: DataTableColumnDef<User> = {
       id: "bio",
       header: "Bio",
       size: 300,
@@ -801,9 +838,8 @@ function AdvancedExample() {
     enableStickyFooter: true,
     enableEditing: true,
     editDisplayMode: "row",
-    defaultShowColumnFilters: true,
-    initialState: { pagination: { pageSize: 10 } },
-    onSaveRow: ({ row, values, exit }) => {
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
+    onEditingRowSave: ({ row, values, exit }) => {
       setData((prev) =>
         prev.map((r) =>
           r.id === row.id ? { ...r, ...(values as Partial<User>) } : r
@@ -839,6 +875,616 @@ function Field({
       <dt className="text-muted-foreground">{label}</dt>
       <dd>{children}</dd>
     </div>
+  )
+}
+
+// ----------------------------------------------------------------------------
+// 1.0 features
+// ----------------------------------------------------------------------------
+
+function SlotPropsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    slotProps: {
+      // Dim inactive people and mark pending ones with a left border.
+      bodyRow: ({ row }) => ({
+        className:
+          row.original.status === "inactive"
+            ? "text-muted-foreground"
+            : row.original.status === "pending"
+              ? "border-l-2 border-l-amber-500"
+              : undefined,
+      }),
+      headCell: { className: "text-[11px] uppercase tracking-wide" },
+      surface: { className: "max-h-[480px]" },
+    },
+  })
+  return <DataTable table={table} />
+}
+
+const NAME_COLUMNS: DataTableColumnDef<User>[] = [
+  {
+    accessorFn: (row) => `${row.firstName} ${row.lastName}`,
+    id: "name",
+    header: "Name",
+    meta: {
+      filterMode: "wordStartsWith",
+      columnFilterModeOptions: ["wordStartsWith", "contains", "equals"],
+    },
+  },
+  { accessorKey: "email", header: "Email" },
+  { accessorKey: "city", header: "City" },
+]
+
+function CustomFilterFnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const table = useDataTable({
+    data,
+    columns: NAME_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: {
+      showColumnFilters: true,
+      pagination: { pageSize: 10 },
+    },
+    // Matches when any word of the cell starts with the typed text.
+    filterFns: {
+      wordStartsWith: (row, columnId, value) =>
+        String(row.getValue(columnId))
+          .toLowerCase()
+          .split(/\s+/)
+          .some((word) => word.startsWith(String(value).toLowerCase())),
+    },
+    localization: { filterModes: { wordStartsWith: "Any word starts with" } },
+  })
+  return <DataTable table={table} />
+}
+
+const ROLE_ORDER: User["role"][] = ["Owner", "Admin", "Editor", "Viewer"]
+
+function CustomSortFnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () =>
+      userColumns().map((column) =>
+        "accessorKey" in column && column.accessorKey === "role"
+          ? { ...column, sortFn: "byRole" }
+          : column
+      ),
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Sort roles by rank, not alphabetically.
+    sortFns: {
+      byRole: (rowA, rowB, columnId) =>
+        ROLE_ORDER.indexOf(rowA.getValue(columnId)) -
+        ROLE_ORDER.indexOf(rowB.getValue(columnId)),
+    },
+    initialState: {
+      sorting: [{ id: "role", desc: false }],
+      pagination: { pageSize: 10 },
+    },
+  })
+  return <DataTable table={table} />
+}
+
+function CustomAggregationExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = React.useMemo<DataTableColumnDef<User>[]>(
+    () => [
+      { accessorKey: "department", header: "Department" },
+      { accessorKey: "firstName", header: "First name" },
+      {
+        accessorKey: "salary",
+        header: "Salary",
+        aggregationFn: "spread",
+        cell: ({ getValue }) => currency.format(getValue() as number),
+        aggregatedCell: ({ getValue }) => (
+          <span className="text-muted-foreground">
+            spread {currency.format(getValue() as number)}
+          </span>
+        ),
+        meta: { align: "right" },
+      },
+    ],
+    []
+  )
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableGrouping: true,
+    // The gap between the highest and lowest salary in each group.
+    aggregationFns: {
+      spread: {
+        aggregate: ({ rows, getValue }) => {
+          const values = rows.map((row) => Number(getValue(row)))
+          return Math.max(...values) - Math.min(...values)
+        },
+      },
+    },
+    initialState: { grouping: ["department"], pagination: { pageSize: 20 } },
+  })
+  return <DataTable table={table} />
+}
+
+function EditingPerRowExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: (row) => row.original.status !== "inactive",
+    editDisplayMode: "cell",
+    onEditingCellSave: ({ row, column, value }) =>
+      setData((prev) =>
+        prev.map((user) =>
+          user.id === row.id ? { ...user, [column.id]: value } : user
+        )
+      ),
+    slotProps: {
+      bodyRow: ({ row }) => ({
+        className:
+          row.original.status === "inactive"
+            ? "text-muted-foreground"
+            : undefined,
+      }),
+    },
+  })
+  return <DataTable table={table} />
+}
+
+function ColumnActionsMenuExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    renderColumnActionsMenuItems: ({ column, table, internalMenuItems }) => (
+      <>
+        {internalMenuItems}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() =>
+            table.setColumnVisibility(
+              Object.fromEntries(
+                table
+                  .getAllLeafColumns()
+                  .map((c) => [c.id, c.id === column.id || !c.getCanHide()])
+              )
+            )
+          }
+        >
+          Show only this column
+        </DropdownMenuItem>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
+function RowActionsMenuExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    editDisplayMode: "modal",
+    onEditingRowSave: ({ row, values, exit }) => {
+      setData((prev) =>
+        prev.map((user) => (user.id === row.id ? { ...user, ...values } : user))
+      )
+      exit()
+    },
+    // The built-in Edit item, then our own.
+    renderRowActionMenuItems: ({ row, internalMenuItems }) => (
+      <>
+        {internalMenuItems}
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={() =>
+            setData((prev) => prev.filter((user) => user.id !== row.id))
+          }
+        >
+          <RiDeleteBinLine />
+          Delete
+        </DropdownMenuItem>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
+function DisplayColumnsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowNumbers: true,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 10 } },
+    displayColumnDefOptions: {
+      "cn-row-number": {
+        header: "#",
+        size: 56,
+        cell: ({ row }) => (
+          <span className="text-muted-foreground tabular-nums">
+            {row.index + 1}
+          </span>
+        ),
+      },
+      "cn-select": { size: 40 },
+    },
+  })
+  return <DataTable table={table} />
+}
+
+function CompositionExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableTopToolbar: false,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return (
+    <DataTableProvider table={table}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2">
+          <span className="mr-auto text-sm font-medium">Team directory</span>
+          <DataTableGlobalFilter table={table} />
+          <DataTableViewOptions table={table} />
+          <DataTableDensityToggle table={table} />
+        </div>
+        <DataTable table={table} />
+      </div>
+    </DataTableProvider>
+  )
+}
+
+type Shift = {
+  id: string
+  person: string
+  city: string
+  start: Date
+  opens: string
+}
+
+const SHIFTS: Shift[] = baseUsers.slice(0, 24).map((user, i) => ({
+  id: user.id,
+  person: `${user.firstName} ${user.lastName}`,
+  city: user.city,
+  start: new Date(2025, 0, 6 + (i % 5), 6 + ((i * 3) % 12), (i * 15) % 60),
+  opens: `${String(6 + ((i * 2) % 12)).padStart(2, "0")}:${i % 2 ? "30" : "00"}`,
+}))
+
+const SHIFT_COLUMNS: DataTableColumnDef<Shift>[] = [
+  { accessorKey: "person", header: "Person" },
+  {
+    accessorKey: "city",
+    header: "City",
+    meta: { filterVariant: "autocomplete" },
+  },
+  {
+    accessorKey: "start",
+    header: "Starts",
+    cell: ({ getValue }) =>
+      (getValue() as Date).toLocaleString("en", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    meta: { filterVariant: "datetime", filterMode: "after" },
+  },
+  {
+    accessorKey: "opens",
+    header: "Desk opens",
+    meta: { filterVariant: "time-range" },
+  },
+]
+
+function DateTimeFiltersExample() {
+  const table = useDataTable({
+    data: SHIFTS,
+    columns: SHIFT_COLUMNS,
+    getRowId: (row) => row.id,
+    initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+
+function EditDialogExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 12))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    editDisplayMode: "modal",
+    onEditingRowSave: ({ row, values, exit }) => {
+      setData((prev) =>
+        prev.map((user) => (user.id === row.id ? { ...user, ...values } : user))
+      )
+      exit()
+    },
+    // Two columns of fields and our own buttons.
+    renderEditRowDialogContent: ({
+      row,
+      internalEditComponents,
+      save,
+      cancel,
+      hasErrors,
+    }) => (
+      <>
+        <DialogHeader>
+          <DialogTitle>
+            Edit {row.original.firstName} {row.original.lastName}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3">{internalEditComponents}</div>
+        <DialogFooter>
+          <Button variant="ghost" size="sm" onClick={cancel}>
+            Discard
+          </Button>
+          <Button size="sm" onClick={save} disabled={hasErrors}>
+            Save changes
+          </Button>
+        </DialogFooter>
+      </>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
+function CreateRowExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 8))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableEditing: true,
+    createDisplayMode: "row",
+    positionCreatingRow: "bottom",
+    createRowDefaults: { role: "Viewer", status: "pending" },
+    onCreatingRowSave: ({ values, exit }) => {
+      setData((prev) => [
+        ...prev,
+        { ...baseUsers[0]!, ...values, id: `U-new-${prev.length}` } as User,
+      ])
+      exit()
+    },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button size="sm" onClick={() => table.beginCreate()}>
+        <RiAddLine />
+        Add person
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
+function ControlledStateExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const [sorting, setSorting] = React.useState<SortingState>([
+    { id: "salary", desc: true },
+  ])
+  const [density, setDensity] = React.useState<Density>("compact")
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    state: { sorting, density },
+    onSortingChange: setSorting,
+    onDensityChange: setDensity,
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSorting([{ id: "age", desc: false }])}
+        >
+          Sort by age
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            setDensity((d) => (d === "compact" ? "spacious" : "compact"))
+          }
+        >
+          Toggle density
+        </Button>
+        <code className="text-xs text-muted-foreground">
+          {JSON.stringify({ sorting, density })}
+        </code>
+      </div>
+      <DataTable table={table} />
+    </div>
+  )
+}
+
+const ACTIVITY = baseUsers.slice(0, 6).map((user, i) => ({
+  id: user.id,
+  who: `${user.firstName} ${user.lastName}`,
+  what: ["opened a ticket", "closed a deal", "joined", "left a comment"][
+    i % 4
+  ] as string,
+  when: `${(i + 1) * 7} min ago`,
+}))
+
+function BodyOnlyExample() {
+  const table = useDataTable({
+    data: ACTIVITY,
+    columns: [
+      { accessorKey: "who", header: "Who" },
+      { accessorKey: "what", header: "What" },
+      {
+        accessorKey: "when",
+        header: "When",
+        meta: { align: "right" },
+      },
+    ],
+    getRowId: (row) => row.id,
+    enableTableHead: false,
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+    enableKeyboardNavigation: false,
+    initialState: { density: "compact" },
+  })
+  return <DataTable table={table} />
+}
+
+function EmptyStateExample() {
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data: [] as User[],
+    columns,
+    getRowId: (row) => row.id,
+    renderEmpty: () => (
+      <div className="flex flex-col items-center gap-2 py-6">
+        <span className="font-medium">No people yet</span>
+        <span className="text-muted-foreground">
+          Invite your team to see them here.
+        </span>
+        <Button size="sm" variant="outline">
+          <RiAddLine />
+          Invite
+        </Button>
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
+function FixedRowHeightExample() {
+  const data = React.useMemo(() => makeUsers(200), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    enableRowVirtualization: true,
+    rowHeight: 36,
+    slotProps: { surface: { className: "max-h-[420px]" } },
+  })
+  return <DataTable table={table} />
+}
+
+function ColumnAutosizeExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableColumnResizing: true,
+    enableColumnAutosize: true,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => table.autoSizeAllColumns()}
+      >
+        Fit all columns
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
+function PaginationPagesExample() {
+  const data = React.useMemo(() => makeUsers(120), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    paginationDisplayMode: "pages",
+    positionPagination: "both",
+    pageSizeOptions: [5, 10, 20],
+    initialState: { pagination: { pageSize: 5 } },
+  })
+  return <DataTable table={table} />
+}
+
+function SelectionActionsExample() {
+  const [data, setData] = React.useState(() => baseUsers.slice(0, 20))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <table.Subscribe selector={(state) => state.rowSelection}>
+        {(selection) => {
+          const count = Object.keys(selection).length
+          return (
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={count === 0}
+              onClick={() => {
+                setData((prev) => prev.filter((user) => !selection[user.id]))
+                table.resetRowSelection()
+              }}
+            >
+              <RiDeleteBinLine />
+              Delete {count > 0 ? count : ""}
+            </Button>
+          )
+        }}
+      </table.Subscribe>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
+function ConfigProviderExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 5 } },
+  })
+  return <DataTable table={table} />
+}
+
+function ConfigProviderShell() {
+  // App-wide strings and icons for every table below the provider.
+  return (
+    <DataTableConfigProvider
+      localization={{ search: "Find", noRecordsToDisplay: "Nothing here" }}
+      icons={{ search: RiSearch2Line }}
+    >
+      <ConfigProviderExample />
+    </DataTableConfigProvider>
   )
 }
 
@@ -1086,6 +1732,13 @@ export const EXAMPLES: ExampleDef[] = [
     Component: LocalizationExample,
   },
   {
+    slug: "rtl",
+    title: "Right-to-left",
+    description: "Arabic, laid out right to left with a pinned column.",
+    category: "Data",
+    Component: RtlExample,
+  },
+  {
     slug: "server-side",
     title: "Server-side (manual)",
     description: "Manual pagination against a simulated server.",
@@ -1115,4 +1768,146 @@ export const EXAMPLES: ExampleDef[] = [
     category: "Data",
     Component: AdvancedExample,
   },
+  {
+    slug: "slot-props",
+    title: "Part props (slotProps)",
+    description: "Style rows and header cells from slotProps, by row.",
+    category: "Display",
+    Component: SlotPropsExample,
+  },
+  {
+    slug: "custom-filter-fns",
+    title: "Custom filter function",
+    description: "A named filter function offered in the column's mode menu.",
+    category: "Filtering",
+    Component: CustomFilterFnsExample,
+  },
+  {
+    slug: "custom-sort-fns",
+    title: "Custom sort function",
+    description: "Sort roles by rank with a named sort function.",
+    category: "Data",
+    Component: CustomSortFnsExample,
+  },
+  {
+    slug: "custom-aggregation",
+    title: "Custom aggregation",
+    description: "A named aggregation (salary spread) in grouped rows.",
+    category: "Data",
+    Component: CustomAggregationExample,
+  },
+  {
+    slug: "editing-per-row",
+    title: "Editing some rows only",
+    description: "enableEditing as a function: inactive people are locked.",
+    category: "Editing",
+    Component: EditingPerRowExample,
+  },
+  {
+    slug: "column-actions-menu",
+    title: "Column menu items",
+    description: "Your own column-menu item next to the built-in ones.",
+    category: "Columns",
+    Component: ColumnActionsMenuExample,
+  },
+  {
+    slug: "row-actions-menu",
+    title: "Row menu with built-in Edit",
+    description: "The row menu's built-in Edit item plus Delete.",
+    category: "Editing",
+    Component: RowActionsMenuExample,
+  },
+  {
+    slug: "display-columns",
+    title: "Display columns",
+    description: "Customize the row-number and selection columns.",
+    category: "Columns",
+    Component: DisplayColumnsExample,
+  },
+  {
+    slug: "composition",
+    title: "Composition",
+    description: "Your own toolbar built from the table's parts.",
+    category: "Display",
+    Component: CompositionExample,
+  },
+  {
+    slug: "datetime-filters",
+    title: "Date-time, time & autocomplete filters",
+    description: "datetime, time-range and autocomplete filter variants.",
+    category: "Filtering",
+    Component: DateTimeFiltersExample,
+  },
+  {
+    slug: "edit-dialog",
+    title: "Custom edit dialog",
+    description: "renderEditRowDialogContent: a two-column form.",
+    category: "Editing",
+    Component: EditDialogExample,
+  },
+  {
+    slug: "create-row",
+    title: "Inline create row",
+    description: "An inline create row at the bottom of the table.",
+    category: "Editing",
+    Component: CreateRowExample,
+  },
+  {
+    slug: "controlled-state",
+    title: "Controlled state",
+    description: "Sorting and density controlled from outside the table.",
+    category: "Data",
+    Component: ControlledStateExample,
+  },
+  {
+    slug: "body-only",
+    title: "Body only",
+    description: "No header or toolbars: a compact list.",
+    category: "Display",
+    Component: BodyOnlyExample,
+  },
+  {
+    slug: "empty-state",
+    title: "Empty state",
+    description: "A custom message and action when there are no rows.",
+    category: "Display",
+    Component: EmptyStateExample,
+  },
+  {
+    slug: "fixed-row-height",
+    title: "Fixed row height",
+    description: "200 virtualized rows at a fixed 36px.",
+    category: "Data",
+    Component: FixedRowHeightExample,
+  },
+  {
+    slug: "column-autosize",
+    title: "Column auto-size",
+    description: "Fit every column to its content from a toolbar button.",
+    category: "Columns",
+    Component: ColumnAutosizeExample,
+  },
+  {
+    slug: "pagination-pages",
+    title: "Numbered pages",
+    description: "Numbered page buttons above and below the table.",
+    category: "Display",
+    Component: PaginationPagesExample,
+  },
+  {
+    slug: "selection-actions",
+    title: "Bulk actions",
+    description: "Delete the selected rows from a toolbar button.",
+    category: "Selection & rows",
+    Component: SelectionActionsExample,
+  },
+  {
+    slug: "config-provider",
+    title: "App-wide config",
+    description:
+      "DataTableConfigProvider sets strings and icons for every table.",
+    category: "Data",
+    Component: ConfigProviderShell,
+  },
+  ...MORE_EXAMPLES,
 ]

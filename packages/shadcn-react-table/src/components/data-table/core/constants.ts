@@ -2,6 +2,7 @@ import {
   EXPAND_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
+  ROW_PIN_COLUMN_ID,
 } from "../injected-columns/injected-columns"
 import { ROW_ACTIONS_COLUMN_ID } from "../injected-columns/data-table-row-actions"
 import { SELECTION_COLUMN_ID } from "../injected-columns/selection-column"
@@ -9,36 +10,36 @@ import type { Density } from "./types"
 
 export const DENSITY_ORDER: Density[] = ["comfortable", "compact", "spacious"]
 
-/** Vertical padding utility per density level, applied to header + body cells. */
-export const DENSITY_CELL_PADDING: Record<Density, string> = {
-  compact: "py-1",
-  comfortable: "py-2.5",
-  spacious: "py-4",
-}
+/** Vertical padding for header, body and footer cells: the density's
+ *  `--dt-cell-py`, which the table root sets. Cells don't depend on the
+ *  density, so changing it re-renders no row. */
+export const CELL_PADDING_Y = "py-(--dt-cell-py)"
+
+/** Sets `--dt-cell-py` on the table root from its `data-density`
+ *  (comfortable, compact, spacious). */
+export const DENSITY_PADDING_VARS =
+  "[--dt-cell-py:calc(var(--spacing)*2.5)] data-[density=compact]:[--dt-cell-py:calc(var(--spacing)*1)] data-[density=spacious]:[--dt-cell-py:calc(var(--spacing)*4)]"
 
 /** Horizontal alignment → text-align utility, applied to body cells. */
 export const ALIGN_CELL = {
-  left: "text-left",
+  left: "text-start",
   center: "text-center",
-  right: "text-right",
+  right: "text-end",
 } as const
-
-/** Injected columns that should never be draggable in the header. */
-export const DISPLAY_COLUMN_IDS = new Set([
-  SELECTION_COLUMN_ID,
-  ROW_NUMBER_COLUMN_ID,
-  ROW_DRAG_COLUMN_ID,
-])
 
 // All injected (non-user) columns, used to find the first real data column so
 // tree (sub-row) rows can be indented by depth there.
 export const NON_DATA_COLUMN_IDS = new Set([
   SELECTION_COLUMN_ID,
   ROW_NUMBER_COLUMN_ID,
+  ROW_PIN_COLUMN_ID,
   ROW_DRAG_COLUMN_ID,
   EXPAND_COLUMN_ID,
   ROW_ACTIONS_COLUMN_ID,
 ])
+
+/** Injected columns that should never be draggable in the header. */
+export const DISPLAY_COLUMN_IDS = NON_DATA_COLUMN_IDS
 
 /**
  * Body-row state tint, shared by the virtualized row and the DnD/normal row so
@@ -57,3 +58,11 @@ export const BODY_ROW_CLASS =
  */
 export const BODY_CELL_CLASS =
   "bg-card bg-[linear-gradient(var(--row-tint),var(--row-tint))] group-data-[state=selected]:first:shadow-[inset_2px_0_0_0_var(--primary)]"
+
+/**
+ * Footer-cell background: opaque card fill with the muted footer tint painted
+ * over it, so sticky / pinned footer cells cover body text (the shadcn
+ * `<tfoot>` background is translucent).
+ */
+export const FOOTER_CELL_CLASS =
+  "bg-card bg-[linear-gradient(color-mix(in_oklab,var(--muted)_50%,transparent),color-mix(in_oklab,var(--muted)_50%,transparent))]"

@@ -1,5 +1,7 @@
 "use client"
 
+import * as React from "react"
+
 import { useDroppable } from "@dnd-kit/core"
 import type { RowData } from "@tanstack/react-table"
 
@@ -8,6 +10,9 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
+import { dt } from "../../core/internal"
+import { DndKeyContext, useDndId } from "../../core/dnd-scope"
+import { mergeProps } from "../../helpers/slot-props"
 
 export const GROUP_DROPZONE_ID = "cn-group-dropzone"
 
@@ -18,16 +23,32 @@ export const GROUP_DROPZONE_ID = "cn-group-dropzone"
  */
 export function DataTableDropToGroupZone<TData extends RowData>({
   table,
+  presenceRef,
+  leaving = false,
 }: {
   table: DataTableInstance<TData>
+  /** Receives the zone's element as well, for its enter and exit motion
+   *  (see `usePresence`). */
+  presenceRef?: React.Ref<HTMLDivElement>
+  /** It is fading out: it no longer takes a drop. */
+  leaving?: boolean
 }) {
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const grouping = table.getState().grouping
-  const { setNodeRef, isOver } = useDroppable({ id: GROUP_DROPZONE_ID })
+  const tableKey = React.useContext(DndKeyContext)
+  const dndId = useDndId()
+  const { setNodeRef, isOver } = useDroppable({
+    id: dndId(GROUP_DROPZONE_ID),
+    data: { type: "group-zone", tableKey },
+    disabled: leaving,
+  })
 
   return (
     <div
-      ref={setNodeRef}
+      {...mergeProps({ ref: setNodeRef } as React.ComponentProps<"div">, {
+        ref: presenceRef,
+      })}
+      data-slot="data-table-group-zone"
       className={cn(
         "flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground transition-colors",
         isOver && "border-primary bg-muted text-foreground"
@@ -44,7 +65,7 @@ export function DataTableDropToGroupZone<TData extends RowData>({
             <Badge
               key={columnId}
               variant="secondary"
-              className="gap-1 rounded-sm pr-1 normal-case"
+              className="gap-1 rounded-sm pe-1 normal-case"
             >
               {getColumnLabel(column)}
               <button

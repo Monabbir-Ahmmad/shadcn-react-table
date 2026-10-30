@@ -7,9 +7,342 @@
       "name": "data-table",
       "type": "registry:block",
       "title": "Data Table",
-      "description": "An MRT-complete data table for shadcn/ui (TanStack Table v8): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
+      "description": "An MRT-complete data table for shadcn/ui (TanStack Table v9): sorting, filtering, search, grouping, editing, pinning, virtualization, export and more.",
       "meta": {
-        "version": "0.4.2"
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ar",
+      "type": "registry:ui",
+      "title": "Data Table locale: Arabic (ar)",
+      "description": "The data table's interface text in Arabic. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-az",
+      "type": "registry:ui",
+      "title": "Data Table locale: Azerbaijani (az)",
+      "description": "The data table's interface text in Azerbaijani. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-bg",
+      "type": "registry:ui",
+      "title": "Data Table locale: Bulgarian (bg)",
+      "description": "The data table's interface text in Bulgarian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-cs",
+      "type": "registry:ui",
+      "title": "Data Table locale: Czech (cs)",
+      "description": "The data table's interface text in Czech. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-da",
+      "type": "registry:ui",
+      "title": "Data Table locale: Danish (da)",
+      "description": "The data table's interface text in Danish. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-de",
+      "type": "registry:ui",
+      "title": "Data Table locale: German (de)",
+      "description": "The data table's interface text in German. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-el",
+      "type": "registry:ui",
+      "title": "Data Table locale: Greek (el)",
+      "description": "The data table's interface text in Greek. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-es",
+      "type": "registry:ui",
+      "title": "Data Table locale: Spanish (es)",
+      "description": "The data table's interface text in Spanish. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-et",
+      "type": "registry:ui",
+      "title": "Data Table locale: Estonian (et)",
+      "description": "The data table's interface text in Estonian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-fa",
+      "type": "registry:ui",
+      "title": "Data Table locale: Persian (fa)",
+      "description": "The data table's interface text in Persian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-fi",
+      "type": "registry:ui",
+      "title": "Data Table locale: Finnish (fi)",
+      "description": "The data table's interface text in Finnish. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-fr",
+      "type": "registry:ui",
+      "title": "Data Table locale: French (fr)",
+      "description": "The data table's interface text in French. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-he",
+      "type": "registry:ui",
+      "title": "Data Table locale: Hebrew (he)",
+      "description": "The data table's interface text in Hebrew. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-hr",
+      "type": "registry:ui",
+      "title": "Data Table locale: Croatian (hr)",
+      "description": "The data table's interface text in Croatian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-hu",
+      "type": "registry:ui",
+      "title": "Data Table locale: Hungarian (hu)",
+      "description": "The data table's interface text in Hungarian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-hy",
+      "type": "registry:ui",
+      "title": "Data Table locale: Armenian (hy)",
+      "description": "The data table's interface text in Armenian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-id",
+      "type": "registry:ui",
+      "title": "Data Table locale: Indonesian (id)",
+      "description": "The data table's interface text in Indonesian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-it",
+      "type": "registry:ui",
+      "title": "Data Table locale: Italian (it)",
+      "description": "The data table's interface text in Italian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ja",
+      "type": "registry:ui",
+      "title": "Data Table locale: Japanese (ja)",
+      "description": "The data table's interface text in Japanese. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ko",
+      "type": "registry:ui",
+      "title": "Data Table locale: Korean (ko)",
+      "description": "The data table's interface text in Korean. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ne",
+      "type": "registry:ui",
+      "title": "Data Table locale: Nepali (ne)",
+      "description": "The data table's interface text in Nepali. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-nl",
+      "type": "registry:ui",
+      "title": "Data Table locale: Dutch (nl)",
+      "description": "The data table's interface text in Dutch. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-no",
+      "type": "registry:ui",
+      "title": "Data Table locale: Norwegian (no)",
+      "description": "The data table's interface text in Norwegian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-pl",
+      "type": "registry:ui",
+      "title": "Data Table locale: Polish (pl)",
+      "description": "The data table's interface text in Polish. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-pt",
+      "type": "registry:ui",
+      "title": "Data Table locale: Portuguese (pt)",
+      "description": "The data table's interface text in Portuguese. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-pt-BR",
+      "type": "registry:ui",
+      "title": "Data Table locale: Portuguese (Brazil) (pt-BR)",
+      "description": "The data table's interface text in Portuguese (Brazil). Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ro",
+      "type": "registry:ui",
+      "title": "Data Table locale: Romanian (ro)",
+      "description": "The data table's interface text in Romanian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-ru",
+      "type": "registry:ui",
+      "title": "Data Table locale: Russian (ru)",
+      "description": "The data table's interface text in Russian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sk",
+      "type": "registry:ui",
+      "title": "Data Table locale: Slovak (sk)",
+      "description": "The data table's interface text in Slovak. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sr-Cyrl-RS",
+      "type": "registry:ui",
+      "title": "Data Table locale: Serbian (Cyrillic) (sr-Cyrl-RS)",
+      "description": "The data table's interface text in Serbian (Cyrillic). Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sr-Latn-RS",
+      "type": "registry:ui",
+      "title": "Data Table locale: Serbian (Latin) (sr-Latn-RS)",
+      "description": "The data table's interface text in Serbian (Latin). Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-sv",
+      "type": "registry:ui",
+      "title": "Data Table locale: Swedish (sv)",
+      "description": "The data table's interface text in Swedish. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-tr",
+      "type": "registry:ui",
+      "title": "Data Table locale: Turkish (tr)",
+      "description": "The data table's interface text in Turkish. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-uk",
+      "type": "registry:ui",
+      "title": "Data Table locale: Ukrainian (uk)",
+      "description": "The data table's interface text in Ukrainian. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-vi",
+      "type": "registry:ui",
+      "title": "Data Table locale: Vietnamese (vi)",
+      "description": "The data table's interface text in Vietnamese. Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-zh-Hans",
+      "type": "registry:ui",
+      "title": "Data Table locale: Chinese (Simplified) (zh-Hans)",
+      "description": "The data table's interface text in Chinese (Simplified). Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "data-table-locale-zh-Hant",
+      "type": "registry:ui",
+      "title": "Data Table locale: Chinese (Traditional) (zh-Hant)",
+      "description": "The data table's interface text in Chinese (Traditional). Add the data-table item first.",
+      "meta": {
+        "version": "1.0.0"
       }
     }
   ]

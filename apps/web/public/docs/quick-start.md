@@ -1,0 +1,118 @@
+# Quick start
+
+A minimal table is two pieces: **columns** (TanStack column defs, typed with `DataTableColumnDef`) and a call to **`useDataTable`**, whose result you hand to **`<DataTable />`**.
+
+1. **Define columns**
+
+   Columns are TanStack column defs, typed with `DataTableColumnDef`. Give rows a stable `id` so selection and state survive re-renders.
+
+   ```tsx
+   "use client"
+
+   import * as React from "react"
+   import {
+     DataTable,
+     useDataTable,
+     type DataTableColumnDef,
+   } from "@/components/ui/data-table"
+
+   type Person = { id: string; name: string; email: string; age: number }
+
+   const data: Person[] = [
+     { id: "1", name: "Ada Lovelace", email: "ada@example.com", age: 36 },
+     { id: "2", name: "Alan Turing", email: "alan@example.com", age: 41 },
+     { id: "3", name: "Grace Hopper", email: "grace@example.com", age: 85 },
+   ]
+
+   const columns: DataTableColumnDef<Person>[] = [
+     { accessorKey: "name", header: "Name" },
+     { accessorKey: "email", header: "Email" },
+     { accessorKey: "age", header: "Age", meta: { align: "right" } },
+   ]
+   ```
+
+2. **Create the table**
+
+   Inside your component, pass `data` and `columns` to `useDataTable`. Everything else is optional; `getRowId` gives rows a stable identity and `initialState` seeds the page size.
+
+3. **Render it**
+
+   Hand the instance to `<DataTable />`.
+
+   ```tsx
+   export function PeopleTable() {
+     const table = useDataTable({
+       data,
+       columns,
+       getRowId: (row) => row.id,
+       initialState: { pagination: { pageSize: 10 } },
+     })
+
+     return <DataTable table={table} />
+   }
+   ```
+
+That already gives you sorting, client pagination, a toolbar with global search, column visibility, and density controls:
+
+Example (`basic`):
+
+```tsx
+function BasicExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Turning features on
+
+Every feature is an option on `useDataTable`. Flip a flag to enable it — for example, multi-column sorting, per-column filters, and row selection:
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableMultiSort: true,
+  initialState: { showColumnFilters: true },
+  enableRowSelection: true,
+})
+```
+
+> **Memoize data and columns:** Pass stable references for `data` and `columns` (e.g. via `React.useMemo` or
+>   module scope). Handing TanStack a new `columns` identity every render can
+>   reset state.
+
+Example (`minimal`):
+
+```tsx
+function MinimalExample() {
+  const data = React.useMemo(() => baseUsers.slice(0, 8), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Turn off most of the built-ins for a plain, read-only table.
+    enableTopToolbar: false,
+    enablePagination: false,
+    enableSorting: false,
+    enableColumnFilters: false,
+    enableColumnActions: false,
+    enableKeyboardNavigation: false,
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Where to go next
+
+- [Usage](/docs/usage) — the options-in / instance-out model and `table.dataTable`.
+- [Guides](/docs/guides/sorting) — enable each feature, with live examples.
+- [API reference](/docs/api/use-data-table) — every option and its default.

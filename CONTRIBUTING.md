@@ -6,7 +6,7 @@ and outside contributors.
 
 ## Prerequisites
 
-- Node.js ≥ 22.13
+- Node.js ≥ 24.22.1 (Node 24 with its latest security fixes; see `.nvmrc`)
 - pnpm 11.13.1 (`corepack enable` will pick up the pinned version)
 
 ## Setup
@@ -31,24 +31,97 @@ pnpm install
    ```bash
    pnpm lint
    pnpm typecheck
+   pnpm test
+   pnpm test:browser
    pnpm build
    ```
+   `pnpm test:browser` runs the `*.browser.test.tsx` files in headless
+   Chromium. Install it once with
+   `pnpm --filter @monabbir/shadcn-react-table exec playwright install chromium`.
 4. Push your branch and open a pull request against `main`.
+
+## Changelog
+
+Versions and the changelog are managed with
+[Changesets](https://github.com/changesets/changesets). Every pull request that
+changes what users get — the data table's behavior, options, types, styles or
+docs they rely on — adds a changeset:
+
+```bash
+pnpm changeset
+```
+
+Pick `major` for a breaking change, `minor` for a new feature, `patch` for a
+fix, and write the summary for users, as it will read in
+[`CHANGELOG.md`](packages/shadcn-react-table/CHANGELOG.md): start it with
+**New**, **Changed**, **Fixed** or **Removed**, and say what to do instead for
+a breaking change. Edit the file in `.changeset/` freely before merging. CI
+checks that a PR touching the table's source (not its tests) has a changeset;
+for a change users can't see (tests, refactors), add the `no-changelog` label.
+
+Releasing is automatic. Once changesets land on `main`, the Version workflow
+keeps a "chore: version packages" pull request open: it bumps `version` in
+`packages/shadcn-react-table/package.json`, moves the changesets into the
+changelog and rebuilds the registry. Merging it publishes the GitHub release,
+with that version's changelog section as its notes.
+
+## Generated files
+
+These are built from the source and committed. Never edit them by hand —
+change the source and regenerate (`pnpm build` does all of them):
+
+| File                                                        | Built by                                              |
+| ----------------------------------------------------------- | ----------------------------------------------------- |
+| `apps/web/public/r/*.json`                                  | `pnpm --filter shadcn-react-table-web registry:build` |
+| `apps/web/lib/api-reference.generated.ts`                   | `pnpm --filter shadcn-react-table-web api:build`      |
+| `apps/web/lib/example-source.generated.ts`                  | `pnpm --filter shadcn-react-table-web examples:build` |
+| `apps/web/public/llms*.txt`, `apps/web/public/docs/**/*.md` | `pnpm --filter shadcn-react-table-web llms:build`     |
+
+CI fails when one of them is out of date. Every documented option needs a
+JSDoc description; `api:build` fails on a missing one.
+
+## Commits
+
+One change per commit, with a subject line in the form `<type>: <summary>`
+(`feat`, `fix`, `perf`, `docs`, `test`, `refactor`, `build`, `ci`, `chore`;
+`feat!:` / `refactor!:` for breaking changes).
 
 ## Pull requests
 
-- CI (lint, typecheck, build) runs automatically on every PR and must pass.
+- CI runs automatically on every PR and must pass: lint, typecheck, test,
+  browser tests (Chromium), build, generated-artifact freshness,
+  `registry:verify`, and the install smoke test (fresh Radix and Base UI apps).
 - At least one approving review is required before merging.
 - Keep PRs focused — smaller PRs are reviewed faster.
 
+## Install smoke test
+
+CI installs the block from the PR's own registry into a fresh shadcn Next.js
+app for both the Radix and Base UI bases, then typechecks and builds it. To
+run it locally (needs internet, a few minutes per base):
+
+```bash
+pnpm --filter shadcn-react-table-web registry:build
+pnpm --filter shadcn-react-table-web registry:smoke -- --base radix
+pnpm --filter shadcn-react-table-web registry:smoke -- --base base
+```
+
+A failed run keeps the generated app for debugging (its path is printed); pass
+`--keep` to keep it after a successful run too. Delete `srt-smoke-*` folders
+under your OS temp directory when you are done. A failure names the step
+(`shadcn init`, `shadcn add`, `typecheck`, `next build`).
+
 ## Useful commands
 
-| Command          | What it does                                  |
-| ---------------- | --------------------------------------------- |
-| `pnpm dev`       | Run the web app (`next dev`)                  |
-| `pnpm build`     | Build all workspaces                          |
-| `pnpm lint`      | ESLint across workspaces                      |
-| `pnpm typecheck` | `tsc --noEmit` across workspaces              |
-| `pnpm format`    | Prettier `--write` across workspaces          |
+| Command                                                               | What it does                                    |
+| --------------------------------------------------------------------- | ----------------------------------------------- |
+| `pnpm dev`                                                            | Run the web app (`next dev`)                    |
+| `pnpm build`                                                          | Build all workspaces                            |
+| `pnpm lint`                                                           | ESLint across workspaces                        |
+| `pnpm typecheck`                                                      | `tsc --noEmit` across workspaces                |
+| `pnpm format`                                                         | Prettier `--write` across workspaces            |
+| `pnpm test`                                                           | Unit tests (Vitest, jsdom)                      |
+| `pnpm test:browser`                                                   | Browser tests (Vitest, headless Chromium)       |
+| `pnpm --filter shadcn-react-table-web registry:smoke -- --base radix` | Install the block into a fresh app and build it |
 
 See [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) for architecture details.

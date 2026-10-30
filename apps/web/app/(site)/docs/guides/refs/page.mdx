@@ -1,0 +1,37 @@
+export const metadata = { title: "Table refs" }
+
+# Table refs
+
+The table instance exposes DOM refs to its structural elements on `table.dataTable.refs`. Use them for imperative access — focusing the search box, measuring the toolbar, or scrolling the container — without wiring up your own refs.
+
+```tsx
+import { DataTable, useDataTable } from "@/components/ui/data-table"
+
+const table = useDataTable({ data, columns })
+
+// e.g. focus the global search box in an effect or event handler:
+table.dataTable.refs.searchInputRef.current?.focus()
+
+// or scroll the table body back to the top:
+table.dataTable.refs.tableContainerRef.current?.scrollTo({ top: 0 })
+
+return <DataTable table={table} />
+```
+
+## Available refs
+
+<ApiTable of="tableRefs" propLabel="Ref" />
+
+<Callout variant="warning" title="Populated after mount">
+  Refs are `null` during the first render and on the server. Read them inside an
+  effect or an event handler, and guard against `null` for elements that may not
+  be rendered (see the notes above).
+</Callout>
+
+## Related
+
+<Cards>
+  <Card href="/docs/guides/virtualization" title="Virtualization" />
+  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
+  <Card href="/docs/api/table-instance" title="Table instance" />
+</Cards>

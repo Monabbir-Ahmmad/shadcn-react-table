@@ -1,6 +1,6 @@
 "use client"
 
-import type { Column, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -33,6 +33,11 @@ import {
   isValuelessOperator,
 } from "../../fns/advanced-filter"
 import { getColumnLabel } from "../../helpers/column-label"
+import type { DataTableColumn } from "../../core/table-types"
+import { dt } from "../../core/internal"
+
+// Stands in for the All/Any picker when splitting the localized sentence.
+const LOGIC_SLOT = "\u0000"
 
 // Monotonic ids for new rules. Panel is client-only, so a module counter is
 // stable enough (and avoids crypto/uuid deps).
@@ -40,19 +45,24 @@ let ruleSeq = 0
 const nextRuleId = () => `cn-adv-rule-${++ruleSeq}`
 
 function columnVariant<TData extends RowData>(
-  column: Column<TData, unknown> | undefined
+  column: DataTableColumn<TData, unknown> | undefined
 ): FilterVariant {
-  return column?.columnDef.meta?.variant ?? "text"
+  return column?.columnDef.meta?.filterVariant ?? "text"
 }
 
-function valueInputType(variant: FilterVariant): "text" | "number" | "date" {
+function valueInputType(
+  variant: FilterVariant
+): "text" | "number" | "date" | "datetime-local" | "time" {
   if (variant === "range" || variant === "range-slider") return "number"
   if (variant === "date" || variant === "date-range") return "date"
+  if (variant === "datetime" || variant === "datetime-range")
+    return "datetime-local"
+  if (variant === "time" || variant === "time-range") return "time"
   return "text"
 }
 
 type Localization<TData extends RowData> =
-  DataTableInstance<TData>["tableInstance"]["localization"]
+  DataTableInstance<TData>["dataTable"]["localization"]
 
 /**
  * Modal dialog for building compound AND/OR filter rules. Edits accumulate in a
@@ -65,8 +75,7 @@ export function DataTableFilterPanel<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { showAdvancedFilterPanel, setShowAdvancedFilterPanel } =
-    table.tableInstance
+  const { showAdvancedFilterPanel, setShowAdvancedFilterPanel } = dt(table)
   return (
     <Dialog
       open={showAdvancedFilterPanel}
@@ -88,7 +97,7 @@ function FilterPanelContent<TData extends RowData>({
     advancedFilter,
     setAdvancedFilter,
     setShowAdvancedFilterPanel,
-  } = table.tableInstance
+  } = dt(table)
 
   // Seeded once on mount (the dialog body remounts each open).
   const [draft, setDraft] = React.useState<AdvancedFilterGroup>(advancedFilter)
@@ -156,6 +165,13 @@ function FilterPanelContent<TData extends RowData>({
         : { operator }
     )
 
+  // The localized sentence around the All/Any picker, split where the
+  // language puts it.
+  const [matchBefore = "", matchAfter = ""] = localization
+    .advancedFiltersMatch(LOGIC_SLOT)
+    .split(LOGIC_SLOT)
+    .map((part) => part.trim())
+
   return (
     <DialogContent className="gap-3 sm:max-w-lg">
       <DialogHeader>
@@ -167,9 +183,9 @@ function FilterPanelContent<TData extends RowData>({
 
       <div className="flex max-h-[50vh] flex-col gap-2 overflow-y-auto">
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-muted-foreground">
-            {localization.advancedFiltersMatchLabel}
-          </span>
+          {matchBefore && (
+            <span className="text-muted-foreground">{matchBefore}</span>
+          )}
           <Select
             value={logic === "or" ? "any" : "all"}
             onValueChange={(v) =>
@@ -179,7 +195,7 @@ function FilterPanelContent<TData extends RowData>({
               }))
             }
           >
-            <SelectTrigger className="h-8 w-20">
+            <SelectTrigger className="h-8 w-auto min-w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -191,9 +207,9 @@ function FilterPanelContent<TData extends RowData>({
               </SelectItem>
             </SelectContent>
           </Select>
-          <span className="text-muted-foreground">
-            {localization.advancedFiltersOf}
-          </span>
+          {matchAfter && (
+            <span className="text-muted-foreground">{matchAfter}</span>
+          )}
         </div>
 
         {rules.length === 0 ? (
@@ -321,13 +337,13 @@ function RuleValueInput<TData extends RowData>({
 }: {
   rule: AdvancedFilterRule
   variant: FilterVariant
-  column: Column<TData, unknown> | undefined
+  column: DataTableColumn<TData, unknown> | undefined
   localization: Localization<TData>
   onChange: (patch: Partial<AdvancedFilterRule>) => void
 }) {
   if (isValuelessOperator(rule.operator)) return null
 
-  const options = column?.columnDef.meta?.options
+  const options = column?.columnDef.meta?.filterSelectOptions
   if ((variant === "select" || variant === "multi-select") && options?.length) {
     return (
       <Select
@@ -358,8 +374,8 @@ function RuleValueInput<TData extends RowData>({
           <SelectValue placeholder={localization.advancedFiltersValue} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="true">True</SelectItem>
-          <SelectItem value="false">False</SelectItem>
+          <SelectItem value="true">{localization.true}</SelectItem>
+          <SelectItem value="false">{localization.false}</SelectItem>
         </SelectContent>
       </Select>
     )

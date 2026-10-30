@@ -1,0 +1,76 @@
+# Column ordering
+
+Set `enableColumnOrdering: true` to add a drag grip to each header. Users can grab the grip and drag a column to a new position.
+
+Example (`column-ordering`):
+
+```tsx
+function ColumnOrderingExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableColumnOrdering: true,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableColumnOrdering: true,
+})
+
+return <DataTable table={table} />
+```
+
+## While you drag
+
+The whole column moves with its header — body, filter and footer cells included — and the other columns slide aside to show where it will land. The movement comes from CSS variables on the scroll surface, so dragging doesn't re-render any rows. With "reduce motion" turned on in the operating system, the columns move without the slide animation.
+
+Example (`column-drag`):
+
+```tsx
+function ColumnDragExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    // Drag a header's grip: the whole column follows and the others make room.
+    enableColumnOrdering: true,
+    enableColumnPinning: true,
+    initialState: { pagination: { pageIndex: 0, pageSize: 8 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+## Initial order
+Provide the starting order with `initialState.columnOrder`, an array of column ids.
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  enableColumnOrdering: true,
+  initialState: {
+    columnOrder: ["firstName", "lastName", "salary"],
+  },
+})
+```
+
+> **Pair with pinning:** Pinned columns stay anchored while the rest reorder. Combine ordering with pinning to keep key columns in view.
+
+## Related
+
+- [Column pinning](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/column-pinning): Set enableColumnPinning: true to let users pin columns left or right from the column-actions menu.
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).

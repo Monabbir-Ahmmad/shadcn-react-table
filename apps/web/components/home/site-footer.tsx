@@ -43,7 +43,7 @@ export function SiteFooter() {
             </Link>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">
               A shadcn/ui data table with Material React Table parity, built on
-              TanStack Table v8.
+              TanStack Table v9.
             </p>
           </div>
 

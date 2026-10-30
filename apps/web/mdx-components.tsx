@@ -4,7 +4,11 @@ import Link from "next/link"
 import { cn } from "@workspace/ui/lib/utils"
 import { ApiTable } from "@/components/docs/api-table"
 import { Callout } from "@/components/docs/callout"
+import { Card, Cards } from "@/components/docs/cards"
+import { CodeBlock } from "@/components/docs/code-block"
 import { Example } from "@/components/docs/example"
+import { PmTabs } from "@/components/docs/pm-tabs"
+import { Step, Steps } from "@/components/docs/steps"
 
 // Provides element styling + custom components to every MDX page in the app.
 // https://nextjs.org/docs/app/guides/mdx
@@ -13,7 +17,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h1: ({ className, ...props }) => (
       <h1
         className={cn(
-          "mt-2 scroll-m-20 text-3xl font-semibold tracking-tight",
+          "mt-2 scroll-m-20 font-heading text-3xl font-semibold tracking-tight md:text-4xl",
           className
         )}
         {...props}
@@ -48,7 +52,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     p: ({ className, ...props }) => (
       <p
-        className={cn("leading-7 [&:not(:first-child)]:mt-5", className)}
+        className={cn(
+          "leading-7 [&:not(:first-child)]:mt-5 [h1+&]:text-lg [h1+&]:text-muted-foreground",
+          className
+        )}
         {...props}
       />
     ),
@@ -108,7 +115,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     th: ({ className, ...props }) => (
       <th
         className={cn(
-          "border-b bg-muted/50 px-3 py-2 text-left font-medium",
+          "border-b bg-muted/50 px-3 py-2 text-start font-medium",
           className
         )}
         {...props}
@@ -116,7 +123,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     td: ({ className, ...props }) => (
       <td
-        className={cn("border-b px-3 py-2 align-top last:border-0", className)}
+        className={cn(
+          // No bottom border on the last row (the wrapper draws the edge).
+          "border-b px-3 py-2 align-top [tr:last-child_&]:border-b-0",
+          className
+        )}
         {...props}
       />
     ),
@@ -129,19 +140,16 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {...props}
       />
     ),
-    pre: ({ className, ...props }) => (
-      <pre
-        className={cn(
-          "my-6 overflow-x-auto rounded-lg border bg-muted/40 p-4 text-sm [&>code]:bg-transparent [&>code]:p-0",
-          className
-        )}
-        {...props}
-      />
-    ),
+    pre: CodeBlock,
     // Custom doc components (usable in MDX without importing).
     ApiTable,
     Callout,
     Example,
+    Steps,
+    Step,
+    PmTabs,
+    Cards,
+    Card,
     ...components,
   }
 }

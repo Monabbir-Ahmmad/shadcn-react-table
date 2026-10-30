@@ -1,9 +1,26 @@
-/** Global-search modes offered in the global filter-mode menu. */
-export type GlobalFilterMode =
+/** Built-in global-search modes offered in the global filter-mode menu. */
+export type BuiltInGlobalFilterMode =
   "fuzzy" | "contains" | "startsWith" | "endsWith" | "equals"
 
-/** All supported filter modes across variants. */
-export type FilterMode =
+/** The global search mode menu's default modes. */
+export const GLOBAL_FILTER_MODES: readonly BuiltInGlobalFilterMode[] = [
+  "fuzzy",
+  "contains",
+  "startsWith",
+  "endsWith",
+  "equals",
+]
+
+/** A global-search mode: a built-in one, or the name of a custom function in
+ *  the `filterFns` option. */
+export type GlobalFilterMode = BuiltInGlobalFilterMode | (string & {})
+
+/** A filter mode: a built-in one, or the name of a custom function in the
+ *  `filterFns` option. */
+export type FilterMode = BuiltInFilterMode | (string & {})
+
+/** The built-in filter modes across variants. */
+export type BuiltInFilterMode =
   // text
   | "contains"
   | "equals"
@@ -30,7 +47,10 @@ export type FilterMode =
   | "arrIncludesSome"
   | "equalsBool"
 
-import { isAfter, isBefore, startOfDay } from "date-fns"
+import { rankItem } from "@tanstack/match-sorter-utils"
+import { endOfDay, isAfter, isBefore, startOfDay } from "date-fns"
+
+import { parseDate } from "../helpers/parse-date"
 
 const str = (v: unknown): string => (v == null ? "" : String(v))
 const lower = (v: unknown): string => str(v).toLowerCase()
@@ -38,23 +58,19 @@ const num = (v: unknown): number =>
   typeof v === "number" ? v : parseFloat(str(v))
 const isBlank = (v: unknown): boolean =>
   v == null || v === "" || (Array.isArray(v) && v.length === 0)
-const toDate = (v: unknown): Date | null => {
-  if (v == null || v === "") return null
-  const d = v instanceof Date ? v : new Date(v as string)
-  return Number.isNaN(d.getTime()) ? null : d
-}
+const toDate = parseDate
 
 // Each entry: (row value already resolved) decides inclusion. The dynamic
 // `filterFn` resolves `row.getValue(columnId)` and dispatches by mode.
 type ModeFn = (cellValue: unknown, filterValue: unknown) => boolean
 
-export const MODE_FNS: Record<FilterMode, ModeFn> = {
+export const MODE_FNS: Record<BuiltInFilterMode, ModeFn> = {
   contains: (cell, val) => lower(cell).includes(lower(val)),
   equals: (cell, val) => lower(cell) === lower(val),
   notEquals: (cell, val) => lower(cell) !== lower(val),
   startsWith: (cell, val) => lower(cell).startsWith(lower(val)),
   endsWith: (cell, val) => lower(cell).endsWith(lower(val)),
-  fuzzy: (cell, val) => lower(cell).includes(lower(val)),
+  fuzzy: (cell, val) => rankItem(str(cell), str(val)).passed,
 
   empty: (cell) => isBlank(cell),
   notEmpty: (cell) => !isBlank(cell),
@@ -74,7 +90,7 @@ export const MODE_FNS: Record<FilterMode, ModeFn> = {
   after: (cell, val) => {
     const c = toDate(cell)
     const v = toDate(val)
-    return c != null && v != null && isAfter(c, startOfDay(v))
+    return c != null && v != null && isAfter(c, endOfDay(v))
   },
   betweenDates: (cell, val) => {
     const c = toDate(cell)
@@ -83,7 +99,7 @@ export const MODE_FNS: Record<FilterMode, ModeFn> = {
     const to = toDate(range[1])
     if (c == null) return false
     if (from != null && isBefore(c, startOfDay(from))) return false
-    if (to != null && isAfter(c, startOfDay(to))) return false
+    if (to != null && isAfter(c, endOfDay(to))) return false
     return from != null || to != null
   },
 
@@ -105,6 +121,84 @@ function betweenNum(cell: unknown, val: unknown, inclusive: boolean): boolean {
   if (min != null && (inclusive ? n < min : n <= min)) return false
   if (max != null && (inclusive ? n > max : n >= max)) return false
   return min != null || max != null
+}
+
+const TIME_OF_DAY = /^(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/
+
+/** Minutes since midnight from a Date, an "HH:mm[:ss]" string or a
+ *  date-time string; null when it is none of those. */
+function toMinutesOfDay(value: unknown): number | null {
+  if (typeof value === "string") {
+    const match = TIME_OF_DAY.exec(value.trim())
+    if (match) return Number(match[1]) * 60 + Number(match[2])
+  }
+  const date = toDate(value)
+  return date ? date.getHours() * 60 + date.getMinutes() : null
+}
+
+/** A date-time to the minute (epoch minutes), or null. */
+function toMinute(value: unknown): number | null {
+  const date = toDate(value)
+  return date ? Math.floor(date.getTime() / 60_000) : null
+}
+
+/** The date modes, comparing values converted by `convert` (inclusive
+ *  ranges, open-ended when one bound is blank). */
+function comparedModes(
+  convert: (value: unknown) => number | null
+): Partial<Record<BuiltInFilterMode, ModeFn>> {
+  const both = (cell: unknown, val: unknown) => {
+    const c = convert(cell)
+    const v = convert(val)
+    return c != null && v != null ? ([c, v] as const) : null
+  }
+  return {
+    equals: (cell, val) => {
+      const pair = both(cell, val)
+      return pair != null && pair[0] === pair[1]
+    },
+    notEquals: (cell, val) => {
+      const pair = both(cell, val)
+      return pair == null || pair[0] !== pair[1]
+    },
+    before: (cell, val) => {
+      const pair = both(cell, val)
+      return pair != null && pair[0] < pair[1]
+    },
+    after: (cell, val) => {
+      const pair = both(cell, val)
+      return pair != null && pair[0] > pair[1]
+    },
+    betweenDates: (cell, val) => {
+      const c = convert(cell)
+      const range = (Array.isArray(val) ? val : []) as unknown[]
+      const from = convert(range[0])
+      const to = convert(range[1])
+      if (c == null || (from == null && to == null)) return false
+      return (from == null || c >= from) && (to == null || c <= to)
+    },
+  }
+}
+
+const DATETIME_MODE_FNS = comparedModes(toMinute)
+const TIME_MODE_FNS = comparedModes(toMinutesOfDay)
+
+/** Variants whose values compare differently from the mode's default: date
+ *  modes on date-times compare to the minute, on times by time of day. */
+export const VARIANT_MODE_FNS: Readonly<
+  Record<string, Partial<Record<BuiltInFilterMode, ModeFn>>>
+> = {
+  datetime: DATETIME_MODE_FNS,
+  "datetime-range": DATETIME_MODE_FNS,
+  time: TIME_MODE_FNS,
+  "time-range": TIME_MODE_FNS,
+}
+
+/** The built-in function for a mode, if it is one. */
+export function getModeFn(mode: string, variant?: string): ModeFn | undefined {
+  if (!Object.hasOwn(MODE_FNS, mode)) return undefined
+  const builtIn = mode as BuiltInFilterMode
+  return (variant && VARIANT_MODE_FNS[variant]?.[builtIn]) || MODE_FNS[builtIn]
 }
 
 /** Modes that activate without a typed value (they test the cell only). */

@@ -1,0 +1,99 @@
+# Row pinning
+
+Set `enableRowPinning: true` to add a pin toggle inside the row-number column. Pinned rows stick to the top while you scroll the rest of the table.
+
+Because the toggle lives in the row-number column, row pinning pairs with `enableRowNumbers: true`.
+
+Example (`row-pinning`):
+
+```tsx
+function RowPinningExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowNumbers: true,
+    enableRowPinning: true,
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowNumbers: true,
+  enableRowPinning: true,
+})
+
+return <DataTable table={table} />
+```
+
+> **Enable row numbers:** Turn on `enableRowNumbers` so the pin toggle has a column to live in.
+
+## Display modes
+
+`rowPinningDisplayMode` sets where pinned rows show and how rows get pinned:
+
+| Mode | Pinned rows | Pinned by |
+| --- | --- | --- |
+| `"top-and-bottom"` (default) | Stay in view above (or below) the other rows while scrolling | The pin button (to the top), or `row.pin("bottom")` |
+| `"top"` / `"bottom"` | The same | The pin button, to that side |
+| `"static"` | Listed first (or last), and scroll away with the rest | The pin button |
+| `"select-top"` / `"select-bottom"` | Stay in view on that side | Selecting the row; deselecting unpins it. No pin buttons |
+
+```tsx
+useDataTable({
+  data,
+  columns,
+  enableRowSelection: true,
+  enableRowPinning: true,
+  rowPinningDisplayMode: "select-top", // selected rows stay in view at the top
+})
+```
+
+Sticky pinned rows have a solid line and a soft shadow on the edge that faces the other rows. They need a bounded scroll surface, which the table has by default (see [Sticky header & footer](/docs/guides/sticky)).
+
+Example (`row-pinning-modes`):
+
+```tsx
+function RowPinningModesExample() {
+  const [mode, setMode] =
+    React.useState<RowPinningDisplayMode>("top-and-bottom")
+  const data = React.useMemo(() => makeUsers(60), [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    enableRowPinning: true,
+    enableRowSelection: true,
+    rowPinningDisplayMode: mode,
+    initialState: { rowPinning: { top: ["U-1004"], bottom: ["U-1050"] } },
+    slotProps: { surface: { className: "max-h-[420px]" } },
+  })
+  return (
+    <div className="flex flex-col gap-3">
+      <Choice
+        label="rowPinningDisplayMode"
+        value={mode}
+        options={PINNING_MODES}
+        onChange={setMode}
+      />
+      <DataTable table={table} />
+    </div>
+  )
+}
+```
+
+## Related
+
+- [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
+- [Table instance](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/table-instance): useDataTable returns the standard TanStack table instance with three additions: the table's UI state in table.getState() (density, editing, filter modes…), methods to change it on table itself, and the resolved options and DOM refs on table.dataTable.
+- [Row numbers](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/row-numbers): Set enableRowNumbers: true to add a leading row-number column to the table.

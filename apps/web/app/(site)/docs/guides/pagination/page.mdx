@@ -1,0 +1,53 @@
+export const metadata = { title: "Pagination" }
+
+# Pagination
+
+The table pages its rows by default, ten to a page, with a page-size menu and first / previous / next / last buttons below the rows.
+
+## Page size and starting page
+
+```tsx
+useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  pageSizeOptions: [10, 25, 50],
+  initialState: { pagination: { pageIndex: 0, pageSize: 25 } },
+})
+```
+
+## How the controls look
+
+- `paginationDisplayMode: "default"` — the row range ("1–10 of 48") with first / previous / next / last buttons.
+- `paginationDisplayMode: "pages"` — numbered page buttons.
+- `paginationDisplayMode: "custom"` — no built-in controls; render your own in `renderBottomToolbarCustomActions`, or place the exported `DataTablePagination` anywhere (see [Composition](/docs/guides/composition)).
+
+`positionPagination` puts the controls at the `"bottom"` (default), `"top"`, `"both"` or `"none"`.
+
+<Example slug="pagination-pages" />
+
+## Turning it off
+
+`enablePagination: false` shows every row. Pair it with a bounded surface and [virtualization](/docs/guides/virtualization) for long lists, or with [infinite scroll](/docs/guides/infinite-scroll).
+
+## Server pagination
+
+Set `manualPagination: true`, pass the total `rowCount`, and control `state.pagination` with `onPaginationChange`; the table renders the page you give it. See [Server-side data](/docs/guides/server-side).
+
+## Behavior worth knowing
+
+- Changing a filter or the search goes back to the first page.
+- When rows go away (a delete, a refetch) and the current page no longer exists, the table moves to the last page that does — except while `isLoading`, so a refetch doesn't jump pages.
+- The range text and page numbers follow the table's language (`localization.language`).
+
+## Relevant options
+
+<ApiTable of="useDataTableOptions" only={["enablePagination", "pageSizeOptions", "paginationDisplayMode", "positionPagination"]} />
+
+## Related
+
+<Cards>
+  <Card href="/docs/guides/server-side" title="Server-side data" />
+  <Card href="/docs/guides/infinite-scroll" title="Infinite scroll" />
+  <Card href="/docs/guides/display-modes" title="Display modes" />
+</Cards>

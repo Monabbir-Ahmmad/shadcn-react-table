@@ -1,6 +1,6 @@
 "use client"
 
-import type { ColumnDef } from "@tanstack/react-table"
+import type { DataTableColumnDef } from "@monabbir/shadcn-react-table/components/data-table"
 
 import { Badge } from "@workspace/ui/components/badge"
 
@@ -53,7 +53,7 @@ const STATUS_OPTIONS = [
  * or tweak this; cells, filter variants, edit variants, and aggregation are all
  * wired so any feature flag can be demonstrated against it.
  */
-export function userColumns(): ColumnDef<User>[] {
+export function userColumns(): DataTableColumnDef<User>[] {
   return [
     {
       accessorKey: "id",
@@ -62,7 +62,7 @@ export function userColumns(): ColumnDef<User>[] {
       enableColumnFilter: false,
       size: 90,
       meta: {
-        disableColumnActions: true,
+        enableColumnActions: false,
         enableEditing: false,
         enableClickToCopy: true,
       },
@@ -94,8 +94,8 @@ export function userColumns(): ColumnDef<User>[] {
       accessorKey: "role",
       header: "Role",
       meta: {
-        variant: "select",
-        options: ROLE_OPTIONS,
+        filterVariant: "select",
+        filterSelectOptions: ROLE_OPTIONS,
         editVariant: "select",
         editSelectOptions: ROLE_OPTIONS,
       },
@@ -104,8 +104,8 @@ export function userColumns(): ColumnDef<User>[] {
       accessorKey: "department",
       header: "Department",
       meta: {
-        variant: "multi-select",
-        options: DEPARTMENT_OPTIONS,
+        filterVariant: "multi-select",
+        filterSelectOptions: DEPARTMENT_OPTIONS,
         editVariant: "select",
         editSelectOptions: DEPARTMENT_OPTIONS,
       },
@@ -114,8 +114,8 @@ export function userColumns(): ColumnDef<User>[] {
       accessorKey: "status",
       header: "Status",
       meta: {
-        variant: "multi-select",
-        options: STATUS_OPTIONS,
+        filterVariant: "multi-select",
+        filterSelectOptions: STATUS_OPTIONS,
         editVariant: "select",
         editSelectOptions: STATUS_OPTIONS,
       },
@@ -135,7 +135,7 @@ export function userColumns(): ColumnDef<User>[] {
       aggregationFn: "mean",
       meta: {
         align: "right",
-        variant: "range-slider",
+        filterVariant: "range-slider",
         editVariant: "number",
         validate: (v) =>
           typeof v === "number" && (v < 0 || v > 120) ? "0–120" : undefined,
@@ -156,7 +156,7 @@ export function userColumns(): ColumnDef<User>[] {
       aggregationFn: "sum",
       meta: {
         align: "right",
-        variant: "range-slider",
+        filterVariant: "range-slider",
         editVariant: "number",
       },
       cell: ({ getValue }) => (
@@ -182,7 +182,7 @@ export function userColumns(): ColumnDef<User>[] {
     {
       accessorKey: "startDate",
       header: "Start date",
-      meta: { variant: "date", enableEditing: false },
+      meta: { filterVariant: "date", enableEditing: false },
       cell: ({ getValue }) => (
         <span className="text-muted-foreground tabular-nums">
           {dateFmt.format(getValue<Date>())}
@@ -192,7 +192,11 @@ export function userColumns(): ColumnDef<User>[] {
     {
       accessorKey: "progress",
       header: "Progress",
-      meta: { align: "right", variant: "range-slider", enableEditing: false },
+      meta: {
+        align: "right",
+        filterVariant: "range-slider",
+        enableEditing: false,
+      },
       cell: ({ getValue }) => {
         const value = getValue<number>()
         return (

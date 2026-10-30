@@ -6,10 +6,15 @@ export function defaultModeForVariant(variant: FilterVariant): FilterMode {
   switch (variant) {
     case "range":
     case "range-slider":
-      return "between"
+      // Inclusive, like MRT: a slider at [min, x] must keep rows equal to min.
+      return "betweenInclusive"
     case "date":
+    case "datetime":
+    case "time":
       return "equals"
     case "date-range":
+    case "datetime-range":
+    case "time-range":
       return "betweenDates"
     case "select":
       return "equalsString"
@@ -26,6 +31,7 @@ export function defaultModeForVariant(variant: FilterVariant): FilterMode {
 export function modeOptionsForVariant(variant: FilterVariant): FilterMode[] {
   switch (variant) {
     case "text":
+    case "autocomplete":
       return [
         "fuzzy",
         "contains",
@@ -39,8 +45,8 @@ export function modeOptionsForVariant(variant: FilterVariant): FilterMode[] {
     case "range":
     case "range-slider":
       return [
-        "between",
         "betweenInclusive",
+        "between",
         "equals",
         "notEquals",
         "greaterThan",
@@ -52,6 +58,10 @@ export function modeOptionsForVariant(variant: FilterVariant): FilterMode[] {
       ]
     case "date":
     case "date-range":
+    case "datetime":
+    case "datetime-range":
+    case "time":
+    case "time-range":
       return [
         "equals",
         "notEquals",

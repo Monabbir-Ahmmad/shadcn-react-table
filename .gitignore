@@ -12,6 +12,9 @@ node_modules
 
 # testing
 coverage
+# vitest browser-mode failure screenshots and attachments
+__screenshots__/
+.vitest-attachments/
 
 # next.js
 .next/
@@ -51,3 +54,6 @@ graphify-out/
 .claude/settings.local.json
 # registry verification fixture (verify-registry.mjs)
 .registry-fixture/
+
+# Brainstorm mockups
+.superpowers/

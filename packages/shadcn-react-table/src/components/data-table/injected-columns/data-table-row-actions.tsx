@@ -1,15 +1,20 @@
 "use client"
 
-import type { ColumnDef, Row, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
+import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 
 import type { DataTableInstance } from "../core/types"
+import type { DataTableColumnDef, DataTableRow } from "../core/table-types"
+import { stopPropagation } from "../helpers/stop-propagation"
+import { dt } from "../core/internal"
 
 export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
 
@@ -18,7 +23,7 @@ export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
  *  left edge; when `"last"` (default) they align to the right. */
 export function createRowActionsColumn<TData extends RowData>(
   position: "first" | "last" = "last"
-): ColumnDef<TData> {
+): DataTableColumnDef<TData> {
   const align = position === "first" ? "left" : "right"
   return {
     id: ROW_ACTIONS_COLUMN_ID,
@@ -29,8 +34,13 @@ export function createRowActionsColumn<TData extends RowData>(
     enableGrouping: false,
     size: 90,
     minSize: 80,
-    meta: { disableColumnActions: true, align },
-    header: () => null,
+    meta: { enableColumnActions: false, align },
+    // Named for screen readers; the column shows no header text.
+    header: ({ table }) => (
+      <span className="sr-only">
+        {dt(table as never).localization.rowActions}
+      </span>
+    ),
     cell: ({ row, table }) => (
       <RowActionsCell
         row={row}
@@ -46,7 +56,7 @@ function RowActionsCell<TData extends RowData>({
   table,
   align,
 }: {
-  row: Row<TData>
+  row: DataTableRow<TData>
   table: DataTableInstance<TData>
   align: "left" | "right"
 }) {
@@ -55,28 +65,40 @@ function RowActionsCell<TData extends RowData>({
     localization,
     icons,
     enableEditing,
+    getCanEditRow,
     editDisplayMode,
     editingRowId,
     rowDraft,
-    onSaveRow,
+    onEditingRowSave,
     beginRowEdit,
     cancelEdit,
+    cancelEditing,
     renderRowActions,
     renderRowActionMenuItems,
-  } = table.tableInstance
+  } = dt(table)
 
   const isEditingThisRow = editDisplayMode === "row" && editingRowId === row.id
+  const [menuOpen, setMenuOpen] = React.useState(false)
 
   if (isEditingThisRow) {
     return (
-      <div className={`flex items-center gap-1 ${justify}`}>
+      <div
+        className={`flex items-center gap-1 ${justify}`}
+        onClick={stopPropagation}
+        onDoubleClick={stopPropagation}
+      >
         <Button
           variant="ghost"
           size="icon"
           aria-label={localization.save}
           className="size-7"
           onClick={() =>
-            onSaveRow?.({ row, values: rowDraft, table, exit: cancelEdit })
+            onEditingRowSave?.({
+              row,
+              values: rowDraft,
+              table,
+              exit: cancelEdit,
+            })
           }
         >
           <icons.save />
@@ -86,7 +108,7 @@ function RowActionsCell<TData extends RowData>({
           size="icon"
           aria-label={localization.cancel}
           className="size-7"
-          onClick={cancelEdit}
+          onClick={cancelEditing}
         >
           <icons.cancel />
         </Button>
@@ -95,11 +117,17 @@ function RowActionsCell<TData extends RowData>({
   }
 
   const canInlineEdit =
-    enableEditing && (editDisplayMode === "row" || editDisplayMode === "modal")
+    enableEditing &&
+    getCanEditRow(row) &&
+    (editDisplayMode === "row" || editDisplayMode === "modal")
 
   return (
-    <div className={`flex items-center gap-1 ${justify}`}>
-      {canInlineEdit && (
+    <div
+      className={`flex items-center gap-1 ${justify}`}
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
+    >
+      {canInlineEdit && !renderRowActionMenuItems && (
         <Button
           variant="ghost"
           size="icon"
@@ -112,7 +140,7 @@ function RowActionsCell<TData extends RowData>({
       )}
       {renderRowActions?.({ row, table })}
       {renderRowActionMenuItems && (
-        <DropdownMenu>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
@@ -124,7 +152,18 @@ function RowActionsCell<TData extends RowData>({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {renderRowActionMenuItems({ row, table })}
+            {renderRowActionMenuItems({
+              row,
+              table,
+              // The edit action lives in the menu when there is one.
+              internalMenuItems: canInlineEdit ? (
+                <DropdownMenuItem onClick={() => beginRowEdit(row)}>
+                  <icons.edit />
+                  {localization.edit}
+                </DropdownMenuItem>
+              ) : null,
+              closeMenu: () => setMenuOpen(false),
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

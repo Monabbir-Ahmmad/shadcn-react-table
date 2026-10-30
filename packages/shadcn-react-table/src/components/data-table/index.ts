@@ -7,6 +7,31 @@
 
 export { DataTable } from "./core/data-table"
 export { useDataTable } from "./core/use-data-table"
+export { DataTableProvider, useDataTableInstance } from "./core/table-context"
+export {
+  DataTableDndProvider,
+  useDataTableDropZone,
+  type RowDropTarget,
+} from "./core/dnd-scope"
+
+// The table's parts, for your own layouts (each takes `table`; render them
+// inside a `DataTableProvider`).
+export { DataTableToolbar } from "./components/toolbar/data-table-toolbar"
+export { DataTableBottomToolbar } from "./components/toolbar/data-table-bottom-toolbar"
+export { DataTableGlobalFilter } from "./components/toolbar/data-table-global-filter"
+export { DataTablePagination } from "./components/toolbar/data-table-pagination"
+export { DataTableAlertBanner } from "./components/toolbar/data-table-alert-banner"
+export { DataTableViewOptions } from "./components/toolbar/data-table-view-options"
+export { DataTableDropToGroupZone } from "./components/toolbar/data-table-grouping"
+export { DataTableDensityToggle } from "./components/toolbar/controls/density-toggle"
+export { DataTableFullscreenToggle } from "./components/toolbar/controls/fullscreen-toggle"
+export { DataTableFilterToggle } from "./components/toolbar/controls/filter-toggle"
+export { DataTableAdvancedFilterToggle } from "./components/toolbar/controls/advanced-filter-toggle"
+export { DataTableFilterPanel } from "./components/menus/data-table-filter-panel"
+export { DataTableColumnActions } from "./components/menus/data-table-column-actions"
+export { DataTableFilterModeMenu } from "./components/menus/data-table-filter-mode-menu"
+export { DataTableColumnFilter } from "./components/head/data-table-column-filter"
+export { DataTableEditModal } from "./components/editing/data-table-edit-modal"
 
 export {
   DataTableConfigProvider,
@@ -29,9 +54,12 @@ export type {
   AdvancedFilterOperator,
   AdvancedFilterRule,
   AdvancedFilterGroup,
-  DataTableConfig,
   DataTableInstance,
+  DataTableMethods,
+  DataTableOptionsResolved,
   DataTableSlotProps,
+  DataTableSlots,
+  SlotProp,
   UseDataTableOptions,
   EditDisplayMode,
   EditVariant,
@@ -43,4 +71,23 @@ export type {
   DataTableColumnVirtualizer,
   RowVirtualizerOptions,
   ColumnVirtualizerOptions,
+  ClickToCopyOption,
+  DisplayColumnId,
+  EditDialogContentProps,
+  RowPinningDisplayMode,
 } from "./core/types"
+
+export type {
+  DataTableColumnDef,
+  DataTableRow,
+  DataTableColumn,
+  DataTableCell,
+  DataTableHeader,
+  DataTableFeatures,
+  DataTableFilterFn,
+  DataTableSortFn,
+  DataTableAggregationFn,
+} from "./core/table-types"
+
+export type { DataTableColumnPinningState } from "./helpers/column-pinning"
+export type { DataTableState } from "./helpers/table-state"

@@ -1,0 +1,43 @@
+name: Version
+
+# Keeps a "chore: version packages" pull request open while changesets wait on
+# main. It bumps the block's version, moves the changesets into the changelog
+# and rebuilds the registry; merging it lets the Release workflow tag and
+# publish the GitHub release. Nothing is published to npm.
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Version comes from the root package.json "packageManager" field.
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Open or update the version pull request
+        uses: changesets/action@v2
+        with:
+          version-script: pnpm run version-packages
+          commit-message: "chore: version packages"
+          pr-title: "chore: version packages"

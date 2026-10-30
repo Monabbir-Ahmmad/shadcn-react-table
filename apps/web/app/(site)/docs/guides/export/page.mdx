@@ -1,0 +1,100 @@
+export const metadata = { title: "Export" }
+
+# Export
+
+The table ships no built-in export — the same stance as Material React
+Table — so the block carries no CSV or spreadsheet dependencies. Everything
+an exporter needs is already on the table instance: pick the rows, map them
+through the visible columns, and hand the result to whichever writer you
+prefer.
+
+<Example slug="export" />
+
+## Reading the data
+
+Pick a row scope from the table's row models, then build an array-of-arrays
+(header + rows) from the visible data columns:
+
+```tsx
+import type { DataTableInstance } from "@/components/ui/data-table"
+
+function toRows<TData>(table: DataTableInstance<TData>) {
+  // Selected rows when any are selected, else the filtered set (all pages).
+  const selected = table.getSelectedRowModel().rows
+  const rows = selected.length > 0 ? selected : table.getFilteredRowModel().rows
+  // Data columns only — injected columns (selection, actions, …) have no accessor.
+  const columns = table
+    .getVisibleLeafColumns()
+    .filter((column) => column.accessorFn != null)
+  return [
+    columns.map((column) => column.id),
+    ...rows.map((row) => columns.map((column) => row.getValue(column.id))),
+  ]
+}
+```
+
+Other scopes: `table.getRowModel().rows` (current page) and
+`table.getPreFilteredRowModel().rows` (everything, ignoring filters).
+
+## Writing a CSV
+
+No library needed for CSV. Two details matter: quote cells containing
+delimiters, and neutralize formula injection (spreadsheets execute cells
+starting with `=`, `+`, `-`, `@`, tab, or CR when a CSV is opened):
+
+```tsx
+function toCsv(rows: unknown[][]) {
+  const escape = (value: unknown) => {
+    const text = value == null ? "" : String(value)
+    const guarded = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text
+    return /[",\n]/.test(guarded)
+      ? `"${guarded.replace(/"/g, '""')}"`
+      : guarded
+  }
+  return rows.map((row) => row.map(escape).join(",")).join("\n")
+}
+
+function downloadCsv(csv: string, fileName: string) {
+  // The BOM makes Excel detect UTF-8.
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = `${fileName}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+```
+
+Wire it to the toolbar with `renderTopToolbarCustomActions`:
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  enableRowSelection: true,
+  renderTopToolbarCustomActions: ({ table }) => (
+    <Button onClick={() => downloadCsv(toCsv(toRows(table)), "users")}>
+      Export CSV
+    </Button>
+  ),
+})
+```
+
+## Excel and richer formats
+
+For `.xlsx`, feed the same array-of-arrays to
+[SheetJS](https://docs.sheetjs.com/docs/getting-started/installation/nodejs)
+(`XLSX.utils.aoa_to_sheet` → `XLSX.writeFile`) — note SheetJS is installed
+from their CDN tarball, not npm. For heavier CSV needs (custom delimiters,
+streaming), [PapaParse](https://www.papaparse.com/)'s `unparse` accepts the
+same shape.
+
+<Example slug="export-pdf" />
+
+## Related
+
+<Cards>
+  <Card href="/docs/guides/row-selection" title="Row selection" />
+  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
+</Cards>

@@ -1,21 +1,28 @@
 "use client"
 
 import * as React from "react"
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import {
   createExpandColumn,
   createRowDragHandleColumn,
   createRowNumberColumn,
+  createRowPinColumn,
 } from "../injected-columns/injected-columns"
 import { createRowActionsColumn } from "../injected-columns/data-table-row-actions"
 import { createSelectionColumn } from "../injected-columns/selection-column"
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { EditDisplayMode, UseDataTableOptions } from "../core/types"
+import type { DataTableColumnDef } from "../core/table-types"
+import {
+  applyDisplayColumnOptions,
+  displayColumnOptionsKey,
+  type DisplayColumnOptions,
+} from "../helpers/display-column-options"
 
 interface UseResolvedColumnsParams<TData extends RowData> {
-  columns: ColumnDef<TData, unknown>[]
+  columns: ReadonlyArray<DataTableColumnDef<TData, unknown>>
   enableRowOrdering: boolean
   enableRowSelection: boolean
   selectAllMode: "page" | "all"
@@ -32,13 +39,15 @@ interface UseResolvedColumnsParams<TData extends RowData> {
   editDisplayMode: EditDisplayMode
   localization: DataTableLocalization
   icons: DataTableIcons
+  /** `defaultDisplayColumn` / `displayColumnDefOptions`. */
+  displayColumnOptions: DisplayColumnOptions<TData>
 }
 
 /**
  * Injects the display columns around the user's columns, memoized so TanStack
  * never receives a new `columns` identity per render (a classic infinite-loop /
  * lost-state trap). Leading order: drag handle → selection → expand → row
- * number → user columns. The expand and row-actions columns can move to the
+ * number (or pin) → user columns. The expand and row-actions columns can move to the
  * trailing/leading edge via `positionExpandColumn` / `positionActionsColumn`.
  */
 export function useResolvedColumns<TData extends RowData>({
@@ -59,7 +68,19 @@ export function useResolvedColumns<TData extends RowData>({
   editDisplayMode,
   localization,
   icons,
-}: UseResolvedColumnsParams<TData>): ColumnDef<TData, unknown>[] {
+  displayColumnOptions,
+}: UseResolvedColumnsParams<TData>): ReadonlyArray<
+  DataTableColumnDef<TData, unknown>
+> {
+  // The overrides' functions are read through this ref, so the columns are
+  // rebuilt only when their plain values change (see `optionsKey`).
+  const optionsRef = React.useRef(displayColumnOptions)
+  // eslint-disable-next-line react-hooks/refs
+  optionsRef.current = displayColumnOptions
+  const optionsKey = displayColumnOptionsKey(displayColumnOptions)
+
+  // The column functions read the ref when they run, not during this render.
+  /* eslint-disable react-hooks/refs */
   return React.useMemo(() => {
     const leading = []
     const trailing = []
@@ -89,6 +110,8 @@ export function useResolvedColumns<TData extends RowData>({
           icons
         )
       )
+    } else if (enableRowPinning) {
+      leading.push(createRowPinColumn<TData>(localization, icons))
     }
     const showRowActions =
       !!renderRowActions ||
@@ -100,9 +123,13 @@ export function useResolvedColumns<TData extends RowData>({
       if (positionActionsColumn === "first") leading.unshift(actions)
       else trailing.push(actions)
     }
+    const withOptions = (column: DataTableColumnDef<TData, unknown>) =>
+      applyDisplayColumnOptions(column, () => optionsRef.current)
     return leading.length > 0 || trailing.length > 0
-      ? [...leading, ...columns, ...trailing]
+      ? [...leading.map(withOptions), ...columns, ...trailing.map(withOptions)]
       : columns
+    // `optionsKey` stands in for the options themselves (read via the ref).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     columns,
     enableRowOrdering,
@@ -121,5 +148,7 @@ export function useResolvedColumns<TData extends RowData>({
     editDisplayMode,
     localization,
     icons,
+    optionsKey,
   ])
+  /* eslint-enable react-hooks/refs */
 }

@@ -11,6 +11,7 @@ import {
 
 import { DENSITY_ORDER } from "../../../core/constants"
 import type { DataTableInstance } from "../../../core/types"
+import { dt } from "../../../core/internal"
 
 const DENSITY_LABEL_KEYS = {
   comfortable: "densityComfortable",
@@ -24,7 +25,7 @@ export function DataTableDensityToggle<TData extends RowData>({
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { localization, icons, density, setDensity } = table.tableInstance
+  const { localization, icons, density, setDensity } = dt(table)
   const currentLabel = localization[DENSITY_LABEL_KEYS[density]]
   const label = `${localization.toggleDensity} (${currentLabel})`
   return (

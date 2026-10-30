@@ -1,12 +1,14 @@
 "use client"
 
 import * as React from "react"
-import type { ColumnDef, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { Button } from "@workspace/ui/components/button"
 
 import type { DataTableIcons, IconComponent } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
+import type { DataTableColumnDef } from "../core/table-types"
+import { stopPropagation } from "../helpers/stop-propagation"
 
 export const ROW_DRAG_COLUMN_ID = "cn-row-drag"
 
@@ -26,7 +28,7 @@ export const RowDragContext = React.createContext<RowDragHandleProps | null>(
 export function createRowDragHandleColumn<TData extends RowData>(
   localization: DataTableLocalization,
   icons: DataTableIcons
-): ColumnDef<TData> {
+): DataTableColumnDef<TData> {
   return {
     id: ROW_DRAG_COLUMN_ID,
     enableSorting: false,
@@ -35,8 +37,8 @@ export function createRowDragHandleColumn<TData extends RowData>(
     enableResizing: false,
     size: 40,
     minSize: 40,
-    meta: { disableColumnActions: true, align: "center" },
-    header: () => null,
+    meta: { enableColumnActions: false, align: "center" },
+    header: () => <span className="sr-only">{localization.reorderRow}</span>,
     cell: () => (
       <RowDragHandle label={localization.reorderRow} Icon={icons.dragHandle} />
     ),
@@ -61,6 +63,8 @@ function RowDragHandle({
       suppressHydrationWarning
       {...(ctx?.attributes ?? {})}
       {...(ctx?.listeners ?? {})}
+      onClick={stopPropagation}
+      onDoubleClick={stopPropagation}
       // touch-none: let dnd-kit's pointer sensor own the touch gesture
       // (otherwise the browser scrolls/selects text before a drag can start on
       // a phone). size-7 gives a finger-friendly tap target.

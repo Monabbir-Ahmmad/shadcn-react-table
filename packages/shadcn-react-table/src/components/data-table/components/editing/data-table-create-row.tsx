@@ -1,27 +1,40 @@
 "use client"
 
-import type { Column, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { Button } from "@workspace/ui/components/button"
 import { TableCell, TableRow } from "@workspace/ui/components/table"
 
 import type { DataTableInstance } from "../../core/types"
+import { useTableState } from "../../hooks/use-table-state"
 import { getColumnLabel } from "../../helpers/column-label"
 import { isColumnEditable } from "../../helpers/is-column-editable"
 import { DataTableEditField } from "./data-table-edit-field"
+import type { DataTableColumn } from "../../core/table-types"
+import { dt } from "../../core/internal"
+import { getSlotProps } from "../../helpers/slot-props"
+import { getEditSelectOptions } from "../../helpers/edit-select-options"
 
 /**
  * Inline create row for `createDisplayMode: "row"`. Renders an editor per
  * editable column bound to the shared `rowDraft`, with Save/Cancel in a
- * full-width action strip beneath it. Save commits via `onCreateRow`.
+ * full-width action strip beneath it. Save commits via `onCreatingRowSave`.
  */
 export function DataTableCreateRow<TData extends RowData>({
   table,
 }: {
   table: DataTableInstance<TData>
 }) {
-  const { enableEditing, rowDraft, onCreateRow, cancelEdit, localization } =
-    table.tableInstance
+  const {
+    enableEditing,
+    rowDraft,
+    onCreatingRowSave,
+    cancelEdit,
+    cancelEditing,
+    localization,
+  } = dt(table)
+  // The body does not re-render for the edit draft.
+  useTableState(table, (state) => state.rowDraft)
 
   const leafColumns = table.getVisibleLeafColumns()
   const editableColumns = leafColumns.filter(
@@ -33,7 +46,7 @@ export function DataTableCreateRow<TData extends RowData>({
 
   const submit = () => {
     if (hasErrors) return
-    onCreateRow?.({ values: rowDraft, table, exit: cancelEdit })
+    onCreatingRowSave?.({ values: rowDraft, table, exit: cancelEdit })
   }
 
   return (
@@ -54,7 +67,7 @@ export function DataTableCreateRow<TData extends RowData>({
       <TableRow className="border-b-2 bg-muted/30 hover:bg-muted/30">
         <TableCell colSpan={leafColumns.length} className="p-2">
           <div className="flex items-center justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={cancelEdit}>
+            <Button variant="outline" size="sm" onClick={cancelEditing}>
               {localization.cancel}
             </Button>
             <Button size="sm" onClick={submit} disabled={hasErrors}>
@@ -72,20 +85,26 @@ function CreateField<TData extends RowData>({
   column,
   table,
 }: {
-  column: Column<TData, unknown>
+  column: DataTableColumn<TData, unknown>
   table: DataTableInstance<TData>
 }) {
-  const cn = table.tableInstance
+  const cn = dt(table)
   const meta = column.columnDef.meta
   const value = cn.rowDraft[column.id]
   return (
     <DataTableEditField
       value={value}
       variant={meta?.editVariant}
-      options={meta?.editSelectOptions ?? meta?.options}
+      options={getEditSelectOptions(column, table)}
       error={meta?.validate?.(value)}
       ariaLabel={getColumnLabel(column)}
       onChange={(next) => cn.setRowDraftValue(column.id, next)}
+      fieldProps={getSlotProps(
+        table,
+        "editField",
+        { column },
+        meta?.slotProps?.editField
+      )}
     />
   )
 }

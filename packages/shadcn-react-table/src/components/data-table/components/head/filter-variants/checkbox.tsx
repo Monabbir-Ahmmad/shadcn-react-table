@@ -6,12 +6,13 @@ import { Checkbox } from "@workspace/ui/components/checkbox"
 
 import { getColumnLabel } from "../../../helpers/column-label"
 import type { FilterFieldProps } from "./shared"
+import { dt } from "../../../core/internal"
 
 export function CheckboxFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization } = table.tableInstance
+  const { localization } = dt(table)
   const value = column.getFilterValue()
   const checked = value === true
   return (

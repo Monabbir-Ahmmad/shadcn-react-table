@@ -1,11 +1,12 @@
-import type { Row, RowData } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
+import type { DataTableRow } from "../core/table-types"
 
 export interface RowHeightOptions<TData extends RowData> {
   /** Flat height (px) applied to every row. */
   rowHeight?: number
   /** Per-row height: a px number, `"auto"` (wrap and grow), or `null` to fall
    *  back to `rowHeight` / the density default. */
-  getRowHeight?: (row: Row<TData>) => number | "auto" | null
+  getRowHeight?: (row: DataTableRow<TData>) => number | "auto" | null
 }
 
 /**
@@ -14,7 +15,7 @@ export interface RowHeightOptions<TData extends RowData> {
  * `rowHeight` → `undefined` (meaning "use the density default").
  */
 export function resolveRowHeight<TData extends RowData>(
-  row: Row<TData>,
+  row: DataTableRow<TData>,
   { getRowHeight, rowHeight }: RowHeightOptions<TData>
 ): number | "auto" | undefined {
   const resolved = getRowHeight?.(row)

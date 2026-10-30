@@ -9,6 +9,8 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { stopPropagation } from "../../helpers/stop-propagation"
+
 /**
  * Wraps cell content in a click-to-copy affordance with a transient "Copied"
  * tooltip. Uses `navigator.clipboard` (secure-context only) with a
@@ -45,10 +47,14 @@ export function ClickToCopy({
       <TooltipTrigger asChild>
         <button
           type="button"
-          onClick={copy}
+          onClick={(event) => {
+            stopPropagation(event)
+            void copy()
+          }}
+          onDoubleClick={stopPropagation}
           aria-label={copyLabel}
           className={cn(
-            "-mx-1 rounded-sm px-1 text-left transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"
+            "-mx-1 rounded-sm px-1 text-start transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"
           )}
         >
           {children}
@@ -59,7 +65,8 @@ export function ClickToCopy({
   )
 }
 
-async function copyText(text: string): Promise<boolean> {
+/** Copies text to the clipboard; resolves whether it worked. */
+export async function copyText(text: string): Promise<boolean> {
   if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
     try {
       await navigator.clipboard.writeText(text)

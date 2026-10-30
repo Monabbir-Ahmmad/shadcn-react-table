@@ -1,72 +1,54 @@
 "use client"
 
 import * as React from "react"
-import type { RowData, RowModel, Table } from "@tanstack/react-table"
+import type { RowData } from "@tanstack/react-table"
 
 import { createAdvancedFilteredRowModel } from "../fns/advanced-filter"
+import type { GlobalFilterMode } from "../fns/filter-fns"
 import type { AdvancedFilterGroup } from "../core/types"
-import { useControllableState } from "./use-controllable-state"
-
-const EMPTY_GROUP: AdvancedFilterGroup = { logic: "and", rules: [] }
+import { EMPTY_ADVANCED_FILTER } from "../core/ui-state"
+import type { DataTableRowModelFactory } from "../core/table-types"
 
 interface UseAdvancedFilterParams {
   enableAdvancedFilter: boolean
-  advancedFilter?: AdvancedFilterGroup
-  defaultAdvancedFilter?: AdvancedFilterGroup
-  onAdvancedFilterChange?: (filter: AdvancedFilterGroup) => void
-}
-
-export interface AdvancedFilterState<TData extends RowData> {
-  advancedFilter: AdvancedFilterGroup
-  setAdvancedFilter: React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>
-  showAdvancedFilterPanel: boolean
-  setShowAdvancedFilterPanel: React.Dispatch<React.SetStateAction<boolean>>
-  /** Filtered row model that applies the advanced group on top of the normal
-   *  column/global filters. Stable identity (preserves TanStack memoization). */
-  advancedFilteredRowModel: (table: Table<TData>) => () => RowModel<TData>
+  /** The current group (table state), read when filtering. */
+  getGroup: () => AdvancedFilterGroup
+  /** The current global search mode (table state): a change re-filters. */
+  getGlobalFilterMode: () => GlobalFilterMode
 }
 
 /**
- * Advanced filter state (controllable group + panel visibility) plus the custom
- * filtered row model it drives. The active group is read through a ref so the
- * row-model factory keeps a stable identity; when the feature is off the ref
- * holds the empty group, so the model is a pass-through.
+ * The filtered row model behind the advanced filter: it applies the group on
+ * top of the normal column/global filters. The group is table state
+ * (`advancedFilter`), read when filtering, so the factory keeps a stable
+ * identity; with the feature off it is a pass-through.
  */
 export function useAdvancedFilter<TData extends RowData>({
   enableAdvancedFilter,
-  advancedFilter: advancedFilterProp,
-  defaultAdvancedFilter,
-  onAdvancedFilterChange,
-}: UseAdvancedFilterParams): AdvancedFilterState<TData> {
-  const [advancedFilter, setAdvancedFilter] =
-    useControllableState<AdvancedFilterGroup>(
-      advancedFilterProp,
-      defaultAdvancedFilter ?? EMPTY_GROUP,
-      onAdvancedFilterChange
-    )
-  const [showAdvancedFilterPanel, setShowAdvancedFilterPanel] =
-    React.useState(false)
-
-  const groupRef = React.useRef<AdvancedFilterGroup>(EMPTY_GROUP)
+  getGroup,
+  getGlobalFilterMode,
+}: UseAdvancedFilterParams): DataTableRowModelFactory<TData> {
+  const configRef = React.useRef({
+    enableAdvancedFilter,
+    getGroup,
+    getGlobalFilterMode,
+  })
   // Render-phase latest-ref write is load-bearing: TanStack computes row
   // models during render, and the stable factory below must see this render's
-  // group (an effect write would filter with a stale group for a full frame).
+  // config (an effect write would filter with a stale config for a frame).
   // eslint-disable-next-line react-hooks/refs
-  groupRef.current = enableAdvancedFilter ? advancedFilter : EMPTY_GROUP
+  configRef.current = { enableAdvancedFilter, getGroup, getGlobalFilterMode }
 
-  const advancedFilteredRowModel = React.useMemo(
-    // The getter runs inside TanStack's row-model computation, not during
-    // this hook's render.
-    // eslint-disable-next-line react-hooks/refs
-    () => createAdvancedFilteredRowModel<TData>(() => groupRef.current),
-    []
+  // The getters run inside TanStack's row-model computation, not during this
+  // hook's render.
+  const readGroup = () =>
+    configRef.current.enableAdvancedFilter
+      ? configRef.current.getGroup()
+      : EMPTY_ADVANCED_FILTER
+  const readMode = () => configRef.current.getGlobalFilterMode()
+  // eslint-disable-next-line react-hooks/refs
+  const [model] = React.useState(() =>
+    createAdvancedFilteredRowModel<TData>(readGroup, readMode)
   )
-
-  return {
-    advancedFilter,
-    setAdvancedFilter,
-    showAdvancedFilterPanel,
-    setShowAdvancedFilterPanel,
-    advancedFilteredRowModel,
-  }
+  return model
 }

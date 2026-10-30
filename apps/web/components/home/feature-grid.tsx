@@ -1,108 +1,136 @@
-import type { ComponentType } from "react"
+import Link from "next/link"
 import {
-  RiArrowUpDownLine,
-  RiDownloadLine,
+  RiDragMove2Line,
   RiEdit2Line,
   RiFilter3Line,
-  RiFlashlightLine,
-  RiLayoutColumnLine,
-  RiListCheck2,
+  RiKeyboardLine,
+  RiPushpinLine,
+  RiSparkling2Line,
+  RiSpeedUpLine,
   RiStackLine,
   RiTranslate2,
+  type RemixiconComponentType,
 } from "@remixicon/react"
 
-interface Feature {
-  icon: ComponentType<{ className?: string }>
+import { SectionLabel } from "@/components/home/section-label"
+
+type Feature = {
+  icon: RemixiconComponentType
   title: string
-  description: string
+  body: string
+  href: string
 }
 
 const FEATURES: Feature[] = [
   {
-    icon: RiArrowUpDownLine,
-    title: "Sorting",
-    description:
-      "Single and multi-column sorting with shift-click and order badges.",
-  },
-  {
     icon: RiFilter3Line,
     title: "Filtering & search",
-    description:
-      "Per-column filter row, switchable match modes, and fuzzy global search.",
-  },
-  {
-    icon: RiLayoutColumnLine,
-    title: "Column management",
-    description: "Reorder, pin, resize, and toggle visibility of any column.",
-  },
-  {
-    icon: RiStackLine,
-    title: "Grouping & trees",
-    description:
-      "Group with aggregation footers, detail panels, and hierarchical sub-rows.",
+    body: "Filters per column with switchable modes, a fuzzy global search and an advanced filter builder.",
+    href: "/docs/guides/column-filtering",
   },
   {
     icon: RiEdit2Line,
-    title: "Inline editing",
-    description:
-      "Edit by cell, row, table, or modal with create and save hooks.",
+    title: "Editing",
+    body: "Edit a cell, a row, a whole table or a modal form, with validation per column.",
+    href: "/docs/guides/editing",
   },
   {
-    icon: RiListCheck2,
-    title: "Rows & selection",
-    description:
-      "Selection, row numbers, pinning, drag-to-reorder, and row actions.",
+    icon: RiStackLine,
+    title: "Grouping & aggregation",
+    body: "Drag a header to group rows, then sum, count or average each group.",
+    href: "/docs/guides/grouping",
   },
   {
-    icon: RiFlashlightLine,
+    icon: RiSpeedUpLine,
     title: "Virtualization",
-    description: "Row and column virtualization keep thousands of rows smooth.",
+    body: "Scroll through 100,000 rows smoothly. Only the rows and columns in view are rendered.",
+    href: "/docs/guides/virtualization",
   },
   {
-    icon: RiDownloadLine,
-    title: "Export",
-    description: "Export selected or filtered rows to CSV and Excel.",
+    icon: RiPushpinLine,
+    title: "Column & row pinning",
+    body: "Keep key columns at the edges and important rows at the top or bottom while the rest scrolls.",
+    href: "/docs/guides/column-pinning",
+  },
+  {
+    icon: RiDragMove2Line,
+    title: "Drag & drop",
+    body: "Reorder rows and columns, or drag rows into another table, with the pointer, touch or keyboard.",
+    href: "/docs/guides/row-dragging",
+  },
+  {
+    icon: RiSparkling2Line,
+    title: "Animations",
+    body: "Rows glide into place when you sort, filter or group, and hold still for reduced motion.",
+    href: "/docs/guides/animations",
   },
   {
     icon: RiTranslate2,
-    title: "Localization & icons",
-    description: "Override every string and swap in your own icon set.",
+    title: "38 languages",
+    body: "Install only the languages you need, right-to-left included, or override any string.",
+    href: "/docs/guides/localization",
+  },
+  {
+    icon: RiKeyboardLine,
+    title: "Accessibility & keyboard",
+    body: "An ARIA grid you can use with arrow keys and a screen reader, checked with axe in CI.",
+    href: "/docs/guides/accessibility",
   },
 ]
 
-/**
- * The breadth pitch: a sharp-cornered grid of headline capabilities that maps
- * one-to-one onto the docs guides.
- */
+/** Nine features in a grid of cards, each linking to its guide. */
 export function FeatureGrid() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-          Everything Material React Table does
-        </h2>
-        <p className="mt-4 text-pretty text-muted-foreground">
-          The full breadth of MRT, rebuilt on TanStack Table v8 and driven by a
-          single hook — nothing bolted on.
-        </p>
-      </div>
-
-      <div className="mt-12 grid grid-cols-1 gap-px border bg-border sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((feature) => (
-          <div
-            key={feature.title}
-            className="group bg-card p-6 transition-colors hover:bg-muted/40"
-          >
-            <feature.icon className="size-5 text-primary" />
-            <h3 className="mt-4 text-sm font-semibold tracking-wide uppercase">
-              {feature.title}
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {feature.description}
-            </p>
+    <section
+      id="features"
+      aria-labelledby="features-title"
+      className="-mt-px scroll-mt-14 border-t"
+    >
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+        <div className="grid gap-x-12 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
+          <div>
+            <SectionLabel index="02">Features</SectionLabel>
+            <h2
+              id="features-title"
+              className="mt-4 font-heading text-4xl font-semibold tracking-tight text-balance md:text-5xl"
+            >
+              Everything a data table needs.
+            </h2>
           </div>
-        ))}
+          <p className="text-base text-pretty text-muted-foreground lg:pb-1.5">
+            Each feature turns on with an option or two. Every one has a guide
+            with a live example.
+          </p>
+        </div>
+        <ul className="mt-10 grid border-t border-l sm:grid-cols-2 md:mt-12 lg:grid-cols-3">
+          {FEATURES.map((feature) => (
+            <li key={feature.href} className="border-r border-b">
+              <FeatureCard feature={feature} />
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
+  )
+}
+
+function FeatureCard({ feature }: { feature: Feature }) {
+  const Icon = feature.icon
+  return (
+    <Link
+      href={feature.href}
+      className="group flex h-full flex-col bg-background p-6 transition-colors outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+    >
+      <Icon aria-hidden className="size-5 text-primary" />
+      <h3 className="mt-5 font-heading text-lg font-semibold tracking-tight">
+        {feature.title}
+      </h3>
+      <p className="mt-2 flex-1 text-sm text-pretty text-muted-foreground">
+        {feature.body}
+      </p>
+      <span className="mt-5 font-mono text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+        Guide →
+      </span>
+    </Link>
   )
 }

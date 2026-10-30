@@ -14,12 +14,13 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { getColumnLabel } from "../../../helpers/column-label"
 import { FIELD_CLASS, useSelectOptions, type FilterFieldProps } from "./shared"
+import { dt } from "../../../core/internal"
 
 export function SelectFilterField<TData extends RowData, TValue>({
   column,
   table,
 }: FilterFieldProps<TData, TValue>) {
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const { options } = useSelectOptions(column)
   const value = (column.getFilterValue() as string) || ""
   return (
@@ -32,7 +33,12 @@ export function SelectFilterField<TData extends RowData, TValue>({
       >
         <SelectTrigger
           size="sm"
-          className={cn(FIELD_CLASS, "w-full min-w-0 flex-1 px-2")}
+          // Some styles size the small trigger with `data-[size=sm]:h-*`,
+          // which beats a plain `h-8`: match the other filter inputs.
+          className={cn(
+            FIELD_CLASS,
+            "w-full min-w-0 flex-1 px-2 data-[size=sm]:h-8"
+          )}
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           <SelectValue

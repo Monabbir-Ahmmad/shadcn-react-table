@@ -1,0 +1,111 @@
+export const metadata = { title: "Composition" }
+
+# Composition
+
+`<DataTable />` lays out the whole table for you. When you need a different layout — the search box in your page header, pagination somewhere else, your own toolbar — use the table's parts directly.
+
+## Reading the table from anywhere inside it
+
+Components rendered inside `<DataTable />` (cells, toolbar slots, menu items, detail panels) can get the instance with `useDataTableInstance()` instead of receiving `table` as a prop:
+
+```tsx
+import { useDataTableInstance } from "@/components/ui/data-table"
+
+function SelectedCount() {
+  const table = useDataTableInstance<Person>()
+  return (
+    <table.Subscribe selector={(state) => state.rowSelection}>
+      {(selection) => <span>{Object.keys(selection).length} selected</span>}
+    </table.Subscribe>
+  )
+}
+
+const table = useDataTable({
+  data,
+  columns,
+  enableRowSelection: true,
+  renderTopToolbarCustomActions: () => <SelectedCount />,
+})
+```
+
+The instance itself never changes, so subscribe to the state you show (as above) to re-render when it changes.
+
+## Your own layout
+
+Wrap your layout in `DataTableProvider` and place the parts where you want them. Each part takes the `table`:
+
+```tsx
+import {
+  DataTable,
+  DataTableDensityToggle,
+  DataTableGlobalFilter,
+  DataTablePagination,
+  DataTableProvider,
+  DataTableViewOptions,
+  useDataTable,
+} from "@/components/ui/data-table"
+
+function People() {
+  const table = useDataTable({
+    data,
+    columns,
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+  })
+  return (
+    <DataTableProvider table={table}>
+      <header className="flex items-center gap-2">
+        <h2 className="mr-auto">People</h2>
+        <DataTableGlobalFilter table={table} />
+        <DataTableViewOptions table={table} />
+        <DataTableDensityToggle table={table} />
+      </header>
+      <DataTable table={table} />
+      <footer>
+        <DataTablePagination table={table} />
+      </footer>
+    </DataTableProvider>
+  )
+}
+```
+
+Here the built-in toolbars are turned off and the same controls appear in your own header and footer.
+
+<Example slug="composition" />
+
+## Fully headless
+
+Render the rows with your own markup and keep only the parts you want from the table — here the search box and pagination. The instance drives both; wrap the part that reads state in `table.Subscribe` so it re-renders.
+
+<Example slug="headless" />
+
+## The parts
+
+| Part | What it is |
+| --- | --- |
+| `DataTableToolbar` | The whole top toolbar |
+| `DataTableBottomToolbar` | The whole bottom toolbar |
+| `DataTableGlobalFilter` | Search box with its mode menu |
+| `DataTablePagination` | Page size, range and page buttons |
+| `DataTableAlertBanner` | The selection banner |
+| `DataTableViewOptions` | Show / hide / reorder columns menu |
+| `DataTableDensityToggle` | Density menu |
+| `DataTableFullscreenToggle` | Full screen button |
+| `DataTableFilterToggle` | Show / hide the filter row |
+| `DataTableAdvancedFilterToggle` | Opens the advanced filter panel |
+| `DataTableFilterPanel` | The advanced filter panel |
+| `DataTableDropToGroupZone` | Drop zone for grouping by drag |
+| `DataTableColumnActions` | A column's actions menu (takes `column`) |
+| `DataTableColumnFilter` | A column's filter field (takes `column`) |
+| `DataTableFilterModeMenu` | A column's filter-mode menu (takes `column`) |
+| `DataTableEditModal` | The edit / create dialog |
+
+The header, body and footer stay inside `<DataTable />`, which manages their scrolling, virtualization and keyboard navigation. To change how they look, use [`slotProps`](/docs/guides/slot-props).
+
+## Related
+
+<Cards>
+  <Card href="/docs/guides/toolbar" title="Toolbar customization" />
+  <Card href="/docs/guides/slot-props" title="Part props (slotProps)" />
+  <Card href="/docs/guides/state" title="State management" />
+</Cards>

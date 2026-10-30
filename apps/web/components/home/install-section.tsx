@@ -1,14 +1,9 @@
-"use client"
-
-import * as React from "react"
 import Link from "next/link"
-import { RiCheckLine, RiFileCopyLine } from "@remixicon/react"
 
-import { Button } from "@workspace/ui/components/button"
-import { cn } from "@workspace/ui/lib/utils"
-
-const INSTALL_COMMAND =
-  "pnpm dlx shadcn@latest add https://monabbir-ahmmad.github.io/shadcn-react-table/r/data-table.json"
+import { CopyButton } from "@/components/copy-button"
+import { Step, Steps } from "@/components/docs/steps"
+import { ProofSection, Wrappable } from "@/components/home/proof/proof-section"
+import { INSTALL_COMMAND } from "@/lib/site"
 
 const SNIPPET = `import { DataTable, useDataTable } from "@/components/ui/data-table"
 
@@ -18,73 +13,55 @@ function Users({ data, columns }) {
 }`
 
 /**
- * The "start in seconds" section: a copyable registry command plus the minimal
- * useDataTable + DataTable snippet.
+ * The install section: three steps — add the block, build a table, make it
+ * yours.
  */
 export function InstallSection() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-          Drop it in with the shadcn CLI
-        </h2>
-        <p className="mt-4 text-pretty text-muted-foreground">
-          One command installs the table source, the primitives it uses in your
-          style, and its dependencies.
-        </p>
+    <ProofSection
+      id="install"
+      index="04"
+      label="Install"
+      title="Three steps."
+      lead="One command installs the table source, the primitives it uses in your style, and its dependencies."
+    >
+      <div className="[&>ol]:my-0">
+        <Steps>
+          <Step title="Add the block">
+            <CommandBlock />
+          </Step>
+          <Step title="Build a table">
+            <pre className="overflow-x-auto border bg-background p-4 text-[13px] leading-relaxed">
+              <code className="font-mono">{SNIPPET}</code>
+            </pre>
+          </Step>
+          <Step title="Make it yours">
+            <p className="text-sm text-pretty text-muted-foreground">
+              The source lives in your project, so edit it in place — restyle
+              it, change a behavior, or delete what you do not use.
+            </p>
+          </Step>
+        </Steps>
       </div>
-
-      <div className="mx-auto mt-10 grid max-w-4xl gap-4 lg:grid-cols-2">
-        <CommandBlock />
-        <pre className="overflow-x-auto border bg-card p-4 text-[13px] leading-relaxed">
-          <code className="font-mono">{SNIPPET}</code>
-        </pre>
-      </div>
-
-      <div className="mt-8 text-center">
-        <Button asChild variant="outline">
-          <Link href="/docs/installation">Read the installation guide →</Link>
-        </Button>
-      </div>
-    </section>
+      <Link
+        href="/docs/installation"
+        className="mt-8 inline-block font-mono text-xs underline-offset-4 transition-colors hover:text-primary hover:underline"
+      >
+        Installation guide →
+      </Link>
+    </ProofSection>
   )
 }
 
+/** The install command; only its copy button runs on the client. */
 function CommandBlock() {
-  const [copied, setCopied] = React.useState(false)
-
-  const copy = () => {
-    void navigator.clipboard.writeText(INSTALL_COMMAND).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    })
-  }
-
   return (
-    <div className="flex flex-col border bg-card">
-      <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2">
-        <span className="text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
-          Terminal
-        </span>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          aria-label={copied ? "Copied" : "Copy install command"}
-          onClick={copy}
-        >
-          {copied ? (
-            <RiCheckLine className={cn("text-primary")} />
-          ) : (
-            <RiFileCopyLine />
-          )}
-        </Button>
-      </div>
-      <div className="flex-1 overflow-x-auto p-4">
-        <code className="font-mono text-[13px] leading-relaxed whitespace-pre">
-          <span className="text-muted-foreground select-none">$ </span>
-          {INSTALL_COMMAND}
-        </code>
-      </div>
+    <div className="flex items-start gap-4 border bg-background p-4 font-mono text-[13px] leading-relaxed">
+      <code className="min-w-0 flex-1 break-words">
+        <span className="text-muted-foreground select-none">$ </span>
+        <Wrappable text={INSTALL_COMMAND} />
+      </code>
+      <CopyButton text={INSTALL_COMMAND} what="the install command" />
     </div>
   )
 }

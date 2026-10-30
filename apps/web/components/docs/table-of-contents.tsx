@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 
 import { cn } from "@workspace/ui/lib/utils"
 
+import { SITE_HEADER_HEIGHT } from "@/lib/site"
+
 type TocEntry = { id: string; text: string }
 type TocItem = TocEntry & { children: TocEntry[] }
 
@@ -67,7 +69,10 @@ function useTableOfContents(): { items: TocItem[]; activeId: string | null } {
             setActiveId((first.target as HTMLElement).id)
           }
         },
-        { rootMargin: "-57px 0% -85% 0%", threshold: 0 }
+        {
+          rootMargin: `-${SITE_HEADER_HEIGHT}px 0% -85% 0%`,
+          threshold: 0,
+        }
       )
 
       headings.forEach((h) => observer.observe(h))
@@ -90,45 +95,60 @@ export function DocsTableOfContents() {
   const totalHeadings = items.reduce((n, i) => n + 1 + i.children.length, 0)
   if (totalHeadings < 2) return null
 
+  const flat = items.flatMap((item) => [item, ...item.children])
+  const activeIndex = Math.max(
+    0,
+    flat.findIndex((e) => e.id === activeId)
+  )
+  const progress = flat.length > 1 ? activeIndex / (flat.length - 1) : 0
+
   return (
     <nav aria-label="On this page">
       <p className="mb-4 text-sm font-medium">On this page</p>
-      <ul className="space-y-1 text-sm">
-        {items.map((item) => (
-          <li key={item.id}>
-            <a
-              href={`#${item.id}`}
-              className={cn(
-                "block py-1 transition-colors hover:text-foreground",
-                activeId === item.id
-                  ? "border-l-2 border-primary pl-2 font-medium text-foreground"
-                  : "text-muted-foreground"
+      <div className="relative ps-3">
+        <div aria-hidden className="absolute inset-y-0 start-0 w-px bg-border">
+          <div
+            className="w-px bg-primary transition-[height] duration-300 motion-reduce:transition-none"
+            style={{ height: `${progress * 100}%` }}
+          />
+        </div>
+        <ul className="space-y-1 text-sm">
+          {items.map((item) => (
+            <li key={item.id}>
+              <a
+                href={`#${item.id}`}
+                className={cn(
+                  "block py-1 transition-colors hover:text-foreground",
+                  activeId === item.id
+                    ? "border-l-2 border-primary pl-2 font-medium text-foreground"
+                    : "text-muted-foreground"
+                )}
+              >
+                {item.text}
+              </a>
+              {item.children.length > 0 && (
+                <ul className="mt-1 space-y-1 pl-4">
+                  {item.children.map((child) => (
+                    <li key={child.id}>
+                      <a
+                        href={`#${child.id}`}
+                        className={cn(
+                          "block py-1 transition-colors hover:text-foreground",
+                          activeId === child.id
+                            ? "border-l-2 border-primary pl-2 font-medium text-foreground"
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        {child.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               )}
-            >
-              {item.text}
-            </a>
-            {item.children.length > 0 && (
-              <ul className="mt-1 space-y-1 pl-4">
-                {item.children.map((child) => (
-                  <li key={child.id}>
-                    <a
-                      href={`#${child.id}`}
-                      className={cn(
-                        "block py-1 transition-colors hover:text-foreground",
-                        activeId === child.id
-                          ? "border-l-2 border-primary pl-2 font-medium text-foreground"
-                          : "text-muted-foreground"
-                      )}
-                    >
-                      {child.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   )
 }

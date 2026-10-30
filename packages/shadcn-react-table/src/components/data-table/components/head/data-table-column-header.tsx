@@ -1,6 +1,8 @@
 "use client"
 
-import { flexRender, type Header, type RowData } from "@tanstack/react-table"
+import * as React from "react"
+
+import { flexRender, type RowData } from "@tanstack/react-table"
 
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -16,6 +18,8 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { defaultIcons } from "../../core/icons"
+import { MOTION_TIMING_CLASS } from "../../core/motion"
 import type { DataTableInstance } from "../../core/types"
 import { getColumnLabel } from "../../helpers/column-label"
 import {
@@ -26,18 +30,20 @@ import {
 import { ColumnDragHandle } from "../body/dnd"
 import { DataTableColumnActions } from "../menus/data-table-column-actions"
 import { DataTableColumnFilter } from "./data-table-column-filter"
+import type { DataTableHeader } from "../../core/table-types"
+import { dt } from "../../core/internal"
 
 interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
-  header: Header<TData, TValue>
+  header: DataTableHeader<TData, TValue>
   table: DataTableInstance<TData>
 }
 
 // Right alignment reverses the row so the label hugs the right edge with its
 // controls on the inside; a reversed main axis starts on the right.
 const ALIGN_CLASS = {
-  left: "justify-start text-left",
+  left: "justify-start text-start",
   center: "justify-center text-center",
-  right: "flex-row-reverse justify-start text-right",
+  right: "flex-row-reverse justify-start text-end",
 } as const
 
 /**
@@ -51,7 +57,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   table,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   const { column } = header
-  const { localization, icons } = table.tableInstance
+  const { localization, icons } = dt(table)
   const controls = headerControlsOptionsFromTable(table)
   const align = column.columnDef.meta?.align ?? "left"
 
@@ -90,7 +96,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
 
   const labelNode = header.isPlaceholder
     ? null
-    : flexRender(column.columnDef.header, header.getContext())
+    : flexRender(column.columnDef.header, { ...header.getContext(), table })
 
   const canSort = column.getCanSort()
   const sorted = column.getIsSorted() // false | "asc" | "desc"
@@ -127,10 +133,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
 
   return (
     <div
-      className={cn(
-        "group/th flex items-center gap-0.5",
-        ALIGN_CLASS[align]
-      )}
+      className={cn("group/th flex items-center gap-0.5", ALIGN_CLASS[align])}
     >
       {canSort ? (
         <Tooltip>
@@ -139,7 +142,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
               type="button"
               onClick={column.getToggleSortingHandler()}
               aria-label={sortTooltip}
-              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground"
+              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground motion-reduce:transition-none"
               data-sorted={!!sorted}
             >
               <span className="min-w-0 truncate">{labelNode}</span>
@@ -147,7 +150,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
               {isMultiSort && (
                 <Badge
                   variant="secondary"
-                  className="ml-0.5 h-4 min-w-4 shrink-0 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
+                  className="ms-0.5 h-4 min-w-4 shrink-0 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
                 >
                   {sortIndex + 1}
                 </Badge>
@@ -175,18 +178,102 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   )
 }
 
+/** One stacked icon layer; only the shown one is visible. Layers fade and
+ *  scale between states. */
+const SORT_LAYER_CLASS = cn(
+  "col-start-1 row-start-1 flex items-center justify-center transition-[opacity,visibility,scale]",
+  MOTION_TIMING_CLASS
+)
+
+/** The today-look of the unsorted icon (faded, brighter on header hover). */
+const UNSORTED_ICON_CLASS =
+  "size-3.5 shrink-0 opacity-50 transition-opacity group-hover/th:opacity-70"
+
+/**
+ * The sort state icon. Every state's icon stays mounted, stacked in one grid
+ * cell, and only the current one is visible, so a change fades between them
+ * (when the table animates) instead of swapping nodes. With the default
+ * icons, one arrow serves both directions and turns 180° for descending.
+ * Custom icons are shown as given and only fade.
+ *
+ * The arrow only turns while it shows: clearing the sort keeps its last
+ * direction so it just fades out, and when it shows again it takes its new
+ * direction at once instead of turning while it fades in.
+ */
 function SortIndicator({
   sorted,
   icons,
 }: {
   sorted: false | "asc" | "desc"
-  icons: DataTableInstance["tableInstance"]["icons"]
+  icons: DataTableInstance["dataTable"]["icons"]
 }) {
-  if (sorted === "asc")
-    return <icons.sortAscending className="size-3.5 shrink-0" />
-  if (sorted === "desc")
-    return <icons.sortDescending className="size-3.5 shrink-0" />
+  const direction = sorted || "none"
+  // The direction before the last change (state, not a ref: it is read
+  // during render). Set during render, as React's "storing information from
+  // previous renders" pattern does.
+  const [seen, setSeen] = React.useState({ direction, from: direction })
+  let from = seen.from
+  if (seen.direction !== direction) {
+    from = seen.direction
+    setSeen({ direction, from })
+  }
+  const turned = (direction === "none" ? from : direction) === "desc"
+  const turns = from !== "none"
+  const defaultArrows =
+    icons.sortAscending === defaultIcons.sortAscending &&
+    icons.sortDescending === defaultIcons.sortDescending
+
+  const layer = (shown: boolean, icon: React.ReactNode, key: string) => (
+    <span
+      key={key}
+      data-shown={shown ? "" : undefined}
+      className={cn(
+        SORT_LAYER_CLASS,
+        shown ? "scale-100" : "invisible scale-75 opacity-0"
+      )}
+    >
+      {icon}
+    </span>
+  )
+
   return (
-    <icons.sortUnsorted className="size-3.5 shrink-0 opacity-50 transition-opacity group-hover/th:opacity-70" />
+    <span
+      data-slot="data-table-sort-indicator"
+      data-direction={direction}
+      aria-hidden="true"
+      className="inline-grid shrink-0 place-items-center"
+    >
+      {layer(
+        direction === "none",
+        <icons.sortUnsorted className={UNSORTED_ICON_CLASS} />,
+        "none"
+      )}
+      {defaultArrows ? (
+        layer(
+          direction !== "none",
+          <icons.sortAscending
+            className={cn(
+              "size-3.5 shrink-0",
+              turns && ["transition-[rotate]", MOTION_TIMING_CLASS],
+              turned && "rotate-180"
+            )}
+          />,
+          "arrow"
+        )
+      ) : (
+        <>
+          {layer(
+            direction === "asc",
+            <icons.sortAscending className="size-3.5 shrink-0" />,
+            "asc"
+          )}
+          {layer(
+            direction === "desc",
+            <icons.sortDescending className="size-3.5 shrink-0" />,
+            "desc"
+          )}
+        </>
+      )}
+    </span>
   )
 }

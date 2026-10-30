@@ -1,0 +1,43 @@
+import type { Metadata } from "next"
+
+import { DocsPageHeader } from "@/components/docs/page-header"
+import { DocsPrevNext } from "@/components/docs/prev-next"
+import { DocsSidebar } from "@/components/docs/sidebar"
+import { DocsTableOfContents } from "@/components/docs/table-of-contents"
+import { SiteHeader } from "@/components/site-header"
+
+export const metadata: Metadata = {
+  title: { default: "Docs", template: "%s — data-table" },
+  description:
+    "Documentation for the data table, a shadcn/ui data table with Material React Table parity.",
+}
+
+export default function DocsLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex min-h-svh flex-col">
+      <SiteHeader />
+
+      <div className="mx-auto flex w-full flex-1 flex-col md:flex-row">
+        <aside className="hidden shrink-0 overflow-y-auto px-4 py-6 md:sticky md:top-(--site-header-h) md:block md:h-[calc(100svh-var(--site-header-h))] md:w-64 md:border-e">
+          <DocsSidebar />
+        </aside>
+
+        <main className="min-w-0 flex-1 px-4 py-6 md:px-10 md:py-8 lg:px-16">
+          <article className="mx-auto max-w-5xl" data-docs-article>
+            <DocsPageHeader />
+            {children}
+            <DocsPrevNext />
+          </article>
+        </main>
+
+        <aside className="hidden xl:sticky xl:top-(--site-header-h) xl:block xl:h-[calc(100svh-var(--site-header-h))] xl:w-56 xl:shrink-0 xl:overflow-y-auto xl:border-s xl:px-4 xl:py-6">
+          <DocsTableOfContents />
+        </aside>
+      </div>
+    </div>
+  )
+}

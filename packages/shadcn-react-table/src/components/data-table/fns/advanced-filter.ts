@@ -1,10 +1,4 @@
-import {
-  getFilteredRowModel,
-  type Row,
-  type RowData,
-  type RowModel,
-  type Table,
-} from "@tanstack/react-table"
+import { createFilteredRowModel, type RowData } from "@tanstack/react-table"
 
 import type {
   AdvancedFilterGroup,
@@ -12,6 +6,13 @@ import type {
   AdvancedFilterRule,
   FilterVariant,
 } from "../core/types"
+import type {
+  DataTableFeatures,
+  DataTableRow,
+  DataTableRowModel,
+  DataTableRowModelFactory,
+} from "../core/table-types"
+import { parseDate } from "../helpers/parse-date"
 
 /** A value that contributes nothing to a filter (no cell value / no input). */
 function isEmptyValue(value: unknown): boolean {
@@ -34,12 +35,8 @@ function asNumber(value: unknown): number | null {
 
 /** Parse an epoch time from a Date or date-ish string, or null. */
 function asTime(value: unknown): number | null {
-  if (value instanceof Date) return value.getTime()
-  if (typeof value === "string" && value.trim() !== "") {
-    const t = Date.parse(value)
-    return Number.isNaN(t) ? null : t
-  }
-  return null
+  if (!(value instanceof Date) && typeof value !== "string") return null
+  return parseDate(value)?.getTime() ?? null
 }
 
 /** Order two cell-ish values: numeric first, then date, then string. */
@@ -142,7 +139,7 @@ export function applyOperator(
 
 /** Evaluate a single rule against a row. */
 export function evaluateRule<TData extends RowData>(
-  row: Row<TData>,
+  row: DataTableRow<TData>,
   rule: AdvancedFilterRule
 ): boolean {
   return applyOperator(
@@ -155,7 +152,7 @@ export function evaluateRule<TData extends RowData>(
 
 /** Evaluate the whole group against a row (AND/OR over its rules). */
 export function evaluateAdvancedFilterGroup<TData extends RowData>(
-  row: Row<TData>,
+  row: DataTableRow<TData>,
   group: AdvancedFilterGroup
 ): boolean {
   if (group.rules.length === 0) return true
@@ -187,6 +184,10 @@ export function getOperatorsForVariant(
       ]
     case "date":
     case "date-range":
+    case "datetime":
+    case "datetime-range":
+    case "time":
+    case "time-range":
       return [
         "equals",
         "notEquals",
@@ -220,13 +221,13 @@ export function isValuelessOperator(operator: AdvancedFilterOperator): boolean {
 /** Rebuild a row model from a filtered set of top-level rows, recomputing the
  *  flat list + id map from the kept rows and their descendants. */
 function filterRowModel<TData extends RowData>(
-  model: RowModel<TData>,
-  predicate: (row: Row<TData>) => boolean
-): RowModel<TData> {
+  model: DataTableRowModel<TData>,
+  predicate: (row: DataTableRow<TData>) => boolean
+): DataTableRowModel<TData> {
   const rows = model.rows.filter(predicate)
-  const flatRows: Row<TData>[] = []
-  const rowsById: Record<string, Row<TData>> = {}
-  const collect = (rs: Row<TData>[]) => {
+  const flatRows: DataTableRow<TData>[] = []
+  const rowsById: Record<string, DataTableRow<TData>> = {}
+  const collect = (rs: DataTableRow<TData>[]) => {
     for (const row of rs) {
       flatRows.push(row)
       rowsById[row.id] = row
@@ -243,17 +244,41 @@ function filterRowModel<TData extends RowData>(
  * group is read through `getGroup` at evaluation time (the factory keeps a
  * stable identity to preserve memoization), and results are cached per
  * underlying model + group so they only recompute when something changes.
+ *
+ * TanStack memoizes its filtered model on state only, never on the filter
+ * functions, so the delegate is rebuilt whenever `options.globalFilterFn`
+ * changes identity (e.g. a global filter mode switch or a consumer swapping
+ * the fn); the fresh memo then recomputes with the new function.
+ *
+ * A consumer `globalFilterFn` must therefore be identity-stable: a new function
+ * on every render re-filters on every render.
  */
 export function createAdvancedFilteredRowModel<TData extends RowData>(
-  getGroup: () => AdvancedFilterGroup
-): (table: Table<TData>) => () => RowModel<TData> {
-  const base = getFilteredRowModel<TData>()
+  getGroup: () => AdvancedFilterGroup,
+  getGlobalFilterMode: () => unknown = () => undefined
+): DataTableRowModelFactory<TData> {
+  const base = createFilteredRowModel<DataTableFeatures, TData>()
   return (table) => {
-    const delegate = base(table)
-    let cachedFor: RowModel<TData> | null = null
+    // TanStack memoizes the filtered model on state only (column filters,
+    // global filter, pre-filtered rows), never on the filter functions or our
+    // global search mode. Key the delegate on both and rebuild it when either
+    // changes; the fresh memo recomputes.
+    let delegate = base(table)
+    let delegateFor = table.options.globalFilterFn
+    let delegateMode = getGlobalFilterMode()
+    let cachedFor: DataTableRowModel<TData> | null = null
     let cachedGroup: AdvancedFilterGroup | null = null
-    let cached: RowModel<TData> | null = null
+    let cached: DataTableRowModel<TData> | null = null
     return () => {
+      const mode = getGlobalFilterMode()
+      if (
+        table.options.globalFilterFn !== delegateFor ||
+        mode !== delegateMode
+      ) {
+        delegate = base(table)
+        delegateFor = table.options.globalFilterFn
+        delegateMode = mode
+      }
       const model = delegate()
       const group = getGroup()
       if (group.rules.length === 0) return model

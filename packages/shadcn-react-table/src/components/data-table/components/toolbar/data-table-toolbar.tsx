@@ -1,7 +1,7 @@
 "use client"
 
 import type { RowData } from "@tanstack/react-table"
-import type * as React from "react"
+import * as React from "react"
 
 import type { DataTableInstance } from "../../core/types"
 import { DataTableFilterPanel } from "../menus/data-table-filter-panel"
@@ -13,6 +13,31 @@ import {
 } from "./controls"
 import { DataTableGlobalFilter } from "./data-table-global-filter"
 import { DataTableViewOptions } from "./data-table-view-options"
+import { dt } from "../../core/internal"
+import { isEditingOrCreating, useAnimationsActive } from "../../core/motion"
+import { getSlotProps, mergeProps } from "../../helpers/slot-props"
+import { useLayoutGlide } from "../../hooks/use-layout-glide"
+
+/**
+ * Glides the toolbar's two item groups. Renders nothing; it sits before the
+ * toolbar so its insertion effect reads the items before React updates them
+ * (see `useLayoutGlide`).
+ */
+function ToolbarGlide({
+  start,
+  actions,
+  active,
+  signal,
+}: {
+  start: React.RefObject<HTMLDivElement | null>
+  actions: React.RefObject<HTMLDivElement | null>
+  active: boolean
+  signal: unknown[]
+}) {
+  useLayoutGlide(start, active, signal)
+  useLayoutGlide(actions, active, signal)
+  return null
+}
 
 /**
  * Top toolbar. Left region: title slot + consumer toolbar actions. Right
@@ -34,7 +59,7 @@ export function DataTableToolbar<TData extends RowData>({
 }) {
   const {
     title,
-    renderToolbarActions,
+    renderTopToolbarCustomActions,
     renderToolbarInternalActions,
     enableToolbarInternalActions,
     enableGlobalFilter,
@@ -45,22 +70,60 @@ export function DataTableToolbar<TData extends RowData>({
     enableColumnActions,
     enableDensityToggle,
     enableFullscreenToggle,
-  } = table.tableInstance
+    enableAnimations,
+  } = dt(table)
+  const startRef = React.useRef<HTMLDivElement>(null)
+  const actionsRef = React.useRef<HTMLDivElement>(null)
+  // Still while a cell or row is edited or created, as the rows are.
+  const active =
+    useAnimationsActive(enableAnimations) &&
+    !isEditingOrCreating(table.getState())
 
   const anyFilterable = table
     .getAllColumns()
     .some((column) => column.getCanFilter())
 
   const showGlobalFilter = enableGlobalFilter && positionGlobalFilter !== "none"
+  const showFilterToggle =
+    enableColumnFilters &&
+    anyFilterable &&
+    columnFilterDisplayMode === "subheader"
 
   return (
     <>
+      <ToolbarGlide
+        start={startRef}
+        actions={actionsRef}
+        active={active}
+        // What adds or removes an item: the buttons slide when an item comes
+        // or goes. Not the search box: its own slide pushes them aside.
+        signal={[
+          showGlobalFilter,
+          positionGlobalFilter,
+          title != null,
+          showFilterToggle,
+          enableAdvancedFilter,
+          enableColumnActions,
+          enableDensityToggle,
+          enableFullscreenToggle,
+          enableToolbarInternalActions,
+          renderToolbarInternalActions != null,
+        ]}
+      />
       <div
-        ref={toolbarRef}
-        data-slot="data-table-toolbar"
-        className="flex items-start justify-between gap-3 py-1"
+        {...mergeProps(
+          {
+            ref: toolbarRef,
+            "data-slot": "data-table-toolbar",
+            className: "flex items-start justify-between gap-3 py-1",
+          } as React.ComponentProps<"div">,
+          getSlotProps(table, "topToolbar", {})
+        )}
       >
-        <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
+        <div
+          ref={startRef}
+          className="relative flex min-h-9 flex-1 flex-wrap items-center gap-2"
+        >
           {showGlobalFilter && positionGlobalFilter === "left" && (
             <DataTableGlobalFilter
               table={table}
@@ -70,13 +133,14 @@ export function DataTableToolbar<TData extends RowData>({
           {title != null && (
             <div className="text-sm font-semibold tracking-wide">{title}</div>
           )}
-          {renderToolbarActions?.({ table })}
+          {renderTopToolbarCustomActions?.({ table })}
         </div>
 
         {enableToolbarInternalActions && (
           <div
+            ref={actionsRef}
             data-slot="data-table-toolbar-actions"
-            className="flex shrink-0 items-center gap-1.5"
+            className="relative flex shrink-0 items-center gap-1.5"
           >
             {renderToolbarInternalActions ? (
               renderToolbarInternalActions({ table })
@@ -88,11 +152,7 @@ export function DataTableToolbar<TData extends RowData>({
                     searchInputRef={searchInputRef}
                   />
                 )}
-                {enableColumnFilters &&
-                  anyFilterable &&
-                  columnFilterDisplayMode === "subheader" && (
-                    <DataTableFilterToggle table={table} />
-                  )}
+                {showFilterToggle && <DataTableFilterToggle table={table} />}
                 {enableAdvancedFilter && (
                   <DataTableAdvancedFilterToggle table={table} />
                 )}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
+  "baseBranch": "main",
+  "changedFilePatterns": ["src/**", "!**/*.test.*"],
+  "changelog": "./changelog.mjs",
+  "commit": false,
+  "format": false,
+  "access": "restricted",
+  "ignore": [
+    "shadcn-react-table-web",
+    "@workspace/ui",
+    "@workspace/eslint-config",
+    "@workspace/typescript-config"
+  ],
+  "privatePackages": {
+    "version": true,
+    "tag": false
+  },
+  "updateInternalDependencies": "patch"
+}

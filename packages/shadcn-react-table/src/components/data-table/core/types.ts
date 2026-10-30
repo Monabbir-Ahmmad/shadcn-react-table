@@ -1,9 +1,12 @@
 import type {
-  Cell,
+  CellData,
   Column,
-  Row,
+  OnChangeFn,
+  PaginationState,
+  ReactTable,
   RowData,
-  Table,
+  TableFeature,
+  TableFeatures,
   TableOptions,
 } from "@tanstack/react-table"
 import type * as React from "react"
@@ -11,8 +14,24 @@ import type * as React from "react"
 import type { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual"
 
 import type { FilterMode, GlobalFilterMode } from "../fns/filter-fns"
+import type { DataTableColumnPinningState } from "../helpers/column-pinning"
+import type { DataTableState } from "../helpers/table-state"
+import type { DataTableFeatures } from "./features"
 import type { DataTableIcons } from "./icons"
 import type { DataTableLocalization } from "./localization"
+import type { DataTableUiState } from "./ui-state"
+import type { RowDropTarget } from "./dnd-scope"
+import type {
+  DataTableAggregationFn,
+  DataTableCell,
+  DataTableColumnDef,
+  DataTableColumn,
+  DataTableFilterFn,
+  DataTableHeader,
+  DataTableHeaderGroup,
+  DataTableRow,
+  DataTableSortFn,
+} from "./table-types"
 
 // Re-exported as part of the public type surface: these describe column-`meta`
 // filter config, while the runtime filter fns stay internal.
@@ -48,7 +67,7 @@ export type ColumnVirtualizerOptions<TData extends RowData> = ValueOrFunc<
 
 /**
  * DOM refs to the table's structural elements, exposed on
- * `table.tableInstance.refs` for imperative access (focus, measure, scroll). Each is
+ * `table.dataTable.refs` for imperative access (focus, measure, scroll). Each is
  * populated after mount and may be `null` when its element isn't rendered
  * (e.g. `bottomToolbarRef` with no bottom toolbar, `tableFooterRef` with no
  * footer, `searchInputRef` before the search box is expanded).
@@ -74,7 +93,10 @@ export interface DataTableRefs {
   searchInputRef: React.RefObject<HTMLInputElement | null>
 }
 
-/** Filter UI variants (full set wired in Phase 2; Phase 1 ships "text"). */
+/** Filter UI variants: the control in the filter row and the modes it offers.
+ *  `datetime*` compare to the minute and `time*` by time of day ("HH:mm"
+ *  strings or Dates); `autocomplete` is a text field suggesting the column's
+ *  values. */
 export type FilterVariant =
   | "text"
   | "select"
@@ -84,6 +106,11 @@ export type FilterVariant =
   | "range-slider"
   | "date"
   | "date-range"
+  | "datetime"
+  | "datetime-range"
+  | "time"
+  | "time-range"
+  | "autocomplete"
 
 export interface DataTableFilterOption {
   label: string
@@ -149,33 +176,62 @@ export type EditVariant = "text" | "number" | "select"
 // Per-column configuration carried on `columnDef.meta`. Augments the TanStack
 // `ColumnMeta` interface so it is strongly typed everywhere `meta` is read.
 declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
+  // The type parameters must match TanStack's for the declarations to merge.
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  interface CellContext<
+    in out TFeatures extends TableFeatures,
+    in out TData extends RowData,
+    TValue extends CellData = CellData,
+  > {
+    /** The cell's value with its matches to the global search or a column
+     *  filter marked (MRT's `renderedCellValue`): render it in a custom
+     *  `cell` to keep the highlighting. The plain value when nothing
+     *  matches. */
+    renderedCellValue?: React.ReactNode
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  interface ColumnMeta<
+    TFeatures extends TableFeatures,
+    TData extends RowData,
+    TValue extends CellData = CellData,
+  > {
     /** Filter UI variant rendered in the filter row. Defaults to "text". */
-    variant?: FilterVariant
+    filterVariant?: FilterVariant
     /** Options for `select` / `multi-select` filter variants. If omitted for a
      *  select-style variant, options are derived from faceted unique values. */
-    options?: DataTableFilterOption[]
+    filterSelectOptions?: DataTableFilterOption[]
     /** Default filter mode for this column (overrides the per-variant default). */
     filterMode?: FilterMode
     /** Per-column override for the filter-mode menu (defaults to the table). */
     enableColumnFilterModes?: boolean
     /** Custom filter UI for this column (escape hatch). Replaces the variant. */
     renderColumnFilter?: (props: {
-      column: Column<TData, TValue>
+      column: Column<TFeatures, TData, TValue>
       table: DataTableInstance<TData>
     }) => React.ReactNode
     /** Restrict (and order) the filter-mode menu for this column to this subset
-     *  of modes. Include the column's default mode. */
+     *  of modes (built-in ones and custom `filterFns` names). Include the
+     *  column's default mode. */
     columnFilterModeOptions?: FilterMode[]
-    /** Allow editing this column (defaults to true when table editing is on). */
-    enableEditing?: boolean
+    /** Allow editing this column (defaults to true when table editing is on),
+     *  or decide per row with a function. */
+    enableEditing?: boolean | ((row: DataTableRow<TData>) => boolean)
     /** Inline editor variant. Defaults to "text". */
     editVariant?: EditVariant
-    /** Options for the "select" edit variant. */
-    editSelectOptions?: DataTableFilterOption[]
+    /** Options for the "select" edit variant, or a function returning them
+     *  for the row being edited (`row` is undefined in the create form). */
+    editSelectOptions?:
+      | DataTableFilterOption[]
+      | ((props: {
+          row?: DataTableRow<TData>
+          column: DataTableColumn<TData, unknown>
+          table: DataTableInstance<TData>
+        }) => DataTableFilterOption[])
     /** Custom inline editor for this column (escape hatch). Replaces the built-in
-     *  editor while the cell/row is editing; drive the value via `table.tableInstance`
-     *  (`rowDraft`/`setRowDraftValue` or `onEditCellSave`). */
+     *  editor while the cell/row is editing; read the draft from
+     *  `table.getState().rowDraft` and write it with `table.setRowDraftValue`
+     *  (row editing), or save with `onEditingCellSave` (cell editing). */
     renderEditCell?: (props: CellRenderProps<TData, TValue>) => React.ReactNode
     /** Custom render for this column's group header cell (when grouped). */
     renderGroupedCell?: (
@@ -193,17 +249,235 @@ declare module "@tanstack/react-table" {
     ) => React.ReactNode
     /** Validate an edited value; return an error message or undefined if valid. */
     validate?: (value: unknown) => string | undefined
-    /** Show a click-to-copy affordance on this column's cells. */
-    enableClickToCopy?: boolean
+    /** Copy this column's cells on click (`true`), from the cell menu
+     *  (`"context-menu"`), or decide per cell with a function. */
+    enableClickToCopy?: ClickToCopyOption<TData>
     /** Horizontal alignment applied to the header label and body cells. */
     align?: "left" | "center" | "right"
-    /** Opt this column out of match highlighting. */
-    disableHighlight?: boolean
-    /** Hide the column-actions menu for this column. */
-    disableColumnActions?: boolean
+    /** `false` opts this column out of match highlighting (the table option of
+     *  the same name turns it on or off for every column). */
+    enableFilterMatchHighlighting?: boolean
+    /** `false` leaves this column out of the show / hide columns menu. */
+    visibleInShowHideMenu?: boolean
+    /** `false` hides the column-actions menu for this column. */
+    enableColumnActions?: boolean
     /** Human-readable label for menus when the header is not a plain string. */
     label?: string
+    /** Props for this column's cells, applied after the table's `slotProps`
+     *  for the same part. */
+    slotProps?: Pick<
+      DataTableSlots<TData>,
+      "headCell" | "filterCell" | "bodyCell" | "footerCell" | "editField"
+    >
   }
+
+  // Registers our feature key (TanStack's plugin mechanism). Optional, and
+  // inert for tables that don't include it.
+  interface Plugins {
+    dataTableInstanceFeature: TableFeature
+    dataTableUiFeature: TableFeature
+  }
+
+  // The table's UI state slices (density, editing, filter modes…) are table
+  // state like sorting: typed in `initialState`, `state` and the store.
+  interface TableState_FeatureMap {
+    dataTableUiFeature: DataTableUiState
+  }
+
+  // Our instance members on TanStack's `Table` type, only for tables whose
+  // feature set includes `dataTableInstanceFeature` (i.e. `DataTableFeatures`).
+  // So render contexts (`cell: ({ table }) => …`), `row.table` and
+  // `column.table` type them; other TanStack tables are unaffected.
+  interface Table_FeatureMap<
+    // Unused, but merging requires TanStack's exact type parameters.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    TFeatures extends TableFeatures,
+    TData extends RowData,
+  > {
+    dataTableInstanceFeature: {
+      /** Table state in our stable shape (left/right column pinning). */
+      getState: () => DataTableState
+      /** The table's resolved options (localization, icons, flags, render
+       *  props) and DOM refs. */
+      dataTable: DataTableOptionsResolved<TData>
+    } & DataTableMethods<TData>
+  }
+}
+
+/** What the edit / create dialog content overrides receive. */
+export interface EditDialogContentProps<TData extends RowData> {
+  table: DataTableInstance<TData>
+  /** The built-in field (label and input) for each editable column. */
+  internalEditComponents: React.ReactNode[]
+  /** Save, as the dialog's Save button does (blocked while `hasErrors`). */
+  save: () => void
+  /** Cancel, as the dialog's Cancel button does. */
+  cancel: () => void
+  /** Whether a field fails its `meta.validate`. */
+  hasErrors: boolean
+}
+
+/** The ids of the columns the table adds itself, for
+ *  `displayColumnDefOptions`. */
+export type DisplayColumnId =
+  | "cn-select"
+  | "cn-expand"
+  | "cn-row-actions"
+  | "cn-row-number"
+  | "cn-row-pin"
+  | "cn-row-drag"
+
+/** Where pinned rows show and how rows get pinned:
+ *  - `"top-and-bottom"` (default): rows pinned to the top stay in view above
+ *    the others while scrolling, rows pinned to the bottom below them; the
+ *    pin button pins to the top.
+ *  - `"top"` / `"bottom"`: the same, with the pin button pinning to that side.
+ *  - `"static"`: pinned rows are listed first / last but scroll away.
+ *  - `"select-top"` / `"select-bottom"`: selecting a row pins it (and
+ *    deselecting unpins it) to that side; no pin buttons. */
+export type RowPinningDisplayMode =
+  | "top-and-bottom"
+  | "top"
+  | "bottom"
+  | "static"
+  | "select-top"
+  | "select-bottom"
+
+/** How cells copy their value: on click (`true`), from the cell menu
+ *  (`"context-menu"`), not at all (`false`), or per cell. */
+export type ClickToCopyOption<TData extends RowData> =
+  | boolean
+  | "context-menu"
+  | ((cell: DataTableCell<TData, unknown>) => boolean | "context-menu")
+
+/** Props for one part of the table (`data-*` attributes included), or a
+ *  function of its context. */
+export type SlotProp<Ctx, Props> =
+  SlotPropsOf<Props> | ((context: Ctx) => SlotPropsOf<Props>)
+
+type SlotPropsOf<Props> = Partial<Props> & {
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined
+}
+
+type WithTable<TData extends RowData, Ctx = object> = Ctx & {
+  table: DataTableInstance<TData>
+}
+
+/** Props for each part of the table (`slotProps`). */
+export interface DataTableSlots<TData extends RowData> {
+  /** The outer wrapper (`<DataTable>`'s own props also land here). */
+  root?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The scroll container around the table. Bound its height here. */
+  surface?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The `<table>` element. */
+  table?: SlotProp<WithTable<TData>, React.ComponentProps<"table">>
+  /** `<thead>`. */
+  head?: SlotProp<WithTable<TData>, React.ComponentProps<"thead">>
+  /** Each header row. */
+  headRow?: SlotProp<
+    WithTable<TData, { headerGroup: DataTableHeaderGroup<TData> }>,
+    React.ComponentProps<"tr">
+  >
+  /** Each header cell. */
+  headCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        header: DataTableHeader<TData, unknown>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"th">
+  >
+  /** Each cell of the column filter row. */
+  filterCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        header: DataTableHeader<TData, unknown>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"th">
+  >
+  /** `<tbody>`. */
+  body?: SlotProp<WithTable<TData>, React.ComponentProps<"tbody">>
+  /** Each body row. */
+  bodyRow?: SlotProp<
+    WithTable<TData, { row: DataTableRow<TData>; rowIndex: number }>,
+    React.ComponentProps<"tr">
+  >
+  /** Each body cell. */
+  bodyCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        cell: DataTableCell<TData, unknown>
+        row: DataTableRow<TData>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"td">
+  >
+  /** The cell holding an expanded row's detail panel. */
+  detailPanel?: SlotProp<
+    WithTable<TData, { row: DataTableRow<TData> }>,
+    React.ComponentProps<"td">
+  >
+  /** `<tfoot>`. */
+  footer?: SlotProp<WithTable<TData>, React.ComponentProps<"tfoot">>
+  /** Each footer row. */
+  footerRow?: SlotProp<
+    WithTable<TData, { footerGroup: DataTableHeaderGroup<TData> }>,
+    React.ComponentProps<"tr">
+  >
+  /** Each footer cell. */
+  footerCell?: SlotProp<
+    WithTable<
+      TData,
+      {
+        header: DataTableHeader<TData, unknown>
+        column: DataTableColumn<TData, unknown>
+      }
+    >,
+    React.ComponentProps<"td">
+  >
+  /** The toolbar above the table. */
+  topToolbar?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The toolbar below the table. */
+  bottomToolbar?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The pagination controls. */
+  pagination?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The selection banner. */
+  alertBanner?: SlotProp<WithTable<TData>, React.ComponentProps<"div">>
+  /** The global search input. */
+  searchInput?: SlotProp<WithTable<TData>, React.ComponentProps<"input">>
+  /** Each inline / dialog edit field (the input, or the select's trigger). */
+  editField?: SlotProp<
+    WithTable<
+      TData,
+      { column: DataTableColumn<TData, unknown>; row?: DataTableRow<TData> }
+    >,
+    React.ComponentProps<"input">
+  >
+  /** The edit / create dialog's content. */
+  editDialog?: SlotProp<
+    WithTable<TData, { row?: DataTableRow<TData>; isCreating: boolean }>,
+    React.ComponentProps<"div">
+  >
+  /** Each loading skeleton (bar or square) in a body cell. */
+  skeleton?: SlotProp<
+    WithTable<
+      TData,
+      { column: DataTableColumn<TData, unknown>; rowIndex: number }
+    >,
+    React.ComponentProps<"div">
+  >
+  /** Each row selection checkbox (and the select-all one, without `row`). */
+  selectCheckbox?: SlotProp<
+    WithTable<TData, { row?: DataTableRow<TData> }>,
+    React.ComponentProps<"button">
+  >
 }
 
 export interface DataTableSlotProps<TData extends RowData> {
@@ -211,62 +485,138 @@ export interface DataTableSlotProps<TData extends RowData> {
 }
 
 export interface RowEvent<TData extends RowData> {
-  row: Row<TData>
+  row: DataTableRow<TData>
   table: DataTableInstance<TData>
   event: React.MouseEvent<HTMLTableRowElement>
 }
 
 export interface CellEvent<TData extends RowData> {
-  cell: Cell<TData, unknown>
-  row: Row<TData>
+  cell: DataTableCell<TData, unknown>
+  row: DataTableRow<TData>
   table: DataTableInstance<TData>
   event: React.MouseEvent<HTMLTableCellElement>
 }
 
 /** Props passed to per-column cell render hooks on `columnDef.meta`. */
 export interface CellRenderProps<TData extends RowData, TValue = unknown> {
-  cell: Cell<TData, TValue>
-  row: Row<TData>
-  column: Column<TData, TValue>
+  cell: DataTableCell<TData, TValue>
+  row: DataTableRow<TData>
+  column: DataTableColumn<TData, TValue>
   table: DataTableInstance<TData>
 }
 
+/** UI state slices: read them with `table.getState()`. */
+type DataTableUiStateKey =
+  | "density"
+  | "isFullscreen"
+  | "direction"
+  | "showColumnFilters"
+  | "showGlobalFilter"
+  | "columnFilterModes"
+  | "globalFilterMode"
+  | "advancedFilter"
+  | "showAdvancedFilterPanel"
+  | "editingCell"
+  | "editingRowId"
+  | "isCreating"
+  | "rowDraft"
+
+/** Methods the table adds to the TanStack instance (`table.setDensity`…). */
+export type DataTableMethodKey =
+  | "setDensity"
+  | "setIsFullscreen"
+  | "setShowColumnFilters"
+  | "setShowGlobalFilter"
+  | "setColumnFilterMode"
+  | "setGlobalFilterMode"
+  | "setAdvancedFilter"
+  | "setShowAdvancedFilterPanel"
+  | "setEditingCell"
+  | "setRowDraftValue"
+  | "beginRowEdit"
+  | "beginCreate"
+  | "cancelEdit"
+  | "autoSizeColumn"
+  | "autoSizeAllColumns"
+
+/** Members for the table's own parts only. */
+type DataTableInternalKey = "setDirection" | "columnsWithCustomCell"
+
+/** The table's resolved options and refs: `table.dataTable`. */
+export type DataTableOptionsResolved<TData extends RowData> = Omit<
+  DataTableConfig<TData>,
+  DataTableUiStateKey | DataTableMethodKey | DataTableInternalKey
+>
+
+/** The methods the table adds to the TanStack instance. */
+export type DataTableMethods<TData extends RowData> = Pick<
+  DataTableConfig<TData>,
+  DataTableMethodKey
+>
+
 /**
- * Our configuration + UI state, attached to the TanStack table instance under
- * `table.tableInstance`. Sub-components read it from the instance rather than via
- * prop drilling (mirrors Material React Table's `table.options` pattern).
+ * The full configuration the table's parts read (through `dt(table)`): the
+ * resolved options, live UI state, methods and internals. Consumers see the
+ * public parts as `table.dataTable` (options), `table.getState()` (state) and
+ * the methods on `table`.
  */
 export interface DataTableConfig<TData extends RowData> {
   localization: DataTableLocalization
   icons: DataTableIcons
+  /** Current density (table state). */
   density: Density
   setDensity: React.Dispatch<React.SetStateAction<Density>>
+  /** Whether the table is full screen (table state). */
   isFullscreen: boolean
   setIsFullscreen: React.Dispatch<React.SetStateAction<boolean>>
+  /** Text direction the table renders in, read from the page (`dir="rtl"`
+   *  on the table or an ancestor). Drives column resizing, arrow keys and
+   *  column virtualization. */
+  direction: "ltr" | "rtl"
+  /** Set by `DataTable` when it measures its direction. */
+  setDirection: React.Dispatch<React.SetStateAction<"ltr" | "rtl">>
+  /** Whether the filter row shows (table state). */
   showColumnFilters: boolean
   setShowColumnFilters: React.Dispatch<React.SetStateAction<boolean>>
+  /** Whether the global search box is open (table state). */
+  showGlobalFilter: boolean
+  /** Open or close the global search box. */
+  setShowGlobalFilter: React.Dispatch<React.SetStateAction<boolean>>
   /** Active filter mode per column id. */
   columnFilterModes: Record<string, FilterMode>
   /** Switch a column's filter mode (resets the value when it becomes invalid). */
   setColumnFilterMode: (columnId: string, mode: FilterMode) => void
+  /** Current global search mode (table state). */
   globalFilterMode: GlobalFilterMode
   setGlobalFilterMode: (mode: GlobalFilterMode) => void
+  /** The consumer's own filter functions, by name. */
+  filterFns: Record<string, DataTableFilterFn<TData>>
+  /** Table-wide filter-mode menu modes, if restricted. */
+  columnFilterModeOptions: FilterMode[] | undefined
+  /** The global search mode menu's modes. */
+  globalFilterModeOptions: GlobalFilterMode[]
   enableGlobalFilter: boolean
   enableGlobalFilterModes: boolean
   /** Compound AND/OR filter panel (independent of, and additive to, the
    *  per-column filters and global search). */
   enableAdvancedFilter: boolean
+  /** Current advanced filter (table state). */
   advancedFilter: AdvancedFilterGroup
   setAdvancedFilter: React.Dispatch<React.SetStateAction<AdvancedFilterGroup>>
+  /** Whether the advanced filter dialog is open. */
   showAdvancedFilterPanel: boolean
   setShowAdvancedFilterPanel: React.Dispatch<React.SetStateAction<boolean>>
   isLoading: boolean
   isSaving: boolean
   showProgressBars: boolean
   showSkeletons: boolean
+  /** Whether skeletons also cover rows already shown (`showSkeletons: true`
+   *  was passed explicitly). */
+  showSkeletonsOverRows: boolean
   showLoadingOverlay: boolean
   enableFacetedValues: boolean
   enableColumnActions: boolean
+  /** Whether per-column filters are on. */
   enableColumnFilters: boolean
   enableColumnFilterModes: boolean
   enableFilterMatchHighlighting: boolean
@@ -289,65 +639,122 @@ export interface DataTableConfig<TData extends RowData> {
   enableGrouping: boolean
   enableExpanding: boolean
   enableStickyFooter: boolean
+  /** Where pinned rows show and how rows get pinned. */
+  rowPinningDisplayMode: RowPinningDisplayMode
+  /** Whether rows have a drag handle for moving them out of the table. */
+  enableRowDragging: boolean
+  onRowDragEnd?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+    over: RowDropTarget
+  }) => void
+  /** Whether the header rows render. */
+  enableTableHead: boolean
+  /** Whether the footer rows render (when columns define footers). */
+  enableTableFooter: boolean
+  /** Whether the expand column's header toggles every row. */
+  enableExpandAll: boolean
   renderDetailPanel?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
 
   // Editing / actions
+  /** Whether editing is on (a per-row `enableEditing` function counts). */
   enableEditing: boolean
+  /** Overrides for the columns the table adds itself, by id. A new object
+   *  re-renders the rows, so memoize it when you pass functions. */
+  displayColumnDefOptions:
+    | Partial<
+        Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>>
+      >
+    | undefined
+  /** Overrides for every column the table adds itself. */
+  defaultDisplayColumn: Partial<DataTableColumnDef<TData, unknown>> | undefined
+  /** Whether a row can be edited: the `enableEditing` function's answer, or
+   *  `enableEditing` itself. */
+  getCanEditRow: (row: DataTableRow<TData>) => boolean
   editDisplayMode: EditDisplayMode
   createDisplayMode: CreateDisplayMode
+  /** The cell being edited in cell mode (`{ rowId, columnId }`), or `null`. */
   editingCell: EditingCell | null
   setEditingCell: React.Dispatch<React.SetStateAction<EditingCell | null>>
+  /** Id of the row being edited in row or modal mode, or `null`. */
   editingRowId: string | null
+  /** Whether a new row is being created. */
   isCreating: boolean
   /** Draft values for the row/modal editor + create form, keyed by column id. */
   rowDraft: Record<string, unknown>
   setRowDraftValue: (columnId: string, value: unknown) => void
   /** Enter row/modal editing for a row, seeding the draft from its values. */
-  beginRowEdit: (row: Row<TData>) => void
+  beginRowEdit: (row: DataTableRow<TData>) => void
   /** Open the create form, seeding the draft from `createRowDefaults`. */
   beginCreate: () => void
   /** Exit any editing/creating state, discarding the draft. */
   cancelEdit: () => void
-  enableClickToCopy: boolean
-  onEditCellSave?: (props: {
-    row: Row<TData>
-    column: Column<TData, unknown>
+  /** Cancel as the user does: calls `onEditingRowCancel` /
+   *  `onCreatingRowCancel`, then `cancelEdit`. */
+  cancelEditing: () => void
+  onEditingRowCancel?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+  }) => void
+  onCreatingRowCancel?: (props: { table: DataTableInstance<TData> }) => void
+  renderEditRowDialogContent?: (
+    props: EditDialogContentProps<TData> & { row: DataTableRow<TData> }
+  ) => React.ReactNode
+  renderCreateRowDialogContent?: (
+    props: EditDialogContentProps<TData>
+  ) => React.ReactNode
+  positionCreatingRow: "top" | "bottom" | number
+  enableClickToCopy: ClickToCopyOption<TData>
+  enableCellActions:
+    boolean | ((cell: DataTableCell<TData, unknown>) => boolean)
+  onEditingCellSave?: (props: {
+    row: DataTableRow<TData>
+    column: DataTableColumn<TData, unknown>
     value: unknown
     table: DataTableInstance<TData>
   }) => void
-  onSaveRow?: (props: {
-    row: Row<TData>
+  onEditingRowSave?: (props: {
+    row: DataTableRow<TData>
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
-  onCreateRow?: (props: {
+  onCreatingRowSave?: (props: {
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
   renderRowActions?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
   renderCellActionMenuItems?: (props: {
-    cell: Cell<TData, unknown>
-    row: Row<TData>
+    cell: DataTableCell<TData, unknown>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Copy, Edit) the menu shows for this cell. */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   renderRowActionMenuItems?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Edit, when the row can be edited). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   renderColumnActionsMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     table: DataTableInstance<TData>
+    /** The built-in items (sort, filter, hide, group, pin). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   renderColumnFilterModeMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     modes: FilterMode[]
     currentMode: FilterMode
     onSelect: (mode: FilterMode) => void
@@ -375,7 +782,7 @@ export interface DataTableConfig<TData extends RowData> {
   /** Flat height (px) applied to every row. */
   rowHeight?: number
   /** Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default. */
-  getRowHeight?: (row: Row<TData>) => number | "auto" | null
+  getRowHeight?: (row: DataTableRow<TData>) => number | "auto" | null
   rowVirtualizerOptions?: RowVirtualizerOptions<TData>
   columnVirtualizerOptions?: ColumnVirtualizerOptions<TData>
   rowVirtualizerInstanceRef?: React.RefObject<DataTableRowVirtualizer | null>
@@ -394,19 +801,30 @@ export interface DataTableConfig<TData extends RowData> {
   infiniteScrollThreshold: number
   positionPagination: "top" | "bottom" | "both" | "none"
   paginationDisplayMode: PaginationDisplayMode
+  /** Choices in the rows-per-page select. */
+  pageSizeOptions: number[]
+  /** Props for the table's parts; see the `slotProps` option. */
+  slotProps: DataTableSlots<TData> | undefined
   columnFilterDisplayMode: ColumnFilterDisplayMode
   positionGlobalFilter: "left" | "right" | "none"
   positionToolbarAlertBanner: "top" | "bottom" | "none"
   positionToolbarDropZone: "top" | "bottom" | "both" | "none"
+  /** Whether rows can be selected. */
   enableRowSelection: boolean
+  /** Shift-click a row's checkbox to select or clear the range since the
+   *  last click. */
+  enableBatchRowSelection: boolean
   enableTopToolbar: boolean
   enableBottomToolbar: boolean
   enableDensityToggle: boolean
   enableFullscreenToggle: boolean
   enableToolbarInternalActions: boolean
   enableKeyboardNavigation: boolean
+  enableAnimations: boolean
   title?: React.ReactNode
-  renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderBottomToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   renderToolbarInternalActions?: (
@@ -419,30 +837,66 @@ export interface DataTableConfig<TData extends RowData> {
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
 
-/** A TanStack table instance enriched with our `tableInstance` config. */
-export type DataTableInstance<TData extends RowData = unknown> =
-  Table<TData> & {
-    tableInstance: DataTableConfig<TData>
-  }
+/** The TanStack v9 React table enriched with our `tableInstance` config and a
+ *  `getState()` that returns state in our stable (left/right) shape. */
+export type DataTableInstance<TData extends RowData = RowData> = ReactTable<
+  DataTableFeatures,
+  TData
+> & {
+  /** The table's resolved options (localization, icons, flags, render props)
+   *  and DOM refs. */
+  dataTable: DataTableOptionsResolved<TData>
+  getState: () => DataTableState
+} & DataTableMethods<TData>
+
+type CoreTableOptions<TData extends RowData> = TableOptions<
+  DataTableFeatures,
+  TData
+>
 
 /**
- * Options for {@link useDataTable}. Extends the full TanStack `TableOptions`
- * (so controlled state, `manual*` flags, `getRowId`, etc. all pass through)
- * and adds our presentation/feature options. `getCoreRowModel` and the other
- * row models are supplied with sensible defaults but can be overridden.
+ * Options for {@link useDataTable}. Extends TanStack's `TableOptions` (so
+ * controlled state, `manual*` flags, `getRowId`, etc. pass through) minus the
+ * feature set and row models, which the hook owns. Column pinning keeps our
+ * left/right shape in `initialState` / `state` / `onColumnPinningChange`.
  */
 export interface UseDataTableOptions<TData extends RowData> extends Omit<
-  TableOptions<TData>,
-  "getCoreRowModel"
+  CoreTableOptions<TData>,
+  "features" | "initialState" | "state" | "onColumnPinningChange"
 > {
-  getCoreRowModel?: TableOptions<TData>["getCoreRowModel"]
+  /** Initial values for uncontrolled table state. `pagination` may be partial
+   *  (TanStack fills the rest from its defaults); column pinning uses `left` /
+   *  `right`. */
+  initialState?: Omit<
+    NonNullable<CoreTableOptions<TData>["initialState"]>,
+    "columnPinning" | "pagination"
+  > & {
+    columnPinning?: DataTableColumnPinningState
+    pagination?: Partial<PaginationState>
+  }
+  /** Controlled table state slices. Column pinning uses `left` / `right` (not
+   *  TanStack v9's `start` / `end`). */
+  state?: Omit<
+    NonNullable<CoreTableOptions<TData>["state"]>,
+    "columnPinning"
+  > & {
+    columnPinning?: DataTableColumnPinningState
+  }
+  /** Called with an updater over the `left` / `right` pinning state when the
+   *  user pins or unpins a column. */
+  onColumnPinningChange?: OnChangeFn<DataTableColumnPinningState>
+  /** Re-render the component that calls `useDataTable` when the selected part
+   *  of the table state changes (compared shallowly). By default it does not
+   *  re-render on table state changes at all: `<DataTable>` subscribes to
+   *  what it shows. Select what your own render reads, e.g.
+   *  `(state) => state.rowSelection` for a "3 selected" label. */
+  stateSelector?: (state: DataTableState) => unknown
+  /** Text for every label, message and screen-reader string. Partial: missing
+   *  keys fall back to English (or to `DataTableConfigProvider`). Install a
+   *  locale item for a full language. */
   localization?: Partial<DataTableLocalization>
   /** Override any subset of the table's icons. */
   icons?: Partial<DataTableIcons>
-  /** Initial density. Uncontrolled. */
-  defaultDensity?: Density
-  /** Initially show the filter row. Uncontrolled. */
-  defaultShowColumnFilters?: boolean
   /** Show the loading affordances (progress bar; skeletons when empty; a dimming
    *  overlay over existing rows). Toggle each independently below. */
   isLoading?: boolean
@@ -451,13 +905,17 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   isSaving?: boolean
   /** Show the top progress bar. Default: `isLoading || isSaving`. */
   showProgressBars?: boolean
-  /** Replace the body with skeleton rows while empty. Default: `isLoading`. */
+  /** Show skeleton rows while the body is empty. Default: `isLoading`.
+   *  Passing `true` also covers rows already shown with skeletons (e.g. while
+   *  refetching), instead of dimming them. */
   showSkeletons?: boolean
   /** Dim existing rows with an overlay while loading. Default: `isLoading`. */
   showLoadingOverlay?: boolean
   /** Compute faceted unique values / min-max (auto select options + range
    *  bounds). Default true; disable to skip the faceted row models. */
   enableFacetedValues?: boolean
+  /** Shows the column-actions menu in each header (sort, filter, pin, hide,
+   *  group…). Default `true`. */
   enableColumnActions?: boolean
   /** Show the filter-mode menu adornment on filter fields. Default true. */
   enableColumnFilterModes?: boolean
@@ -467,44 +925,95 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableGlobalFilter?: boolean
   /** Show the global search mode menu (fuzzy/contains/…). Default true. */
   enableGlobalFilterModes?: boolean
+  /** Your own filter functions, by name (TanStack's filter function
+   *  signature). Name one on a column's `filterFn`, as a column's
+   *  `meta.filterMode`, or in `columnFilterModeOptions` /
+   *  `globalFilterModeOptions` to offer it in the mode menus (labelled by
+   *  `localization.filterModes[name]`, else the name). The names are read
+   *  when the table is created; the functions stay current. */
+  filterFns?: Record<string, DataTableFilterFn<TData>>
+  /** Your own sort functions, by name; a column uses one with
+   *  `sortFn: "name"`. The names are read when the table is created; the
+   *  functions stay current. */
+  sortFns?: Record<string, DataTableSortFn<TData>>
+  /** Your own aggregation functions, by name; a column uses one with
+   *  `aggregationFn: "name"`. The names are read when the table is created;
+   *  the functions stay current. */
+  aggregationFns?: Record<string, DataTableAggregationFn<TData>>
+  /** Restrict (and order) every column's filter-mode menu to these modes —
+   *  built-in ones (kept where the column's variant supports them) and custom
+   *  `filterFns` names. A column's `meta.columnFilterModeOptions` wins. */
+  columnFilterModeOptions?: FilterMode[]
+  /** Restrict (and order) the global search mode menu: built-in modes and
+   *  custom `filterFns` names. */
+  globalFilterModeOptions?: GlobalFilterMode[]
   /** While the global search is in fuzzy mode, order rows by best match (most
    *  relevant first) until the user applies their own sort. Default false —
    *  MRT defaults this on, but the data table keeps it off so searching never silently
    *  reorders rows unless opted in. Ignored for non-fuzzy modes, when grouping
    *  or expanded, or under manual sorting/filtering. */
   enableGlobalFilterRankedResults?: boolean
-  /** Initial global search mode. Default "fuzzy". */
-  defaultGlobalFilterMode?: GlobalFilterMode
-  /** Controlled density. Pair with `onDensityChange`; omit for uncontrolled
-   *  (seed the initial value with `defaultDensity`). */
-  density?: Density
-  /** Called whenever the density changes (toolbar toggle or programmatic). */
+  /** Shift-click a row's checkbox to select (or clear) every row since the
+   *  last one clicked. Default true. */
+  enableBatchRowSelection?: boolean
+  /** Column options for the columns the table adds itself (selection,
+   *  expand, row actions, row number, row pin, drag handle), by id — e.g.
+   *  `{ "cn-select": { size: 48 } }`. `meta` merges with the column's own. */
+  displayColumnDefOptions?: Partial<
+    Record<DisplayColumnId, Partial<DataTableColumnDef<TData, unknown>>>
+  >
+  /** Column options applied to every column the table adds itself, under
+   *  `displayColumnDefOptions`. */
+  defaultDisplayColumn?: Partial<DataTableColumnDef<TData, unknown>>
+  /** Props for the table's parts (cells, rows, toolbars, …), as an object or
+   *  a function of the part's context. `className` is combined with the
+   *  table's, `style` merged, event handlers both run; other props replace
+   *  the table's. See `DataTableSlots`. */
+  slotProps?: DataTableSlots<TData>
+  /** Choices in the rows-per-page select. Default `[5, 10, 25, 50, 100]`. */
+  pageSizeOptions?: number[]
+  /** Called whenever the density changes (toolbar toggle or programmatic).
+   *  Set it with `initialState.density`, control it with `state.density`. */
   onDensityChange?: (density: Density) => void
-  /** Controlled full-screen state. Pair with `onIsFullscreenChange`. */
-  isFullscreen?: boolean
-  /** Called whenever the full-screen state is toggled. */
+  /** Called whenever the full-screen state is toggled. Control it with
+   *  `state.isFullscreen`. */
   onIsFullscreenChange?: (isFullscreen: boolean) => void
-  /** Controlled filter-row visibility. Pair with `onShowColumnFiltersChange`;
-   *  omit for uncontrolled (seed with `defaultShowColumnFilters`). */
-  showColumnFilters?: boolean
-  /** Called whenever the filter row is shown or hidden. */
+  /** Called whenever the filter row is shown or hidden. Set it with
+   *  `initialState.showColumnFilters`, control it with `state.showColumnFilters`. */
   onShowColumnFiltersChange?: (showColumnFilters: boolean) => void
+  /** Called whenever the global search box opens or closes. Set it with
+   *  `initialState.showGlobalFilter`, control it with
+   *  `state.showGlobalFilter`. */
+  onShowGlobalFilterChange?: (showGlobalFilter: boolean) => void
   /** Enable the advanced filter panel: compound rules joined by AND/OR, applied
    *  on top of the per-column filters. A toolbar button opens the panel and
    *  shows the active-rule count. Default false. */
   enableAdvancedFilter?: boolean
-  /** Controlled advanced filter. Pair with `onAdvancedFilterChange`; omit for
-   *  uncontrolled (seed with `defaultAdvancedFilter`). */
-  advancedFilter?: AdvancedFilterGroup
-  /** Initial advanced filter for uncontrolled usage. */
-  defaultAdvancedFilter?: AdvancedFilterGroup
-  /** Called whenever the advanced filter changes. */
+  /** Called whenever the advanced filter changes. Set it with
+   *  `initialState.advancedFilter`, control it with `state.advancedFilter`. */
   onAdvancedFilterChange?: (filter: AdvancedFilterGroup) => void
-  /** Controlled global search mode. Pair with `onGlobalFilterModeChange`;
-   *  omit for uncontrolled (seed with `defaultGlobalFilterMode`). */
-  globalFilterMode?: GlobalFilterMode
-  /** Called whenever the global search mode changes. */
+  /** Called whenever the global search mode changes (default `"fuzzy"`). Set
+   *  it with `initialState.globalFilterMode`, control it with
+   *  `state.globalFilterMode`. */
   onGlobalFilterModeChange?: (mode: GlobalFilterMode) => void
+  /** Called when a column's filter mode changes, with every column's mode.
+   *  Control it with `state.columnFilterModes`. */
+  onColumnFilterModesChange?: (modes: Record<string, FilterMode>) => void
+  /** Called when the advanced filter dialog opens or closes. Control it with
+   *  `state.showAdvancedFilterPanel`. */
+  onShowAdvancedFilterPanelChange?: (open: boolean) => void
+  /** Called when cell editing starts or ends (`null`). Control it with
+   *  `state.editingCell`. */
+  onEditingCellChange?: (cell: EditingCell | null) => void
+  /** Called when row editing starts or ends (`null`). Control it with
+   *  `state.editingRowId`. */
+  onEditingRowIdChange?: (rowId: string | null) => void
+  /** Called when the new-row editor opens or closes. Control it with
+   *  `state.isCreating`. */
+  onIsCreatingChange?: (isCreating: boolean) => void
+  /** Called when the draft of the row being edited or created changes. Control
+   *  it with `state.rowDraft`. */
+  onRowDraftChange?: (draft: Record<string, unknown>) => void
   /** Drag-and-drop column reordering (adds a grip to each header). */
   enableColumnOrdering?: boolean
   /** Column pinning (left/right) via the column-actions menu + sticky columns. */
@@ -525,6 +1034,18 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableRowNumbers?: boolean
   /** "static" tracks the current view (page-aware); "original" uses source index. */
   rowNumberMode?: "static" | "original"
+  /** Adds a drag handle to each row for moving rows out of the table — to
+   *  another table or a drop zone in the same `DataTableDndProvider` —
+   *  without reordering inside it (combine with `enableRowOrdering` for
+   *  both). Default false. */
+  enableRowDragging?: boolean
+  /** Called when a row is dropped on another table or a drop zone in the same
+   *  `DataTableDndProvider`. Move the row in your data. */
+  onRowDragEnd?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+    over: RowDropTarget
+  }) => void
   /** Called on a row drag-and-drop reorder; the consumer reorders its data. */
   onRowOrderChange?: (activeRowId: string, overRowId: string) => void
   /** Row grouping (group-by menu + drop-to-group zone + aggregated group rows). */
@@ -535,15 +1056,25 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Pin the footer (aggregation/footer cells) to the bottom of the surface.
    *  Default false. */
   enableStickyFooter?: boolean
+  /** Where pinned rows show and how rows get pinned (see
+   *  {@link RowPinningDisplayMode}). Default `"top-and-bottom"`. */
+  rowPinningDisplayMode?: RowPinningDisplayMode
+  /** Render the header rows. Default true; `false` shows the body only. */
+  enableTableHead?: boolean
+  /** Render the footer rows when columns define a `footer`. Default true. */
+  enableTableFooter?: boolean
+  /** Show the expand-all toggle in the expand column's header. Default true. */
+  enableExpandAll?: boolean
   /** Render an expanding detail panel for each row. */
   renderDetailPanel?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
 
   // Editing / actions
-  /** Enable inline editing. */
-  enableEditing?: boolean
+  /** Enable inline editing, or decide per row with a function (rows it
+   *  returns false for can't be edited; creating rows is still allowed). */
+  enableEditing?: boolean | ((row: DataTableRow<TData>) => boolean)
   /** How edits are surfaced. Default "cell". */
   editDisplayMode?: EditDisplayMode
   /** How the create form is surfaced, independent of `editDisplayMode`:
@@ -552,50 +1083,98 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   createDisplayMode?: CreateDisplayMode
   /** Default values for the create form, keyed by column id. */
   createRowDefaults?: Record<string, unknown>
-  /** Show a click-to-copy affordance on all cells (per-column override via meta). */
-  enableClickToCopy?: boolean
-  onEditCellSave?: (props: {
-    row: Row<TData>
-    column: Column<TData, unknown>
+  /** Copy cells on click (`true`), from the cell menu (`"context-menu"`), or
+   *  decide per cell with a function. Per-column override via meta. */
+  enableClickToCopy?: ClickToCopyOption<TData>
+  /** A right-click menu on each cell with built-in Copy (when click-to-copy
+   *  is on) and Edit (when the cell is editable) items, or a function deciding
+   *  per cell. `renderCellActionMenuItems` customizes it. Default false. */
+  enableCellActions?:
+    boolean | ((cell: DataTableCell<TData, unknown>) => boolean)
+  /** Called when a cell edit is committed (cell and table editing) with the
+   *  new `value`. Persist it; the table does not change `data` itself. */
+  onEditingCellSave?: (props: {
+    row: DataTableRow<TData>
+    column: DataTableColumn<TData, unknown>
     value: unknown
     table: DataTableInstance<TData>
   }) => void
-  onSaveRow?: (props: {
-    row: Row<TData>
+  /** Called when a row edit is saved (row and modal editing) with the edited
+   *  `values`. Call `exit()` to leave editing, e.g. after the save succeeds. */
+  onEditingRowSave?: (props: {
+    row: DataTableRow<TData>
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
-  onCreateRow?: (props: {
+  /** Called when the new-row editor is saved with the row's `values`. Call
+   *  `exit()` to close it. */
+  onCreatingRowSave?: (props: {
     values: Record<string, unknown>
     table: DataTableInstance<TData>
     exit: () => void
   }) => void
+  /** Called when the user cancels a row edit (Cancel, closing the dialog). */
+  onEditingRowCancel?: (props: {
+    row: DataTableRow<TData>
+    table: DataTableInstance<TData>
+  }) => void
+  /** Called when the user cancels the create form. */
+  onCreatingRowCancel?: (props: { table: DataTableInstance<TData> }) => void
+  /** Replace the edit dialog's content. You get the built-in fields as
+   *  `internalEditComponents`, plus `save()` / `cancel()`. */
+  renderEditRowDialogContent?: (
+    props: EditDialogContentProps<TData> & { row: DataTableRow<TData> }
+  ) => React.ReactNode
+  /** Replace the create dialog's content (same props, without `row`). */
+  renderCreateRowDialogContent?: (
+    props: EditDialogContentProps<TData>
+  ) => React.ReactNode
+  /** Where the inline create row (`createDisplayMode: "row"`) appears:
+   *  `"top"` (default), `"bottom"`, or a row index on the current page to
+   *  insert it before (with row virtualization an index means `"top"`). */
+  positionCreatingRow?: "top" | "bottom" | number
+  /** Content of the row-actions column, replacing the default edit and menu
+   *  buttons. */
   renderRowActions?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
   }) => React.ReactNode
+  /** The contents of the right-click menu on each cell (turns the menu on).
+   *  Include `internalMenuItems` to keep the built-in Copy / Edit items. */
   renderCellActionMenuItems?: (props: {
-    cell: Cell<TData, unknown>
-    row: Row<TData>
+    cell: DataTableCell<TData, unknown>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Copy, Edit) the menu shows for this cell. */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   /** Render a kebab menu in the row-actions column. Returns the menu items
-   *  (e.g. `<DropdownMenuItem>`); injects the actions column automatically. */
+   *  (e.g. `<DropdownMenuItem>`); injects the actions column automatically.
+   *  While editing is on, the Edit action moves into this menu: include
+   *  `internalMenuItems` to keep it. */
   renderRowActionMenuItems?: (props: {
-    row: Row<TData>
+    row: DataTableRow<TData>
     table: DataTableInstance<TData>
+    /** The built-in items (Edit, when the row can be edited). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
-  /** Append custom items to the bottom of every column-actions menu. Returns the
-   *  items (e.g. `<DropdownMenuItem>`); a separator is added before them. */
+  /** The contents of every column-actions menu. Return your items (e.g.
+   *  `<DropdownMenuItem>`) with `internalMenuItems` where the built-in ones
+   *  should go, or leave it out to replace them. */
   renderColumnActionsMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     table: DataTableInstance<TData>
+    /** The built-in items (sort, filter, hide, group, pin). */
+    internalMenuItems: React.ReactNode
+    closeMenu: () => void
   }) => React.ReactNode
   /** Replace the radio items in a column's filter-mode menu. Render your own
    *  items and call `onSelect(mode)` to switch; `modes` is the allowed set. */
   renderColumnFilterModeMenuItems?: (props: {
-    column: Column<TData, unknown>
+    column: DataTableColumn<TData, unknown>
     modes: FilterMode[]
     currentMode: FilterMode
     onSelect: (mode: FilterMode) => void
@@ -612,17 +1191,22 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
 
   /** Fired when a body row is clicked / double-clicked. */
   onRowClick?: (props: RowEvent<TData>) => void
+  /** Called when a row is double-clicked. Double-clicks on controls inside
+   *  the row (edit, expand, pin…) are ignored. */
   onRowDoubleClick?: (props: RowEvent<TData>) => void
   /** Fired when a body cell is clicked / double-clicked. */
   onCellClick?: (props: CellEvent<TData>) => void
+  /** Called when a cell is double-clicked. Double-clicks on controls inside
+   *  the cell are ignored. */
   onCellDoubleClick?: (props: CellEvent<TData>) => void
 
   /** Virtualize body rows for large datasets (recommended past ~100 rows).
    *  The table surface becomes the scroll container — give it a bounded height
    *  via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. */
   enableRowVirtualization?: boolean
-  /** Virtualize columns for very wide tables. Applies fixed column widths and
-   *  is not combined with column pinning/ordering. */
+  /** Virtualize columns for very wide tables. Applies fixed column widths;
+   *  works with column pinning (pinned columns stay rendered), column
+   *  ordering and grouped headers. */
   enableColumnVirtualization?: boolean
   /** Estimated row height (px) for the virtualizer. Default 52. */
   estimateRowHeight?: number
@@ -634,7 +1218,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Per-row height. Return a px number to pin the row, `"auto"` to let it wrap
    *  and grow to fit its content (even with column resizing on), or `null` to
    *  fall back to `rowHeight` / the density default. Applies to data rows. */
-  getRowHeight?: (row: Row<TData>) => number | "auto" | null
+  getRowHeight?: (row: DataTableRow<TData>) => number | "auto" | null
   /** Partial `@tanstack/react-virtual` options merged into the row virtualizer
    *  (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`).
    *  Accepts an object or a `({ table }) => options` function. */
@@ -651,8 +1235,10 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Pin the header rows to the top of the scrollable surface. Also gives the
    *  surface a default viewport-bound max-height (`clamp(350px, 100dvh -
    *  200px, 9999px)`) so tall content scrolls internally; override the bound
-   *  with `surfaceClassName`. Default true. */
+   *  with `slotProps.surface`. Default true. */
   enableStickyHeader?: boolean
+  /** Splits rows into pages with pagination controls. Default `true`; turn it
+   *  off for virtualization or infinite scroll. */
   enablePagination?: boolean
   /** Load more rows as the user scrolls near the bottom (infinite append). When
    *  on, the pager is hidden and pagination is forced to a single growing page,
@@ -700,7 +1286,11 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   selectAllMode?: "page" | "all"
   /** Show the select-all checkbox in the selection column header. Default true. */
   enableSelectAll?: boolean
+  /** Shows the toolbar above the table (title, search, filters, view
+   *  options). Default `true`. */
   enableTopToolbar?: boolean
+  /** Shows the toolbar below the table (pagination, custom actions). Default
+   *  `true`. */
   enableBottomToolbar?: boolean
   /** Show the density toggle in the toolbar. Default true. */
   enableDensityToggle?: boolean
@@ -710,11 +1300,27 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  visibility, export, density, full screen). Default true. Hides the whole
    *  cluster at once; use the per-item flags for finer control. */
   enableToolbarInternalActions?: boolean
+  /** Cell keyboard navigation with a single Tab stop: arrow keys, Home/End,
+   *  PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also
+   *  makes the table an ARIA grid. Default `true`. */
   enableKeyboardNavigation?: boolean
+  /**
+   * Animate the table: rows glide when their order changes, fade in and out
+   * when they enter or leave the data, detail panels open and close smoothly,
+   * and the sort arrow, selection checkboxes and selected count transition.
+   * Always off when the user prefers reduced motion. Retime it with the CSS
+   * variables `--dt-motion-duration`, `--dt-motion-duration-fast` and
+   * `--dt-motion-ease` on the table.
+   * @default true
+   */
+  enableAnimations?: boolean
+  /** Heading shown at the start of the top toolbar. */
   title?: React.ReactNode
   /** Custom content rendered in the top toolbar's left region (next to the
    *  title), e.g. bulk-action buttons. */
-  renderToolbarActions?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  renderTopToolbarCustomActions?: (
+    props: DataTableSlotProps<TData>
+  ) => React.ReactNode
   /** Replace the entire top toolbar with custom content. */
   renderTopToolbar?: (props: DataTableSlotProps<TData>) => React.ReactNode
   /** Replace the entire bottom toolbar (pagination region) with custom content. */
@@ -730,5 +1336,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   ) => React.ReactNode
   /** Render a `<caption>` for the table (e.g. an accessible summary). */
   renderCaption?: (props: DataTableSlotProps<TData>) => React.ReactNode
+  /** Content shown when there are no rows. Defaults to
+   *  `localization.noRecordsToDisplay`. */
   renderEmpty?: (props: DataTableSlotProps<TData>) => React.ReactNode
 }
