@@ -131,6 +131,11 @@ async function checkHome(colorScheme) {
       // Let hydration swap in the still frame, then watch for 4 s.
       await stillPage.waitForTimeout(500)
       const before = await captionText(stillPage)
+      // The still frame: sorted, filtered and two rows selected.
+      assert(
+        /\b03 Select\b.*\benableRowSelection\b/.test(before ?? ""),
+        `expected the still frame's caption, found "${before}"`
+      )
       await stillPage.waitForTimeout(4000)
       const after = await captionText(stillPage)
       assert(before === after, `caption moved: ${before} -> ${after}`)

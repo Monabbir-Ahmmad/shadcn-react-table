@@ -112,8 +112,13 @@ export function AutoDemo({ className }: { className?: string }) {
       data-auto-demo=""
       data-scene={scene.id}
       className={cn("group/demo outline-none", className)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      // Mouse only: a tap fires enter without a matching leave.
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") setHovered(true)
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") setHovered(false)
+      }}
       onFocus={() => setFocused(true)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) {

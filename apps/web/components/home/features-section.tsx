@@ -31,8 +31,8 @@ export function FeaturesSection() {
           </p>
         </div>
         <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 md:mt-12 lg:grid-cols-5">
-          {FEATURES.map((part, i) => (
-            <FeatureColumn key={part.id} part={part} index={i} />
+          {FEATURES.map((part) => (
+            <FeatureColumn key={part.id} part={part} />
           ))}
         </div>
       </div>
@@ -40,13 +40,10 @@ export function FeaturesSection() {
   )
 }
 
-function FeatureColumn({ part, index }: { part: FeaturePart; index: number }) {
+function FeatureColumn({ part }: { part: FeaturePart }) {
   return (
     <div className="min-w-0 border-t border-foreground/70 pt-4">
-      <p className="font-mono text-xs text-muted-foreground">
-        {String(index + 1).padStart(2, "0")}
-      </p>
-      <h3 className="mt-3 font-heading text-xl font-semibold tracking-tight">
+      <h3 className="font-heading text-xl font-semibold tracking-tight">
         {part.title}
       </h3>
       <p className="mt-1 font-mono text-[11px] break-words text-muted-foreground">
