@@ -5,7 +5,7 @@
   "title": "Data Table locale: Ukrainian (uk)",
   "description": "The data table's interface text in Ukrainian. Add the data-table item first.",
   "meta": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "files": [
     {
