@@ -75,6 +75,58 @@ describe("global filter input", () => {
     expect((screen.getByRole("textbox") as HTMLInputElement).value).toBe("")
   })
 
+  it("follows a controlled search reset from outside (#27)", () => {
+    vi.useFakeTimers()
+    try {
+      // The issue's steps: a controlled search, typed into, then reset by
+      // the app (a "Clear filters" button).
+      function Controlled() {
+        const [globalFilter, setGlobalFilter] = React.useState("")
+        const table = useDataTable<Person>({
+          columns,
+          data: people,
+          getRowId: (row) => row.id,
+          state: { globalFilter },
+          onGlobalFilterChange: (updater) =>
+            setGlobalFilter((prev) =>
+              typeof updater === "function" ? (updater(prev) ?? "") : updater
+            ),
+        })
+        return (
+          <>
+            <button type="button" onClick={() => setGlobalFilter("")}>
+              Clear filters
+            </button>
+            <DataTable table={table} />
+          </>
+        )
+      }
+      render(<Controlled />)
+      fireEvent.click(screen.getByRole("button", { name: "Search" }))
+      const input = () =>
+        screen.getByRole("textbox", { name: "Search" }) as HTMLInputElement
+      // Data rows only (not the "no results" row).
+      const names = () =>
+        document.querySelectorAll("tbody tr[data-row-id]").length
+
+      fireEvent.change(input(), { target: { value: "abc" } })
+      act(() => vi.advanceTimersByTime(10))
+      expect(names()).toBe(0)
+
+      fireEvent.click(screen.getByRole("button", { name: "Clear filters" }))
+      // Every row is back, and the box no longer shows the old text.
+      expect(names()).toBe(people.length)
+      expect(input().value).toBe("")
+
+      // The next keystroke searches for itself only, not "abc" + it.
+      fireEvent.change(input(), { target: { value: "M" } })
+      act(() => vi.advanceTimersByTime(10))
+      expect(names()).toBe(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("keeps typing when controlled state catches up late", () => {
     vi.useFakeTimers()
     try {
