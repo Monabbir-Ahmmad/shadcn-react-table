@@ -120,7 +120,12 @@ function useHeaderRowBox(
   anchorRef: React.RefObject<HTMLDivElement | null>,
   active: boolean
 ) {
-  const [box, setBox] = React.useState<{ top: number; height: number }>()
+  const [box, setBox] = React.useState<{
+    top: number
+    height: number
+    /** How far the header's select-all checkbox sits from the row's start. */
+    checkboxStart?: number
+  }>()
   const measure = React.useCallback(() => {
     const head = headRef.current
     const anchor = anchorRef.current
@@ -129,12 +134,23 @@ function useHeaderRowBox(
     const rowRect = row.getBoundingClientRect()
     const top = rowRect.top - anchor.getBoundingClientRect().top
     const height = rowRect.height
+    // From the row's start, which horizontal scroll doesn't change (the
+    // banner itself stays at the visible start).
+    const checkbox = row.querySelector<HTMLElement>('[role="checkbox"]')
+    const rtl = getComputedStyle(row).direction === "rtl"
+    const cbRect = checkbox?.getBoundingClientRect()
+    const checkboxStart = cbRect
+      ? rtl
+        ? rowRect.right - cbRect.right
+        : cbRect.left - rowRect.left
+      : undefined
     setBox((prev) =>
       prev &&
       Math.abs(prev.top - top) < 0.5 &&
-      Math.abs(prev.height - height) < 0.5
+      Math.abs(prev.height - height) < 0.5 &&
+      prev.checkboxStart === checkboxStart
         ? prev
-        : { top, height }
+        : { top, height, checkboxStart }
     )
   }, [headRef, anchorRef])
   React.useLayoutEffect(() => {
@@ -248,9 +264,19 @@ export function DataTableHeadOverlayBanner<TData extends RowData>({
         )}
       >
         {withSelectAll && (
-          // As wide as the selection column, so the checkbox sits over the
-          // header's own one when that column comes first.
-          <span className="flex w-11 shrink-0 items-center justify-center">
+          // Lined up over the header's own checkbox when the selection column
+          // comes first (measured: cell padding differs between styles).
+          <span
+            className={cn(
+              "flex shrink-0 items-center",
+              box?.checkboxStart == null && "w-11 justify-center"
+            )}
+            style={
+              box?.checkboxStart != null
+                ? { paddingInlineStart: box.checkboxStart }
+                : undefined
+            }
+          >
             <SelectAllCheckbox
               table={table as unknown as DataTableCoreTable<TData>}
               label={localization.selectAll}
