@@ -18,6 +18,7 @@ import { ClickToCopy, copyText } from "../body/click-to-copy"
 import { DataTableEditField } from "./data-table-edit-field"
 import type { DataTableCell } from "../../core/table-types"
 import { dt } from "../../core/internal"
+import { ALIGN_CELL } from "../../core/constants"
 import { getSlotProps } from "../../helpers/slot-props"
 import { getEditSelectOptions } from "../../helpers/edit-select-options"
 
@@ -89,7 +90,8 @@ export function DataTableBodyCellContent<TData extends RowData>({
           cn.setEditingCell({ rowId: row.id, columnId: column.id })
         }}
         onDoubleClick={stopPropagation}
-        className="-mx-1 w-full rounded-sm px-1 text-start transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40"
+        // Aligned like the cell: a button would center or start its text.
+        className={`-mx-1 w-full rounded-sm px-1 ${ALIGN_CELL[column.columnDef.meta?.align ?? "left"]} transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40`}
       >
         {node}
       </button>

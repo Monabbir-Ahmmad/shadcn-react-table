@@ -161,3 +161,16 @@ describe("select cell editor", () => {
     expect(onEditingCellSave.mock.calls[0]![0].value).toBe(2)
   })
 })
+
+describe("click-to-edit alignment", () => {
+  it("keeps the column's alignment on the cell's edit button", () => {
+    const aligned: DataTableColumnDef<Person>[] = [
+      { accessorKey: "name", header: "Name" },
+      { accessorKey: "status", header: "Status", meta: { align: "right" } },
+    ]
+    render(<Harness columns={aligned} enableEditing editDisplayMode="cell" />)
+    const button = screen.getAllByText("a")[0]!.closest("button")!
+    expect(button.className).toContain("text-end")
+    expect(button.className).not.toContain("text-start")
+  })
+})
