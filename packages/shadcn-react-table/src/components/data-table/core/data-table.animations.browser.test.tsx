@@ -132,6 +132,43 @@ describe("row animations", () => {
     expect(String(first.transform)).toMatch(/translateY\(\d+(\.\d+)?px\)/)
   })
 
+  it("keeps a gliding row's bottom border", async () => {
+    render(<Harness />)
+    await nextFrame()
+    const before = bodyRows().map((tr) => tr.dataset.rowId)
+    const color = getComputedStyle(bodyRows()[0]!).borderBottomColor
+    fireEvent.click(
+      document.querySelectorAll<HTMLElement>("th button[data-sorted]")[1]!
+    )
+    // The table draws the row borders where the rows are laid out, under the
+    // cells, so a moving row draws its own while it glides.
+    const moved = bodyRows().filter(
+      (tr, i) =>
+        tr.dataset.rowId !== before[i] &&
+        getComputedStyle(tr).borderBottomWidth !== "0px"
+    )
+    expect(moved.length).toBeGreaterThan(0)
+    for (const tr of moved) {
+      for (const cell of tr.cells) {
+        const line = animating(cell, "boxShadow")
+        expect(line.length).toBe(1)
+        const frame = (line[0]!.effect as KeyframeEffect).getKeyframes()[0]!
+        expect(String(frame.boxShadow)).toContain(color)
+        expect(getComputedStyle(cell).boxShadow).toMatch(
+          /0px -1px 0px 0px inset/
+        )
+      }
+      // The table's own border stays where the row is laid out: cleared.
+      expect(getComputedStyle(tr).borderBottomColor).toBe("rgba(0, 0, 0, 0)")
+    }
+    await settle()
+    const [tr] = moved
+    expect(getComputedStyle(tr!).borderBottomColor).toBe(color)
+    for (const cell of tr!.cells) {
+      expect(getComputedStyle(cell).boxShadow).toBe("none")
+    }
+  })
+
   it("does nothing when turned off", async () => {
     render(<Harness enableAnimations={false} />)
     await nextFrame()
@@ -188,7 +225,7 @@ describe("row animations", () => {
     expect(running()).toBeGreaterThan(0)
     expect(running()).toBeLessThanOrEqual(drawn)
     const r1 = bodyRows().find((tr) => tr.dataset.rowId === "r1")!
-    expect(r1.getAnimations().length).toBe(1)
+    expect(animating(r1, "transform").length).toBe(1)
   })
 
   it("glides a row into the top pinned group and back", async () => {
@@ -198,7 +235,7 @@ describe("row animations", () => {
     const row = () => bodyRows().find((tr) => tr.dataset.rowId === "r5")!
     act(() => table.getRow("r5").pin("top"))
     expect(row().closest("tbody")!.dataset.pinnedRows).toBe("top")
-    expect(row().getAnimations().length).toBe(1)
+    expect(animating(row(), "transform").length).toBe(1)
     // The rows above it make room by gliding down (the rows below may
     // shift by the pinned group's border too).
     expect(running()).toBeGreaterThanOrEqual(6)
@@ -207,7 +244,7 @@ describe("row animations", () => {
 
     act(() => table.getRow("r5").pin(false))
     expect(row().closest("tbody")!.dataset.pinnedRows).toBeUndefined()
-    expect(row().getAnimations().length).toBe(1)
+    expect(animating(row(), "transform").length).toBe(1)
     await settle()
     expect(running()).toBe(0)
     expect(layer()!.children.length).toBe(0)

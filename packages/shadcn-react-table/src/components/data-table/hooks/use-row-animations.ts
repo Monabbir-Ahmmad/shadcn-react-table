@@ -121,6 +121,30 @@ function copyRow(tr: HTMLTableRowElement) {
   return copy
 }
 
+/**
+ * The table draws a row's bottom border where the row is laid out, under its
+ * cells and unmoved by the row's transform: a gliding row covers it, or it
+ * cuts across whatever passes there. While the row glides, its cells draw the
+ * border instead (an inset line on top of their own shadows: the selection
+ * mark, a focus ring) and the table's stays clear.
+ */
+function moveBorder(tr: HTMLTableRowElement, duration: number) {
+  const style = getComputedStyle(tr)
+  const width = style.borderBottomWidth
+  if (style.borderBottomStyle === "none" || width === "0px") return []
+  const line = `inset 0 -${width} 0 0 ${style.borderBottomColor}`
+  const lines = [...tr.cells].map((cell) => {
+    const own = getComputedStyle(cell).boxShadow
+    const shadow = own === "none" ? line : `${line}, ${own}`
+    return cell.animate({ boxShadow: [shadow, shadow] }, { duration })
+  })
+  const clear = tr.animate(
+    { borderBottomColor: ["transparent", "transparent"] },
+    { duration }
+  )
+  return [...lines, clear]
+}
+
 /** Draws a leave copy at its row's last place and animates it out. */
 function animateOutCopy(
   layer: HTMLElement,
@@ -283,6 +307,7 @@ export function useRowAnimations({
           { duration, easing: ease }
         )
       )
+      for (const animation of moveBorder(tr, duration)) track(animation)
     }
     for (const key of plan.enters) {
       const tr = rows.get(key)
