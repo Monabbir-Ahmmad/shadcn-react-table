@@ -139,13 +139,16 @@ export function FeatureTour() {
           ref={listRef}
           aria-label="Features"
           variant="line"
-          className="h-auto w-full justify-start gap-0 overflow-x-auto border-b bg-muted/40 px-2 py-0"
+          // Phones: a strip that scrolls sideways, without a scrollbar (the
+          // playing tab scrolls into view). Large screens fit all the tabs.
+          className="h-auto w-full justify-start gap-0 overflow-x-auto overflow-y-hidden border-b bg-muted/40 px-2 py-0 [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden"
         >
           {TOUR_SCENES.map((s, i) => (
             <TabsTrigger
               key={s.id}
               value={s.id}
-              className="h-11 flex-none overflow-hidden lg:flex-1"
+              // The progress bar marks the playing tab, not the line style's underline.
+              className="h-11 flex-none overflow-hidden after:hidden lg:flex-1"
             >
               {s.label}
               {i === shown.scene && !reduced && (
@@ -213,14 +216,17 @@ const columns: DataTableColumnDef<HeroRow>[] = [
     accessorKey: "name",
     header: "Name",
     // A group row stands for several people: no one name.
-    cell: ({ row }) =>
-      row.getIsGrouped() ? null : <Person row={row.original} />,
+    // `renderedCellValue` keeps the search's highlighting in a custom cell.
+    cell: ({ row, renderedCellValue }) =>
+      row.getIsGrouped() ? null : (
+        <Person row={row.original} name={renderedCellValue} />
+      ),
   },
   {
     accessorKey: "team",
     header: "Team",
-    cell: ({ getValue }) => (
-      <Badge variant="outline">{getValue<string>()}</Badge>
+    cell: ({ renderedCellValue }) => (
+      <Badge variant="outline">{renderedCellValue}</Badge>
     ),
   },
   {
@@ -319,15 +325,16 @@ function TourTable({ frame }: { frame: TourFrame }) {
     enableColumnActions: false,
     enableFullscreenToggle: false,
     positionToolbarDropZone: "none",
-    // A fixed height, like an app's window: the page never shifts as the
-    // scenes change, and the tallest (grouped) scrolls inside.
+    // A fixed height, like an app's window: the header and eight rows. The
+    // page never shifts as the scenes change; the tallest (grouped) scrolls
+    // inside.
     enableStickyHeader: true,
     slotProps: {
       surface: {
         // Makes room for the selection banner above it.
         className: cn(
           "max-h-none",
-          frame.selected.length > 0 ? "h-[calc(34rem-42px)]" : "h-[34rem]"
+          frame.selected.length > 0 ? "h-[calc(506px-42px)]" : "h-[506px]"
         ),
       },
     },
@@ -361,7 +368,7 @@ function TourTable({ frame }: { frame: TourFrame }) {
   )
 }
 
-function Person({ row }: { row: HeroRow }) {
+function Person({ row, name }: { row: HeroRow; name: React.ReactNode }) {
   const hue = AVATAR_HUES[Number(row.id.slice(1)) % AVATAR_HUES.length]
   return (
     <span className="flex min-w-0 items-center gap-3">
@@ -376,7 +383,7 @@ function Person({ row }: { row: HeroRow }) {
         {initials(row.name)}
       </span>
       <span className="flex min-w-0 flex-col">
-        <span className="truncate font-medium">{row.name}</span>
+        <span className="truncate font-medium">{name}</span>
         <span className="truncate text-xs text-muted-foreground">
           {row.email}
         </span>

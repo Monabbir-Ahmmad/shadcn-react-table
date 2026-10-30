@@ -48,7 +48,7 @@ describe("tourFrame", () => {
   it("types the search one key at a time", () => {
     const search = index("search")
     expect(tourFrame(search, APPLY_AT).search).toBe("r")
-    expect(tourFrame(search, 1).search).toBe("ra")
+    expect(tourFrame(search, 1).search).toBe("research")
   })
 
   it("ticks two rows in the select scene", () => {

@@ -60,8 +60,6 @@ export const HERO_ROWS: readonly HeroRow[] = [
   ),
   row("u7", "Barbara Liskov", "Design", "active", "2021-10-11", 86, 121000),
   row("u8", "Radia Perlman", "Research", "paused", "2023-02-27", 73, 109000),
-  row("u9", "Frances Allen", "Design", "active", "2022-08-08", 79, 113500),
-  row("u10", "Dennis Ritchie", "Platform", "invited", "2025-01-13", 58, 101000),
 ]
 
 const SALARY = new Intl.NumberFormat("en-US", {

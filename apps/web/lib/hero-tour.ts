@@ -64,8 +64,9 @@ export type TourFrame = {
 
 const SELECT_AT = [APPLY_AT, 0.45] as const
 const SELECT_IDS = ["u6", "u1"] as const
-const SEARCH = "ra"
-const SEARCH_KEY_STEP = 0.1
+// A team: the search matches across columns, not only names.
+const SEARCH = "research"
+const SEARCH_KEY_STEP = 0.06
 const EDIT_TYPE_AT = 0.35
 const EDIT_KEY_STEP = 0.06
 const EDIT_SAVE_AT = 0.8
