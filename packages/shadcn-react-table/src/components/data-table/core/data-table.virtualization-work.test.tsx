@@ -54,40 +54,42 @@ const columns: DataTableColumnDef<Row>[] = [
 ]
 
 // jsdom has no layout: give the scroll surface a size, so the row
-// virtualizer computes a real window.
-const descriptors = {
-  offsetHeight: Object.getOwnPropertyDescriptor(
-    HTMLElement.prototype,
-    "offsetHeight"
-  ),
-  offsetWidth: Object.getOwnPropertyDescriptor(
-    HTMLElement.prototype,
-    "offsetWidth"
-  ),
-}
+// virtualizer computes a real window (it reads the client size; the offset
+// size too, for older versions).
+const SIZES = {
+  offsetHeight: 400,
+  offsetWidth: 800,
+  clientHeight: 400,
+  clientWidth: 800,
+} as const
+const descriptors = Object.fromEntries(
+  Object.keys(SIZES).map((key) => [
+    key,
+    Object.getOwnPropertyDescriptor(HTMLElement.prototype, key) ??
+      Object.getOwnPropertyDescriptor(Element.prototype, key),
+  ])
+)
 const isSurface = (el: HTMLElement) =>
   el.getAttribute("data-slot") === "data-table-surface"
 
 beforeEach(() => {
   created.MemoRow = MemoRow
-  Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
-    configurable: true,
-    get(this: HTMLElement) {
-      return isSurface(this) ? 400 : 0
-    },
-  })
-  Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
-    configurable: true,
-    get(this: HTMLElement) {
-      return isSurface(this) ? 800 : 0
-    },
-  })
+  for (const [key, size] of Object.entries(SIZES)) {
+    Object.defineProperty(HTMLElement.prototype, key, {
+      configurable: true,
+      get(this: HTMLElement) {
+        return isSurface(this) ? size : 0
+      },
+    })
+  }
 })
 afterEach(() => {
   vi.restoreAllMocks()
   for (const [key, descriptor] of Object.entries(descriptors)) {
     if (descriptor)
       Object.defineProperty(HTMLElement.prototype, key, descriptor)
+    else
+      delete (HTMLElement.prototype as unknown as Record<string, unknown>)[key]
   }
 })
 

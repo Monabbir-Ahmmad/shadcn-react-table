@@ -6,7 +6,7 @@ and outside contributors.
 
 ## Prerequisites
 
-- Node.js ≥ 22.13
+- Node.js ≥ 24.22.1 (Node 24 with its latest security fixes; see `.nvmrc`)
 - pnpm 11.13.1 (`corepack enable` will pick up the pinned version)
 
 ## Setup

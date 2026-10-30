@@ -15,11 +15,11 @@ The data table is the product; everything in `apps/web` exists to document and s
 
 ## Critical: Next.js version
 
-This repo uses **Next.js 16.2.6** (with React 19.2.4). Per `AGENTS.md`, this version has breaking changes vs. older Next.js — APIs, conventions, and file structure may differ from training data. Before writing any Next.js code, read the relevant guide in `node_modules/next/dist/docs/` and heed deprecation notices.
+This repo uses **Next.js 16.4.3** (with React 19.3.1). Per `AGENTS.md`, this version has breaking changes vs. older Next.js — APIs, conventions, and file structure may differ from training data. Before writing any Next.js code, read the relevant guide in `node_modules/next/dist/docs/` and heed deprecation notices.
 
 ## Commands
 
-Package manager is **pnpm 11.13.1** (Node ≥ 22.13). All top-level tasks are orchestrated by Turborepo and fan out via `dependsOn: ["^task"]`.
+Package manager is **pnpm 11.13.1** (Node ≥ 24.22.1, the latest security release of Node 24; `.nvmrc` pins the major). All top-level tasks are orchestrated by Turborepo and fan out via `dependsOn: ["^task"]`.
 
 From repo root:
 
