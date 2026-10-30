@@ -121,9 +121,10 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
     // Clean up once, when the column's header goes away.
   }, [column.id])
 
+  const pinningStyle = getColumnPinningStyle(column)
   const style: React.CSSProperties = {
     ...widthStyle,
-    ...getColumnPinningStyle(column),
+    ...pinningStyle,
     transform: CSS.Translate.toString(transform),
     // Animate width for programmatic changes (autosize, pinning) but not during
     // an active drag, where the easing makes the header lag behind the cursor;
@@ -134,7 +135,8 @@ export function DataTableHeadCell<TData extends RowData, TValue>({
           .filter(Boolean)
           .join(", "),
     opacity: isDragging ? 0.85 : undefined,
-    zIndex: isDragging ? 30 : undefined,
+    // A pinned header keeps its pinning layer, above the headers under it.
+    zIndex: isDragging ? 30 : pinningStyle.zIndex,
   }
 
   // Hand the drag-activator props to the header (via context) so the grip can

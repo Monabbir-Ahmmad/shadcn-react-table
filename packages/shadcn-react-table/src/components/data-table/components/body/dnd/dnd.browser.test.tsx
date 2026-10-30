@@ -146,6 +146,22 @@ describe("column reordering", () => {
 
     expect(headerOrder()).toEqual(["Bravo", "Alpha", "Charlie"])
   })
+
+  it("keeps a pinned header above the headers scrolling under it", () => {
+    render(
+      <Table
+        enableColumnOrdering
+        enableColumnPinning
+        initialState={{ columnPinning: { left: ["a"] } }}
+      />
+    )
+    const pinned = screen.getByText("Alpha").closest("th")!
+    const other = screen.getByText("Bravo").closest("th")!
+    expect(getComputedStyle(pinned).position).toBe("sticky")
+    expect(Number(getComputedStyle(pinned).zIndex)).toBeGreaterThan(
+      Number(getComputedStyle(other).zIndex) || 0
+    )
+  })
 })
 
 describe("row reordering", () => {
