@@ -300,6 +300,15 @@ export function useRowAnimations({
             })
           )
         }
+        // The table draws the row's collapsed bottom border, which no clip
+        // or opacity on the cells or the row hides: keep it clear until the
+        // panel's bottom edge reaches it.
+        track(
+          tr.animate(
+            { borderBottomColor: ["transparent", "transparent"] },
+            { duration }
+          )
+        )
         continue
       }
       track(

@@ -325,6 +325,71 @@ describe("row animations", () => {
     ).toBeLessThan(2)
   })
 
+  it("animates nothing while a row is being edited", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        onTable={(t) => (table = t)}
+        enableEditing
+        editDisplayMode="cell"
+      />
+    )
+    await nextFrame()
+    act(() => table.setEditingCell({ rowId: "r0", columnId: "name" }))
+    act(() => table.setSorting([{ id: "n", desc: false }]))
+    expect(running()).toBe(0)
+  })
+
+  it("animates nothing while a row is being dragged", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} enableRowOrdering />)
+    await nextFrame()
+    const grip = screen.getAllByRole("button", { name: /reorder row/i })[0]!
+    const { left, top, width, height } = grip.getBoundingClientRect()
+    const at = { x: left + width / 2, y: top + height / 2 }
+    const base = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      isPrimary: true,
+      pointerType: "mouse",
+      button: 0,
+    }
+    grip.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        ...base,
+        buttons: 1,
+        clientX: at.x,
+        clientY: at.y,
+      })
+    )
+    await nextFrame()
+    for (let i = 1; i <= 5; i++) {
+      document.dispatchEvent(
+        new PointerEvent("pointermove", {
+          ...base,
+          buttons: 1,
+          clientX: at.x,
+          clientY: at.y + i * 8,
+        })
+      )
+      await nextFrame()
+    }
+    expect(document.querySelector("tr[data-dragging]")).not.toBeNull()
+    act(() => table.setGlobalFilter("Name 1"))
+    expect(running()).toBe(0)
+    expect(layer()!.children.length).toBe(0)
+    document.dispatchEvent(
+      new PointerEvent("pointerup", { ...base, buttons: 0 })
+    )
+    // End the drag as a browser does: the click that follows pointerup,
+    // which dnd-kit swallows. Its click-swallowing listener stays on the
+    // document until 50 ms after the drag ends, so wait that out too, or it
+    // eats the next test's first click.
+    grip.dispatchEvent(new MouseEvent("click", base))
+    await new Promise((resolve) => setTimeout(resolve, 60))
+  })
+
   it("reveals a detail panel as the rows below glide down", async () => {
     render(<Harness renderDetailPanel={detailPanel} />)
     await nextFrame()
@@ -342,9 +407,17 @@ describe("row animations", () => {
     expect(timing(reveal[0]!).easing).toBe(timing(glide[0]!).easing)
     expect(timing(reveal[0]!).delay).toBe(0)
     expect(Math.abs(next.getBoundingClientRect().top - was)).toBeLessThan(2)
+    // The table draws the row's (collapsed) bottom border, which no clip
+    // hides: it stays transparent until the panel's bottom edge arrives.
+    const border = animating(detail, "borderBottomColor")
+    expect(border.length).toBe(1)
+    expect(timing(border[0]!).duration).toBe(timing(glide[0]!).duration)
+    const transparent = "rgba(0, 0, 0, 0)"
+    expect(getComputedStyle(detail).borderBottomColor).toBe(transparent)
     await nextFrame()
     await settle()
     expect(Math.abs(next.getBoundingClientRect().top - was)).toBeGreaterThan(50)
+    expect(getComputedStyle(detail).borderBottomColor).not.toBe(transparent)
   })
 
   it("clips a detail panel while it opens", async () => {
@@ -426,66 +499,6 @@ describe("row animations", () => {
     } finally {
       await session.send("Emulation.setEmulatedMedia", { features: [] })
     }
-  })
-
-  it("animates nothing while a row is being edited", async () => {
-    let table!: DataTableInstance<Row>
-    render(
-      <Harness
-        onTable={(t) => (table = t)}
-        enableEditing
-        editDisplayMode="cell"
-      />
-    )
-    await nextFrame()
-    act(() => table.setEditingCell({ rowId: "r0", columnId: "name" }))
-    act(() => table.setSorting([{ id: "n", desc: false }]))
-    expect(running()).toBe(0)
-  })
-
-  it("animates nothing while a row is being dragged", async () => {
-    let table!: DataTableInstance<Row>
-    render(<Harness onTable={(t) => (table = t)} enableRowOrdering />)
-    await nextFrame()
-    const grip = screen.getAllByRole("button", { name: /reorder row/i })[0]!
-    const { left, top, width, height } = grip.getBoundingClientRect()
-    const at = { x: left + width / 2, y: top + height / 2 }
-    const base = {
-      bubbles: true,
-      cancelable: true,
-      pointerId: 1,
-      isPrimary: true,
-      pointerType: "mouse",
-      button: 0,
-    }
-    grip.dispatchEvent(
-      new PointerEvent("pointerdown", {
-        ...base,
-        buttons: 1,
-        clientX: at.x,
-        clientY: at.y,
-      })
-    )
-    await nextFrame()
-    for (let i = 1; i <= 5; i++) {
-      document.dispatchEvent(
-        new PointerEvent("pointermove", {
-          ...base,
-          buttons: 1,
-          clientX: at.x,
-          clientY: at.y + i * 8,
-        })
-      )
-      await nextFrame()
-    }
-    expect(document.querySelector("tr[data-dragging]")).not.toBeNull()
-    act(() => table.setGlobalFilter("Name 1"))
-    expect(running()).toBe(0)
-    expect(layer()!.children.length).toBe(0)
-    document.dispatchEvent(
-      new PointerEvent("pointerup", { ...base, buttons: 0 })
-    )
-    await nextFrame()
   })
 
   it("animates nothing under reduced motion", async () => {
