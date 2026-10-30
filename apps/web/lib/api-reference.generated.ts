@@ -2952,9 +2952,9 @@ export const iconSlots: ApiMember[] = [
     name: "pinTop",
     type: "IconComponent",
     required: true,
-    default: "PinTop",
+    default: "Pin",
     description:
-      "Pin-row-to-the-top button while the row is unpinned. The default needle points up.",
+      "Pin-row-to-the-top button while the row is unpinned. The default is the plain pin.",
   },
   {
     name: "pinBottom",
@@ -2962,7 +2962,7 @@ export const iconSlots: ApiMember[] = [
     required: true,
     default: "Pin",
     description:
-      'Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default needle points down.',
+      'Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default is the plain pin.',
   },
   {
     name: "pinnedRow",

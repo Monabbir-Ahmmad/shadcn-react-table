@@ -163,14 +163,15 @@ describe("default pin directions", () => {
     expect(right).toContain("-rotate-90")
   })
 
-  it("points the top pin up and the bottom pin down", () => {
+  it("uses the plain pin for the top and bottom row pins", () => {
     const [top, bottom, pinned, plain] = slots([
       "pinTop",
       "pinBottom",
       "pinnedRow",
       "pin",
     ])
-    expect(top).toContain("rotate-180")
+    expect(top).not.toContain("rotate")
+    expect(top).toBe(plain)
     expect(bottom).not.toContain("rotate")
     expect(bottom).toBe(plain)
     expect(pinned).toBe(plain)

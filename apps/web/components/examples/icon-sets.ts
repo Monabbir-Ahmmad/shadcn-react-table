@@ -64,7 +64,7 @@ export const remixIcons: DataTableIcons = {
   pin: RiPushpinLine,
   pinLeft: turnedPin("rotate-90"),
   pinRight: turnedPin("-rotate-90"),
-  pinTop: turnedPin("rotate-180"),
+  pinTop: RiPushpinLine,
   pinBottom: RiPushpinLine,
   pinnedRow: RiPushpinFill,
   unpin: RiUnpinLine,

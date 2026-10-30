@@ -59,7 +59,7 @@ import { RiSearchLine } from "@remixicon/react"
 
 ## Pin and clear icons
 
-Pinning and clearing have their own slots: `pinLeft`, `pinRight` (column menu), `pinTop`, `pinBottom` (row pin button), `clearSort` and `clearFilter` (column menu). The defaults are the Lucide pin turned to point into the edge it pins to, `ListX` and `FilterX`.
+Pinning and clearing have their own slots: `pinLeft`, `pinRight` (column menu), `pinTop`, `pinBottom` (row pin button), `clearSort` and `clearFilter` (column menu). The column pins default to the Lucide pin turned to point into the edge it pins to, the row pins to the plain pin, and the clear items to `ListX` and `FilterX`.
 
 If you only set the older slots, the new ones follow them, so existing overrides keep working:
 

@@ -188,9 +188,9 @@ for every rename.
   selection banner and grouping drop zone slide in and out. On by default and
   off for reduced motion; `enableAnimations: false` turns it off.
 - **New:** icon slots `pinLeft`, `pinRight`, `pinTop`, `pinBottom`,
-  `clearSort` and `clearFilter`. Pinning to the left and right, and to the top
-  and bottom, no longer share one icon, and "Clear sort" no longer shares
-  `clearAll`. Overrides keep working: the pin slots fall back to `pin`,
+  `clearSort` and `clearFilter`. Pinning to the left and right no longer
+  share one icon (the row pins keep the plain pin by default), and "Clear
+  sort" no longer shares `clearAll`. Overrides keep working: the pin slots fall back to `pin`,
   `clearSort` to `clearAll` and `clearFilter` to `filterOff`. Code that types
   a full `DataTableIcons` object must add the six keys.
 - **Changed:** the filter-mode menu and a clear button sit inside the filter

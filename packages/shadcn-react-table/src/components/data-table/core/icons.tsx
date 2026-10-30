@@ -55,8 +55,6 @@ function rotated(
 const PinLeft = rotated(Pin, "rotate-90", "PinLeft")
 /** Needle points right, the mirror of `PinLeft`. */
 const PinRight = rotated(Pin, "-rotate-90", "PinRight")
-/** Needle points up (turned half a turn). */
-const PinTop = rotated(Pin, "rotate-180", "PinTop")
 
 /**
  * Every icon the data table renders, by semantic name. Defaults are Lucide
@@ -103,11 +101,12 @@ export interface DataTableIcons {
   pinLeft: IconComponent
   /** Pin-column-to-the-right menu item. The default needle points right. */
   pinRight: IconComponent
-  /** Pin-row-to-the-top button while the row is unpinned. The default needle points up. */
+  /** Pin-row-to-the-top button while the row is unpinned. The default is the
+   *  plain pin. */
   pinTop: IconComponent
   /**
    * Pin-row-to-the-bottom button while the row is unpinned (used when
-   * `rowPinningDisplayMode` is `"bottom"`). The default needle points down.
+   * `rowPinningDisplayMode` is `"bottom"`). The default is the plain pin.
    */
   pinBottom: IconComponent
   /** Shown on a pinned row's pin button. */
@@ -169,7 +168,7 @@ export const defaultIcons: DataTableIcons = {
   pin: Pin,
   pinLeft: PinLeft,
   pinRight: PinRight,
-  pinTop: PinTop,
+  pinTop: Pin,
   pinBottom: Pin,
   pinnedRow: Pin,
   unpin: PinOff,

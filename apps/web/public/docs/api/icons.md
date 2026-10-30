@@ -34,8 +34,8 @@ See the [Custom icons guide](/docs/guides/custom-icons) for swapping the whole s
 | `pin` | `IconComponent` | `Pin` | Generic pin glyph. Any of `pinLeft`, `pinRight`, `pinTop` and `pinBottom` you don't override falls back to this one, unrotated. |
 | `pinLeft` | `IconComponent` | `PinLeft` | Pin-column-to-the-left menu item. The default needle points left. |
 | `pinRight` | `IconComponent` | `PinRight` | Pin-column-to-the-right menu item. The default needle points right. |
-| `pinTop` | `IconComponent` | `PinTop` | Pin-row-to-the-top button while the row is unpinned. The default needle points up. |
-| `pinBottom` | `IconComponent` | `Pin` | Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default needle points down. |
+| `pinTop` | `IconComponent` | `Pin` | Pin-row-to-the-top button while the row is unpinned. The default is the plain pin. |
+| `pinBottom` | `IconComponent` | `Pin` | Pin-row-to-the-bottom button while the row is unpinned (used when `rowPinningDisplayMode` is `"bottom"`). The default is the plain pin. |
 | `pinnedRow` | `IconComponent` | `Pin` | Shown on a pinned row's pin button. |
 | `unpin` | `IconComponent` | `PinOff` | Unpin column and unpin row actions. |
 | `group` | `IconComponent` | `Group` | Group-by menu item and grouping chips. |
