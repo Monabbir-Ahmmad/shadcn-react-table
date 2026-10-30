@@ -5,7 +5,9 @@ import type * as React from "react"
 
 import { dt } from "../../core/internal"
 import type { DataTableInstance } from "../../core/types"
+import { isFilterRowVisible } from "../../helpers/grid-rows"
 import { useRowAnimations } from "../../hooks/use-row-animations"
+import { publishStickyOffsets } from "../../hooks/use-row-pinning-display"
 import { useTableState } from "../../hooks/use-table-state"
 
 /** Every row key: row ids, plus "<id>:detail" for open detail panels. */
@@ -47,7 +49,9 @@ export function DataTableRowMotion<TData extends RowData>({
   tableRef: React.RefObject<HTMLTableElement | null>
   active: boolean
 }) {
-  const hasDetailPanel = !!dt(table).renderDetailPanel
+  const { renderDetailPanel, density } = dt(table)
+  const hasDetailPanel = !!renderDetailPanel
+  const filterRow = isFilterRowVisible(table)
   // Its own subscription: the table root does not re-render when an edit
   // starts, and starting one must stop the motion in flight.
   const editing = useTableState(
@@ -61,16 +65,35 @@ export function DataTableRowMotion<TData extends RowData>({
     tableRef,
     active,
     // The row lists are memoized: new only when the rows, their order or
-    // pinning change, never on scroll.
+    // pinning change, never on scroll. Rows are measured from the table's
+    // top, so the head growing (the filter row) or the rows' height changing
+    // (the density) moves them too.
     signal: [
       table.getTopRows(),
       table.getCenterRows(),
       table.getBottomRows(),
       table.getState().expanded,
       hasDetailPanel,
+      density,
+      filterRow,
     ],
     members: () => rowKeys(table, hasDetailPanel),
     paused: () => editing,
+    filterRow,
+    // The pinned row groups stick under the header at `--dt-head-h`, which
+    // must follow the filter row before the rows are measured.
+    sync: (el) => {
+      const surface = el.closest<HTMLElement>(
+        '[data-slot="data-table-surface"]'
+      )
+      const { enableStickyHeader, enableStickyFooter } = dt(table)
+      if (surface) {
+        publishStickyOffsets(table, surface, {
+          stickyHeader: enableStickyHeader,
+          stickyFooter: enableStickyFooter,
+        })
+      }
+    },
   })
   return null
 }

@@ -10,6 +10,34 @@ const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((id) => b.includes(id))
 
 /**
+ * Publishes the sticky header's and footer's heights on the scroll surface
+ * (`--dt-head-h`, `--dt-foot-h`); unchanged values are not written again.
+ * Also called by the row motion, before it measures the rows after a change
+ * that resizes the header: the resize observer would publish only after it.
+ */
+export function publishStickyOffsets<TData extends RowData>(
+  table: DataTableInstance<TData>,
+  surface: HTMLElement,
+  {
+    stickyHeader,
+    stickyFooter,
+  }: { stickyHeader: boolean; stickyFooter: boolean }
+) {
+  const { tableHeadRef, tableFooterRef } = table.dataTable.refs
+  const head = stickyHeader ? (tableHeadRef.current?.offsetHeight ?? 0) : 0
+  const foot = stickyFooter ? (tableFooterRef.current?.offsetHeight ?? 0) : 0
+  for (const [name, px] of [
+    ["--dt-head-h", head],
+    ["--dt-foot-h", foot],
+  ] as const) {
+    const value = `${px}px`
+    if (surface.style.getPropertyValue(name) !== value) {
+      surface.style.setProperty(name, value)
+    }
+  }
+}
+
+/**
  * Supports `rowPinningDisplayMode`:
  * - publishes the sticky header's and footer's heights on the scroll surface
  *   (`--dt-head-h`, `--dt-foot-h`), so pinned row groups stick just inside
@@ -32,14 +60,8 @@ export function useRowPinningDisplay<TData extends RowData>({
     const surface = surfaceRef.current
     const { tableHeadRef, tableFooterRef } = table.dataTable.refs
     if (!surface) return
-    const publish = () => {
-      const head = stickyHeader ? (tableHeadRef.current?.offsetHeight ?? 0) : 0
-      const foot = stickyFooter
-        ? (tableFooterRef.current?.offsetHeight ?? 0)
-        : 0
-      surface.style.setProperty("--dt-head-h", `${head}px`)
-      surface.style.setProperty("--dt-foot-h", `${foot}px`)
-    }
+    const publish = () =>
+      publishStickyOffsets(table, surface, { stickyHeader, stickyFooter })
     publish()
     if (typeof ResizeObserver === "undefined") return
     const observer = new ResizeObserver(publish)

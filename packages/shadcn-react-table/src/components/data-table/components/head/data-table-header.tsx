@@ -174,6 +174,8 @@ export function DataTableHeader<TData extends RowData>({
         headerGroups.slice(-1).map((headerGroup) => (
           <TableRow
             key={`${headerGroup.id}-filters`}
+            // Found by the row motion, which fades it in and out.
+            data-filter-row=""
             aria-rowindex={rowIndex(headerGroups.length)}
             className="hover:bg-transparent"
           >

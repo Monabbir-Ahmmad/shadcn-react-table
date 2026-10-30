@@ -800,6 +800,299 @@ describe("row animations", () => {
   })
 })
 
+describe("filter row and density glide", () => {
+  /** The head's filter row (never a leave copy's). */
+  const filterRow = () =>
+    document.querySelector<HTMLTableRowElement>(
+      '[data-slot="table-container"] > table > thead > tr[data-filter-row]'
+    )
+
+  /** Each drawn row's top on screen, by key. */
+  const tops = () =>
+    new Map(
+      bodyRows().map((tr) => [
+        tr.dataset.rowId!,
+        tr.getBoundingClientRect().top,
+      ])
+    )
+
+  /** Where a glide starts: its first keyframe's offset, in px. */
+  const fromY = (el: Element) => {
+    const [glide] = animating(el, "transform")
+    const first = (glide!.effect as KeyframeEffect).getKeyframes()[0]!
+    return parseFloat(
+      /translateY\((-?[\d.]+)px\)/.exec(String(first.transform))![1]!
+    )
+  }
+
+  /** Pauses every animation on the page at `time` ms. */
+  const pauseAt = (time: number) => {
+    for (const a of document.getAnimations()) {
+      a.pause()
+      a.currentTime = time
+    }
+  }
+
+  it("glides the rows down as the filter row appears", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} />)
+    await nextFrame()
+    const was = tops()
+    act(() => table.setShowColumnFilters(true))
+    const height = filterRow()!.getBoundingClientRect().height
+    expect(height).toBeGreaterThan(0)
+    expect(running()).toBe(bodyRows().length)
+    for (const tr of bodyRows()) {
+      // From where it was: no jump.
+      expect(fromY(tr)).toBeCloseTo(-height, 0)
+      const top = tr.getBoundingClientRect().top
+      expect(Math.abs(top - was.get(tr.dataset.rowId!)!)).toBeLessThan(1)
+    }
+    await settle()
+    expect(running()).toBe(0)
+    // Exactly where the static layout puts it.
+    for (const tr of bodyRows()) {
+      const top = tr.getBoundingClientRect().top
+      expect(top - was.get(tr.dataset.rowId!)!).toBeCloseTo(height, 0)
+    }
+  })
+
+  it("fades the filter inputs in as the filter row appears", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} />)
+    await nextFrame()
+    act(() => table.setShowColumnFilters(true))
+    const cells = [...filterRow()!.cells]
+    expect(cells.length).toBe(2)
+    for (const cell of cells) {
+      // The cell (and its background) shows at once: the rows glide out
+      // from under it. Only its content fades in and drops.
+      expect(animating(cell, "opacity")).toHaveLength(0)
+      const fades = [...cell.children].flatMap((el) => animating(el, "opacity"))
+      expect(fades).toHaveLength(1)
+      const [first] = (fades[0]!.effect as KeyframeEffect).getKeyframes()
+      expect(Number(first!.opacity)).toBe(0)
+      expect(String(first!.transform)).toBe("translateY(-4px)")
+      // Timed like a row that enters.
+      expect(timing(fades[0]!).duration).toBe(MOTION_DEFAULTS.durationFast)
+      expect(timing(fades[0]!).delay).toBe(MOTION_DEFAULTS.durationFast / 2)
+      expect(timing(fades[0]!).fill).toBe("backwards")
+    }
+    await settle()
+    for (const cell of cells) {
+      for (const el of cell.children) {
+        expect(getComputedStyle(el).opacity).toBe("1")
+      }
+    }
+  })
+
+  it("fades a copy of the filter row out as the rows glide up", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        onTable={(t) => (table = t)}
+        initialState={{ showColumnFilters: true }}
+      />
+    )
+    await nextFrame()
+    const was = filterRow()!.getBoundingClientRect()
+    const rowsWere = tops()
+    act(() => table.setShowColumnFilters(false))
+    expect(filterRow()).toBeNull()
+    const ghost = layer()!.querySelector<HTMLElement>(
+      '[data-slot="data-table-leave-copy"]'
+    )!
+    expect(ghost.inert).toBe(true)
+    // No ids or names a live control could clash with.
+    expect(ghost.querySelector("[id], [name]")).toBeNull()
+    // Where the filter row was.
+    const copy = ghost.querySelector("tr")!.getBoundingClientRect()
+    expect(Math.abs(copy.top - was.top)).toBeLessThan(1)
+    expect(Math.abs(copy.left - was.left)).toBeLessThan(1)
+    expect(Math.abs(copy.height - was.height)).toBeLessThan(1)
+    const fade = animating(ghost, "opacity")
+    expect(fade).toHaveLength(1)
+    expect(timing(fade[0]!).duration).toBe(MOTION_DEFAULTS.durationFast)
+    // The rows glide up from where they were.
+    expect(running()).toBe(bodyRows().length)
+    for (const tr of bodyRows()) {
+      expect(fromY(tr)).toBeCloseTo(was.height, 0)
+      const top = tr.getBoundingClientRect().top
+      expect(Math.abs(top - rowsWere.get(tr.dataset.rowId!)!)).toBeLessThan(1)
+    }
+    await waitFor(() => expect(layer()!.children.length).toBe(0), {
+      timeout: 2000,
+    })
+    await settle()
+    for (const tr of bodyRows()) {
+      const top = tr.getBoundingClientRect().top
+      expect(rowsWere.get(tr.dataset.rowId!)! - top).toBeCloseTo(was.height, 0)
+    }
+  })
+
+  it("glides the rows when the density changes", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} />)
+    await nextFrame()
+    const was = tops()
+    act(() => table.setDensity("compact"))
+    // Every row below the first moved (each row above it got shorter), and
+    // starts where it was.
+    expect(running()).toBe(bodyRows().length - 1)
+    for (const tr of bodyRows()) {
+      const top = tr.getBoundingClientRect().top
+      expect(Math.abs(top - was.get(tr.dataset.rowId!)!)).toBeLessThan(1)
+    }
+    await settle()
+    expect(running()).toBe(0)
+    // Back to the static layout: each row sits right under the one above.
+    const drawn = bodyRows()
+    for (let i = 1; i < drawn.length; i++) {
+      const above = drawn[i - 1]!.getBoundingClientRect().bottom
+      expect(drawn[i]!.getBoundingClientRect().top).toBeCloseTo(above, 0)
+    }
+    const last = drawn.at(-1)!
+    expect(last.getBoundingClientRect().top).toBeLessThan(
+      was.get(last.dataset.rowId!)! - 1
+    )
+  })
+
+  it.each([
+    [
+      "the density changes",
+      true,
+      (t: DataTableInstance<Row>) => t.setDensity("compact"),
+    ],
+    [
+      "the filter row appears",
+      false,
+      (t: DataTableInstance<Row>) => t.setShowColumnFilters(true),
+    ],
+    [
+      "the filter row hides",
+      true,
+      (t: DataTableInstance<Row>) => t.setShowColumnFilters(false),
+    ],
+  ])(
+    "keeps the pinned groups' dividers on their edge rows when %s",
+    async (_, filters, change) => {
+      let table!: DataTableInstance<Row>
+      render(
+        <Harness
+          onTable={(t) => (table = t)}
+          enableRowPinning
+          initialState={{
+            rowPinning: { top: ["r0", "r1"], bottom: ["r7"] },
+            showColumnFilters: filters,
+          }}
+        />
+      )
+      await nextFrame()
+      const group = (side: string) =>
+        document.querySelector<HTMLElement>(
+          `tbody[data-pinned-rows="${side}"]`
+        )!
+      const was = tops()
+      act(() => change(table))
+      // A frame for the sticky offsets to catch up, then the glide's start:
+      // the pinned rows are still where they were (no jump).
+      await nextFrame()
+      pauseAt(0)
+      for (const key of ["r0", "r1", "r7"]) {
+        const top = findRow(key)!.getBoundingClientRect().top
+        expect(Math.abs(top - was.get(key)!)).toBeLessThan(1)
+      }
+      for (const time of [0, MOTION_DEFAULTS.duration / 2]) {
+        pauseAt(time)
+        // Each group's divider (its ::after) moves with the row on its edge.
+        const shift = (el: Element, pseudo?: string) =>
+          new DOMMatrix(getComputedStyle(el, pseudo).transform).m42
+        const top = group("top")
+        const edge = findRow("r1")!
+        expect(shift(top, "::after")).toBeCloseTo(shift(edge), 0)
+        expect(
+          top.getBoundingClientRect().bottom + shift(top, "::after")
+        ).toBeCloseTo(edge.getBoundingClientRect().bottom, 0)
+        const bottom = group("bottom")
+        const first = findRow("r7")!
+        expect(shift(bottom, "::after")).toBeCloseTo(shift(first), 0)
+        expect(
+          bottom.getBoundingClientRect().top + shift(bottom, "::after")
+        ).toBeCloseTo(first.getBoundingClientRect().top, 0)
+      }
+      for (const a of document.getAnimations()) a.finish()
+      expect(getComputedStyle(group("top"), "::after").transform).toBe("none")
+    }
+  )
+
+  it("just updates when far too many rows are drawn", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness data={rows(1000)} onTable={(t) => (table = t)} />)
+    await nextFrame()
+    act(() => table.setDensity("compact"))
+    act(() => table.setShowColumnFilters(true))
+    expect(running()).toBe(0)
+    // No script animation anywhere (the toolbar's CSS transitions aside).
+    const scripted = document
+      .getAnimations()
+      .filter((a) => !(a instanceof CSSTransition))
+    expect(scripted).toHaveLength(0)
+  })
+
+  it("glides only the drawn rows of a virtualized table", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        data={rows(2000)}
+        enableRowVirtualization
+        onTable={(t) => (table = t)}
+      />
+    )
+    await nextFrame()
+    act(() => table.setShowColumnFilters(true))
+    const drawn = bodyRows().length
+    expect(drawn).toBeLessThan(100)
+    expect(running()).toBeGreaterThan(0)
+    expect(running()).toBeLessThanOrEqual(drawn)
+    await settle()
+    act(() => table.setDensity("compact"))
+    expect(running()).toBeGreaterThan(0)
+    expect(running()).toBeLessThanOrEqual(bodyRows().length)
+    // Shorter rows: a few more drawn, still a window of the 2,000.
+    expect(bodyRows().length).toBeLessThan(200)
+  })
+
+  it("changes the filter row and density at once when animations are off", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} enableAnimations={false} />)
+    await nextFrame()
+    act(() => table.setShowColumnFilters(true))
+    act(() => table.setDensity("compact"))
+    act(() => table.setShowColumnFilters(false))
+    expect(document.getAnimations()).toHaveLength(0)
+    expect(layer()).toBeNull()
+  })
+
+  it("changes the filter row and density at once under reduced motion", async () => {
+    const session = cdp()
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+    })
+    try {
+      let table!: DataTableInstance<Row>
+      render(<Harness onTable={(t) => (table = t)} />)
+      await nextFrame()
+      act(() => table.setShowColumnFilters(true))
+      act(() => table.setDensity("compact"))
+      act(() => table.setShowColumnFilters(false))
+      expect(document.getAnimations()).toHaveLength(0)
+      expect(layer()).toBeNull()
+    } finally {
+      await session.send("Emulation.setEmulatedMedia", { features: [] })
+    }
+  })
+})
+
 describe("control animations", () => {
   const sortArrow = () =>
     document.querySelector<HTMLElement>(

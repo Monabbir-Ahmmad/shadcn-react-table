@@ -21,6 +21,14 @@ type Args = {
    *  row created). Motion in flight stops when it turns true. A row drag in
    *  progress is detected by the hook itself (`tr[data-dragging]`). */
   paused: () => boolean
+  /** Whether the head shows its filter row (`tr[data-filter-row]`). Include
+   *  it in `signal`: the body rows glide as it comes or goes, its inputs fade
+   *  in as it appears and a copy of it fades out as it goes. */
+  filterRow?: boolean
+  /** Brings what the change resized up to date before the rows are measured
+   *  in their new places: the offsets the sticky pinned row groups stick at,
+   *  which follow the header's height. */
+  sync?: (table: HTMLTableElement) => void
 }
 
 /** A copy of a leaving row and where it sat, relative to the motion layer. */
@@ -37,10 +45,17 @@ type Job = {
   prev: RowSnapshot
   members: ReadonlySet<string>
   leaving: Leaving[]
+  /** The filter row just appeared: fade its inputs in. */
+  revealFilterRow: boolean
+  /** The pinned groups' edge rows before the change (see `pinnedEdges`). */
+  edges: PinnedEdge[]
 }
 
 // The table's own rows: not the rows of a table nested in a detail panel.
 const ROWS = ":scope > tbody > tr[data-row-id]"
+
+// The head's filter row (see `DataTableHeader`).
+const FILTER_ROW = ":scope > thead > tr[data-filter-row]"
 
 // Attributes a leave copy drops so nothing mistakes it for the live row:
 // keys the planner and grid navigation look up, ids, tab stops, and form
@@ -71,6 +86,11 @@ const HIDE: Keyframe[] = [
   { clipPath: CLIPPED, opacity: 0 },
 ]
 const FADE: Keyframe[] = [{ opacity: 1 }, { opacity: 0 }]
+// The filter inputs come in from above, the side the row opens from.
+const DROP_IN: Keyframe[] = [
+  { opacity: 0, transform: "translateY(-4px)" },
+  { opacity: 1, transform: "none" },
+]
 
 const isDetail = (tr: HTMLTableRowElement) => tr.dataset.rowKind === "detail"
 
@@ -105,6 +125,26 @@ function topsOf(
   return tops
 }
 
+/** The row on a sticky pinned group's inner edge, beside its divider. */
+type PinnedEdge = { side: "top" | "bottom"; key: string }
+
+/**
+ * The last top-pinned and the first bottom-pinned row: the rows along the
+ * dividers the sticky groups draw (`getRowPinningClass`). Static pinning has
+ * no groups, so none. Work proportional to the pinned rows.
+ */
+function pinnedEdges(table: HTMLTableElement): PinnedEdge[] {
+  const edges: PinnedEdge[] = []
+  for (const side of ["top", "bottom"] as const) {
+    const rows = table.querySelectorAll<HTMLTableRowElement>(
+      `:scope > tbody[data-pinned-rows="${side}"] > tr[data-row-id]`
+    )
+    const tr = side === "top" ? rows[rows.length - 1] : rows[0]
+    if (tr) edges.push({ side, key: tr.dataset.rowId! })
+  }
+  return edges
+}
+
 function motionLayer(table: HTMLTableElement) {
   return table
     .closest('[data-slot="data-table-surface"]')
@@ -135,6 +175,18 @@ function copyRow(tr: HTMLTableRowElement) {
     for (const name of COPY_DROPS) el.removeAttribute(name)
   }
   return copy
+}
+
+/** A leaving row's copy and where it sat, relative to the layer. Reads. */
+function leaveCopy(tr: HTMLTableRowElement, base: DOMRect): Leaving {
+  const rect = tr.getBoundingClientRect()
+  return {
+    node: copyRow(tr),
+    top: rect.top - base.top,
+    left: rect.left - base.left,
+    width: rect.width,
+    widths: [...tr.cells].map((c) => c.getBoundingClientRect().width),
+  }
 }
 
 /**
@@ -279,6 +331,8 @@ export function useRowAnimations({
   signal,
   members,
   paused,
+  filterRow = false,
+  sync,
 }: Args) {
   const lastSignal = React.useRef<unknown[] | null>(null)
   const lastMembers = React.useRef<ReadonlySet<string> | null>(null)
@@ -343,24 +397,24 @@ export function useRowAnimations({
     }
     const tops = topsOf(table, rows)
     const gone = [...rows.keys()].filter((key) => !next.has(key))
-    const layer = motionLayer(table)
+    const base = motionLayer(table)?.getBoundingClientRect()
     const leaving: Leaving[] = []
     // Past the limit the planner skips the change, so copy nothing.
-    if (layer && gone.length <= MAX_ANIMATED_ROWS) {
-      const base = layer.getBoundingClientRect()
-      for (const key of gone) {
-        const tr = rows.get(key)!
-        const rect = tr.getBoundingClientRect()
-        leaving.push({
-          node: copyRow(tr),
-          top: rect.top - base.top,
-          left: rect.left - base.left,
-          width: rect.width,
-          widths: [...tr.cells].map((c) => c.getBoundingClientRect().width),
-        })
-      }
+    if (base && gone.length <= MAX_ANIMATED_ROWS) {
+      for (const key of gone) leaving.push(leaveCopy(rows.get(key)!, base))
     }
-    job.current = { prev: { members: prev, tops }, members: next, leaving }
+    // The filter row goes: a copy fades out where it was while the rows
+    // glide up over it. Cheaper than keeping the row mounted to fade it, and
+    // the layout changes at once, as for any other change.
+    const filter = table.querySelector<HTMLTableRowElement>(FILTER_ROW)
+    if (base && filter && !filterRow) leaving.push(leaveCopy(filter, base))
+    job.current = {
+      prev: { members: prev, tops },
+      members: next,
+      leaving,
+      revealFilterRow: !filter && filterRow,
+      edges: pinnedEdges(table),
+    }
   })
 
   // After the update: glide, fade in, and fade out the copies.
@@ -375,6 +429,7 @@ export function useRowAnimations({
     stop()
     const live = running.current
 
+    sync?.(table)
     const rows = drawnRows(table)
     const plan = planRowAnimations(work.prev, {
       members: work.members,
@@ -424,6 +479,41 @@ export function useRowAnimations({
         track(tr.animate(CLEAR_BORDER, { duration }))
       }
     })
+    // A sticky pinned group draws its divider (a pseudo-element) along its
+    // edge, which snaps to the new layout: while the row on that edge glides
+    // (a density change, the filter row), the divider glides with it, as a
+    // gliding row's border does (see `moveBorder`). A new edge row (a row
+    // pinned or unpinned there) is a new edge: the divider just moves.
+    for (const { side, key } of pinnedEdges(table)) {
+      if (!work.edges.some((e) => e.side === side && e.key === key)) continue
+      const move = plan.moves.find((m) => m.key === key)
+      const group = rows.get(key)?.parentElement
+      if (!move || !group) continue
+      track(
+        group.animate(
+          { transform: [`translateY(${move.dy}px)`, "none"] },
+          { duration, easing: ease, pseudoElement: "::after" }
+        )
+      )
+    }
+    // The filter row appeared: its inputs fade in and drop into place, timed
+    // like an entering row. Its cells show at once, so the rows glide out
+    // from under them.
+    if (work.revealFilterRow) {
+      const filter = table.querySelector<HTMLTableRowElement>(FILTER_ROW)
+      for (const cell of filter?.cells ?? []) {
+        for (const el of cell.children) {
+          track(
+            el.animate(DROP_IN, {
+              duration: durationFast,
+              easing: ease,
+              delay: durationFast / 2,
+              fill: "backwards",
+            })
+          )
+        }
+      }
+    }
     // Rows new to a virtual window came with the change (from outside the
     // drawn rows, so there is no place to glide from): they fade in too, at
     // once, as the rows they replace are gone (still in the data: no copies).
