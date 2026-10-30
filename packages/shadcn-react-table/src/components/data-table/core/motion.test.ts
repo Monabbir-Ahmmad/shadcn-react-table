@@ -2,20 +2,24 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 
 import {
   getReducedMotion,
-  MOTION_CSS_VARS,
   MOTION_DEFAULTS,
+  MOTION_ROOT_CLASS,
   readMotionTokens,
 } from "./motion"
 
 afterEach(() => vi.unstubAllGlobals())
 
 describe("motion tokens", () => {
-  it("exposes the defaults as CSS variables", () => {
-    expect(MOTION_CSS_VARS).toEqual({
-      "--dt-motion-duration": "280ms",
-      "--dt-motion-duration-fast": "160ms",
-      "--dt-motion-ease": "cubic-bezier(0.22, 1, 0.36, 1)",
-    })
+  it("falls back to the defaults in the root's control timing", () => {
+    // Literal for Tailwind, so the numbers are checked here instead.
+    expect(MOTION_ROOT_CLASS).toContain(
+      `var(--dt-motion-duration,${MOTION_DEFAULTS.duration}ms)`
+    )
+    expect(MOTION_ROOT_CLASS).toContain(
+      `var(--dt-motion-ease,${MOTION_DEFAULTS.ease.replace(/ /g, "")})`
+    )
+    // Without animations, the root sets 0ms (nested tables included).
+    expect(MOTION_ROOT_CLASS).toMatch(/(^| )\[--dt-ctl-duration:0ms\]/)
   })
 
   it("reads overrides from an element and falls back to the defaults", () => {

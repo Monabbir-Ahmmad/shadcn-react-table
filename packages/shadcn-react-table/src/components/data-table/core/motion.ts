@@ -7,13 +7,6 @@ export const MOTION_DEFAULTS = {
   ease: "cubic-bezier(0.22, 1, 0.36, 1)",
 } as const
 
-/** The CSS variables a theme can set on the table to retime its motion. */
-export const MOTION_CSS_VARS: Record<string, string> = {
-  "--dt-motion-duration": `${MOTION_DEFAULTS.duration}ms`,
-  "--dt-motion-duration-fast": `${MOTION_DEFAULTS.durationFast}ms`,
-  "--dt-motion-ease": MOTION_DEFAULTS.ease,
-}
-
 function toMs(value: string, fallback: number): number {
   const v = value.trim()
   if (!v) return fallback
@@ -79,9 +72,20 @@ export function useAnimationsActive(enabled: boolean): boolean {
 }
 
 /**
- * Tailwind classes that time a control's CSS transition with the motion
- * tokens. They only apply under the root's `[data-animations]`, so with
- * animations off (or reduced motion) controls change instantly.
+ * Set on every table root: the timing its own controls use. With
+ * `[data-animations]` it is the motion tokens (`--dt-motion-*`, with the
+ * `MOTION_DEFAULTS` as fallbacks), otherwise 0ms. Each root sets it, so the
+ * nearest root wins: a non-animated table nested in an animated one (in a
+ * detail panel, say) keeps its controls still. Literal strings, so Tailwind
+ * sees the classes; a test keeps the numbers in step with `MOTION_DEFAULTS`.
+ */
+export const MOTION_ROOT_CLASS =
+  "[--dt-ctl-duration:0ms] data-[animations]:[--dt-ctl-duration:var(--dt-motion-duration,280ms)] data-[animations]:[--dt-ctl-ease:var(--dt-motion-ease,cubic-bezier(0.22,1,0.36,1))]"
+
+/**
+ * Tailwind classes that time a control's CSS transition with its table's
+ * control timing (see `MOTION_ROOT_CLASS`): 0ms, so an instant change, when
+ * that table does not animate (off, or reduced motion).
  */
 export const MOTION_TIMING_CLASS =
-  "group-data-[animations]/table:duration-[var(--dt-motion-duration,280ms)] group-data-[animations]/table:ease-[var(--dt-motion-ease,cubic-bezier(0.22,1,0.36,1))]"
+  "duration-[var(--dt-ctl-duration,0ms)] ease-[var(--dt-ctl-ease,ease)]"

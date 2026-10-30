@@ -19,7 +19,7 @@ function GlyphPath({ d, shown }: { d: string; shown: boolean }) {
       className={
         shown
           ? cn(
-              "[stroke-dashoffset:0] group-data-[animations]/table:transition-[stroke-dashoffset]",
+              "transition-[stroke-dashoffset] [stroke-dashoffset:0]",
               MOTION_TIMING_CLASS
             )
           : "opacity-0 [stroke-dashoffset:1]"
@@ -96,7 +96,7 @@ function SelectionCheckbox({
       )}
       {!radio && (
         // Always mounted (hidden while unchecked) so checking transitions it
-        // in under `[data-animations]` — never on mount, e.g. a row scrolled
+        // in when the table animates — never on mount, e.g. a row scrolled
         // into a virtual window or a leaving row's copy.
         <svg
           viewBox="0 0 24 24"
@@ -110,7 +110,7 @@ function SelectionCheckbox({
             "size-3.5",
             active
               ? cn(
-                  "scale-100 opacity-100 group-data-[animations]/table:transition-[opacity,scale]",
+                  "scale-100 opacity-100 transition-[opacity,scale]",
                   MOTION_TIMING_CLASS
                 )
               : "invisible scale-75 opacity-0"

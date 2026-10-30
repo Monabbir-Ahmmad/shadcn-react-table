@@ -692,6 +692,57 @@ describe("control animations", () => {
     expect(offStyle.rotate).toBe("180deg")
   })
 
+  it("keeps a nested table's controls on its own timing", async () => {
+    render(
+      <Harness
+        initialState={{ expanded: { r0: true } }}
+        renderDetailPanel={() => (
+          <div data-testid="inner">
+            <Harness enableAnimations={false} />
+          </div>
+        )}
+      />
+    )
+    await nextFrame()
+    const inner = screen.getByTestId("inner")
+    const sortIn = (scope: ParentNode) =>
+      scope.querySelector<HTMLElement>("th button[data-sorted]")!
+    const arrowIn = (scope: ParentNode) =>
+      scope.querySelector<HTMLElement>(
+        '[data-slot="data-table-sort-indicator"] [data-shown] svg'
+      )!
+    // The outer table's first header (not one inside the panel).
+    const outerHead = document.querySelector("thead")!
+    fireEvent.click(sortIn(outerHead))
+    fireEvent.click(sortIn(outerHead))
+    fireEvent.click(sortIn(inner))
+    fireEvent.click(sortIn(inner))
+    expect(getComputedStyle(arrowIn(outerHead)).transitionDuration).toBe(
+      `${MOTION_DEFAULTS.duration / 1000}s`
+    )
+    // The nearest table root decides: the inner one does not animate.
+    expect(getComputedStyle(arrowIn(inner)).transitionDuration).toBe("0s")
+    expect(arrowIn(inner).getAnimations()).toHaveLength(0)
+  })
+
+  it("leaves no transition running after a sort under reduced motion", async () => {
+    const session = cdp()
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+    })
+    try {
+      render(<Harness />)
+      await nextFrame()
+      // The header's colour fade to "sorted" is off too.
+      fireEvent.click(
+        document.querySelectorAll<HTMLElement>("th button[data-sorted]")[0]!
+      )
+      expect(document.getAnimations()).toHaveLength(0)
+    } finally {
+      await session.send("Emulation.setEmulatedMedia", { features: [] })
+    }
+  })
+
   it("crossfades the selected count in place", async () => {
     render(<Harness enableRowSelection />)
     const boxes = () => [

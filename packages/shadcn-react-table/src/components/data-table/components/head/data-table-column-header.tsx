@@ -142,7 +142,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
               type="button"
               onClick={column.getToggleSortingHandler()}
               aria-label={sortTooltip}
-              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground"
+              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground motion-reduce:transition-none"
               data-sorted={!!sorted}
             >
               <span className="min-w-0 truncate">{labelNode}</span>
@@ -181,7 +181,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
 /** One stacked icon layer; only the shown one is visible. Layers fade and
  *  scale between states. */
 const SORT_LAYER_CLASS = cn(
-  "col-start-1 row-start-1 flex items-center justify-center group-data-[animations]/table:transition-[opacity,visibility,scale]",
+  "col-start-1 row-start-1 flex items-center justify-center transition-[opacity,visibility,scale]",
   MOTION_TIMING_CLASS
 )
 
@@ -192,7 +192,7 @@ const UNSORTED_ICON_CLASS =
 /**
  * The sort state icon. Every state's icon stays mounted, stacked in one grid
  * cell, and only the current one is visible, so a change fades between them
- * (under `[data-animations]`) instead of swapping nodes. With the default
+ * (when the table animates) instead of swapping nodes. With the default
  * icons, one arrow serves both directions and turns 180° for descending.
  * Custom icons are shown as given and only fade.
  *
@@ -254,10 +254,7 @@ function SortIndicator({
           <icons.sortAscending
             className={cn(
               "size-3.5 shrink-0",
-              turns && [
-                "group-data-[animations]/table:transition-[rotate]",
-                MOTION_TIMING_CLASS,
-              ],
+              turns && ["transition-[rotate]", MOTION_TIMING_CLASS],
               turned && "rotate-180"
             )}
           />,

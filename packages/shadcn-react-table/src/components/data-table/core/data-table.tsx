@@ -46,7 +46,7 @@ import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
 import { DENSITY_PADDING_VARS } from "./constants"
-import { useAnimationsActive } from "./motion"
+import { MOTION_ROOT_CLASS, useAnimationsActive } from "./motion"
 
 /**
  * Body wrapper that freezes during an active column resize. With
@@ -519,8 +519,9 @@ export function DataTable<TData extends RowData>({
             ref: paperRef,
             "data-slot": "data-table",
             className: cn(
-              // `group/table` lets controls animate under `[data-animations]`.
-              "group/table relative flex w-full flex-col gap-2",
+              // The timing of this table's own controls (nearest root wins).
+              "relative flex w-full flex-col gap-2",
+              MOTION_ROOT_CLASS,
               DENSITY_PADDING_VARS,
               isFullscreen &&
                 "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4"
