@@ -425,7 +425,9 @@ export function useRowAnimations({
       }
     })
     // Rows new to a virtual window came with the change (from outside the
-    // drawn rows, so there is no place to glide from): they fade in too.
+    // drawn rows, so there is no place to glide from): they fade in too, at
+    // once, as the rows they replace are gone (still in the data: no copies).
+    const arrived = new Set(plan.arrivals)
     for (const key of [...plan.enters, ...plan.arrivals]) {
       const tr = rows.get(key)
       if (!tr) continue
@@ -458,7 +460,7 @@ export function useRowAnimations({
             duration: durationFast,
             easing: ease,
             // Starts as the leaving rows fade; hidden until then.
-            delay: durationFast / 2,
+            delay: arrived.has(key) ? 0 : durationFast / 2,
             fill: "backwards",
           }
         )

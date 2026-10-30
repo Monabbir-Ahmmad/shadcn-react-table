@@ -313,6 +313,9 @@ describe("row animations", () => {
       expect(fade).toHaveLength(1)
       const first = (fade[0]!.effect as KeyframeEffect).getKeyframes()[0]!
       expect(Number(first.opacity)).toBe(0)
+      // The rows they replace are gone at once (still in the data, so no
+      // copies to wait for): no delay, or the window shows a gap.
+      expect(timing(fade[0]!).delay).toBe(0)
     }
     // Nothing left the data, so no copies.
     expect(layer()!.children.length).toBe(0)
