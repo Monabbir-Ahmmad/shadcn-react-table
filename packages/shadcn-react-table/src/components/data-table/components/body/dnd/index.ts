@@ -5,3 +5,4 @@
 export { ColumnResizeHandle } from "./column-resize-handle"
 export { DataTableHeadCell, ColumnDragHandle } from "./head-cell"
 export { DataTableBodyRow } from "./body-row"
+export { DraggedRowTracker } from "./dragged-row-tracker"

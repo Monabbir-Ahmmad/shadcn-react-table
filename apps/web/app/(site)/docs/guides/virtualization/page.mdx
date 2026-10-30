@@ -64,10 +64,11 @@ const table = useDataTable({
 rowVirtualizerRef.current?.scrollToIndex(100)
 ```
 
-<Callout variant="warning" title="Row drag-ordering is disabled">
-  Row virtualization is incompatible with row drag-ordering. If you need to
-  reorder rows by dragging, leave virtualization off. See
-  [Row ordering](/docs/guides/row-ordering).
+<Callout variant="tip" title="Dragging rows">
+  Rows can be dragged with virtualization on (`enableRowOrdering`,
+  `enableRowDragging`): the table scrolls as you drag toward its edge, and the
+  dragged row stays rendered. See
+  [Row ordering](/docs/guides/row-ordering#with-virtualization).
 </Callout>
 
 ## Column virtualization

@@ -39,6 +39,7 @@ MRT puts its own column options on the column definition. Here they live under `
 | `enableClickToCopy` | `meta.enableClickToCopy` |
 | `enableColumnActions` | `meta.enableColumnActions` |
 | `visibleInShowHideMenu` | `meta.visibleInShowHideMenu` |
+| `grow` | `meta.grow` (in `layoutMode: "grid"`, a weight: every data column grows by 1 unless set; see [Column resizing](/docs/guides/column-resizing#layout-mode-and-grow)) |
 | `muiTableHeadCellProps` / `muiTableBodyCellProps` / `muiTableFooterCellProps` | `meta.slotProps.headCell` / `.bodyCell` / `.footerCell` |
 
 ## Component props (`mui*Props`)
@@ -131,7 +132,6 @@ Set the MRT value explicitly to keep the old behavior.
 
 ## Not here (yet)
 
-- `layoutMode` and column `grow`, and the `"head-overlay"` alert banner position.
 - `rowPinningDisplayMode` values `"sticky"` and `"select-sticky"` (rows that stick in place); use `"top-and-bottom"` or `"select-top"`.
 - `enableColumnDragging` as a separate switch.
 - MRT's `enableRowDragging` works through `DataTableDndProvider` and `onRowDragEnd` here; see [Row dragging](/docs/guides/row-dragging).

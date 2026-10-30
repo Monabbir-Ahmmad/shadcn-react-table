@@ -143,4 +143,57 @@ describe("dragging rows between tables", () => {
     await nextFrame()
     expect(onRowOrderChange).toHaveBeenCalledWith("1", "3")
   })
+
+  it("drags rows of virtualized tables to another table and a zone", async () => {
+    const onRowDragEnd = vi.fn()
+    let right: DataTableInstance<Row> | undefined
+    render(
+      <DataTableDndProvider>
+        <div style={{ display: "flex", gap: 40 }}>
+          <Table
+            label="Left"
+            data={rows("left")}
+            enableRowVirtualization
+            onRowDragEnd={onRowDragEnd}
+          />
+          <Table
+            label="Right"
+            data={rows("right")}
+            enableRowVirtualization
+            onTable={(t) => (right = t)}
+          />
+        </div>
+        <Zone />
+      </DataTableDndProvider>
+    )
+    await nextFrame()
+    const drag = async (grip: Element, to: DOMRect) => {
+      const from = grip.getBoundingClientRect()
+      await dragPointer(grip, {
+        dx: to.left + 20 - (from.left + from.width / 2),
+        dy: to.top + to.height / 2 - (from.top + from.height / 2),
+      })
+      await nextFrame()
+    }
+
+    await drag(
+      grips("Left")[0]!,
+      screen.getByText("right-2").closest("tr")!.getBoundingClientRect()
+    )
+    const first = onRowDragEnd.mock.calls[0]![0] as {
+      row: { id: string }
+      over: RowDropTarget
+    }
+    expect(first.row.id).toBe("1")
+    expect(first.over.type === "table" && first.over.table).toBe(right)
+
+    await drag(
+      grips("Left")[1]!,
+      screen.getByText("Trash").getBoundingClientRect()
+    )
+    expect(onRowDragEnd.mock.calls[1]![0].over).toEqual({
+      type: "zone",
+      id: "trash",
+    })
+  })
 })

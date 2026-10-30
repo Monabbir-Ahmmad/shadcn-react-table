@@ -48,6 +48,7 @@
 | `enableColumnOrdering` | `boolean` | `false` | Drag-and-drop column reordering (adds a grip to each header). |
 | `enableColumnPinning` | `boolean` | `false` | Column pinning (left/right) via the column-actions menu + sticky columns. |
 | `enableColumnResizing` | `boolean` | `false` | Column resizing via an edge drag handle. |
+| `layoutMode` | `LayoutMode` | `"semantic"` | How the table sizes its columns. `"semantic"` (default) uses the browser's table layout. `"grid"` keeps every column at its size and shares the spare width between the growing columns by weight (see the column's `meta.grow`; the table's own columns never grow), so the table fills its container. `"grid-no-grow"` keeps every column at its size and the table as wide as its columns. |
 | `enableColumnAutosize` | `boolean` |  | Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead. |
 | `enableRowOrdering` | `boolean` | `false` | Drag-and-drop row reordering (adds a drag-handle column). |
 | `enableRowPinning` | `boolean` | `false` | Row pinning (top) via a pin toggle in the row-number column. |
@@ -88,13 +89,13 @@
 | `onRowDoubleClick` | `(props: RowEvent<TData>) => void` |  | Called when a row is double-clicked. Double-clicks on controls inside the row (edit, expand, pin…) are ignored. |
 | `onCellClick` | `(props: CellEvent<TData>) => void` |  | Fired when a body cell is clicked / double-clicked. |
 | `onCellDoubleClick` | `(props: CellEvent<TData>) => void` |  | Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored. |
-| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. |
+| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls. |
 | `enableColumnVirtualization` | `boolean` | `false` | Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers. |
 | `estimateRowHeight` | `number` | `52` | Estimated row height (px) for the virtualizer. Default 52. |
 | `virtualOverscan` | `number` | `8` | Extra rows rendered above/below the viewport. Default 8. |
 | `rowHeight` | `number` |  | Flat height (px) applied to every row. Overridden per-row by `getRowHeight`. Also seeds the virtualizer estimate. |
 | `getRowHeight` | `(row: DataTableRow<TData>) => number \| "auto" \| null` |  | Per-row height. Return a px number to pin the row, `"auto"` to let it wrap and grow to fit its content (even with column resizing on), or `null` to fall back to `rowHeight` / the density default. Applies to data rows. |
-| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function. |
+| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function. |
 | `columnVirtualizerOptions` | `ColumnVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function. |
 | `rowVirtualizerInstanceRef` | `React.RefObject<DataTableRowVirtualizer \| null>` |  | Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`. |
 | `columnVirtualizerInstanceRef` | `React.RefObject<DataTableColumnVirtualizer \| null>` |  | Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`. |
@@ -109,7 +110,7 @@
 | `paginationDisplayMode` | `PaginationDisplayMode` | `"default"` | Pagination control style: `"default"` (range label + first/prev/next/last buttons), `"pages"` (numbered page buttons), or `"custom"` (render your own via `renderBottomToolbarCustomActions`). Default "default". |
 | `columnFilterDisplayMode` | `ColumnFilterDisplayMode` | `"subheader"` | Where column filter inputs live: `"subheader"` (a filter row under the header, default), `"popover"` (per-column popovers opened from the column header), or `"custom"` (you render them). |
 | `positionGlobalFilter` | `"left" \| "right" \| "none"` | `"right"` | Which toolbar region the global search renders in. Default "right" (the internal-actions cluster). "left" places it next to the title/actions; "none" hides it (same as `enableGlobalFilter: false`). |
-| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "none"` | `"top"` | Where the row-selection alert banner renders. Default "top". |
+| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "head-overlay" \| "none"` | `"top"` | Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`). |
 | `positionToolbarDropZone` | `"top" \| "bottom" \| "both" \| "none"` | `"top"` | Where the group-by drop zone renders (grouping only). Default "top". |
 | `positionActionsColumn` | `"first" \| "last"` | `"last"` | Position of the auto-injected row-actions column. Default "last". |
 | `positionExpandColumn` | `"first" \| "last"` | `"first"` | Position of the auto-injected expand column (tree / detail panel). Default "first". |

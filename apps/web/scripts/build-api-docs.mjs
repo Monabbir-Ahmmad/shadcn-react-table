@@ -224,7 +224,10 @@ const SLOT_DESCRIPTIONS = {
   "data-table-toolbar": "Top toolbar root.",
   "data-table-toolbar-actions":
     "Internal actions cluster (search, filters, density, full screen, …).",
-  "data-table-alert-banner": "Selection alert banner.",
+  "data-table-alert-banner":
+    'Selection alert banner (`data-position="head-overlay"` when it lies over the header row).',
+  "data-table-alert-banner-anchor":
+    'Zero-height sticky holder at the start of the scroll surface that the selection banner lies over the header row from (`positionToolbarAlertBanner: "head-overlay"`).',
   "data-table-bottom-toolbar":
     "Bottom toolbar (custom actions and/or pagination).",
   "data-table-pagination": "Pagination controls.",

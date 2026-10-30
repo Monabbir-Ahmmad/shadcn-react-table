@@ -109,6 +109,67 @@ function ColumnAutosizeExample() {
 }
 ```
 
+## Layout mode and grow
+
+`layoutMode` decides how the table hands out its width, as in Material React Table:
+
+- `"semantic"` (default) — the browser's table layout. Columns with a `size` keep it and the others share what's left.
+- `"grid"` — every column keeps its `size`, and the spare width (the container's width minus the columns' sizes) goes to the growing columns, so the table fills its container. When the columns are wider than the container, nothing grows and the table scrolls.
+- `"grid-no-grow"` — every column keeps its `size` and nothing grows; the table is exactly as wide as its columns.
+
+In grid mode every data column grows by default. Set `meta.grow` on a column to change that: `false` (or `0`) keeps it at its size, and a number sets its share — a column with `grow: 2` takes twice the spare width of one with `grow: 1`. The table's own columns (selection, expand, row numbers, row drag, row pin, row actions) never grow.
+
+```tsx
+const columns = [
+  { accessorKey: "firstName", size: 150 },
+  { accessorKey: "email", size: 220, meta: { grow: 2 } },
+  { accessorKey: "role", size: 130, meta: { grow: false } },
+]
+
+const table = useDataTable({
+  data,
+  columns,
+  layoutMode: "grid",
+  enableColumnResizing: true,
+})
+```
+
+Resizing works in every mode. In grid mode, resizing a growing column starts from the width it shows, and from then on the column keeps the size you gave it (it has a size in `columnSizing`, so it stops growing); the other growing columns take up the difference. Resetting the column (`column.resetSize()`) lets it grow again. A column given a size through `initialState.columnSizing` does not grow either.
+
+Example (`layout-mode`):
+
+```tsx
+function LayoutModeExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const [layoutMode, setLayoutMode] = React.useState<LayoutMode>("grid")
+  const table = useDataTable({
+    data,
+    columns: layoutModeColumns,
+    getRowId: (row) => row.id,
+    layoutMode,
+    enableColumnResizing: true,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 5 } },
+    renderTopToolbarCustomActions: () => (
+      <div className="flex gap-1">
+        {LAYOUT_MODES.map((mode) => (
+          <Button
+            key={mode}
+            size="sm"
+            variant={mode === layoutMode ? "default" : "outline"}
+            aria-pressed={mode === layoutMode}
+            onClick={() => setLayoutMode(mode)}
+          >
+            {mode}
+          </Button>
+        ))}
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).

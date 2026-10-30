@@ -25,6 +25,7 @@ import {
   type DataTableInstance,
   type Density,
   type EditDisplayMode,
+  type LayoutMode,
 } from "@monabbir/shadcn-react-table/components/data-table"
 import { dataTableLocalizationAr } from "@monabbir/shadcn-react-table/components/data-table/locales/ar"
 import { Button } from "@workspace/ui/components/button"
@@ -189,6 +190,47 @@ function ColumnResizingExample() {
   return <DataTable table={table} />
 }
 
+const LAYOUT_MODES: LayoutMode[] = ["semantic", "grid", "grid-no-grow"]
+
+const layoutModeColumns: DataTableColumnDef<User>[] = [
+  { accessorKey: "firstName", header: "First name", size: 150 },
+  { accessorKey: "lastName", header: "Last name", size: 150 },
+  // Takes twice the spare width of the name columns.
+  { accessorKey: "email", header: "Email", size: 220, meta: { grow: 2 } },
+  // Keeps its size.
+  { accessorKey: "role", header: "Role", size: 130, meta: { grow: false } },
+]
+
+function LayoutModeExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const [layoutMode, setLayoutMode] = React.useState<LayoutMode>("grid")
+  const table = useDataTable({
+    data,
+    columns: layoutModeColumns,
+    getRowId: (row) => row.id,
+    layoutMode,
+    enableColumnResizing: true,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 5 } },
+    renderTopToolbarCustomActions: () => (
+      <div className="flex gap-1">
+        {LAYOUT_MODES.map((mode) => (
+          <Button
+            key={mode}
+            size="sm"
+            variant={mode === layoutMode ? "default" : "outline"}
+            aria-pressed={mode === layoutMode}
+            onClick={() => setLayoutMode(mode)}
+          >
+            {mode}
+          </Button>
+        ))}
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
 function ColumnVisibilityExample() {
   const data = React.useMemo(() => baseUsers, [])
   const columns = useUserColumns()
@@ -274,6 +316,20 @@ function RowSelectionExample() {
   return <DataTable table={table} />
 }
 
+function SelectionBannerOverlayExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    positionToolbarAlertBanner: "head-overlay",
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+
 function SingleSelectionExample() {
   const data = React.useMemo(() => baseUsers, [])
   const columns = useUserColumns()
@@ -324,6 +380,30 @@ function RowOrderingExample() {
     columns,
     getRowId: (row) => row.id,
     enableRowOrdering: true,
+    enablePagination: false,
+    onRowOrderChange: (activeId, overId) =>
+      setData((prev) => {
+        const from = prev.findIndex((r) => r.id === activeId)
+        const to = prev.findIndex((r) => r.id === overId)
+        if (from === -1 || to === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(from, 1)
+        if (moved) next.splice(to, 0, moved)
+        return next
+      }),
+  })
+  return <DataTable table={table} />
+}
+
+function VirtualizedRowOrderingExample() {
+  const [data, setData] = React.useState(() => makeUsers(1000))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowOrdering: true,
+    enableRowVirtualization: true,
     enablePagination: false,
     onRowOrderChange: (activeId, overId) =>
       setData((prev) => {
@@ -1563,6 +1643,14 @@ export const EXAMPLES: ExampleDef[] = [
     Component: ColumnResizingExample,
   },
   {
+    slug: "layout-mode",
+    title: "Layout mode",
+    description:
+      "Switch between semantic, grid and grid-no-grow; grow columns by weight.",
+    category: "Columns",
+    Component: LayoutModeExample,
+  },
+  {
     slug: "column-visibility",
     title: "Column visibility",
     description: "Toggle columns from the toolbar or the column-actions menu.",
@@ -1598,6 +1686,13 @@ export const EXAMPLES: ExampleDef[] = [
     Component: RowSelectionExample,
   },
   {
+    slug: "selection-banner-overlay",
+    title: "Selection banner over the header",
+    description: "The selection banner lies over the header row.",
+    category: "Selection & rows",
+    Component: SelectionBannerOverlayExample,
+  },
+  {
     slug: "single-selection",
     title: "Single selection",
     description: "Single-row selection (no select-all).",
@@ -1624,6 +1719,14 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Drag rows to reorder (controlled data).",
     category: "Selection & rows",
     Component: RowOrderingExample,
+  },
+  {
+    slug: "row-ordering-virtualized",
+    title: "Row ordering (virtualized)",
+    description:
+      "Drag rows to reorder in a virtualized table (1,000 rows); it scrolls as you drag.",
+    category: "Selection & rows",
+    Component: VirtualizedRowOrderingExample,
   },
   {
     slug: "grouping",

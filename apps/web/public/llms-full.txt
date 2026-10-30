@@ -452,6 +452,27 @@ const columns: DataTableColumnDef<Person>[] = [
 ]
 ```
 
+### Column helper
+
+`createDataTableColumnHelper` is TanStack's column helper with the table's features filled in. `accessor` infers each column's value type from a key or an accessor function, so `getValue()` in `cell` is typed without annotations, and `meta` takes the table's column options.
+
+```tsx
+import { createDataTableColumnHelper } from "@/components/ui/data-table"
+
+const helper = createDataTableColumnHelper<Person>()
+
+const columns = helper.columns([
+  helper.accessor("name", { header: "Name" }),
+  helper.accessor((row) => row.salary / 12, {
+    id: "monthly",
+    header: "Monthly",
+    cell: ({ getValue }) => getValue().toFixed(0), // getValue(): number
+    meta: { align: "right" },
+  }),
+  helper.display({ id: "actions", cell: ({ row }) => <RowMenu row={row} /> }),
+])
+```
+
 ## App-wide defaults
 
 Wrap a subtree in `DataTableConfigProvider` to set default `icons` and `localization` for every table inside it, without editing each call site:
@@ -652,6 +673,7 @@ MRT puts its own column options on the column definition. Here they live under `
 | `enableClickToCopy` | `meta.enableClickToCopy` |
 | `enableColumnActions` | `meta.enableColumnActions` |
 | `visibleInShowHideMenu` | `meta.visibleInShowHideMenu` |
+| `grow` | `meta.grow` (in `layoutMode: "grid"`, a weight: every data column grows by 1 unless set; see [Column resizing](/docs/guides/column-resizing#layout-mode-and-grow)) |
 | `muiTableHeadCellProps` / `muiTableBodyCellProps` / `muiTableFooterCellProps` | `meta.slotProps.headCell` / `.bodyCell` / `.footerCell` |
 
 ## Component props (`mui*Props`)
@@ -744,7 +766,6 @@ Set the MRT value explicitly to keep the old behavior.
 
 ## Not here (yet)
 
-- `layoutMode` and column `grow`, and the `"head-overlay"` alert banner position.
 - `rowPinningDisplayMode` values `"sticky"` and `"select-sticky"` (rows that stick in place); use `"top-and-bottom"` or `"select-top"`.
 - `enableColumnDragging` as a separate switch.
 - MRT's `enableRowDragging` works through `DataTableDndProvider` and `onRowDragEnd` here; see [Row dragging](/docs/guides/row-dragging).
@@ -1667,6 +1688,67 @@ function ColumnAutosizeExample() {
 }
 ```
 
+## Layout mode and grow
+
+`layoutMode` decides how the table hands out its width, as in Material React Table:
+
+- `"semantic"` (default) — the browser's table layout. Columns with a `size` keep it and the others share what's left.
+- `"grid"` — every column keeps its `size`, and the spare width (the container's width minus the columns' sizes) goes to the growing columns, so the table fills its container. When the columns are wider than the container, nothing grows and the table scrolls.
+- `"grid-no-grow"` — every column keeps its `size` and nothing grows; the table is exactly as wide as its columns.
+
+In grid mode every data column grows by default. Set `meta.grow` on a column to change that: `false` (or `0`) keeps it at its size, and a number sets its share — a column with `grow: 2` takes twice the spare width of one with `grow: 1`. The table's own columns (selection, expand, row numbers, row drag, row pin, row actions) never grow.
+
+```tsx
+const columns = [
+  { accessorKey: "firstName", size: 150 },
+  { accessorKey: "email", size: 220, meta: { grow: 2 } },
+  { accessorKey: "role", size: 130, meta: { grow: false } },
+]
+
+const table = useDataTable({
+  data,
+  columns,
+  layoutMode: "grid",
+  enableColumnResizing: true,
+})
+```
+
+Resizing works in every mode. In grid mode, resizing a growing column starts from the width it shows, and from then on the column keeps the size you gave it (it has a size in `columnSizing`, so it stops growing); the other growing columns take up the difference. Resetting the column (`column.resetSize()`) lets it grow again. A column given a size through `initialState.columnSizing` does not grow either.
+
+Example (`layout-mode`):
+
+```tsx
+function LayoutModeExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const [layoutMode, setLayoutMode] = React.useState<LayoutMode>("grid")
+  const table = useDataTable({
+    data,
+    columns: layoutModeColumns,
+    getRowId: (row) => row.id,
+    layoutMode,
+    enableColumnResizing: true,
+    enableRowSelection: true,
+    initialState: { pagination: { pageSize: 5 } },
+    renderTopToolbarCustomActions: () => (
+      <div className="flex gap-1">
+        {LAYOUT_MODES.map((mode) => (
+          <Button
+            key={mode}
+            size="sm"
+            variant={mode === layoutMode ? "default" : "outline"}
+            aria-pressed={mode === layoutMode}
+            onClick={() => setLayoutMode(mode)}
+          >
+            {mode}
+          </Button>
+        ))}
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
 ## Related
 
 - [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
@@ -1840,6 +1922,40 @@ const table = useDataTable({
 })
 ```
 
+## Where the selection banner shows
+
+`positionToolbarAlertBanner` places the banner with the selected count and **Clear selection**: `"top"` (default, between the toolbar and the table), `"bottom"` (under the table), `"head-overlay"` or `"none"`.
+
+With `"head-overlay"` (as in Material React Table) the banner lies over the header row instead, with the select-all checkbox at its start, so selecting rows never pushes the table down. It stays over a sticky header while the table scrolls, spans the visible width when it scrolls sideways, and goes away when nothing is selected, leaving the header clickable again. If you Tab into a header control while it shows, it steps aside until focus leaves the header row. It needs the table head (`enableTableHead`).
+
+Example (`selection-banner-overlay`):
+
+```tsx
+function SelectionBannerOverlayExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    positionToolbarAlertBanner: "head-overlay",
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowSelection: true,
+  positionToolbarAlertBanner: "head-overlay", // "top" | "bottom" | "head-overlay" | "none"
+})
+```
+
 ## Relevant options
 
 | Name | Type | Default | Description |
@@ -1847,6 +1963,7 @@ const table = useDataTable({
 | `enableSelectAll` | `boolean` | `true` | Show the select-all checkbox in the selection column header. Default true. |
 | `selectAllMode` | `"page" \| "all"` | `"page"` | Select-all scope for the header checkbox: the current page ("page", default) or every row ("all"). |
 | `enableBatchRowSelection` | `boolean` | `true` | Shift-click a row's checkbox to select (or clear) every row since the last one clicked. Default true. |
+| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "head-overlay" \| "none"` | `"top"` | Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`). |
 
 ## Related
 
@@ -1915,7 +2032,51 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-> **Not compatible with virtualization:** Row drag-and-drop is incompatible with row virtualization. Disable virtualization when you enable row ordering.
+## With virtualization
+
+Row ordering works with `enableRowVirtualization`. Drag a row toward the top or bottom edge of the table and it scrolls; the dragged row stays rendered while it moves past the rendered window, so you can drop it anywhere in a long list.
+
+Example (`row-ordering-virtualized`):
+
+```tsx
+function VirtualizedRowOrderingExample() {
+  const [data, setData] = React.useState(() => makeUsers(1000))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowOrdering: true,
+    enableRowVirtualization: true,
+    enablePagination: false,
+    onRowOrderChange: (activeId, overId) =>
+      setData((prev) => {
+        const from = prev.findIndex((r) => r.id === activeId)
+        const to = prev.findIndex((r) => r.id === overId)
+        if (from === -1 || to === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(from, 1)
+        if (moved) next.splice(to, 0, moved)
+        return next
+      }),
+  })
+  return <DataTable table={table} />
+}
+```
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowOrdering: true,
+  enableRowVirtualization: true,
+  enablePagination: false,
+  onRowOrderChange, // as above
+})
+```
+
+> **Custom range extractor:** A `rangeExtractor` passed in `rowVirtualizerOptions` still picks the rendered rows; the table adds the dragged row to its result.
 
 ## Related
 
@@ -4288,7 +4449,7 @@ The row-selection alert banner and the group-by drop zone default to the top. Re
 
 ```tsx
 useDataTable({
-  positionToolbarAlertBanner: "bottom", // "top" | "bottom" | "none"
+  positionToolbarAlertBanner: "bottom", // "top" | "bottom" | "head-overlay" | "none"
   positionToolbarDropZone: "both", // "top" | "bottom" | "both" | "none"
 })
 ```
@@ -4301,7 +4462,7 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 | --- | --- | --- | --- |
 | `data-table-toolbar` |  |  | Top toolbar root. |
 | `data-table-toolbar-actions` |  |  | Internal actions cluster (search, filters, density, full screen, …). |
-| `data-table-alert-banner` |  |  | Selection alert banner. |
+| `data-table-alert-banner` |  |  | Selection alert banner (`data-position="head-overlay"` when it lies over the header row). |
 | `data-table-bottom-toolbar` |  |  | Bottom toolbar (custom actions and/or pagination). |
 | `data-table-pagination` |  |  | Pagination controls. |
 
@@ -6100,9 +6261,10 @@ const table = useDataTable({
 rowVirtualizerRef.current?.scrollToIndex(100)
 ```
 
-> **Row drag-ordering is disabled:** Row virtualization is incompatible with row drag-ordering. If you need to
->   reorder rows by dragging, leave virtualization off. See
->   [Row ordering](/docs/guides/row-ordering).
+> **Dragging rows:** Rows can be dragged with virtualization on (`enableRowOrdering`,
+>   `enableRowDragging`): the table scrolls as you drag toward its edge, and the
+>   dragged row stays rendered. See
+>   [Row ordering](/docs/guides/row-ordering#with-virtualization).
 
 ## Column virtualization
 
@@ -6148,11 +6310,11 @@ return <DataTable table={table} />
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. |
+| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls. |
 | `enableColumnVirtualization` | `boolean` | `false` | Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers. |
 | `estimateRowHeight` | `number` | `52` | Estimated row height (px) for the virtualizer. Default 52. |
 | `virtualOverscan` | `number` | `8` | Extra rows rendered above/below the viewport. Default 8. |
-| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function. |
+| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function. |
 | `columnVirtualizerOptions` | `ColumnVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function. |
 | `rowVirtualizerInstanceRef` | `React.RefObject<DataTableRowVirtualizer \| null>` |  | Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`. |
 | `columnVirtualizerInstanceRef` | `React.RefObject<DataTableColumnVirtualizer \| null>` |  | Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`. |
@@ -6802,6 +6964,7 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 | `enableColumnOrdering` | `boolean` | `false` | Drag-and-drop column reordering (adds a grip to each header). |
 | `enableColumnPinning` | `boolean` | `false` | Column pinning (left/right) via the column-actions menu + sticky columns. |
 | `enableColumnResizing` | `boolean` | `false` | Column resizing via an edge drag handle. |
+| `layoutMode` | `LayoutMode` | `"semantic"` | How the table sizes its columns. `"semantic"` (default) uses the browser's table layout. `"grid"` keeps every column at its size and shares the spare width between the growing columns by weight (see the column's `meta.grow`; the table's own columns never grow), so the table fills its container. `"grid-no-grow"` keeps every column at its size and the table as wide as its columns. |
 | `enableColumnAutosize` | `boolean` |  | Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead. |
 | `enableRowOrdering` | `boolean` | `false` | Drag-and-drop row reordering (adds a drag-handle column). |
 | `enableRowPinning` | `boolean` | `false` | Row pinning (top) via a pin toggle in the row-number column. |
@@ -6842,13 +7005,13 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 | `onRowDoubleClick` | `(props: RowEvent<TData>) => void` |  | Called when a row is double-clicked. Double-clicks on controls inside the row (edit, expand, pin…) are ignored. |
 | `onCellClick` | `(props: CellEvent<TData>) => void` |  | Fired when a body cell is clicked / double-clicked. |
 | `onCellDoubleClick` | `(props: CellEvent<TData>) => void` |  | Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored. |
-| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. |
+| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls. |
 | `enableColumnVirtualization` | `boolean` | `false` | Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers. |
 | `estimateRowHeight` | `number` | `52` | Estimated row height (px) for the virtualizer. Default 52. |
 | `virtualOverscan` | `number` | `8` | Extra rows rendered above/below the viewport. Default 8. |
 | `rowHeight` | `number` |  | Flat height (px) applied to every row. Overridden per-row by `getRowHeight`. Also seeds the virtualizer estimate. |
 | `getRowHeight` | `(row: DataTableRow<TData>) => number \| "auto" \| null` |  | Per-row height. Return a px number to pin the row, `"auto"` to let it wrap and grow to fit its content (even with column resizing on), or `null` to fall back to `rowHeight` / the density default. Applies to data rows. |
-| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function. |
+| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function. |
 | `columnVirtualizerOptions` | `ColumnVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function. |
 | `rowVirtualizerInstanceRef` | `React.RefObject<DataTableRowVirtualizer \| null>` |  | Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`. |
 | `columnVirtualizerInstanceRef` | `React.RefObject<DataTableColumnVirtualizer \| null>` |  | Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`. |
@@ -6863,7 +7026,7 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 | `paginationDisplayMode` | `PaginationDisplayMode` | `"default"` | Pagination control style: `"default"` (range label + first/prev/next/last buttons), `"pages"` (numbered page buttons), or `"custom"` (render your own via `renderBottomToolbarCustomActions`). Default "default". |
 | `columnFilterDisplayMode` | `ColumnFilterDisplayMode` | `"subheader"` | Where column filter inputs live: `"subheader"` (a filter row under the header, default), `"popover"` (per-column popovers opened from the column header), or `"custom"` (you render them). |
 | `positionGlobalFilter` | `"left" \| "right" \| "none"` | `"right"` | Which toolbar region the global search renders in. Default "right" (the internal-actions cluster). "left" places it next to the title/actions; "none" hides it (same as `enableGlobalFilter: false`). |
-| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "none"` | `"top"` | Where the row-selection alert banner renders. Default "top". |
+| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "head-overlay" \| "none"` | `"top"` | Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`). |
 | `positionToolbarDropZone` | `"top" \| "bottom" \| "both" \| "none"` | `"top"` | Where the group-by drop zone renders (grouping only). Default "top". |
 | `positionActionsColumn` | `"first" \| "last"` | `"last"` | Position of the auto-injected row-actions column. Default "last". |
 | `positionExpandColumn` | `"first" \| "last"` | `"first"` | Position of the auto-injected expand column (tree / detail panel). Default "first". |
@@ -6927,6 +7090,7 @@ const columns: DataTableColumnDef<Person>[] = [
 | `validate` | `(value: unknown) => string \| undefined` |  | Validate an edited value; return an error message or undefined if valid. |
 | `enableClickToCopy` | `ClickToCopyOption<TData>` |  | Copy this column's cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function. |
 | `align` | `"left" \| "center" \| "right"` |  | Horizontal alignment applied to the header label and body cells. |
+| `grow` | `boolean \| number` |  | In `layoutMode: "grid"`, whether this column takes a share of the spare width (`true`, the default for data columns), keeps its size (`false` or 0), or how large its share is (a number: 2 takes twice the share of a column with 1). A column the user has resized (one with a size in `columnSizing`) keeps that size. |
 | `enableFilterMatchHighlighting` | `boolean` |  | `false` opts this column out of match highlighting (the table option of the same name turns it on or off for every column). |
 | `visibleInShowHideMenu` | `boolean` |  | `false` leaves this column out of the show / hide columns menu. |
 | `enableColumnActions` | `boolean` |  | `false` hides the column-actions menu for this column. |
@@ -7018,6 +7182,7 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `enableColumnOrdering` | `boolean` |  | Drag-and-drop column reordering (adds a grip to each header). |
 | `enableColumnPinning` | `boolean` |  | Column pinning (left/right) via the column-actions menu + sticky columns. |
 | `enableColumnResizing` | `boolean` |  | Column resizing via an edge drag handle. |
+| `layoutMode` | `LayoutMode` |  | How the table sizes its columns (see {@link LayoutMode}). |
 | `enableColumnAutosize` | `boolean` |  | Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead. |
 | `enableRowOrdering` | `boolean` |  | Drag-and-drop row reordering (adds a drag-handle column). |
 | `enableRowPinning` | `boolean` |  | Row pinning (top) via a pin toggle in the row-number column. |
@@ -7062,13 +7227,13 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `onCellClick` | `(props: CellEvent<TData>) => void` |  | Fired when a body cell is clicked / double-clicked. |
 | `onCellDoubleClick` | `(props: CellEvent<TData>) => void` |  | Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored. |
 | `refs` | `DataTableRefs` |  | DOM refs to the table's structural elements (populated after mount). |
-| `enableRowVirtualization` | `boolean` |  | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. |
+| `enableRowVirtualization` | `boolean` |  | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls. |
 | `enableColumnVirtualization` | `boolean` |  | Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers. |
 | `estimateRowHeight` | `number` |  | Estimated row height (px) for the virtualizer. Default 52. |
 | `virtualOverscan` | `number` |  | Extra rows rendered above/below the viewport. Default 8. |
 | `rowHeight` | `number` |  | Flat height (px) applied to every row. |
 | `getRowHeight` | `(row: DataTableRow<TData>) => number \| "auto" \| null` |  | Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default. |
-| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function. |
+| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function. |
 | `columnVirtualizerOptions` | `ColumnVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function. |
 | `rowVirtualizerInstanceRef` | `React.RefObject<DataTableRowVirtualizer \| null>` |  | Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`. |
 | `columnVirtualizerInstanceRef` | `React.RefObject<DataTableColumnVirtualizer \| null>` |  | Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`. |
@@ -7085,9 +7250,11 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `slotProps` | `DataTableSlots<TData> \| undefined` |  | Props for the table's parts; see the `slotProps` option. |
 | `columnFilterDisplayMode` | `ColumnFilterDisplayMode` |  | Where column filter inputs live: `"subheader"` (a filter row under the header, default), `"popover"` (per-column popovers opened from the column header), or `"custom"` (you render them). |
 | `positionGlobalFilter` | `"left" \| "right" \| "none"` |  | Which toolbar region the global search renders in. Default "right" (the internal-actions cluster). "left" places it next to the title/actions; "none" hides it (same as `enableGlobalFilter: false`). |
-| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "none"` |  | Where the row-selection alert banner renders. Default "top". |
+| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "head-overlay" \| "none"` |  | Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`). |
 | `positionToolbarDropZone` | `"top" \| "bottom" \| "both" \| "none"` |  | Where the group-by drop zone renders (grouping only). Default "top". |
 | `enableRowSelection` | `boolean` |  | Whether rows can be selected. |
+| `selectAllMode` | `"page" \| "all"` |  | Select-all scope for the header checkbox: the current page ("page", default) or every row ("all"). |
+| `enableSelectAll` | `boolean` |  | Show the select-all checkbox in the selection column header. Default true. |
 | `enableBatchRowSelection` | `boolean` |  | Shift-click a row's checkbox to select or clear the range since the last click. |
 | `enableTopToolbar` | `boolean` |  | Shows the toolbar above the table (title, search, filters, view options). Default `true`. |
 | `enableBottomToolbar` | `boolean` |  | Shows the toolbar below the table (pagination, custom actions). Default `true`. |

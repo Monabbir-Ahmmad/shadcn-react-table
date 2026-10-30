@@ -11,7 +11,6 @@ import { cn } from "@workspace/ui/lib/utils"
 import {
   ALIGN_CELL,
   BODY_CELL_CLASS,
-  BODY_ROW_CLASS,
   CELL_PADDING_Y,
   NON_DATA_COLUMN_IDS,
 } from "../../core/constants"
@@ -206,6 +205,13 @@ export function DataTableBody<TData extends RowData>({
   }
 
   const dndId = useDndId()
+  // The rows' drag ids, in order. A virtualized body sorts against every
+  // row, rendered or not, so it is built when the rows change, not on each
+  // scroll frame.
+  const sortableIds = React.useMemo(
+    () => centerRows.map((row) => dndId(row.id)),
+    [centerRows, dndId]
+  )
 
   const renderCell = (
     cell: DataTableCell<TData, unknown>,
@@ -410,6 +416,10 @@ export function DataTableBody<TData extends RowData>({
     />
   )
 
+  const rowDnd = !!(enableRowOrdering || enableRowDragging)
+  const isRowDraggable = (row: DataTableRow<TData>) =>
+    rowDnd && !row.getIsPinned() && !row.getIsGrouped()
+
   const renderRowContent = (row: DataTableRow<TData>, rowIndex: number) => {
     const isGrouped = row.getIsGrouped()
     const showDetail = !!renderDetailPanel && row.getIsExpanded() && !isGrouped
@@ -419,12 +429,7 @@ export function DataTableBody<TData extends RowData>({
         <DataTableBodyRow
           {...bodyRowProps(row, rowIndex)}
           row={row}
-          draggable={
-            (enableRowOrdering || enableRowDragging) &&
-            !enableRowVirtualization &&
-            !row.getIsPinned() &&
-            !isGrouped
-          }
+          draggable={isRowDraggable(row)}
         >
           {renderCells(row, rowIndex)}
         </DataTableBodyRow>
@@ -506,82 +511,86 @@ export function DataTableBody<TData extends RowData>({
             {!stickyPins && topRows.map((row, i) => renderRow(row, i))}
             {(() => {
               const vRows = rowVirtualizer.getVirtualItems()
-              const padTop = vRows.length ? (vRows[0]?.start ?? 0) : 0
-              const padBottom = vRows.length
-                ? rowVirtualizer.getTotalSize() -
-                  (vRows[vRows.length - 1]?.end ?? 0)
-                : 0
-              return (
-                <>
-                  {padTop > 0 && (
-                    <tr aria-hidden>
-                      <td
-                        colSpan={visibleColumnCount}
-                        style={{ height: padTop, padding: 0, border: 0 }}
-                      />
-                    </tr>
-                  )}
-                  {vRows.map((vRow) => {
-                    const item = virtualItems[vRow.index]
-                    if (!item) return null
-                    if (item.detail) {
-                      return (
-                        <TableRow
-                          key={`${item.row.id}-detail`}
-                          {...detailRowProps(item.row)}
-                          data-index={vRow.index}
-                          ref={rowVirtualizer.measureElement}
-                          className="hover:bg-transparent"
-                        >
-                          <TableCell {...detailCellProps(item.row)}>
-                            <div className="p-3">
-                              {renderDetailPanel?.({ row: item.row, table })}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    }
-                    const rowIndex = centerOffset + item.index
-                    return (
-                      <MemoRow
-                        key={item.row.id}
-                        stateKey={`${item.row.id}@${rowIndex}`}
-                        rowKey={[item.row, rowIndex, vRow.index]}
-                        selectRowState={() => rowState(item.row)}
-                        tableDeps={tableDeps}
-                        render={() => (
-                          <TableRow
-                            {...mergeProps(
-                              {
-                                "data-index": vRow.index,
-                                ref: rowVirtualizer.measureElement,
-                                "data-state": item.row.getIsSelected()
-                                  ? "selected"
-                                  : undefined,
-                                className: cn(
-                                  BODY_ROW_CLASS,
-                                  (onRowClick || onRowDoubleClick) &&
-                                    "cursor-pointer"
-                                ),
-                              } as React.ComponentProps<"tr">,
-                              bodyRowProps(item.row, rowIndex)
-                            )}
-                          >
-                            {renderCells(item.row, rowIndex)}
-                          </TableRow>
-                        )}
-                      />
+              // A spacer stands in for each run of skipped rows: before the
+              // window, after it, and between the window and a dragged row
+              // kept rendered outside it (see useTableVirtualizers).
+              const spacer = (key: string, height: number) => (
+                <tr key={key} aria-hidden>
+                  <td
+                    colSpan={visibleColumnCount}
+                    style={{ height, padding: 0, border: 0 }}
+                  />
+                </tr>
+              )
+              const nodes: React.ReactNode[] = []
+              let end = 0
+              vRows.forEach((vRow, i) => {
+                if (vRow.start > end) {
+                  nodes.push(
+                    spacer(
+                      i === 0 ? "gap-start" : `gap-${vRow.index}`,
+                      vRow.start - end
                     )
-                  })}
-                  {padBottom > 0 && (
-                    <tr aria-hidden>
-                      <td
-                        colSpan={visibleColumnCount}
-                        style={{ height: padBottom, padding: 0, border: 0 }}
-                      />
-                    </tr>
-                  )}
-                </>
+                  )
+                }
+                end = vRow.end
+                const item = virtualItems[vRow.index]
+                if (!item) return
+                if (item.detail) {
+                  nodes.push(
+                    <TableRow
+                      key={`${item.row.id}-detail`}
+                      {...detailRowProps(item.row)}
+                      data-index={vRow.index}
+                      ref={rowVirtualizer.measureElement}
+                      className="hover:bg-transparent"
+                    >
+                      <TableCell {...detailCellProps(item.row)}>
+                        <div className="p-3">
+                          {renderDetailPanel?.({ row: item.row, table })}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                  return
+                }
+                const rowIndex = centerOffset + item.index
+                nodes.push(
+                  <MemoRow
+                    key={item.row.id}
+                    stateKey={`${item.row.id}@${rowIndex}`}
+                    rowKey={[item.row, rowIndex, vRow.index]}
+                    selectRowState={() => rowState(item.row)}
+                    tableDeps={tableDeps}
+                    render={() => (
+                      <DataTableBodyRow
+                        {...mergeProps(
+                          {
+                            "data-index": vRow.index,
+                            ref: rowVirtualizer.measureElement,
+                          } as React.ComponentProps<"tr">,
+                          bodyRowProps(item.row, rowIndex)
+                        )}
+                        row={item.row}
+                        draggable={isRowDraggable(item.row)}
+                      >
+                        {renderCells(item.row, rowIndex)}
+                      </DataTableBodyRow>
+                    )}
+                  />
+                )
+              })
+              const total = rowVirtualizer.getTotalSize()
+              if (vRows.length && total > end) {
+                nodes.push(spacer("gap-end", total - end))
+              }
+              return (
+                <SortableContext
+                  items={sortableIds}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {nodes}
+                </SortableContext>
               )
             })()}
             {!stickyPins &&
@@ -591,7 +600,7 @@ export function DataTableBody<TData extends RowData>({
           <>
             {!stickyPins && topRows.map((row, i) => renderRow(row, i))}
             <SortableContext
-              items={centerRows.map((row) => dndId(row.id))}
+              items={sortableIds}
               strategy={verticalListSortingStrategy}
             >
               {renderCenterRows()}

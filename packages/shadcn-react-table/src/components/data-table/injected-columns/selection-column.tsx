@@ -61,6 +61,43 @@ function toggleRow<TData extends RowData>(
 }
 
 /**
+ * The select-all checkbox (indeterminate while some rows are selected) of the
+ * selection column's header; the selection banner over the header row
+ * (`positionToolbarAlertBanner: "head-overlay"`) shows the same one.
+ * `selectAllMode` toggles the current page ("page") or every row ("all").
+ */
+export function SelectAllCheckbox<TData extends RowData>({
+  table,
+  label,
+  selectAllMode,
+}: {
+  table: DataTableCoreTable<TData>
+  label: string
+  selectAllMode: "page" | "all"
+}) {
+  const allMode = selectAllMode === "all"
+  const allSelected = allMode
+    ? table.getIsAllRowsSelected()
+    : table.getIsAllPageRowsSelected()
+  const someSelected = allMode
+    ? table.getIsSomeRowsSelected()
+    : table.getIsSomePageRowsSelected()
+  return (
+    <SelectionCheckbox
+      {...getSlotProps(table as never, "selectCheckbox", {})}
+      aria-label={label}
+      checked={allSelected}
+      indeterminate={someSelected && !allSelected}
+      onCheckedChange={(value) =>
+        allMode
+          ? table.toggleAllRowsSelected(!!value)
+          : table.toggleAllPageRowsSelected(!!value)
+      }
+    />
+  )
+}
+
+/**
  * Builds the auto-injected selection column. The header carries the
  * select-all checkbox (with indeterminate state) for multi-select tables; for
  * single-select tables the header is empty. `selectAllMode` selects the current
@@ -87,29 +124,16 @@ export function createSelectionColumn<TData extends RowData>(
       // the header still names the column for screen readers.
       if (!enableSelectAll || table.options.enableMultiRowSelection === false)
         return <span className="sr-only">{localization.selectRow}</span>
-      const allMode = selectAllMode === "all"
-      const allSelected = allMode
-        ? table.getIsAllRowsSelected()
-        : table.getIsAllPageRowsSelected()
-      const someSelected = allMode
-        ? table.getIsSomeRowsSelected()
-        : table.getIsSomePageRowsSelected()
       return (
         <div
           className="flex items-center justify-center"
           onClick={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >
-          <SelectionCheckbox
-            {...getSlotProps(table as never, "selectCheckbox", {})}
-            aria-label={localization.selectAll}
-            checked={allSelected}
-            indeterminate={someSelected && !allSelected}
-            onCheckedChange={(value) =>
-              allMode
-                ? table.toggleAllRowsSelected(!!value)
-                : table.toggleAllPageRowsSelected(!!value)
-            }
+          <SelectAllCheckbox
+            table={table as unknown as DataTableCoreTable<TData>}
+            label={localization.selectAll}
+            selectAllMode={selectAllMode}
           />
         </div>
       )

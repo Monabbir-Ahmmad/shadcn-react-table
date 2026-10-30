@@ -11,13 +11,17 @@ import { getSlotProps, mergeProps } from "../helpers/slot-props"
 
 import { DataTableBody } from "../components/body/data-table-body"
 import { DataTableRowMotion } from "../components/body/row-motion"
+import { DraggedRowTracker } from "../components/body/dnd"
 import {
   DataTableFooter,
   hasFooter,
 } from "../components/body/data-table-footer"
 import { DataTableEditModal } from "../components/editing/data-table-edit-modal"
 import { DataTableHeader } from "../components/head/data-table-header"
-import { DataTableAlertBanner } from "../components/toolbar/data-table-alert-banner"
+import {
+  DataTableAlertBanner,
+  DataTableHeadOverlayBanner,
+} from "../components/toolbar/data-table-alert-banner"
 import { DataTableBottomToolbar } from "../components/toolbar/data-table-bottom-toolbar"
 import { DataTableDropToGroupZone } from "../components/toolbar/data-table-grouping"
 import { DataTablePagination } from "../components/toolbar/data-table-pagination"
@@ -41,7 +45,8 @@ import { useTableState } from "../hooks/use-table-state"
 import { useFullscreenModal } from "../hooks/use-fullscreen-modal"
 import { useRowPinningDisplay } from "../hooks/use-row-pinning-display"
 import { getDataRowCount, getHeaderRowCount } from "../helpers/grid-rows"
-import { getColumnSizeVars } from "../utils/column-styles"
+import { getColumnSizeVars, TABLE_GROW_VAR } from "../utils/column-styles"
+import { useColumnGrow } from "../hooks/use-column-grow"
 import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
@@ -65,6 +70,7 @@ import { usePresence } from "../hooks/use-presence"
 // draft, so it is not one of them.
 const ToolbarRegion = region(DataTableToolbar)
 const AlertBannerRegion = region(DataTableAlertBanner)
+const HeadOverlayBannerRegion = region(DataTableHeadOverlayBanner)
 const PaginationRegion = region(DataTablePagination)
 const BottomToolbarRegion = region(DataTableBottomToolbar)
 const DropToGroupZoneRegion = region(DataTableDropToGroupZone)
@@ -145,10 +151,13 @@ export function DataTable<TData extends RowData>({
     direction,
     setDirection,
     enableColumnVirtualization,
+    layoutMode,
     localization,
     renderCaption,
     renderTopToolbar,
   } = dt(table)
+  // The grid modes size every column from the size vars (fixed layout).
+  const isGridLayout = layoutMode === "grid" || layoutMode === "grid-no-grow"
   const { refs } = table.dataTable
   const animate = useAnimationsActive(enableAnimations)
   // The drop zones slide in and fade out when grouping turns on or off;
@@ -258,6 +267,9 @@ export function DataTable<TData extends RowData>({
       },
     })
   }, [dndScope, dndKey])
+  // The row being dragged, kept rendered by the row virtualizer while the
+  // drag scrolls it out of the window (see DraggedRowTracker).
+  const [draggedRowId, setDraggedRowId] = React.useState<string | null>(null)
   const {
     rowVirtualizer,
     columnVirtualizer,
@@ -265,7 +277,7 @@ export function DataTable<TData extends RowData>({
     virtualColumns,
     withColumnSpacers,
     withHeaderSpacers,
-  } = useTableVirtualizers(table, gridRef)
+  } = useTableVirtualizers(table, gridRef, draggedRowId)
 
   // Keyboard navigation works on display indexes (top, center, bottom rows;
   // visible leaf columns), which it maps back to the virtualizers' indexes to
@@ -336,15 +348,43 @@ export function DataTable<TData extends RowData>({
 
   const columnSizing = table.getState().columnSizing
   const columnSizingInfo = table.getState().columnSizingInfo
+  const flatHeaders = table.getFlatHeaders()
+  const useSizeVars = enableColumnResizing || isGridLayout
   const columnSizeVars = React.useMemo(
-    () => (enableColumnResizing ? getColumnSizeVars(table) : {}),
-    // columnSizing/Info are intentional triggers: recompute vars on resize.
+    () => (useSizeVars ? getColumnSizeVars(table) : {}),
+    // columnSizing/Info are intentional triggers: recompute vars on resize;
+    // the headers change when columns are shown, hidden or replaced.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [enableColumnResizing, table, columnSizing, columnSizingInfo]
+    [useSizeVars, table, columnSizing, columnSizingInfo, flatHeaders]
   )
+  useColumnGrow(table, gridRef, layoutMode === "grid")
+  const totalSize = table.getTotalSize()
+  // Fixed layout makes per-column widths authoritative (auto layout would
+  // stretch/redistribute them and ignore a resize). In grid mode the table is
+  // its columns' sizes plus the spare width they grew by (`--table-grow`,
+  // see `useColumnGrow`); without grow, just their sizes. With resizing in
+  // semantic mode, `max(100%, totalSize)` keeps the table at least as wide as
+  // the surface: when the columns are narrower than the surface, fixed layout
+  // distributes the slack proportionally so they fill it (no trailing empty
+  // space); when they outgrow the surface, the table exceeds 100% and scrolls
+  // horizontally.
+  const tableWidth =
+    layoutMode === "grid"
+      ? `calc((${totalSize} + var(${TABLE_GROW_VAR}, 0)) * 1px)`
+      : layoutMode === "grid-no-grow"
+        ? `${totalSize}px`
+        : enableColumnResizing
+          ? `max(100%, ${totalSize}px)`
+          : undefined
 
   const dndContent = (
     <>
+      {enableRowVirtualization && (
+        <DraggedRowTracker
+          tableKey={dndScope ? dndKey : null}
+          onChange={setDraggedRowId}
+        />
+      )}
       {zoneTop.present && (
         <DropToGroupZoneRegion
           table={table}
@@ -393,6 +433,12 @@ export function DataTable<TData extends RowData>({
           getSlotProps(table, "surface", {})
         )}
       >
+        {/* First in the surface: a zero-height sticky anchor, so the banner
+            over the header row takes no room and comes before the header in
+            the Tab order. */}
+        {positionToolbarAlertBanner === "head-overlay" && enableTableHead && (
+          <HeadOverlayBannerRegion table={table} config={dt(table)} />
+        )}
         {animate && (
           <div
             data-slot="data-table-motion-layer"
@@ -447,18 +493,9 @@ export function DataTable<TData extends RowData>({
               "aria-busy": isBusy || undefined,
               style: {
                 ...columnSizeVars,
-                // Fixed layout makes per-column widths authoritative (auto
-                // layout would stretch/redistribute them and ignore a resize).
-                // `max(100%, totalSize)` keeps the table at least as wide as the
-                // surface: when the columns are narrower than the surface, fixed
-                // layout distributes the slack proportionally so they fill it
-                // (no trailing empty space); when they outgrow the surface, the
-                // table exceeds 100% and scrolls horizontally.
-                ...(enableColumnResizing
-                  ? { width: `max(100%, ${table.getTotalSize()}px)` }
-                  : null),
+                ...(tableWidth ? { width: tableWidth } : null),
               },
-              className: cn(enableColumnResizing && "table-fixed"),
+              className: cn(useSizeVars && "table-fixed"),
             } as React.ComponentProps<"table">,
             getSlotProps(table, "table", {})
           )}

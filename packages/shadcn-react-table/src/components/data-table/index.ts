@@ -7,6 +7,10 @@
 
 export { DataTable } from "./core/data-table"
 export { useDataTable } from "./core/use-data-table"
+export {
+  createDataTableColumnHelper,
+  type DataTableColumnHelper,
+} from "./helpers/column-helper"
 export { DataTableProvider, useDataTableInstance } from "./core/table-context"
 export {
   DataTableDndProvider,
@@ -64,6 +68,7 @@ export type {
   EditDisplayMode,
   EditVariant,
   EditingCell,
+  LayoutMode,
   RowEvent,
   CellEvent,
   DataTableRefs,

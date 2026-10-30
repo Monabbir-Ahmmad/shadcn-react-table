@@ -86,6 +86,27 @@ const columns: DataTableColumnDef<Person>[] = [
 ]
 ```
 
+### Column helper
+
+`createDataTableColumnHelper` is TanStack's column helper with the table's features filled in. `accessor` infers each column's value type from a key or an accessor function, so `getValue()` in `cell` is typed without annotations, and `meta` takes the table's column options.
+
+```tsx
+import { createDataTableColumnHelper } from "@/components/ui/data-table"
+
+const helper = createDataTableColumnHelper<Person>()
+
+const columns = helper.columns([
+  helper.accessor("name", { header: "Name" }),
+  helper.accessor((row) => row.salary / 12, {
+    id: "monthly",
+    header: "Monthly",
+    cell: ({ getValue }) => getValue().toFixed(0), // getValue(): number
+    meta: { align: "right" },
+  }),
+  helper.display({ id: "actions", cell: ({ row }) => <RowMenu row={row} /> }),
+])
+```
+
 ## App-wide defaults
 
 Wrap a subtree in `DataTableConfigProvider` to set default `icons` and `localization` for every table inside it, without editing each call site:

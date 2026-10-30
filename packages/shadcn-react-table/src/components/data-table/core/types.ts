@@ -173,6 +173,15 @@ export interface EditingCell {
 /** Edit-field variants for the inline editors. */
 export type EditVariant = "text" | "number" | "select"
 
+/** How the table sizes its columns (see `layoutMode`):
+ *  - `"semantic"` (default): the browser's table layout; columns with a
+ *    `size` keep it and the others share the rest of the width.
+ *  - `"grid"`: every column keeps its size and the spare width goes to the
+ *    growing columns (`meta.grow`), by weight.
+ *  - `"grid-no-grow"`: every column keeps its size and nothing grows; the
+ *    table is as wide as its columns. */
+export type LayoutMode = "semantic" | "grid" | "grid-no-grow"
+
 // Per-column configuration carried on `columnDef.meta`. Augments the TanStack
 // `ColumnMeta` interface so it is strongly typed everywhere `meta` is read.
 declare module "@tanstack/react-table" {
@@ -254,6 +263,12 @@ declare module "@tanstack/react-table" {
     enableClickToCopy?: ClickToCopyOption<TData>
     /** Horizontal alignment applied to the header label and body cells. */
     align?: "left" | "center" | "right"
+    /** In `layoutMode: "grid"`, whether this column takes a share of the
+     *  spare width (`true`, the default for data columns), keeps its size
+     *  (`false` or 0), or how large its share is (a number: 2 takes twice
+     *  the share of a column with 1). A column the user has resized (one with
+     *  a size in `columnSizing`) keeps that size. */
+    grow?: boolean | number
     /** `false` opts this column out of match highlighting (the table option of
      *  the same name turns it on or off for every column). */
     enableFilterMatchHighlighting?: boolean
@@ -625,6 +640,8 @@ export interface DataTableConfig<TData extends RowData> {
   enableColumnOrdering: boolean
   enableColumnPinning: boolean
   enableColumnResizing: boolean
+  /** How the table sizes its columns (see {@link LayoutMode}). */
+  layoutMode: LayoutMode
   enableColumnAutosize: boolean
   /** Resize a single column to fit its widest visible value (header + data). */
   autoSizeColumn: (columnId: string) => void
@@ -807,10 +824,12 @@ export interface DataTableConfig<TData extends RowData> {
   slotProps: DataTableSlots<TData> | undefined
   columnFilterDisplayMode: ColumnFilterDisplayMode
   positionGlobalFilter: "left" | "right" | "none"
-  positionToolbarAlertBanner: "top" | "bottom" | "none"
+  positionToolbarAlertBanner: "top" | "bottom" | "head-overlay" | "none"
   positionToolbarDropZone: "top" | "bottom" | "both" | "none"
   /** Whether rows can be selected. */
   enableRowSelection: boolean
+  selectAllMode: "page" | "all"
+  enableSelectAll: boolean
   /** Shift-click a row's checkbox to select or clear the range since the
    *  last click. */
   enableBatchRowSelection: boolean
@@ -1021,6 +1040,15 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Column resizing via an edge drag handle. */
   enableColumnResizing?: boolean
   /**
+   * How the table sizes its columns. `"semantic"` (default) uses the
+   * browser's table layout. `"grid"` keeps every column at its size and
+   * shares the spare width between the growing columns by weight (see the
+   * column's `meta.grow`; the table's own columns never grow), so the table
+   * fills its container. `"grid-no-grow"` keeps every column at its size and
+   * the table as wide as its columns.
+   */
+  layoutMode?: LayoutMode
+  /**
    * Double-clicking a column's resize handle auto-sizes it to fit its widest
    * value. Defaults to `enableColumnResizing`. When off, double-click resets
    * the column to its default size instead.
@@ -1202,7 +1230,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
 
   /** Virtualize body rows for large datasets (recommended past ~100 rows).
    *  The table surface becomes the scroll container — give it a bounded height
-   *  via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. */
+   *  via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be
+   *  dragged: the dragged row stays rendered while the drag scrolls. */
   enableRowVirtualization?: boolean
   /** Virtualize columns for very wide tables. Applies fixed column widths;
    *  works with column pinning (pinned columns stay rendered), column
@@ -1221,7 +1250,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   getRowHeight?: (row: DataTableRow<TData>) => number | "auto" | null
   /** Partial `@tanstack/react-virtual` options merged into the row virtualizer
    *  (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`).
-   *  Accepts an object or a `({ table }) => options` function. */
+   *  A `rangeExtractor` picks the rendered rows; a row being dragged is added
+   *  to its result. Accepts an object or a `({ table }) => options` function. */
   rowVirtualizerOptions?: RowVirtualizerOptions<TData>
   /** Partial `@tanstack/react-virtual` options merged into the column
    *  virtualizer. Accepts an object or a `({ table }) => options` function. */
@@ -1272,8 +1302,11 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  internal-actions cluster). "left" places it next to the title/actions;
    *  "none" hides it (same as `enableGlobalFilter: false`). */
   positionGlobalFilter?: "left" | "right" | "none"
-  /** Where the row-selection alert banner renders. Default "top". */
-  positionToolbarAlertBanner?: "top" | "bottom" | "none"
+  /** Where the row-selection alert banner renders: above the table
+   *  (`"top"`, default), below it (`"bottom"`), over the header row
+   *  (`"head-overlay"`, with the select-all checkbox, so selecting rows does
+   *  not move the table; needs the table head), or nowhere (`"none"`). */
+  positionToolbarAlertBanner?: "top" | "bottom" | "head-overlay" | "none"
   /** Where the group-by drop zone renders (grouping only). Default "top". */
   positionToolbarDropZone?: "top" | "bottom" | "both" | "none"
   /** Position of the auto-injected row-actions column. Default "last". */

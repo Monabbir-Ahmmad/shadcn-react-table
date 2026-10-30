@@ -50,6 +50,11 @@ export const EXAMPLE_META: { slug: string; title: string; category: string }[] =
       category: "Columns",
     },
     {
+      slug: "layout-mode",
+      title: "Layout mode",
+      category: "Columns",
+    },
+    {
       slug: "column-visibility",
       title: "Column visibility",
       category: "Columns",
@@ -75,6 +80,11 @@ export const EXAMPLE_META: { slug: string; title: string; category: string }[] =
       category: "Selection & rows",
     },
     {
+      slug: "selection-banner-overlay",
+      title: "Selection banner over the header",
+      category: "Selection & rows",
+    },
+    {
       slug: "single-selection",
       title: "Single selection",
       category: "Selection & rows",
@@ -92,6 +102,11 @@ export const EXAMPLE_META: { slug: string; title: string; category: string }[] =
     {
       slug: "row-ordering",
       title: "Row ordering",
+      category: "Selection & rows",
+    },
+    {
+      slug: "row-ordering-virtualized",
+      title: "Row ordering (virtualized)",
       category: "Selection & rows",
     },
     {
