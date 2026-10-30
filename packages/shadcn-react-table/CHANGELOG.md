@@ -86,6 +86,9 @@ for every rename.
 
 ### New
 
+- **New:** a custom `cell` renderer gets `renderedCellValue`: the cell's
+  value with its matches to the global search or a column filter marked (as
+  in Material React Table), so custom cells keep the match highlighting.
 - **New:** drag rows between tables and onto drop zones:
   `DataTableDndProvider`, `enableRowDragging`, `onRowDragEnd({ row, table,
   over })` and `useDataTableDropZone(id)`, with keyboard support, a floating

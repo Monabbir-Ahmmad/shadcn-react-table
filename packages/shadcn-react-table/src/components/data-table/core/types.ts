@@ -176,6 +176,21 @@ export type EditVariant = "text" | "number" | "select"
 // Per-column configuration carried on `columnDef.meta`. Augments the TanStack
 // `ColumnMeta` interface so it is strongly typed everywhere `meta` is read.
 declare module "@tanstack/react-table" {
+  // The type parameters must match TanStack's for the declarations to merge.
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  interface CellContext<
+    in out TFeatures extends TableFeatures,
+    in out TData extends RowData,
+    TValue extends CellData = CellData,
+  > {
+    /** The cell's value with its matches to the global search or a column
+     *  filter marked (MRT's `renderedCellValue`): render it in a custom
+     *  `cell` to keep the highlighting. The plain value when nothing
+     *  matches. */
+    renderedCellValue?: React.ReactNode
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
   interface ColumnMeta<
     TFeatures extends TableFeatures,
     TData extends RowData,

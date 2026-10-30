@@ -61,3 +61,36 @@ describe("filter match highlighting", () => {
     expect(marks(container)).toEqual([])
   })
 })
+
+describe("renderedCellValue", () => {
+  it("hands a custom cell its value with the matches marked", () => {
+    const custom: DataTableColumnDef<Person>[] = [
+      {
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ renderedCellValue }) => <b>{renderedCellValue}</b>,
+      },
+    ]
+    const { container } = render(
+      <Table columns={custom} initialState={{ globalFilter: "ma" }} />
+    )
+    expect(marks(container)).toEqual(["Ma"])
+    expect(container.querySelector("tbody b mark")).not.toBeNull()
+  })
+
+  it("hands it the plain value when nothing matches", () => {
+    const custom: DataTableColumnDef<Person>[] = [
+      {
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ renderedCellValue }) => <b>{renderedCellValue}</b>,
+      },
+    ]
+    const { container } = render(<Table columns={custom} />)
+    expect(
+      Array.from(container.querySelectorAll("tbody b")).map(
+        (b) => b.textContent
+      )
+    ).toEqual(["Mason", "Lily"])
+  })
+})

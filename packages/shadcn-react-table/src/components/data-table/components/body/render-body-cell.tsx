@@ -118,8 +118,9 @@ export function renderBodyCell<TData extends RowData>(
 }
 
 /**
- * Renders a cell's value, auto-highlighting matched substrings for columns with
- * no custom cell renderer and an active string substring filter / global query.
+ * Renders a cell's value with its matches to an active string substring filter
+ * or the global search marked. A column with no custom cell shows it as is; a
+ * custom cell gets it as `renderedCellValue` (MRT parity) to place itself.
  */
 function renderCellContent<TData extends RowData>(
   cell: DataTableCell<TData, unknown>,
@@ -133,17 +134,21 @@ function renderCellContent<TData extends RowData>(
   const canHighlight =
     enableHighlight &&
     column.columnDef.meta?.enableFilterMatchHighlighting !== false &&
-    !columnsWithCustomCell.has(column.id) &&
     (typeof value === "string" || typeof value === "number")
+  const query = canHighlight
+    ? resolveHighlightQuery(cell, table, globalFilter)
+    : null
+  const highlighted = query ? (
+    <Highlight text={String(value)} query={query} />
+  ) : null
 
-  if (canHighlight) {
-    const query = resolveHighlightQuery(cell, table, globalFilter)
-    if (query) {
-      return <Highlight text={String(value)} query={query} />
-    }
-  }
+  if (highlighted && !columnsWithCustomCell.has(column.id)) return highlighted
 
-  return flexRender(column.columnDef.cell, { ...cell.getContext(), table })
+  return flexRender(column.columnDef.cell, {
+    ...cell.getContext(),
+    table,
+    renderedCellValue: highlighted ?? (value as React.ReactNode),
+  })
 }
 
 /** The active highlight query for a cell: its column filter, else global search. */
