@@ -928,6 +928,14 @@ export const useDataTableOptions: ApiMember[] = [
       "Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`.",
   },
   {
+    name: "enableAnimations",
+    type: "boolean",
+    required: false,
+    default: "true",
+    description:
+      "Animate the table: rows glide when their order changes, fade in and out when they enter or leave the data, detail panels open and close smoothly, and the sort arrow, selection checkboxes and selected count transition. Always off when the user prefers reduced motion. Retime it with the CSS variables `--dt-motion-duration`, `--dt-motion-duration-fast` and `--dt-motion-ease` on the table.",
+  },
+  {
     name: "title",
     type: "React.ReactNode",
     required: false,
@@ -1920,6 +1928,14 @@ export const dataTableOptions: ApiMember[] = [
     default: null,
     description:
       "Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`.",
+  },
+  {
+    name: "enableAnimations",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Animate the table: rows glide when their order changes, fade in and out when they enter or leave the data, detail panels open and close smoothly, and the sort arrow, selection checkboxes and selected count transition. Always off when the user prefers reduced motion. Retime it with the CSS variables `--dt-motion-duration`, `--dt-motion-duration-fast` and `--dt-motion-ease` on the table.",
   },
   {
     name: "title",
@@ -3145,6 +3161,14 @@ export const slots: ApiMember[] = [
     default: null,
     description:
       "Invisible marker after the last row; infinite scroll loads more when it nears the viewport.",
+  },
+  {
+    name: "data-table-motion-layer",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Invisible overlay inside the surface where row enter and leave animations play (only when animations are on).",
   },
   {
     name: "data-table-progress",

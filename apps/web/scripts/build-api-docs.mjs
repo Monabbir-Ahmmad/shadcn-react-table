@@ -204,6 +204,8 @@ const slotParts = typesSf
 const SLOT_DESCRIPTIONS = {
   "data-table": "Outermost wrapper element.",
   "data-table-surface": "The scroll container for the table (both axes).",
+  "data-table-motion-layer":
+    "Invisible overlay inside the surface where row enter and leave animations play (only when animations are on).",
   "data-table-progress":
     "Indeterminate progress bar shown while loading or saving.",
   "data-table-progress-bar": "The moving bar inside `data-table-progress`.",

@@ -1,3 +1,5 @@
+import * as React from "react"
+
 /** Default timing for the table's motion (ms and a CSS easing). */
 export const MOTION_DEFAULTS = {
   duration: 280,
@@ -58,4 +60,14 @@ export function subscribeReducedMotion(cb: () => void): () => void {
   const mql = matchMedia(QUERY)
   mql.addEventListener("change", cb)
   return () => mql.removeEventListener("change", cb)
+}
+
+/** Whether this table should animate right now. */
+export function useAnimationsActive(enabled: boolean): boolean {
+  const reduced = React.useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    () => false
+  )
+  return enabled && !reduced
 }

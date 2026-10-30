@@ -45,6 +45,7 @@ import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
 import { DENSITY_PADDING_VARS } from "./constants"
+import { MOTION_CSS_VARS, useAnimationsActive } from "./motion"
 
 /**
  * Body wrapper that freezes during an active column resize. With
@@ -132,6 +133,7 @@ export function DataTable<TData extends RowData>({
     positionToolbarDropZone,
     enableTopToolbar,
     enableKeyboardNavigation,
+    enableAnimations,
     enableTableHead,
     enableTableFooter,
     direction,
@@ -142,6 +144,7 @@ export function DataTable<TData extends RowData>({
     renderTopToolbar,
   } = dt(table)
   const { refs } = table.dataTable
+  const animate = useAnimationsActive(enableAnimations !== false)
 
   // The paper div feeds `refs.tablePaperRef` and, when given, the consumer's
   // own ref; a plain `ref={refs.tablePaperRef}` would be overwritten by the
@@ -363,6 +366,13 @@ export function DataTable<TData extends RowData>({
           getSlotProps(table, "surface", {})
         )}
       >
+        {animate && (
+          <div
+            data-slot="data-table-motion-layer"
+            aria-hidden
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+          />
+        )}
         {showProgressBars && (
           <div
             data-slot="data-table-progress"
@@ -504,6 +514,8 @@ export function DataTable<TData extends RowData>({
                 "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4"
             ),
             "data-density": density,
+            "data-animations": animate ? "" : undefined,
+            style: animate ? MOTION_CSS_VARS : undefined,
             // A row from another table is over this one (see
             // DataTableDndProvider); style it with `data-[drop-target]:…`.
             "data-drop-target": isDropTarget || undefined,

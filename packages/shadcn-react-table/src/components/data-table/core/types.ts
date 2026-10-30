@@ -805,6 +805,7 @@ export interface DataTableConfig<TData extends RowData> {
   enableFullscreenToggle: boolean
   enableToolbarInternalActions: boolean
   enableKeyboardNavigation: boolean
+  enableAnimations: boolean
   title?: React.ReactNode
   renderTopToolbarCustomActions?: (
     props: DataTableSlotProps<TData>
@@ -1288,6 +1289,16 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also
    *  makes the table an ARIA grid. Default `true`. */
   enableKeyboardNavigation?: boolean
+  /**
+   * Animate the table: rows glide when their order changes, fade in and out
+   * when they enter or leave the data, detail panels open and close smoothly,
+   * and the sort arrow, selection checkboxes and selected count transition.
+   * Always off when the user prefers reduced motion. Retime it with the CSS
+   * variables `--dt-motion-duration`, `--dt-motion-duration-fast` and
+   * `--dt-motion-ease` on the table.
+   * @default true
+   */
+  enableAnimations?: boolean
   /** Heading shown at the start of the top toolbar. */
   title?: React.ReactNode
   /** Custom content rendered in the top toolbar's left region (next to the
