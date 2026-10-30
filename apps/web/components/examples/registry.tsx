@@ -339,6 +339,30 @@ function RowOrderingExample() {
   return <DataTable table={table} />
 }
 
+function VirtualizedRowOrderingExample() {
+  const [data, setData] = React.useState(() => makeUsers(1000))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowOrdering: true,
+    enableRowVirtualization: true,
+    enablePagination: false,
+    onRowOrderChange: (activeId, overId) =>
+      setData((prev) => {
+        const from = prev.findIndex((r) => r.id === activeId)
+        const to = prev.findIndex((r) => r.id === overId)
+        if (from === -1 || to === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(from, 1)
+        if (moved) next.splice(to, 0, moved)
+        return next
+      }),
+  })
+  return <DataTable table={table} />
+}
+
 // ----------------------------------------------------------------------------
 // Grouping & trees
 // ----------------------------------------------------------------------------
@@ -1624,6 +1648,14 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Drag rows to reorder (controlled data).",
     category: "Selection & rows",
     Component: RowOrderingExample,
+  },
+  {
+    slug: "row-ordering-virtualized",
+    title: "Row ordering (virtualized)",
+    description:
+      "Drag rows to reorder in a virtualized table (1,000 rows); it scrolls as you drag.",
+    category: "Selection & rows",
+    Component: VirtualizedRowOrderingExample,
   },
   {
     slug: "grouping",

@@ -1,12 +1,19 @@
 "use client"
 
 import type { RowData } from "@tanstack/react-table"
-import { useVirtualizer } from "@tanstack/react-virtual"
+import {
+  defaultRangeExtractor,
+  useVirtualizer,
+  type Range,
+} from "@tanstack/react-virtual"
 import * as React from "react"
 
 import type { DataTableInstance } from "../core/types"
 import { getPinSide } from "../helpers/column-pinning"
-import { pinnedRangeExtractor } from "../helpers/pinned-range-extractor"
+import {
+  pinnedRangeExtractor,
+  withKeptIndexes,
+} from "../helpers/pinned-range-extractor"
 import { resolveRowHeight } from "../helpers/resolve-row-height"
 import { getVirtualHeaderRuns } from "../helpers/virtual-header-runs"
 import type { DataTableRow } from "../core/table-types"
@@ -46,11 +53,13 @@ export type WithHeaderSpacers = <H extends { id: string; colSpan: number }>(
  * virtualization list (center rows + their expanded detail panels), wires both
  * `@tanstack/react-virtual` instances, exposes them via the optional instance
  * refs, and returns the helpers the header/body/footer need to render only the
- * visible window with left/right column spacers.
+ * visible window with left/right column spacers. `draggedRowId` is the row
+ * being dragged, if any, which is kept rendered outside the window.
  */
 export function useTableVirtualizers<TData extends RowData>(
   table: DataTableInstance<TData>,
-  gridRef: React.RefObject<HTMLDivElement | null>
+  gridRef: React.RefObject<HTMLDivElement | null>,
+  draggedRowId: string | null = null
 ) {
   const {
     enableRowVirtualization,
@@ -95,14 +104,36 @@ export function useTableVirtualizers<TData extends RowData>(
   ])
 
   // User-supplied passthrough options, resolved from their value-or-function form.
-  const rowVOptions =
-    typeof rowVirtualizerOptions === "function"
+  const { rangeExtractor: userRowRangeExtractor, ...rowVOptions } =
+    (typeof rowVirtualizerOptions === "function"
       ? rowVirtualizerOptions({ table })
-      : rowVirtualizerOptions
+      : rowVirtualizerOptions) ?? {}
   const columnVOptions =
     typeof columnVirtualizerOptions === "function"
       ? columnVirtualizerOptions({ table })
       : columnVirtualizerOptions
+
+  // The row being dragged stays rendered while the drag scrolls it out of the
+  // window: unmounting it would end the drag. Added on top of the window from
+  // the consumer's `rangeExtractor` (or the default one).
+  const draggedIndex = React.useMemo(
+    () =>
+      draggedRowId == null
+        ? -1
+        : virtualItems.findIndex(
+            (item) => !item.detail && item.row.id === draggedRowId
+          ),
+    [draggedRowId, virtualItems]
+  )
+  const rowRangeExtractor = React.useCallback(
+    (range: Range) =>
+      withKeptIndexes(
+        (userRowRangeExtractor ?? defaultRangeExtractor)(range),
+        [draggedIndex],
+        range.count
+      ),
+    [userRowRangeExtractor, draggedIndex]
+  )
 
   // The React Compiler bails on TanStack Virtual's mutable instance; expected.
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -124,6 +155,7 @@ export function useTableVirtualizers<TData extends RowData>(
         ? (el) => el?.getBoundingClientRect().height ?? 0
         : undefined,
     ...rowVOptions,
+    rangeExtractor: rowRangeExtractor,
   })
 
   // Horizontal virtualizer for wide tables. When off, count is 0 and the

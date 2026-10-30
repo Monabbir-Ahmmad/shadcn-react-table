@@ -11,6 +11,7 @@ import { getSlotProps, mergeProps } from "../helpers/slot-props"
 
 import { DataTableBody } from "../components/body/data-table-body"
 import { DataTableRowMotion } from "../components/body/row-motion"
+import { DraggedRowTracker } from "../components/body/dnd"
 import {
   DataTableFooter,
   hasFooter,
@@ -258,6 +259,9 @@ export function DataTable<TData extends RowData>({
       },
     })
   }, [dndScope, dndKey])
+  // The row being dragged, kept rendered by the row virtualizer while the
+  // drag scrolls it out of the window (see DraggedRowTracker).
+  const [draggedRowId, setDraggedRowId] = React.useState<string | null>(null)
   const {
     rowVirtualizer,
     columnVirtualizer,
@@ -265,7 +269,7 @@ export function DataTable<TData extends RowData>({
     virtualColumns,
     withColumnSpacers,
     withHeaderSpacers,
-  } = useTableVirtualizers(table, gridRef)
+  } = useTableVirtualizers(table, gridRef, draggedRowId)
 
   // Keyboard navigation works on display indexes (top, center, bottom rows;
   // visible leaf columns), which it maps back to the virtualizers' indexes to
@@ -345,6 +349,12 @@ export function DataTable<TData extends RowData>({
 
   const dndContent = (
     <>
+      {enableRowVirtualization && (
+        <DraggedRowTracker
+          tableKey={dndScope ? dndKey : null}
+          onChange={setDraggedRowId}
+        />
+      )}
       {zoneTop.present && (
         <DropToGroupZoneRegion
           table={table}

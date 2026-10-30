@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { pinnedRangeExtractor } from "./pinned-range-extractor"
+import { pinnedRangeExtractor, withKeptIndexes } from "./pinned-range-extractor"
 
 const range = { startIndex: 10, endIndex: 14, overscan: 2, count: 40 }
 
@@ -25,5 +25,18 @@ describe("pinnedRangeExtractor", () => {
 
   it("ignores indexes past the column count", () => {
     expect(pinnedRangeExtractor(range, [40])).not.toContain(40)
+  })
+})
+
+describe("withKeptIndexes", () => {
+  it("adds a kept index outside the window in order", () => {
+    expect(withKeptIndexes([5, 6, 7], [0], 10)).toEqual([0, 5, 6, 7])
+    expect(withKeptIndexes([5, 6, 7], [9], 10)).toEqual([5, 6, 7, 9])
+  })
+
+  it("returns the window as is when nothing needs adding", () => {
+    const window = [5, 6, 7]
+    expect(withKeptIndexes(window, [6], 10)).toBe(window)
+    expect(withKeptIndexes(window, [-1, 10], 10)).toBe(window)
   })
 })

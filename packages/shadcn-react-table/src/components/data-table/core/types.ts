@@ -1202,7 +1202,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
 
   /** Virtualize body rows for large datasets (recommended past ~100 rows).
    *  The table surface becomes the scroll container — give it a bounded height
-   *  via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. */
+   *  via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be
+   *  dragged: the dragged row stays rendered while the drag scrolls. */
   enableRowVirtualization?: boolean
   /** Virtualize columns for very wide tables. Applies fixed column widths;
    *  works with column pinning (pinned columns stay rendered), column
@@ -1221,7 +1222,8 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   getRowHeight?: (row: DataTableRow<TData>) => number | "auto" | null
   /** Partial `@tanstack/react-virtual` options merged into the row virtualizer
    *  (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`).
-   *  Accepts an object or a `({ table }) => options` function. */
+   *  A `rangeExtractor` picks the rendered rows; a row being dragged is added
+   *  to its result. Accepts an object or a `({ table }) => options` function. */
   rowVirtualizerOptions?: RowVirtualizerOptions<TData>
   /** Partial `@tanstack/react-virtual` options merged into the column
    *  virtualizer. Accepts an object or a `({ table }) => options` function. */

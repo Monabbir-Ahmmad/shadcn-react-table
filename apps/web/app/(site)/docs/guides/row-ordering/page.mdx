@@ -32,8 +32,26 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-<Callout variant="warning" title="Not compatible with virtualization">
-Row drag-and-drop is incompatible with row virtualization. Disable virtualization when you enable row ordering.
+## With virtualization
+
+Row ordering works with `enableRowVirtualization`. Drag a row toward the top or bottom edge of the table and it scrolls; the dragged row stays rendered while it moves past the rendered window, so you can drop it anywhere in a long list.
+
+<Example slug="row-ordering-virtualized" />
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowOrdering: true,
+  enableRowVirtualization: true,
+  enablePagination: false,
+  onRowOrderChange, // as above
+})
+```
+
+<Callout variant="note" title="Custom range extractor">
+A `rangeExtractor` passed in `rowVirtualizerOptions` still picks the rendered rows; the table adds the dragged row to its result.
 </Callout>
 
 ## Related
