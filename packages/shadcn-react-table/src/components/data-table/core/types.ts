@@ -807,10 +807,12 @@ export interface DataTableConfig<TData extends RowData> {
   slotProps: DataTableSlots<TData> | undefined
   columnFilterDisplayMode: ColumnFilterDisplayMode
   positionGlobalFilter: "left" | "right" | "none"
-  positionToolbarAlertBanner: "top" | "bottom" | "none"
+  positionToolbarAlertBanner: "top" | "bottom" | "head-overlay" | "none"
   positionToolbarDropZone: "top" | "bottom" | "both" | "none"
   /** Whether rows can be selected. */
   enableRowSelection: boolean
+  selectAllMode: "page" | "all"
+  enableSelectAll: boolean
   /** Shift-click a row's checkbox to select or clear the range since the
    *  last click. */
   enableBatchRowSelection: boolean
@@ -1274,8 +1276,11 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
    *  internal-actions cluster). "left" places it next to the title/actions;
    *  "none" hides it (same as `enableGlobalFilter: false`). */
   positionGlobalFilter?: "left" | "right" | "none"
-  /** Where the row-selection alert banner renders. Default "top". */
-  positionToolbarAlertBanner?: "top" | "bottom" | "none"
+  /** Where the row-selection alert banner renders: above the table
+   *  (`"top"`, default), below it (`"bottom"`), over the header row
+   *  (`"head-overlay"`, with the select-all checkbox, so selecting rows does
+   *  not move the table; needs the table head), or nowhere (`"none"`). */
+  positionToolbarAlertBanner?: "top" | "bottom" | "head-overlay" | "none"
   /** Where the group-by drop zone renders (grouping only). Default "top". */
   positionToolbarDropZone?: "top" | "bottom" | "both" | "none"
   /** Position of the auto-injected row-actions column. Default "last". */

@@ -18,7 +18,10 @@ import {
 } from "../components/body/data-table-footer"
 import { DataTableEditModal } from "../components/editing/data-table-edit-modal"
 import { DataTableHeader } from "../components/head/data-table-header"
-import { DataTableAlertBanner } from "../components/toolbar/data-table-alert-banner"
+import {
+  DataTableAlertBanner,
+  DataTableHeadOverlayBanner,
+} from "../components/toolbar/data-table-alert-banner"
 import { DataTableBottomToolbar } from "../components/toolbar/data-table-bottom-toolbar"
 import { DataTableDropToGroupZone } from "../components/toolbar/data-table-grouping"
 import { DataTablePagination } from "../components/toolbar/data-table-pagination"
@@ -66,6 +69,7 @@ import { usePresence } from "../hooks/use-presence"
 // draft, so it is not one of them.
 const ToolbarRegion = region(DataTableToolbar)
 const AlertBannerRegion = region(DataTableAlertBanner)
+const HeadOverlayBannerRegion = region(DataTableHeadOverlayBanner)
 const PaginationRegion = region(DataTablePagination)
 const BottomToolbarRegion = region(DataTableBottomToolbar)
 const DropToGroupZoneRegion = region(DataTableDropToGroupZone)
@@ -403,6 +407,12 @@ export function DataTable<TData extends RowData>({
           getSlotProps(table, "surface", {})
         )}
       >
+        {/* First in the surface: a zero-height sticky anchor, so the banner
+            over the header row takes no room and comes before the header in
+            the Tab order. */}
+        {positionToolbarAlertBanner === "head-overlay" && enableTableHead && (
+          <HeadOverlayBannerRegion table={table} config={dt(table)} />
+        )}
         {animate && (
           <div
             data-slot="data-table-motion-layer"

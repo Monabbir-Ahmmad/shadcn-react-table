@@ -52,10 +52,15 @@ function placeIn(el: HTMLElement) {
  *
  * Attach `ref` to the strip's root element; render it while `present`.
  * `leaving` is true while it fades out (it should take no drops or clicks).
+ *
+ * `overlay`: the strip is already out of the flow (it lies over other
+ * content, as the selection banner over the header row does), so nothing
+ * after it moves and it stays where it is while it fades out.
  */
 export function usePresence<T extends HTMLElement = HTMLElement>(
   show: boolean,
-  active: boolean
+  active: boolean,
+  { overlay = false }: { overlay?: boolean } = {}
 ) {
   const animates = active && canAnimate()
   const [present, setPresent] = React.useState(show)
@@ -109,7 +114,7 @@ export function usePresence<T extends HTMLElement = HTMLElement>(
       return animation
     }
     // Reads first: the siblings below, and how far the strip pushes them.
-    const below = followers(el)
+    const below = overlay ? [] : followers(el)
     const push = pushOf(el, below[0])
     const glide = (from: number) => {
       if (Math.abs(from) < 0.5) return
@@ -138,16 +143,18 @@ export function usePresence<T extends HTMLElement = HTMLElement>(
     }
     // Out of the flow, where it sat: the siblings move up at once and glide
     // there over it while it fades.
-    const at = placeIn(el)
     restore.current = { el, css: el.style.cssText }
-    Object.assign(el.style, {
-      position: "absolute",
-      top: `${at.top}px`,
-      left: `${at.left}px`,
-      width: `${at.width}px`,
-      margin: "0",
-      pointerEvents: "none",
-    })
+    if (!overlay) {
+      const at = placeIn(el)
+      Object.assign(el.style, {
+        position: "absolute",
+        top: `${at.top}px`,
+        left: `${at.left}px`,
+        width: `${at.width}px`,
+        margin: "0",
+      })
+    }
+    el.style.pointerEvents = "none"
     el.setAttribute("inert", "")
     glide(push)
     track(
@@ -168,7 +175,7 @@ export function usePresence<T extends HTMLElement = HTMLElement>(
       // Cancelled: it came back, or the table stopped animating.
       () => {}
     )
-  }, [show, animates])
+  }, [show, animates, overlay])
 
   React.useEffect(() => {
     const live = running.current

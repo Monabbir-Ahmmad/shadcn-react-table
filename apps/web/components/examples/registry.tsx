@@ -274,6 +274,20 @@ function RowSelectionExample() {
   return <DataTable table={table} />
 }
 
+function SelectionBannerOverlayExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    positionToolbarAlertBanner: "head-overlay",
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+
 function SingleSelectionExample() {
   const data = React.useMemo(() => baseUsers, [])
   const columns = useUserColumns()
@@ -1620,6 +1634,13 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Multi-row selection with an alert banner.",
     category: "Selection & rows",
     Component: RowSelectionExample,
+  },
+  {
+    slug: "selection-banner-overlay",
+    title: "Selection banner over the header",
+    description: "The selection banner lies over the header row.",
+    category: "Selection & rows",
+    Component: SelectionBannerOverlayExample,
   },
   {
     slug: "single-selection",

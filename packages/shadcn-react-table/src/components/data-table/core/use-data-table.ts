@@ -923,6 +923,8 @@ export function useDataTable<TData extends RowData>(
     positionToolbarDropZone,
     enableRowSelection,
     enableBatchRowSelection,
+    selectAllMode,
+    enableSelectAll,
     enableTopToolbar,
     enableBottomToolbar,
     enableDensityToggle,
