@@ -372,7 +372,9 @@ export function DataTable<TData extends RowData>({
           <div
             data-slot="data-table-motion-layer"
             aria-hidden
-            className="pointer-events-none absolute top-0 left-0 h-0 w-full overflow-visible"
+            // Sized and clipped to the table while it shows leave copies,
+            // so they never extend the scroll area (see `layerClip`).
+            className="pointer-events-none absolute top-0 left-0 h-0 w-full overflow-x-visible overflow-y-clip"
           />
         )}
         {showProgressBars && (

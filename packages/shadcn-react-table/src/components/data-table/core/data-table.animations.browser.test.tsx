@@ -407,6 +407,29 @@ describe("row animations", () => {
     expect(Math.abs(now.height - was.height)).toBeLessThan(1)
   })
 
+  it("does not jump the scroll when the copies are removed", async () => {
+    const data = rows(60)
+    const slotProps = { surface: { style: { maxHeight: 240 } } }
+    const { rerender } = render(<Harness data={data} slotProps={slotProps} />)
+    await nextFrame()
+    // Scrolled to the bottom, the last 20 rows leave: the content shrinks.
+    surface().scrollTop = surface().scrollHeight
+    await nextFrame()
+    rerender(<Harness data={data.slice(0, 40)} slotProps={slotProps} />)
+    expect(layer()!.children.length).toBeGreaterThan(0)
+    // The copies never extend the scroll area, so the browser clamps the
+    // scroll with the change, not when the copies go 160 ms later.
+    const table = document.querySelector('[data-slot="table-container"]')!
+    expect(surface().scrollHeight).toBeLessThanOrEqual(
+      Math.ceil(table.getBoundingClientRect().height) + 1
+    )
+    const after = surface().scrollTop
+    await settle()
+    await nextFrame()
+    expect(layer()!.children.length).toBe(0)
+    expect(surface().scrollTop).toBe(after)
+  })
+
   it("fades in rows that enter the data", async () => {
     let table!: DataTableInstance<Row>
     render(

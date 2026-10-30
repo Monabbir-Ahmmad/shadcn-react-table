@@ -113,6 +113,21 @@ function motionLayer(table: HTMLTableElement) {
     )
 }
 
+/**
+ * How far down the motion layer shows its copies (it clips the rest): to the
+ * table's bottom, or the surface's visible height if that is taller. That is
+ * never past what the table itself scrolls to, so the copies never extend the
+ * surface's scroll area: when a change shrinks the content, the browser
+ * clamps the scroll with the change, rather than with a jump when the copies
+ * go. The trade-off: in a scrolled surface, a leaving row that sat below the
+ * table's new bottom is clipped instead of fading out. Reads only.
+ */
+function layerClip(layer: HTMLElement, table: HTMLTableElement) {
+  const top = layer.getBoundingClientRect().top
+  const bottom = table.getBoundingClientRect().bottom - top
+  return Math.max(bottom, layer.parentElement?.clientHeight ?? 0)
+}
+
 /** An inert copy of a row to fade out in the motion layer. */
 function copyRow(tr: HTMLTableRowElement) {
   const copy = tr.cloneNode(true) as HTMLTableRowElement
@@ -185,7 +200,8 @@ function animateOutCopy(
   { node, top, left, width, widths }: Leaving,
   keyframes: Keyframe[],
   options: KeyframeAnimationOptions,
-  ghosts: Set<HTMLElement>
+  ghosts: Set<HTMLElement>,
+  onRemoved: () => void
 ) {
   const ghost = document.createElement("table")
   ghost.className = table.className
@@ -214,6 +230,7 @@ function animateOutCopy(
   const remove = () => {
     ghost.remove()
     ghosts.delete(ghost)
+    onRemoved()
   }
   ghost
     .animate(keyframes, { ...options, fill: "forwards" })
@@ -251,6 +268,15 @@ export function useRowAnimations({
   const job = React.useRef<Job | null>(null)
   const running = React.useRef(new Set<Animation>())
   const ghosts = React.useRef(new Set<HTMLElement>())
+  /** The motion layer, while it is sized to show copies (see `layerClip`). */
+  const sized = React.useRef<HTMLElement | null>(null)
+
+  /** Back to an empty, zero-height layer once no copy is left. */
+  const unclip = () => {
+    if (ghosts.current.size > 0 || !sized.current) return
+    sized.current.style.removeProperty("height")
+    sized.current = null
+  }
 
   /** Drops the motion in flight, so it never plays against a new layout. */
   const stop = () => {
@@ -258,6 +284,7 @@ export function useRowAnimations({
     running.current.clear()
     for (const ghost of ghosts.current) ghost.remove()
     ghosts.current.clear()
+    unclip()
   }
 
   // Before React touches the rows: where they sit, and copies of the rows
@@ -341,6 +368,8 @@ export function useRowAnimations({
       return
     }
     const { duration, durationFast, ease } = readMotionTokens(table)
+    const layer = work.leaving.length > 0 ? motionLayer(table) : null
+    const clip = layer ? layerClip(layer, table) : 0
     const track = (animation: Animation) => {
       live.add(animation)
       const done = () => live.delete(animation)
@@ -411,8 +440,9 @@ export function useRowAnimations({
         )
       )
     }
-    const layer = motionLayer(table)
     if (!layer) return
+    layer.style.height = `${clip}px`
+    sized.current = layer
     for (const copy of work.leaving) {
       // A panel closes with the glide of the rows below; other rows fade.
       const detail = isDetail(copy.node)
@@ -422,7 +452,8 @@ export function useRowAnimations({
         copy,
         detail ? HIDE : FADE,
         { duration: detail ? duration : durationFast, easing: ease },
-        ghosts.current
+        ghosts.current,
+        unclip
       )
     }
   })
