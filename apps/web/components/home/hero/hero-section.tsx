@@ -1,16 +1,21 @@
-import { AutoDemo } from "@/components/home/hero/auto-demo"
 import { HeroCopy } from "@/components/home/hero/hero-copy"
+import { FeatureTour } from "@/components/home/hero/feature-tour"
 
 /**
- * The hero: the pitch on the left, a small table on the right that sorts,
- * filters, selects and edits on its own. Stacks on phones, copy first.
+ * The hero: the pitch, then the real table playing its features one by one.
  */
 export function HeroSection() {
   return (
-    <section aria-labelledby="hero-title" className="overflow-x-clip border-b">
-      <div className="mx-auto grid max-w-6xl items-center gap-x-12 gap-y-14 px-4 py-16 sm:px-6 md:py-24 lg:min-h-[min(calc(100svh-var(--site-header-h)),56rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:px-8">
+    <section
+      data-hero=""
+      aria-labelledby="hero-title"
+      className="overflow-x-clip border-b"
+    >
+      <div className="mx-auto max-w-6xl px-4 pt-16 pb-16 sm:px-6 md:pt-24 md:pb-24 lg:px-8">
         <HeroCopy />
-        <AutoDemo className="w-full max-w-xl lg:justify-self-end" />
+        <div className="isolate mt-12 md:mt-16">
+          <FeatureTour />
+        </div>
       </div>
     </section>
   )

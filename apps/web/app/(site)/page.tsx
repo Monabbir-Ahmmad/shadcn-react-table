@@ -2,11 +2,9 @@ import type { Metadata } from "next"
 
 import { SiteHeader } from "@/components/site-header"
 import { HeroSection } from "@/components/home/hero/hero-section"
-import { FeaturesSection } from "@/components/home/features-section"
-import { LiveTableSection } from "@/components/home/live/live-table-section"
-import { StyleDeck } from "@/components/home/deck/style-deck"
-import { Compared } from "@/components/home/proof/compared"
-import { ExamplesIndex } from "@/components/home/proof/examples-index"
+import { MakeItYours } from "@/components/home/customize/make-it-yours"
+import { FeatureGrid } from "@/components/home/feature-grid"
+import { BuiltOn } from "@/components/home/built-on"
 import { ForAgents } from "@/components/home/proof/for-agents"
 import { InstallSection } from "@/components/home/install-section"
 import { SiteFooter } from "@/components/home/site-footer"
@@ -23,11 +21,9 @@ export default function HomePage() {
       <SiteHeader />
       <main className="flex-1 [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px)] [background-size:calc(100%/6)_100%] [background-position:center] md:[background-size:calc(100%/12)_100%] dark:[background-image:linear-gradient(to_right,color-mix(in_oklch,var(--border),transparent_40%)_1px,transparent_1px)]">
         <HeroSection />
-        <FeaturesSection />
-        <LiveTableSection />
-        <StyleDeck />
-        <Compared />
-        <ExamplesIndex />
+        <MakeItYours />
+        <FeatureGrid />
+        <BuiltOn />
         <ForAgents />
         <InstallSection />
       </main>
