@@ -352,6 +352,8 @@ export function DataTableBody<TData extends RowData>({
   const bodyRowProps = (row: DataTableRow<TData>, rowIndex: number) =>
     mergeProps(
       {
+        // The row's key for the row animations (see useRowAnimations).
+        "data-row-id": row.id,
         ...gridRowProps(row, rowIndex),
         onClick: onRowClick
           ? (event: React.MouseEvent<HTMLTableRowElement>) =>
@@ -361,12 +363,18 @@ export function DataTableBody<TData extends RowData>({
           ? (event: React.MouseEvent<HTMLTableRowElement>) =>
               latest.current.onRowDoubleClick?.({ row, table, event })
           : undefined,
-      } as React.ComponentProps<"tr">,
+      } as React.ComponentProps<"tr"> & { "data-row-id": string },
       getSlotProps(table, "bodyRow", { row, rowIndex })
     )
 
+  /** Keys a detail panel's row for the row animations. */
+  const detailRowProps = (row: DataTableRow<TData>) => ({
+    "data-row-id": `${row.id}:detail`,
+    "data-row-kind": "detail",
+  })
+
   const detailRow = (row: DataTableRow<TData>) => (
-    <TableRow className="hover:bg-transparent">
+    <TableRow {...detailRowProps(row)} className="hover:bg-transparent">
       <TableCell {...detailCellProps(row)}>
         <div className="p-3">{renderDetailPanel?.({ row, table })}</div>
       </TableCell>
@@ -516,6 +524,7 @@ export function DataTableBody<TData extends RowData>({
                       return (
                         <TableRow
                           key={`${item.row.id}-detail`}
+                          {...detailRowProps(item.row)}
                           data-index={vRow.index}
                           ref={rowVirtualizer.measureElement}
                           className="hover:bg-transparent"

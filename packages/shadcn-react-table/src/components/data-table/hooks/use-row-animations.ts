@@ -1,0 +1,281 @@
+import * as React from "react"
+
+import { readMotionTokens } from "../core/motion"
+import {
+  MAX_ANIMATED_ROWS,
+  planRowAnimations,
+  type RowSnapshot,
+} from "../helpers/plan-row-animations"
+
+type Args = {
+  /** The `<table>` element. */
+  tableRef: React.RefObject<HTMLTableElement | null>
+  /** Whether the table animates (see `useAnimationsActive`). */
+  active: boolean
+  /** Identities whose change means the rows may have moved, entered or left. */
+  signal: unknown[]
+  /** Every row key now (row ids + "<id>:detail" for open panels). Built only
+   *  when `signal` changes. */
+  members: () => ReadonlySet<string>
+  /** True while rows must not move (a cell or row is being edited). */
+  paused: () => boolean
+}
+
+/** A copy of a leaving row and where it sat, relative to the motion layer. */
+type Leaving = {
+  node: HTMLTableRowElement
+  top: number
+  left: number
+  width: number
+  widths: number[]
+}
+
+/** What a change found before React touched the DOM. */
+type Job = {
+  prev: RowSnapshot
+  members: ReadonlySet<string>
+  leaving: Leaving[]
+}
+
+// The table's own rows: not the rows of a table nested in a detail panel.
+const ROWS = ":scope > tbody > tr[data-row-id]"
+
+// Attributes a leave copy drops so nothing mistakes it for the live row:
+// keys the planner and grid navigation look up, ids, tab stops, and form
+// control names (a copied checked radio would uncheck the live one).
+const COPY_DROPS = [
+  "id",
+  "name",
+  "for",
+  "tabindex",
+  "data-row-id",
+  "data-cell-row",
+  "data-cell-col",
+  "data-index",
+  "aria-rowindex",
+  "aria-colindex",
+]
+
+/** Whether the Web Animations API is there (jsdom has none). */
+const canAnimate = () =>
+  typeof Element !== "undefined" &&
+  typeof Element.prototype.animate === "function"
+
+function changed(a: unknown[] | null, b: unknown[]) {
+  return !a || a.length !== b.length || a.some((v, i) => !Object.is(v, b[i]))
+}
+
+/** The drawn rows by key. */
+function drawnRows(table: HTMLTableElement) {
+  const rows = new Map<string, HTMLTableRowElement>()
+  table.querySelectorAll<HTMLTableRowElement>(ROWS).forEach((tr) => {
+    rows.set(tr.dataset.rowId!, tr)
+  })
+  return rows
+}
+
+/** Where each drawn row sits: px from the table's top edge. */
+function topsOf(
+  table: HTMLTableElement,
+  rows: Map<string, HTMLTableRowElement>
+) {
+  const origin = table.getBoundingClientRect().top
+  const tops = new Map<string, number>()
+  for (const [key, tr] of rows) {
+    tops.set(key, tr.getBoundingClientRect().top - origin)
+  }
+  return tops
+}
+
+function motionLayer(table: HTMLTableElement) {
+  return table
+    .closest('[data-slot="data-table-surface"]')
+    ?.querySelector<HTMLElement>(
+      ':scope > [data-slot="data-table-motion-layer"]'
+    )
+}
+
+/** An inert copy of a row to fade out in the motion layer. */
+function copyRow(tr: HTMLTableRowElement) {
+  const copy = tr.cloneNode(true) as HTMLTableRowElement
+  for (const el of [copy, ...copy.querySelectorAll("*")]) {
+    for (const name of COPY_DROPS) el.removeAttribute(name)
+  }
+  return copy
+}
+
+/** Draws a leave copy at its row's last place and fades it out. */
+function fadeOutCopy(
+  layer: HTMLElement,
+  table: HTMLTableElement,
+  { node, top, left, width, widths }: Leaving,
+  options: KeyframeAnimationOptions
+) {
+  const ghost = document.createElement("table")
+  ghost.className = table.className
+  // Column size variables and the like live on the table's own style.
+  ghost.style.cssText = table.style.cssText
+  Object.assign(ghost.style, {
+    position: "absolute",
+    top: `${top}px`,
+    left: `${left}px`,
+    width: `${width}px`,
+    minWidth: "0",
+    margin: "0",
+    tableLayout: "fixed",
+  })
+  ghost.inert = true
+  ghost.setAttribute("data-slot", "data-table-leave-copy")
+  ;[...node.cells].forEach((cell, i) => {
+    const w = `${widths[i] ?? 0}px`
+    Object.assign(cell.style, { width: w, minWidth: w, maxWidth: w })
+  })
+  const body = document.createElement("tbody")
+  body.append(node)
+  ghost.append(body)
+  layer.append(ghost)
+  const remove = () => ghost.remove()
+  ghost
+    .animate([{ opacity: 1 }, { opacity: 0 }], { ...options, fill: "forwards" })
+    .finished.then(remove, remove)
+}
+
+/**
+ * Glides drawn rows to their new places, fades rows that entered the data in
+ * and rows that left it out (from copies in the motion layer), using the Web
+ * Animations API. Runs only when `signal` changes, never on scroll; the work
+ * is proportional to the drawn rows, except `members()` (once per change).
+ *
+ * Must be called from a component that commits before the table body: its
+ * insertion effect reads the rows as they were, before React updates them.
+ */
+export function useRowAnimations({
+  tableRef,
+  active,
+  signal,
+  members,
+  paused,
+}: Args) {
+  const lastSignal = React.useRef<unknown[] | null>(null)
+  const lastMembers = React.useRef<ReadonlySet<string> | null>(null)
+  const job = React.useRef<Job | null>(null)
+  const running = React.useRef(new Set<Animation>())
+
+  // Before React touches the rows: where they sit, and copies of the rows
+  // about to leave.
+  React.useInsertionEffect(() => {
+    job.current = null
+    const isChange = changed(lastSignal.current, signal)
+    lastSignal.current = signal
+    if (!active || !canAnimate()) {
+      lastMembers.current = null
+      return
+    }
+    // Unchanged rows: nothing to do, unless animations just turned on and
+    // the next change needs a baseline.
+    if (!isChange && lastMembers.current) return
+    const next = members()
+    const prev = lastMembers.current
+    lastMembers.current = next
+    // On the first commit the table is not attached yet: `next` is the
+    // baseline for the next change.
+    const table = tableRef.current
+    if (
+      !prev ||
+      !table ||
+      paused() ||
+      table.querySelector(":scope > tbody > tr[data-dragging]")
+    ) {
+      return
+    }
+    const rows = drawnRows(table)
+    const tops = topsOf(table, rows)
+    const gone = [...rows.keys()].filter((key) => !next.has(key))
+    const layer = motionLayer(table)
+    const leaving: Leaving[] = []
+    // Past the limit the planner skips the change, so copy nothing.
+    if (layer && gone.length <= MAX_ANIMATED_ROWS) {
+      const base = layer.getBoundingClientRect()
+      for (const key of gone) {
+        const tr = rows.get(key)!
+        const rect = tr.getBoundingClientRect()
+        leaving.push({
+          node: copyRow(tr),
+          top: rect.top - base.top,
+          left: rect.left - base.left,
+          width: rect.width,
+          widths: [...tr.cells].map((c) => c.getBoundingClientRect().width),
+        })
+      }
+    }
+    job.current = { prev: { members: prev, tops }, members: next, leaving }
+  })
+
+  // After the update: glide, fade in, and fade out the copies.
+  React.useLayoutEffect(() => {
+    const work = job.current
+    job.current = null
+    const table = tableRef.current
+    if (!work || !table) return
+    // Rows mid-animation were measured where they showed; restart from there.
+    const live = running.current
+    for (const animation of live) animation.cancel()
+    live.clear()
+
+    const rows = drawnRows(table)
+    const plan = planRowAnimations(work.prev, {
+      members: work.members,
+      tops: topsOf(table, rows),
+    })
+    if (plan.skipped) return
+    const { duration, durationFast, ease } = readMotionTokens(table)
+    const track = (animation: Animation) => {
+      live.add(animation)
+      const done = () => live.delete(animation)
+      animation.finished.then(done, done)
+    }
+
+    for (const { key, dy } of plan.moves) {
+      const tr = rows.get(key)
+      if (!tr) continue
+      track(
+        tr.animate(
+          [{ transform: `translateY(${dy}px)` }, { transform: "none" }],
+          { duration, easing: ease }
+        )
+      )
+    }
+    for (const key of plan.enters) {
+      const tr = rows.get(key)
+      if (!tr) continue
+      track(
+        tr.animate(
+          [
+            { opacity: 0, transform: "translateY(4px)" },
+            { opacity: 1, transform: "none" },
+          ],
+          {
+            duration: durationFast,
+            easing: ease,
+            // Starts as the leaving rows fade; hidden until then.
+            delay: durationFast / 2,
+            fill: "backwards",
+          }
+        )
+      )
+    }
+    const layer = motionLayer(table)
+    if (!layer) return
+    for (const copy of work.leaving) {
+      fadeOutCopy(layer, table, copy, { duration: durationFast, easing: ease })
+    }
+  })
+
+  React.useEffect(() => {
+    const live = running.current
+    return () => {
+      for (const animation of live) animation.cancel()
+      live.clear()
+    }
+  }, [])
+}

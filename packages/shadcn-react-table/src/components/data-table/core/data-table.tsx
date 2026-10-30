@@ -10,6 +10,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { getSlotProps, mergeProps } from "../helpers/slot-props"
 
 import { DataTableBody } from "../components/body/data-table-body"
+import { DataTableRowMotion } from "../components/body/row-motion"
 import {
   DataTableFooter,
   hasFooter,
@@ -169,6 +170,7 @@ export function DataTable<TData extends RowData>({
   )
 
   const gridRef = React.useRef<HTMLDivElement>(null)
+  const tableElRef = React.useRef<HTMLTableElement>(null)
   // One callback for the table's lifetime: a new one each render would make
   // React detach and re-attach the surface on every commit, leaving
   // `refs.tableContainerRef` empty while child effects run.
@@ -398,9 +400,18 @@ export function DataTable<TData extends RowData>({
           </div>
         )}
 
+        {/* Before the table: it reads the rows before React updates them. */}
+        <DataTableRowMotion
+          table={table}
+          tableRef={tableElRef}
+          active={animate}
+        />
         <Table
           {...mergeProps(
+            // The ref is forwarded to the element, not read during render.
+            // eslint-disable-next-line react-hooks/refs
             {
+              ref: tableElRef,
               role: isGrid ? "grid" : undefined,
               "aria-rowcount": isGrid ? ariaRowCount : undefined,
               "aria-colcount": isGrid
