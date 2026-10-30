@@ -21,6 +21,13 @@ describe("planRowAnimations", () => {
     })
   })
 
+  it("returns a fresh plan every time", () => {
+    const a = planRowAnimations(null, snap([], []))
+    const b = planRowAnimations(null, snap([], []))
+    expect(a).not.toBe(b)
+    expect(a.moves).not.toBe(b.moves)
+  })
+
   it("moves rows whose position changed", () => {
     const prev = snap(
       ["a", "b"],

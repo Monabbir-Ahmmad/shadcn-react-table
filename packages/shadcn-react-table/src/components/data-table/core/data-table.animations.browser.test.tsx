@@ -169,6 +169,72 @@ describe("row animations", () => {
     }
   })
 
+  it("reads every border before it starts any animation", async () => {
+    render(<Harness />)
+    await nextFrame()
+    // A read after a write forces another style pass: all reads of the
+    // rows and cells come first. (The root's once-per-commit direction check
+    // on the surface is not the hook's.)
+    const calls: string[] = []
+    const realRead = window.getComputedStyle.bind(window)
+    const realAnimate = Element.prototype.animate
+    const spyRead = vi
+      .spyOn(window, "getComputedStyle")
+      .mockImplementation((el, pseudo) => {
+        if (el.closest("table")) calls.push("read")
+        return realRead(el, pseudo)
+      })
+    const spyAnimate = vi
+      .spyOn(Element.prototype, "animate")
+      .mockImplementation(function (this: Element, ...args) {
+        calls.push("write")
+        return realAnimate.apply(this, args)
+      })
+    try {
+      fireEvent.click(
+        document.querySelectorAll<HTMLElement>("th button[data-sorted]")[1]!
+      )
+    } finally {
+      spyRead.mockRestore()
+      spyAnimate.mockRestore()
+    }
+    const firstWrite = calls.indexOf("write")
+    expect(firstWrite).toBeGreaterThan(0)
+    expect(calls.lastIndexOf("read")).toBeLessThan(firstWrite)
+  })
+
+  it("draws no per-cell lines when very many rows glide", async () => {
+    const data = Array.from({ length: 150 }, (_, i) => ({
+      id: `r${i}`,
+      name: `Name ${i}`,
+      n: i,
+    }))
+    let table!: DataTableInstance<Row>
+    render(<Harness data={data} onTable={(t) => (table = t)} />)
+    await nextFrame()
+    act(() => table.setSorting([{ id: "n", desc: true }]))
+    const moved = bodyRows().filter((tr) => animating(tr, "transform").length)
+    expect(moved.length).toBeGreaterThan(100)
+    for (const tr of moved) {
+      // The table's border is still cleared, so no stray line crosses rows.
+      expect(animating(tr, "borderBottomColor").length).toBe(1)
+      for (const cell of tr.cells) {
+        expect(animating(cell, "boxShadow").length).toBe(0)
+      }
+    }
+  })
+
+  it("drops the previous change's leave copies when a new change starts", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} />)
+    await nextFrame()
+    act(() => table.setGlobalFilter("Name 1"))
+    expect(layer()!.children.length).toBe(7)
+    act(() => table.setGlobalFilter(""))
+    // The copies would fade over the new layout: gone at once.
+    expect(layer()!.children.length).toBe(0)
+  })
+
   it("does nothing when turned off", async () => {
     render(<Harness enableAnimations={false} />)
     await nextFrame()

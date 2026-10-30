@@ -122,27 +122,59 @@ function copyRow(tr: HTMLTableRowElement) {
 }
 
 /**
+ * Above this many gliding rows, their cells draw no border line while they
+ * glide (the table's border is still cleared). The lines are box-shadow
+ * animations, painted on the main thread every frame for every cell, and in
+ * a reshuffle that large a missing separator for 280 ms goes unnoticed.
+ */
+const MAX_BORDER_LINES = 100
+
+/** A gliding row's bottom border, drawn by its cells (see `moveBorder`). */
+type BorderLine = {
+  tr: HTMLTableRowElement
+  /** The border as an inset shadow line; null when the row has none. */
+  line: string | null
+  /** Each cell's own box-shadow, kept under the line. */
+  shadows: string[]
+}
+
+/**
+ * Reads what `moveBorder` needs. Reads only: every gliding row is read before
+ * any animation starts, so the whole batch costs one style pass. (Rows don't
+ * all share one border: the last row of a group usually has none.)
+ */
+function readBorder(tr: HTMLTableRowElement): BorderLine {
+  const style = getComputedStyle(tr)
+  const width = style.borderBottomWidth
+  if (style.borderBottomStyle === "none" || width === "0px") {
+    return { tr, line: null, shadows: [] }
+  }
+  return {
+    tr,
+    line: `inset 0 -${width} 0 0 ${style.borderBottomColor}`,
+    shadows: [...tr.cells].map((cell) => getComputedStyle(cell).boxShadow),
+  }
+}
+
+const CLEAR_BORDER: PropertyIndexedKeyframes = {
+  borderBottomColor: ["transparent", "transparent"],
+}
+
+/**
  * The table draws a row's bottom border where the row is laid out, under its
  * cells and unmoved by the row's transform: a gliding row covers it, or it
  * cuts across whatever passes there. While the row glides, its cells draw the
  * border instead (an inset line on top of their own shadows: the selection
- * mark, a focus ring) and the table's stays clear.
+ * mark, a focus ring) and the table's stays clear. Writes only.
  */
-function moveBorder(tr: HTMLTableRowElement, duration: number) {
-  const style = getComputedStyle(tr)
-  const width = style.borderBottomWidth
-  if (style.borderBottomStyle === "none" || width === "0px") return []
-  const line = `inset 0 -${width} 0 0 ${style.borderBottomColor}`
-  const lines = [...tr.cells].map((cell) => {
-    const own = getComputedStyle(cell).boxShadow
+function moveBorder({ tr, line, shadows }: BorderLine, duration: number) {
+  if (!line) return []
+  const lines = [...tr.cells].map((cell, i) => {
+    const own = shadows[i] ?? "none"
     const shadow = own === "none" ? line : `${line}, ${own}`
     return cell.animate({ boxShadow: [shadow, shadow] }, { duration })
   })
-  const clear = tr.animate(
-    { borderBottomColor: ["transparent", "transparent"] },
-    { duration }
-  )
-  return [...lines, clear]
+  return [...lines, tr.animate(CLEAR_BORDER, { duration })]
 }
 
 /** Draws a leave copy at its row's last place and animates it out. */
@@ -195,6 +227,16 @@ function animateOutCopy(
  *
  * Must be called from a component that commits before the table body: its
  * insertion effect reads the rows as they were, before React updates them.
+ * That leans on React's commit order, which is internal rather than
+ * documented: a sibling's insertion effects run before the next sibling's DOM
+ * mutations (React 19.2 runs a component's own insertion effects only after
+ * its children's mutations, hence a sibling placed before `<table>`, see
+ * `DataTableRowMotion`). If an upgrade changes that, the old positions and the
+ * leave copies come from the new DOM. The browser tests in
+ * `data-table.animations.browser.test.tsx` that guard it: "glides rows when
+ * sorting", "fades out rows that leave and removes the copies", "draws a
+ * leave copy where the row was, in a scrolled surface" and "hides a detail
+ * panel as the rows below glide up".
  */
 export function useRowAnimations({
   tableRef,
@@ -277,10 +319,11 @@ export function useRowAnimations({
     job.current = null
     const table = tableRef.current
     if (!work || !table) return
-    // Rows mid-animation were measured where they showed; restart from there.
+    // Rows mid-animation were measured where they showed; restart from
+    // there. The previous change's leave copies would fade over the new
+    // layout: drop them too.
+    stop()
     const live = running.current
-    for (const animation of live) animation.cancel()
-    live.clear()
 
     const rows = drawnRows(table)
     const plan = planRowAnimations(work.prev, {
@@ -298,17 +341,30 @@ export function useRowAnimations({
       animation.finished.then(done, done)
     }
 
-    for (const { key, dy } of plan.moves) {
+    const glides = plan.moves.flatMap(({ key, dy }) => {
       const tr = rows.get(key)
-      if (!tr) continue
+      return tr ? [{ tr, dy }] : []
+    })
+    // All reads before the first animation: a read after a write would
+    // force another style pass, once per row.
+    const borders =
+      glides.length <= MAX_BORDER_LINES
+        ? glides.map(({ tr }) => readBorder(tr))
+        : null
+    glides.forEach(({ tr, dy }, i) => {
       track(
         tr.animate(
           [{ transform: `translateY(${dy}px)` }, { transform: "none" }],
           { duration, easing: ease }
         )
       )
-      for (const animation of moveBorder(tr, duration)) track(animation)
-    }
+      const border = borders?.[i]
+      if (border) {
+        for (const animation of moveBorder(border, duration)) track(animation)
+      } else if (!borders) {
+        track(tr.animate(CLEAR_BORDER, { duration }))
+      }
+    })
     for (const key of plan.enters) {
       const tr = rows.get(key)
       if (!tr) continue
@@ -328,12 +384,7 @@ export function useRowAnimations({
         // The table draws the row's collapsed bottom border, which no clip
         // or opacity on the cells or the row hides: keep it clear until the
         // panel's bottom edge reaches it.
-        track(
-          tr.animate(
-            { borderBottomColor: ["transparent", "transparent"] },
-            { duration }
-          )
-        )
+        track(tr.animate(CLEAR_BORDER, { duration }))
         continue
       }
       track(

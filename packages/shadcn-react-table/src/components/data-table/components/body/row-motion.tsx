@@ -32,7 +32,11 @@ function rowKeys<TData extends RowData>(
 /**
  * Runs the row animations. Renders nothing; it sits before the `<table>` so
  * its insertion effect sees the rows before React updates them (React runs a
- * component's insertion effects after updating its own children).
+ * component's insertion effects after updating its own children, and a
+ * sibling's before the next sibling's DOM updates). That order is React's
+ * internal behaviour, not a documented guarantee; the leave, glide and
+ * detail-panel tests in `data-table.animations.browser.test.tsx` catch a
+ * change (see `useRowAnimations`).
  */
 export function DataTableRowMotion<TData extends RowData>({
   table,

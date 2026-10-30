@@ -16,12 +16,13 @@ export type RowAnimationPlan = {
 /** Above this many animated rows the table just updates. */
 export const MAX_ANIMATED_ROWS = 300
 
-const NONE: RowAnimationPlan = {
+/** An empty plan: a fresh object each time, so no caller can share it. */
+const none = (skipped = false): RowAnimationPlan => ({
   moves: [],
   enters: [],
   leaves: [],
-  skipped: false,
-}
+  skipped,
+})
 
 /**
  * What changed between two snapshots: rows to glide (with the distance), rows
@@ -33,7 +34,7 @@ export function planRowAnimations(
   next: RowSnapshot,
   limit = MAX_ANIMATED_ROWS
 ): RowAnimationPlan {
-  if (!prev) return NONE
+  if (!prev) return none()
   const moves: { key: string; dy: number }[] = []
   const enters: string[] = []
   for (const [key, top] of next.tops) {
@@ -49,7 +50,7 @@ export function planRowAnimations(
     if (!next.members.has(key)) leaves.push(key)
   }
   if (moves.length + enters.length + leaves.length > limit) {
-    return { ...NONE, skipped: true }
+    return none(true)
   }
   return { moves, enters, leaves, skipped: false }
 }
