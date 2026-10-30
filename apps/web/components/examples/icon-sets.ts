@@ -36,10 +36,12 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableIcons } from "@monabbir/shadcn-react-table/components/data-table"
 
 /** Remix has no directional pins, so turn the pushpin like the defaults do. */
-const turnedPin =
-  (rotation: string): DataTableIcons["pin"] =>
-  ({ className }) =>
+function turnedPin(rotation: string): DataTableIcons["pin"] {
+  const TurnedPin: DataTableIcons["pin"] = ({ className }) =>
     createElement(RiPushpinLine, { className: cn(rotation, className) })
+  TurnedPin.displayName = "TurnedPin"
+  return TurnedPin
+}
 
 /**
  * A full Remix Icon mapping for every `DataTableIcons` slot, so the customizer
