@@ -45,7 +45,8 @@ import { useTableState } from "../hooks/use-table-state"
 import { useFullscreenModal } from "../hooks/use-fullscreen-modal"
 import { useRowPinningDisplay } from "../hooks/use-row-pinning-display"
 import { getDataRowCount, getHeaderRowCount } from "../helpers/grid-rows"
-import { getColumnSizeVars } from "../utils/column-styles"
+import { getColumnSizeVars, TABLE_GROW_VAR } from "../utils/column-styles"
+import { useColumnGrow } from "../hooks/use-column-grow"
 import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
@@ -150,10 +151,13 @@ export function DataTable<TData extends RowData>({
     direction,
     setDirection,
     enableColumnVirtualization,
+    layoutMode,
     localization,
     renderCaption,
     renderTopToolbar,
   } = dt(table)
+  // The grid modes size every column from the size vars (fixed layout).
+  const isGridLayout = layoutMode === "grid" || layoutMode === "grid-no-grow"
   const { refs } = table.dataTable
   const animate = useAnimationsActive(enableAnimations)
   // The drop zones slide in and fade out when grouping turns on or off;
@@ -344,12 +348,34 @@ export function DataTable<TData extends RowData>({
 
   const columnSizing = table.getState().columnSizing
   const columnSizingInfo = table.getState().columnSizingInfo
+  const flatHeaders = table.getFlatHeaders()
+  const useSizeVars = enableColumnResizing || isGridLayout
   const columnSizeVars = React.useMemo(
-    () => (enableColumnResizing ? getColumnSizeVars(table) : {}),
-    // columnSizing/Info are intentional triggers: recompute vars on resize.
+    () => (useSizeVars ? getColumnSizeVars(table) : {}),
+    // columnSizing/Info are intentional triggers: recompute vars on resize;
+    // the headers change when columns are shown, hidden or replaced.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [enableColumnResizing, table, columnSizing, columnSizingInfo]
+    [useSizeVars, table, columnSizing, columnSizingInfo, flatHeaders]
   )
+  useColumnGrow(table, gridRef, layoutMode === "grid")
+  const totalSize = table.getTotalSize()
+  // Fixed layout makes per-column widths authoritative (auto layout would
+  // stretch/redistribute them and ignore a resize). In grid mode the table is
+  // its columns' sizes plus the spare width they grew by (`--table-grow`,
+  // see `useColumnGrow`); without grow, just their sizes. With resizing in
+  // semantic mode, `max(100%, totalSize)` keeps the table at least as wide as
+  // the surface: when the columns are narrower than the surface, fixed layout
+  // distributes the slack proportionally so they fill it (no trailing empty
+  // space); when they outgrow the surface, the table exceeds 100% and scrolls
+  // horizontally.
+  const tableWidth =
+    layoutMode === "grid"
+      ? `calc((${totalSize} + var(${TABLE_GROW_VAR}, 0)) * 1px)`
+      : layoutMode === "grid-no-grow"
+        ? `${totalSize}px`
+        : enableColumnResizing
+          ? `max(100%, ${totalSize}px)`
+          : undefined
 
   const dndContent = (
     <>
@@ -467,18 +493,9 @@ export function DataTable<TData extends RowData>({
               "aria-busy": isBusy || undefined,
               style: {
                 ...columnSizeVars,
-                // Fixed layout makes per-column widths authoritative (auto
-                // layout would stretch/redistribute them and ignore a resize).
-                // `max(100%, totalSize)` keeps the table at least as wide as the
-                // surface: when the columns are narrower than the surface, fixed
-                // layout distributes the slack proportionally so they fill it
-                // (no trailing empty space); when they outgrow the surface, the
-                // table exceeds 100% and scrolls horizontally.
-                ...(enableColumnResizing
-                  ? { width: `max(100%, ${table.getTotalSize()}px)` }
-                  : null),
+                ...(tableWidth ? { width: tableWidth } : null),
               },
-              className: cn(enableColumnResizing && "table-fixed"),
+              className: cn(useSizeVars && "table-fixed"),
             } as React.ComponentProps<"table">,
             getSlotProps(table, "table", {})
           )}

@@ -173,6 +173,15 @@ export interface EditingCell {
 /** Edit-field variants for the inline editors. */
 export type EditVariant = "text" | "number" | "select"
 
+/** How the table sizes its columns (see `layoutMode`):
+ *  - `"semantic"` (default): the browser's table layout; columns with a
+ *    `size` keep it and the others share the rest of the width.
+ *  - `"grid"`: every column keeps its size and the spare width goes to the
+ *    growing columns (`meta.grow`), by weight.
+ *  - `"grid-no-grow"`: every column keeps its size and nothing grows; the
+ *    table is as wide as its columns. */
+export type LayoutMode = "semantic" | "grid" | "grid-no-grow"
+
 // Per-column configuration carried on `columnDef.meta`. Augments the TanStack
 // `ColumnMeta` interface so it is strongly typed everywhere `meta` is read.
 declare module "@tanstack/react-table" {
@@ -254,6 +263,12 @@ declare module "@tanstack/react-table" {
     enableClickToCopy?: ClickToCopyOption<TData>
     /** Horizontal alignment applied to the header label and body cells. */
     align?: "left" | "center" | "right"
+    /** In `layoutMode: "grid"`, whether this column takes a share of the
+     *  spare width (`true`, the default for data columns), keeps its size
+     *  (`false` or 0), or how large its share is (a number: 2 takes twice
+     *  the share of a column with 1). A column the user has resized (one with
+     *  a size in `columnSizing`) keeps that size. */
+    grow?: boolean | number
     /** `false` opts this column out of match highlighting (the table option of
      *  the same name turns it on or off for every column). */
     enableFilterMatchHighlighting?: boolean
@@ -625,6 +640,8 @@ export interface DataTableConfig<TData extends RowData> {
   enableColumnOrdering: boolean
   enableColumnPinning: boolean
   enableColumnResizing: boolean
+  /** How the table sizes its columns (see {@link LayoutMode}). */
+  layoutMode: LayoutMode
   enableColumnAutosize: boolean
   /** Resize a single column to fit its widest visible value (header + data). */
   autoSizeColumn: (columnId: string) => void
@@ -1022,6 +1039,15 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   enableColumnPinning?: boolean
   /** Column resizing via an edge drag handle. */
   enableColumnResizing?: boolean
+  /**
+   * How the table sizes its columns. `"semantic"` (default) uses the
+   * browser's table layout. `"grid"` keeps every column at its size and
+   * shares the spare width between the growing columns by weight (see the
+   * column's `meta.grow`; the table's own columns never grow), so the table
+   * fills its container. `"grid-no-grow"` keeps every column at its size and
+   * the table as wide as its columns.
+   */
+  layoutMode?: LayoutMode
   /**
    * Double-clicking a column's resize handle auto-sizes it to fit its widest
    * value. Defaults to `enableColumnResizing`. When off, double-click resets

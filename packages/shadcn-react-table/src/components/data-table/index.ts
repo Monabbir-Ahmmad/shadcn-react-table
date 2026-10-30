@@ -68,6 +68,7 @@ export type {
   EditDisplayMode,
   EditVariant,
   EditingCell,
+  LayoutMode,
   RowEvent,
   CellEvent,
   DataTableRefs,
