@@ -121,6 +121,7 @@
 | `enableFullscreenToggle` | `boolean` | `true` | Show the full-screen toggle in the toolbar. Default true. |
 | `enableToolbarInternalActions` | `boolean` | `true` | Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control. |
 | `enableKeyboardNavigation` | `boolean` | `true` | Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`. |
+| `enableAnimations` | `boolean` | `true` | Animate the table: rows glide when their order changes, fade in and out when they enter or leave the data, detail panels open and close smoothly, and the sort arrow, selection checkboxes and selected count transition. Always off when the user prefers reduced motion. Retime it with the CSS variables `--dt-motion-duration`, `--dt-motion-duration-fast` and `--dt-motion-ease` on the table. |
 | `title` | `React.ReactNode` |  | Heading shown at the start of the top toolbar. |
 | `renderTopToolbarCustomActions` | `( props: DataTableSlotProps<TData> ) => React.ReactNode` |  | Custom content rendered in the top toolbar's left region (next to the title), e.g. bulk-action buttons. |
 | `renderTopToolbar` | `(props: DataTableSlotProps<TData>) => React.ReactNode` |  | Replace the entire top toolbar with custom content. |

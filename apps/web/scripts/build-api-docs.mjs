@@ -206,6 +206,12 @@ const SLOT_DESCRIPTIONS = {
   "data-table-surface": "The scroll container for the table (both axes).",
   "data-table-motion-layer":
     "Invisible overlay inside the surface where row enter and leave animations play (only when animations are on).",
+  "data-table-leave-copy":
+    "Copy of a removed row that fades out inside `data-table-motion-layer` (only when animations are on).",
+  "data-table-sort-indicator":
+    "The sort arrow in a column header; it turns around for descending order.",
+  "data-table-selected-count":
+    'The "N selected" text in the selection alert banner.',
   "data-table-progress":
     "Indeterminate progress bar shown while loading or saving.",
   "data-table-progress-bar": "The moving bar inside `data-table-progress`.",

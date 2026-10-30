@@ -394,4 +394,9 @@ export const EXAMPLE_META: { slug: string; title: string; category: string }[] =
       title: "Column drag",
       category: "Columns",
     },
+    {
+      slug: "animations",
+      title: "Animations",
+      category: "Display",
+    },
   ]

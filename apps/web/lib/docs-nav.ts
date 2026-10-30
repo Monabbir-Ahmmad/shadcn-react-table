@@ -107,6 +107,7 @@ export const docsNav: DocsNavGroup[] = [
     icon: RiPaletteLine,
     items: [
       { title: "Density", href: "/docs/guides/density" },
+      { title: "Animations", href: "/docs/guides/animations", badge: "New" },
       { title: "Sticky header & footer", href: "/docs/guides/sticky" },
       { title: "Toolbar customization", href: "/docs/guides/toolbar" },
       {

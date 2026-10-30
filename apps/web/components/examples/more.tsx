@@ -949,6 +949,37 @@ function ColumnDragExample() {
   return <DataTable table={table} />
 }
 
+function AnimationsExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const [animated, setAnimated] = React.useState(true)
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    enableAnimations: animated,
+    initialState: { pagination: { pageIndex: 0, pageSize: 8 } },
+    renderDetailPanel: ({ row }) => (
+      <p className="p-4 text-sm text-muted-foreground">
+        {row.original.firstName} {row.original.lastName} is {row.original.role}{" "}
+        in {row.original.department}, based in {row.original.city}.
+      </p>
+    ),
+    renderTopToolbarCustomActions: () => (
+      <Button
+        size="sm"
+        variant={animated ? "default" : "outline"}
+        aria-pressed={animated}
+        onClick={() => setAnimated((on) => !on)}
+      >
+        Animations {animated ? "on" : "off"}
+      </Button>
+    ),
+  })
+  return <DataTable table={table} />
+}
+
 export const MORE_EXAMPLES = [
   {
     slug: "minimal",
@@ -1091,5 +1122,13 @@ export const MORE_EXAMPLES = [
     description: "The whole column moves while you drag it.",
     category: "Columns",
     Component: ColumnDragExample,
+  },
+  {
+    slug: "animations",
+    title: "Animations",
+    description:
+      "Rows glide, fade and open smoothly as you sort, filter and expand.",
+    category: "Display",
+    Component: AnimationsExample,
   },
 ]

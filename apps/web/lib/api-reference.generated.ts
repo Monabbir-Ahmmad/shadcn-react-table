@@ -3163,6 +3163,14 @@ export const slots: ApiMember[] = [
       "Invisible marker after the last row; infinite scroll loads more when it nears the viewport.",
   },
   {
+    name: "data-table-leave-copy",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Copy of a removed row that fades out inside `data-table-motion-layer` (only when animations are on).",
+  },
+  {
     name: "data-table-motion-layer",
     type: "",
     required: true,
@@ -3183,6 +3191,21 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: "The moving bar inside `data-table-progress`.",
+  },
+  {
+    name: "data-table-selected-count",
+    type: "",
+    required: true,
+    default: null,
+    description: 'The "N selected" text in the selection alert banner.',
+  },
+  {
+    name: "data-table-sort-indicator",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "The sort arrow in a column header; it turns around for descending order.",
   },
   {
     name: "data-table-surface",

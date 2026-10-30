@@ -180,6 +180,10 @@ for every rename.
   loading.
 - **Added:** `direction` on the table instance (`"ltr"` or `"rtl"`, measured
   from the page).
+- **New:** animations. Rows glide when their order changes and fade in and
+  out, detail panels open smoothly, and the sort arrow, checkboxes and selected
+  count transition. On by default and off for reduced motion;
+  `enableAnimations: false` turns it off.
 
 ### Changed
 
