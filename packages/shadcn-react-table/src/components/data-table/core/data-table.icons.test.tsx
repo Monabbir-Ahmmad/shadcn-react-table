@@ -1,8 +1,9 @@
+import { renderToStaticMarkup } from "react-dom/server"
 import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeAll, describe, expect, it } from "vitest"
 
 import { DataTable } from "./data-table"
-import type { DataTableIcons } from "./icons"
+import { defaultIcons, type DataTableIcons } from "./icons"
 import type { UseDataTableOptions } from "./types"
 import { useDataTable } from "./use-data-table"
 
@@ -112,6 +113,67 @@ describe("directional pin icons", () => {
     expect(iconOf("Clear filter").getAttribute("data-icon")).toBe(
       "clear-filter"
     )
+  })
+})
+
+describe("clear icon fallbacks", () => {
+  const openMenu = (icons: Partial<DataTableIcons>) => {
+    render(<Harness icons={icons} columnFilterDisplayMode="subheader" />)
+    openColumnMenu()
+  }
+
+  it("uses an overridden clearAll for clear sort", () => {
+    openMenu({ clearAll: Marker("my-clear-all") })
+    expect(iconOf("Clear sort").getAttribute("data-icon")).toBe("my-clear-all")
+    expect(iconOf("Show all columns").getAttribute("data-icon")).toBe(
+      "my-clear-all"
+    )
+  })
+
+  it("uses an overridden filterOff for clear filter", () => {
+    openMenu({ filterOff: Marker("my-filter-off") })
+    expect(iconOf("Clear filter").getAttribute("data-icon")).toBe(
+      "my-filter-off"
+    )
+  })
+
+  it("prefers clearSort and clearFilter when both are set", () => {
+    openMenu({
+      clearAll: Marker("all"),
+      clearSort: Marker("sort"),
+      filterOff: Marker("off"),
+      clearFilter: Marker("filter"),
+    })
+    expect(iconOf("Clear sort").getAttribute("data-icon")).toBe("sort")
+    expect(iconOf("Clear filter").getAttribute("data-icon")).toBe("filter")
+  })
+})
+
+describe("default pin directions", () => {
+  const slots = (names: (keyof DataTableIcons)[]) =>
+    names.map((name) => {
+      const Icon = defaultIcons[name]
+      return renderToStaticMarkup(<Icon />)
+    })
+
+  it("points left and right pins into their edges, mirrored", () => {
+    const [left, right] = slots(["pinLeft", "pinRight"])
+    expect(left).toContain("rotate-90")
+    expect(left).not.toContain("-rotate-90")
+    expect(right).toContain("-rotate-90")
+  })
+
+  it("points the top pin up and the bottom pin down", () => {
+    const [top, bottom, pinned, plain] = slots([
+      "pinTop",
+      "pinBottom",
+      "pinnedRow",
+      "pin",
+    ])
+    expect(top).toContain("rotate-180")
+    expect(bottom).not.toContain("rotate")
+    expect(bottom).toBe(plain)
+    expect(pinned).toBe(plain)
   })
 })
 

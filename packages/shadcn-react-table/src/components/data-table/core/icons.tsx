@@ -56,7 +56,7 @@ const PinLeft = rotated(Pin, "rotate-90", "PinLeft")
 /** Needle points right, the mirror of `PinLeft`. */
 const PinRight = rotated(Pin, "-rotate-90", "PinRight")
 /** Needle points up (turned half a turn). */
-const PinBottom = rotated(Pin, "rotate-180", "PinBottom")
+const PinTop = rotated(Pin, "rotate-180", "PinTop")
 
 /**
  * Every icon the data table renders, by semantic name. Defaults are Lucide
@@ -82,9 +82,15 @@ export interface DataTableIcons {
   advancedFilter: IconComponent
   /** Show-all-columns reset action in the column menu. */
   clearAll: IconComponent
-  /** Clear-sort item in the column menu. */
+  /**
+   * Clear-sort item in the column menu. When not overridden but `clearAll`
+   * is, it uses your `clearAll`.
+   */
   clearSort: IconComponent
-  /** Clear-filter item in the column menu. */
+  /**
+   * Clear-filter item in the column menu. When not overridden but `filterOff`
+   * is, it uses your `filterOff`.
+   */
   clearFilter: IconComponent
   /** Hide-column menu item. */
   hide: IconComponent
@@ -97,11 +103,11 @@ export interface DataTableIcons {
   pinLeft: IconComponent
   /** Pin-column-to-the-right menu item. The default needle points right. */
   pinRight: IconComponent
-  /** Pin-row-to-the-top button while the row is unpinned. */
+  /** Pin-row-to-the-top button while the row is unpinned. The default needle points up. */
   pinTop: IconComponent
   /**
    * Pin-row-to-the-bottom button while the row is unpinned (used when
-   * `rowPinningDisplayMode` is `"bottom"`). The default needle points up.
+   * `rowPinningDisplayMode` is `"bottom"`). The default needle points down.
    */
   pinBottom: IconComponent
   /** Shown on a pinned row's pin button. */
@@ -163,8 +169,8 @@ export const defaultIcons: DataTableIcons = {
   pin: Pin,
   pinLeft: PinLeft,
   pinRight: PinRight,
-  pinTop: Pin,
-  pinBottom: PinBottom,
+  pinTop: PinTop,
+  pinBottom: Pin,
   pinnedRow: Pin,
   unpin: PinOff,
   group: Group,
@@ -195,6 +201,8 @@ const PIN_SLOTS = ["pinLeft", "pinRight", "pinTop", "pinBottom"] as const
  * Merges the icon layers over the defaults (later layers win). A consumer who
  * overrides `pin` but none of the directional pin slots gets their `pin` on
  * all of them, so the library never mixes their set with its own rotated pins.
+ * Likewise `clearSort` falls back to an overridden `clearAll` and
+ * `clearFilter` to an overridden `filterOff`.
  */
 export function resolveIcons(
   ...layers: (Partial<DataTableIcons> | undefined)[]
@@ -205,6 +213,12 @@ export function resolveIcons(
     for (const slot of PIN_SLOTS) {
       if (!overrides[slot]) resolved[slot] = overrides.pin
     }
+  }
+  if (overrides.clearAll && !overrides.clearSort) {
+    resolved.clearSort = overrides.clearAll
+  }
+  if (overrides.filterOff && !overrides.clearFilter) {
+    resolved.clearFilter = overrides.filterOff
   }
   return resolved
 }
