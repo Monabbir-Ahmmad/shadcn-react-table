@@ -1,7 +1,7 @@
 "use client"
 
 import type { RowData } from "@tanstack/react-table"
-import type * as React from "react"
+import * as React from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -26,8 +26,27 @@ interface DataTablePaginationProps<TData extends RowData> {
   table: DataTableInstance<TData>
 }
 
+/** Below Tailwind's `sm`: phones get the native page-size picker. */
+const PHONE = "(max-width: 639px)"
+
+function subscribePhone(onChange: () => void) {
+  if (typeof matchMedia !== "function") return () => {}
+  const media = matchMedia(PHONE)
+  media.addEventListener("change", onChange)
+  return () => media.removeEventListener("change", onChange)
+}
+
+/** Whether the screen is phone-sized; false on the server and in hydration. */
+function usePhone() {
+  return React.useSyncExternalStore(
+    subscribePhone,
+    () => typeof matchMedia === "function" && matchMedia(PHONE).matches,
+    () => false
+  )
+}
+
 /**
- * Bottom toolbar. Left: rows-per-page select. Right: MRT-style "start–end of
+ * Bottom toolbar. Left: rows-per-page select (the native picker on phones). Right: MRT-style "start–end of
  * total" range label + first/prev/next/last icon buttons. Works in client and
  * manual/server pagination (counts come from the table instance).
  */
@@ -36,6 +55,7 @@ export function DataTablePagination<TData extends RowData>({
 }: DataTablePaginationProps<TData>) {
   const { localization, icons, paginationDisplayMode, pageSizeOptions } =
     dt(table)
+  const phone = usePhone()
   if (paginationDisplayMode === "custom") return null
 
   const { pageIndex, pageSize } = table.getState().pagination
@@ -57,27 +77,43 @@ export function DataTablePagination<TData extends RowData>({
         <span className="text-xs font-medium tracking-wide text-muted-foreground">
           {localization.rowsPerPage}
         </span>
-        <Select
-          value={`${pageSize}`}
-          onValueChange={(value) => table.setPageSize(Number(value))}
-        >
-          <SelectTrigger
-            size="sm"
-            className="h-8 w-18"
+        {phone ? (
+          // The phone's own picker: easier to use by touch than a popover.
+          <select
+            value={pageSize}
+            onChange={(event) => table.setPageSize(Number(event.target.value))}
             aria-label={localization.rowsPerPage}
+            className="h-8 w-18 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
           >
-            <SelectValue
-              placeholder={formatInteger(pageSize, localization.language)}
-            />
-          </SelectTrigger>
-          <SelectContent>
             {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={`${size}`}>
+              <option key={size} value={size}>
                 {formatInteger(size, localization.language)}
-              </SelectItem>
+              </option>
             ))}
-          </SelectContent>
-        </Select>
+          </select>
+        ) : (
+          <Select
+            value={`${pageSize}`}
+            onValueChange={(value) => table.setPageSize(Number(value))}
+          >
+            <SelectTrigger
+              size="sm"
+              className="h-8 w-18"
+              aria-label={localization.rowsPerPage}
+            >
+              <SelectValue
+                placeholder={formatInteger(pageSize, localization.language)}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {pageSizeOptions.map((size) => (
+                <SelectItem key={size} value={`${size}`}>
+                  {formatInteger(size, localization.language)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {paginationDisplayMode === "pages" ? (
