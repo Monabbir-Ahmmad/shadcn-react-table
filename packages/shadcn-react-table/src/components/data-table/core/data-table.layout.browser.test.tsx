@@ -439,3 +439,55 @@ describe("range filters", () => {
     }
   })
 })
+
+type PickRow = { id: string; name: string; role: string; team: string }
+
+function PickFilters() {
+  const table = useDataTable<PickRow>({
+    columns: [
+      { accessorKey: "name", header: "Name", size: 200 },
+      {
+        accessorKey: "role",
+        header: "Role",
+        size: 200,
+        meta: { filterVariant: "select" },
+      },
+      {
+        accessorKey: "team",
+        header: "Team",
+        size: 200,
+        meta: { filterVariant: "multi-select" },
+      },
+    ],
+    data: [
+      { id: "0", name: "Ava", role: "Owner", team: "Ops" },
+      { id: "1", name: "Liam", role: "Admin", team: "Sales" },
+    ],
+    getRowId: (row) => row.id,
+    enablePagination: false,
+    initialState: { showColumnFilters: true },
+  })
+  return <DataTable table={table} />
+}
+
+describe("filter row", () => {
+  it("lines the select filters up with the text filters", async () => {
+    render(<PickFilters />)
+    await nextFrame()
+    const row = document.querySelector("tr[data-filter-row]")!
+    const text = row
+      .querySelector('[data-slot="input-group"]')!
+      .getBoundingClientRect()
+    const select = row
+      .querySelector('[data-slot="select-trigger"]')!
+      .getBoundingClientRect()
+    const multi = row
+      .querySelector('[data-slot="popover-trigger"]')!
+      .getBoundingClientRect()
+    for (const box of [select, multi]) {
+      expect(box.height).toBeCloseTo(text.height, 0)
+      // Same bottom edge: the underlines line up.
+      expect(box.bottom).toBeCloseTo(text.bottom, 0)
+    }
+  })
+})

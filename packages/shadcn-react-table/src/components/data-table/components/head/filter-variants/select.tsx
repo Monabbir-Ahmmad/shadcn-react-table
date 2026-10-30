@@ -33,7 +33,12 @@ export function SelectFilterField<TData extends RowData, TValue>({
       >
         <SelectTrigger
           size="sm"
-          className={cn(FIELD_CLASS, "w-full min-w-0 flex-1 px-2")}
+          // Some styles size the small trigger with `data-[size=sm]:h-*`,
+          // which beats a plain `h-8`: match the other filter inputs.
+          className={cn(
+            FIELD_CLASS,
+            "w-full min-w-0 flex-1 px-2 data-[size=sm]:h-8"
+          )}
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           <SelectValue
