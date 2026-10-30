@@ -41,9 +41,8 @@ describe("enableAnimations", () => {
     render(<Harness />)
     expect(root().hasAttribute("data-animations")).toBe(true)
     expect(layer()).not.toBeNull()
-    expect(
-      (root() as HTMLElement).style.getPropertyValue("--dt-motion-duration")
-    ).toBe("280ms")
+    const surface = document.querySelector('[data-slot="data-table-surface"]')!
+    expect(surface.contains(layer())).toBe(true)
   })
 
   it("lets the consumer retime the motion", () => {
@@ -71,5 +70,6 @@ describe("enableAnimations", () => {
     }))
     render(<Harness />)
     expect(root().hasAttribute("data-animations")).toBe(false)
+    expect(layer()).toBeNull()
   })
 })
