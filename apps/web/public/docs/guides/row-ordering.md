@@ -55,7 +55,51 @@ const table = useDataTable({
 return <DataTable table={table} />
 ```
 
-> **Not compatible with virtualization:** Row drag-and-drop is incompatible with row virtualization. Disable virtualization when you enable row ordering.
+## With virtualization
+
+Row ordering works with `enableRowVirtualization`. Drag a row toward the top or bottom edge of the table and it scrolls; the dragged row stays rendered while it moves past the rendered window, so you can drop it anywhere in a long list.
+
+Example (`row-ordering-virtualized`):
+
+```tsx
+function VirtualizedRowOrderingExample() {
+  const [data, setData] = React.useState(() => makeUsers(1000))
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowOrdering: true,
+    enableRowVirtualization: true,
+    enablePagination: false,
+    onRowOrderChange: (activeId, overId) =>
+      setData((prev) => {
+        const from = prev.findIndex((r) => r.id === activeId)
+        const to = prev.findIndex((r) => r.id === overId)
+        if (from === -1 || to === -1) return prev
+        const next = [...prev]
+        const [moved] = next.splice(from, 1)
+        if (moved) next.splice(to, 0, moved)
+        return next
+      }),
+  })
+  return <DataTable table={table} />
+}
+```
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowOrdering: true,
+  enableRowVirtualization: true,
+  enablePagination: false,
+  onRowOrderChange, // as above
+})
+```
+
+> **Custom range extractor:** A `rangeExtractor` passed in `rowVirtualizerOptions` still picks the rendered rows; the table adds the dragged row to its result.
 
 ## Related
 

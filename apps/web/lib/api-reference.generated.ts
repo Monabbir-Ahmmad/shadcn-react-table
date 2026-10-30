@@ -359,6 +359,14 @@ export const useDataTableOptions: ApiMember[] = [
     description: "Column resizing via an edge drag handle.",
   },
   {
+    name: "layoutMode",
+    type: "LayoutMode",
+    required: false,
+    default: '"semantic"',
+    description:
+      'How the table sizes its columns. `"semantic"` (default) uses the browser\'s table layout. `"grid"` keeps every column at its size and shares the spare width between the growing columns by weight (see the column\'s `meta.grow`; the table\'s own columns never grow), so the table fills its container. `"grid-no-grow"` keeps every column at its size and the table as wide as its columns.',
+  },
+  {
     name: "enableColumnAutosize",
     type: "boolean",
     required: false,
@@ -675,7 +683,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "false",
     description:
-      "Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD.",
+      "Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls.",
   },
   {
     name: "enableColumnVirtualization",
@@ -721,7 +729,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function.",
+      "Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function.",
   },
   {
     name: "columnVirtualizerOptions",
@@ -836,10 +844,11 @@ export const useDataTableOptions: ApiMember[] = [
   },
   {
     name: "positionToolbarAlertBanner",
-    type: '"top" | "bottom" | "none"',
+    type: '"top" | "bottom" | "head-overlay" | "none"',
     required: false,
     default: '"top"',
-    description: 'Where the row-selection alert banner renders. Default "top".',
+    description:
+      'Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`).',
   },
   {
     name: "positionToolbarDropZone",
@@ -1128,6 +1137,14 @@ export const columnOptions: ApiMember[] = [
       "Horizontal alignment applied to the header label and body cells.",
   },
   {
+    name: "grow",
+    type: "boolean | number",
+    required: false,
+    default: null,
+    description:
+      'In `layoutMode: "grid"`, whether this column takes a share of the spare width (`true`, the default for data columns), keeps its size (`false` or 0), or how large its share is (a number: 2 takes twice the share of a column with 1). A column the user has resized (one with a size in `columnSizing`) keeps that size.',
+  },
+  {
     name: "enableFilterMatchHighlighting",
     type: "boolean",
     required: false,
@@ -1336,6 +1353,13 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description: "Column resizing via an edge drag handle.",
+  },
+  {
+    name: "layoutMode",
+    type: "LayoutMode",
+    required: true,
+    default: null,
+    description: "How the table sizes its columns (see {@link LayoutMode}).",
   },
   {
     name: "enableColumnAutosize",
@@ -1683,7 +1707,7 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description:
-      "Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD.",
+      "Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls.",
   },
   {
     name: "enableColumnVirtualization",
@@ -1728,7 +1752,7 @@ export const dataTableOptions: ApiMember[] = [
     required: false,
     default: null,
     description:
-      "Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function.",
+      "Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function.",
   },
   {
     name: "columnVirtualizerOptions",
@@ -1855,10 +1879,11 @@ export const dataTableOptions: ApiMember[] = [
   },
   {
     name: "positionToolbarAlertBanner",
-    type: '"top" | "bottom" | "none"',
+    type: '"top" | "bottom" | "head-overlay" | "none"',
     required: true,
     default: null,
-    description: 'Where the row-selection alert banner renders. Default "top".',
+    description:
+      'Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`).',
   },
   {
     name: "positionToolbarDropZone",
@@ -1874,6 +1899,22 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description: "Whether rows can be selected.",
+  },
+  {
+    name: "selectAllMode",
+    type: '"page" | "all"',
+    required: true,
+    default: null,
+    description:
+      'Select-all scope for the header checkbox: the current page ("page", default) or every row ("all").',
+  },
+  {
+    name: "enableSelectAll",
+    type: "boolean",
+    required: true,
+    default: null,
+    description:
+      "Show the select-all checkbox in the selection column header. Default true.",
   },
   {
     name: "enableBatchRowSelection",
@@ -3185,7 +3226,16 @@ export const slots: ApiMember[] = [
     type: "",
     required: true,
     default: null,
-    description: "Selection alert banner.",
+    description:
+      'Selection alert banner (`data-position="head-overlay"` when it lies over the header row).',
+  },
+  {
+    name: "data-table-alert-banner-anchor",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      'Zero-height sticky holder at the start of the scroll surface that the selection banner lies over the header row from (`positionToolbarAlertBanner: "head-overlay"`).',
   },
   {
     name: "data-table-bottom-toolbar",

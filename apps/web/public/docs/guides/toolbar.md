@@ -115,7 +115,7 @@ The row-selection alert banner and the group-by drop zone default to the top. Re
 
 ```tsx
 useDataTable({
-  positionToolbarAlertBanner: "bottom", // "top" | "bottom" | "none"
+  positionToolbarAlertBanner: "bottom", // "top" | "bottom" | "head-overlay" | "none"
   positionToolbarDropZone: "both", // "top" | "bottom" | "both" | "none"
 })
 ```
@@ -128,7 +128,7 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 | --- | --- | --- | --- |
 | `data-table-toolbar` |  |  | Top toolbar root. |
 | `data-table-toolbar-actions` |  |  | Internal actions cluster (search, filters, density, full screen, …). |
-| `data-table-alert-banner` |  |  | Selection alert banner. |
+| `data-table-alert-banner` |  |  | Selection alert banner (`data-position="head-overlay"` when it lies over the header row). |
 | `data-table-bottom-toolbar` |  |  | Bottom toolbar (custom actions and/or pagination). |
 | `data-table-pagination` |  |  | Pagination controls. |
 

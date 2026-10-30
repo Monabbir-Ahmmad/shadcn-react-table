@@ -77,9 +77,10 @@ const table = useDataTable({
 rowVirtualizerRef.current?.scrollToIndex(100)
 ```
 
-> **Row drag-ordering is disabled:** Row virtualization is incompatible with row drag-ordering. If you need to
->   reorder rows by dragging, leave virtualization off. See
->   [Row ordering](/docs/guides/row-ordering).
+> **Dragging rows:** Rows can be dragged with virtualization on (`enableRowOrdering`,
+>   `enableRowDragging`): the table scrolls as you drag toward its edge, and the
+>   dragged row stays rendered. See
+>   [Row ordering](/docs/guides/row-ordering#with-virtualization).
 
 ## Column virtualization
 
@@ -125,11 +126,11 @@ return <DataTable table={table} />
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. |
+| `enableRowVirtualization` | `boolean` | `false` | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls. |
 | `enableColumnVirtualization` | `boolean` | `false` | Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers. |
 | `estimateRowHeight` | `number` | `52` | Estimated row height (px) for the virtualizer. Default 52. |
 | `virtualOverscan` | `number` | `8` | Extra rows rendered above/below the viewport. Default 8. |
-| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function. |
+| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function. |
 | `columnVirtualizerOptions` | `ColumnVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function. |
 | `rowVirtualizerInstanceRef` | `React.RefObject<DataTableRowVirtualizer \| null>` |  | Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`. |
 | `columnVirtualizerInstanceRef` | `React.RefObject<DataTableColumnVirtualizer \| null>` |  | Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`. |

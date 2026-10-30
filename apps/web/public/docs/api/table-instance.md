@@ -56,6 +56,7 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `enableColumnOrdering` | `boolean` |  | Drag-and-drop column reordering (adds a grip to each header). |
 | `enableColumnPinning` | `boolean` |  | Column pinning (left/right) via the column-actions menu + sticky columns. |
 | `enableColumnResizing` | `boolean` |  | Column resizing via an edge drag handle. |
+| `layoutMode` | `LayoutMode` |  | How the table sizes its columns (see {@link LayoutMode}). |
 | `enableColumnAutosize` | `boolean` |  | Double-clicking a column's resize handle auto-sizes it to fit its widest value. Defaults to `enableColumnResizing`. When off, double-click resets the column to its default size instead. |
 | `enableRowOrdering` | `boolean` |  | Drag-and-drop row reordering (adds a drag-handle column). |
 | `enableRowPinning` | `boolean` |  | Row pinning (top) via a pin toggle in the row-number column. |
@@ -100,13 +101,13 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `onCellClick` | `(props: CellEvent<TData>) => void` |  | Fired when a body cell is clicked / double-clicked. |
 | `onCellDoubleClick` | `(props: CellEvent<TData>) => void` |  | Called when a cell is double-clicked. Double-clicks on controls inside the cell are ignored. |
 | `refs` | `DataTableRefs` |  | DOM refs to the table's structural elements (populated after mount). |
-| `enableRowVirtualization` | `boolean` |  | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Disables row DnD. |
+| `enableRowVirtualization` | `boolean` |  | Virtualize body rows for large datasets (recommended past ~100 rows). The table surface becomes the scroll container — give it a bounded height via `className`/`style` (defaults to `max-h-[600px]`). Rows can still be dragged: the dragged row stays rendered while the drag scrolls. |
 | `enableColumnVirtualization` | `boolean` |  | Virtualize columns for very wide tables. Applies fixed column widths; works with column pinning (pinned columns stay rendered), column ordering and grouped headers. |
 | `estimateRowHeight` | `number` |  | Estimated row height (px) for the virtualizer. Default 52. |
 | `virtualOverscan` | `number` |  | Extra rows rendered above/below the viewport. Default 8. |
 | `rowHeight` | `number` |  | Flat height (px) applied to every row. |
 | `getRowHeight` | `(row: DataTableRow<TData>) => number \| "auto" \| null` |  | Per-row height: a px number, `"auto"` (wrap + grow), or `null` for default. |
-| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). Accepts an object or a `({ table }) => options` function. |
+| `rowVirtualizerOptions` | `RowVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the row virtualizer (overrides the built-in `count`/`estimateSize`/`overscan`/`measureElement`). A `rangeExtractor` picks the rendered rows; a row being dragged is added to its result. Accepts an object or a `({ table }) => options` function. |
 | `columnVirtualizerOptions` | `ColumnVirtualizerOptions<TData>` |  | Partial `@tanstack/react-virtual` options merged into the column virtualizer. Accepts an object or a `({ table }) => options` function. |
 | `rowVirtualizerInstanceRef` | `React.RefObject<DataTableRowVirtualizer \| null>` |  | Ref populated with the row `Virtualizer` instance for imperative control (e.g. `scrollToIndex`). Only set when `enableRowVirtualization`. |
 | `columnVirtualizerInstanceRef` | `React.RefObject<DataTableColumnVirtualizer \| null>` |  | Ref populated with the column `Virtualizer` instance. Only set when `enableColumnVirtualization`. |
@@ -123,9 +124,11 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `slotProps` | `DataTableSlots<TData> \| undefined` |  | Props for the table's parts; see the `slotProps` option. |
 | `columnFilterDisplayMode` | `ColumnFilterDisplayMode` |  | Where column filter inputs live: `"subheader"` (a filter row under the header, default), `"popover"` (per-column popovers opened from the column header), or `"custom"` (you render them). |
 | `positionGlobalFilter` | `"left" \| "right" \| "none"` |  | Which toolbar region the global search renders in. Default "right" (the internal-actions cluster). "left" places it next to the title/actions; "none" hides it (same as `enableGlobalFilter: false`). |
-| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "none"` |  | Where the row-selection alert banner renders. Default "top". |
+| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "head-overlay" \| "none"` |  | Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`). |
 | `positionToolbarDropZone` | `"top" \| "bottom" \| "both" \| "none"` |  | Where the group-by drop zone renders (grouping only). Default "top". |
 | `enableRowSelection` | `boolean` |  | Whether rows can be selected. |
+| `selectAllMode` | `"page" \| "all"` |  | Select-all scope for the header checkbox: the current page ("page", default) or every row ("all"). |
+| `enableSelectAll` | `boolean` |  | Show the select-all checkbox in the selection column header. Default true. |
 | `enableBatchRowSelection` | `boolean` |  | Shift-click a row's checkbox to select or clear the range since the last click. |
 | `enableTopToolbar` | `boolean` |  | Shows the toolbar above the table (title, search, filters, view options). Default `true`. |
 | `enableBottomToolbar` | `boolean` |  | Shows the toolbar below the table (pagination, custom actions). Default `true`. |

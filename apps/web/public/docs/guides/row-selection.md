@@ -162,6 +162,40 @@ const table = useDataTable({
 })
 ```
 
+## Where the selection banner shows
+
+`positionToolbarAlertBanner` places the banner with the selected count and **Clear selection**: `"top"` (default, between the toolbar and the table), `"bottom"` (under the table), `"head-overlay"` or `"none"`.
+
+With `"head-overlay"` (as in Material React Table) the banner lies over the header row instead, with the select-all checkbox at its start, so selecting rows never pushes the table down. It stays over a sticky header while the table scrolls, spans the visible width when it scrolls sideways, and goes away when nothing is selected, leaving the header clickable again. If you Tab into a header control while it shows, it steps aside until focus leaves the header row. It needs the table head (`enableTableHead`).
+
+Example (`selection-banner-overlay`):
+
+```tsx
+function SelectionBannerOverlayExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    positionToolbarAlertBanner: "head-overlay",
+    initialState: { pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+```
+
+```tsx
+const table = useDataTable({
+  data,
+  columns,
+  getRowId: (row) => row.id,
+  enableRowSelection: true,
+  positionToolbarAlertBanner: "head-overlay", // "top" | "bottom" | "head-overlay" | "none"
+})
+```
+
 ## Relevant options
 
 | Name | Type | Default | Description |
@@ -169,6 +203,7 @@ const table = useDataTable({
 | `enableSelectAll` | `boolean` | `true` | Show the select-all checkbox in the selection column header. Default true. |
 | `selectAllMode` | `"page" \| "all"` | `"page"` | Select-all scope for the header checkbox: the current page ("page", default) or every row ("all"). |
 | `enableBatchRowSelection` | `boolean` | `true` | Shift-click a row's checkbox to select (or clear) every row since the last one clicked. Default true. |
+| `positionToolbarAlertBanner` | `"top" \| "bottom" \| "head-overlay" \| "none"` | `"top"` | Where the row-selection alert banner renders: above the table (`"top"`, default), below it (`"bottom"`), over the header row (`"head-overlay"`, with the select-all checkbox, so selecting rows does not move the table; needs the table head), or nowhere (`"none"`). |
 
 ## Related
 

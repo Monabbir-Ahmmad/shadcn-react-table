@@ -34,6 +34,7 @@ const columns: DataTableColumnDef<Person>[] = [
 | `validate` | `(value: unknown) => string \| undefined` |  | Validate an edited value; return an error message or undefined if valid. |
 | `enableClickToCopy` | `ClickToCopyOption<TData>` |  | Copy this column's cells on click (`true`), from the cell menu (`"context-menu"`), or decide per cell with a function. |
 | `align` | `"left" \| "center" \| "right"` |  | Horizontal alignment applied to the header label and body cells. |
+| `grow` | `boolean \| number` |  | In `layoutMode: "grid"`, whether this column takes a share of the spare width (`true`, the default for data columns), keeps its size (`false` or 0), or how large its share is (a number: 2 takes twice the share of a column with 1). A column the user has resized (one with a size in `columnSizing`) keeps that size. |
 | `enableFilterMatchHighlighting` | `boolean` |  | `false` opts this column out of match highlighting (the table option of the same name turns it on or off for every column). |
 | `visibleInShowHideMenu` | `boolean` |  | `false` leaves this column out of the show / hide columns menu. |
 | `enableColumnActions` | `boolean` |  | `false` hides the column-actions menu for this column. |
