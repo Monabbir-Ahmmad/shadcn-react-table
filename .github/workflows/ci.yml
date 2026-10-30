@@ -19,7 +19,8 @@ permissions:
   contents: read
 
 jobs:
-  # A PR that changes the table's source must say what changed for users.
+  # A PR that changes the table's source must say what changed for users: a
+  # changeset (`pnpm changeset`), or the no-changelog label.
   changelog:
     if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'no-changelog')
     runs-on: ubuntu-latest
@@ -29,14 +30,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Changelog entry for source changes
+      # Version comes from the root package.json "packageManager" field.
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Fails when the table's source (not its tests, see `changedFilePatterns`
+      # in .changeset/config.json) changed with no changeset.
+      - name: Changeset for source changes
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: |
-          changed=$(git diff --name-only "$BASE"...HEAD)
-          source=$(echo "$changed" | grep '^packages/shadcn-react-table/src/' | grep -v '\.test\.' || true)
-          if [ -n "$source" ] && ! echo "$changed" | grep -q '^packages/shadcn-react-table/CHANGELOG.md$'; then
-            echo "::error::The table's source changed without a CHANGELOG.md entry. Add one under '## Unreleased', or the no-changelog label."
+          if ! pnpm changeset status --since="$BASE"; then
+            echo "::error::The table's source changed without a changeset. Run 'pnpm changeset', or add the no-changelog label."
             exit 1
           fi
 

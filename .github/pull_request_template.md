@@ -13,6 +13,6 @@
 - [ ] `pnpm typecheck` passes
 - [ ] `pnpm test` and `pnpm test:browser` pass
 - [ ] `pnpm build` passes and the regenerated files are committed
-- [ ] User-facing changes have a `CHANGELOG.md` entry under `## Unreleased` (or the PR has the `no-changelog` label)
+- [ ] User-facing changes have a changeset (`pnpm changeset`), or the PR has the `no-changelog` label
 - [ ] New options have JSDoc and, where it helps, a docs example
 - [ ] I've described what I changed and why above

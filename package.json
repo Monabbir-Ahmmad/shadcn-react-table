@@ -10,9 +10,12 @@
     "format": "turbo format",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "test:browser": "turbo test:browser"
+    "test:browser": "turbo test:browser",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm --filter shadcn-react-table-web registry:build"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "prettier": "^3.9.9",

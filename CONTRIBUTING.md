@@ -42,18 +42,28 @@ pnpm install
 
 ## Changelog
 
-Every pull request that changes what users get — the data table's behavior,
-options, types, styles or docs they rely on — adds an entry to
-[`packages/shadcn-react-table/CHANGELOG.md`](packages/shadcn-react-table/CHANGELOG.md)
-under `## Unreleased` (create the heading if it isn't there). Start each entry
-with **New**, **Changed**, **Fixed** or **Removed**, and mark breaking changes
-**(breaking)** with what to do instead. CI checks that a PR touching the table's
-source also touches the changelog; for a change users can't see (tests,
-refactors), add the `no-changelog` label.
+Versions and the changelog are managed with
+[Changesets](https://github.com/changesets/changesets). Every pull request that
+changes what users get — the data table's behavior, options, types, styles or
+docs they rely on — adds a changeset:
 
-A release renames `## Unreleased` to the new version and bumps `version` in
-`packages/shadcn-react-table/package.json`; merging that to `main` publishes the
-GitHub release with that section as its notes.
+```bash
+pnpm changeset
+```
+
+Pick `major` for a breaking change, `minor` for a new feature, `patch` for a
+fix, and write the summary for users, as it will read in
+[`CHANGELOG.md`](packages/shadcn-react-table/CHANGELOG.md): start it with
+**New**, **Changed**, **Fixed** or **Removed**, and say what to do instead for
+a breaking change. Edit the file in `.changeset/` freely before merging. CI
+checks that a PR touching the table's source (not its tests) has a changeset;
+for a change users can't see (tests, refactors), add the `no-changelog` label.
+
+Releasing is automatic. Once changesets land on `main`, the Version workflow
+keeps a "chore: version packages" pull request open: it bumps `version` in
+`packages/shadcn-react-table/package.json`, moves the changesets into the
+changelog and rebuilds the registry. Merging it publishes the GitHub release,
+with that version's changelog section as its notes.
 
 ## Generated files
 

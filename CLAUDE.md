@@ -45,6 +45,24 @@ Per-package: the same scripts exist in each workspace's `package.json` and can b
 
 > Plans are stored under `.ai/plans/` and code reviews under `.ai/reviews/`.
 
+## Versioning & changelog (Changesets)
+
+The block follows semver and is versioned with [Changesets](https://github.com/changesets/changesets) (config in `.changeset/config.json`). Only `@monabbir/shadcn-react-table` is versioned (private, never published to npm); the other workspaces are ignored.
+
+- **Every change users can see** (behavior, options, types, styles, the docs they rely on) needs a changeset: `pnpm changeset`, or write `.changeset/<name>.md` by hand:
+  ```md
+  ---
+  "@monabbir/shadcn-react-table": patch
+  ---
+
+  **Fixed:** what changed, written for users.
+  ```
+  `major` = breaking (say what to do instead), `minor` = new feature, `patch` = fix. Start the summary with **New**, **Changed**, **Fixed** or **Removed** — it lands in `CHANGELOG.md` word for word (`.changeset/changelog.mjs`, no hashes or links).
+- **Never** bump `version` in `packages/shadcn-react-table/package.json` or add version sections to `CHANGELOG.md` by hand.
+- CI's `changelog` job fails a PR that changes `packages/shadcn-react-table/src/**` (not tests) without a changeset; the `no-changelog` label skips it for changes users can't see (tests, refactors, tooling).
+- Releasing: on `main`, the Version workflow (`.github/workflows/version.yml`) keeps a "chore: version packages" PR open; it runs `pnpm version-packages` (`changeset version` + the registry rebuild, since `meta.version` comes from `package.json`). Merging it bumps the version, and `release.yml` then tags `v<version>` and publishes the GitHub release with that changelog section as its notes.
+- `format` is `false` in the config, so Changesets never runs Prettier on Markdown.
+
 ## Adding shadcn/ui components
 
 Run from the **repo root** (not inside `apps/web`):
