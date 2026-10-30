@@ -958,6 +958,43 @@ describe("filter row and density glide", () => {
     )
   })
 
+  it("shows no scrollbar while the rows glide past a table that fits", async () => {
+    let table!: DataTableInstance<Row>
+    render(<Harness onTable={(t) => (table = t)} />)
+    await nextFrame()
+    const el = surface()
+    expect(el.scrollHeight).toBeLessThanOrEqual(el.clientHeight)
+    act(() => table.setDensity("compact"))
+    // The rows start where they were, below the shorter table's bottom: the
+    // surface hides that overflow rather than flash a scrollbar.
+    expect(running()).toBeGreaterThan(0)
+    expect(getComputedStyle(el).overflowY).toBe("hidden")
+    expect(el.offsetWidth - el.clientWidth).toBe(
+      parseFloat(getComputedStyle(el).borderLeftWidth) +
+        parseFloat(getComputedStyle(el).borderRightWidth)
+    )
+    await settle()
+    expect(el.style.overflowY).toBe("")
+    expect(getComputedStyle(el).overflowY).toBe("auto")
+  })
+
+  it("keeps a scrolling surface scrollable while the rows glide", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        onTable={(t) => (table = t)}
+        slotProps={{ surface: { style: { maxHeight: 120 } } }}
+      />
+    )
+    await nextFrame()
+    const el = surface()
+    expect(el.scrollHeight).toBeGreaterThan(el.clientHeight)
+    act(() => table.setDensity("compact"))
+    expect(running()).toBeGreaterThan(0)
+    expect(getComputedStyle(el).overflowY).toBe("auto")
+    await settle()
+  })
+
   it.each([
     [
       "the density changes",

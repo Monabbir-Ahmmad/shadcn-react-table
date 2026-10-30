@@ -354,12 +354,21 @@ export function useRowAnimations({
   const ghosts = React.useRef(new Set<HTMLElement>())
   /** The motion layer, while it is sized to show copies (see `layerClip`). */
   const sized = React.useRef<HTMLElement | null>(null)
+  /** The surface, and its own overflow-y, while it hides the glide's. */
+  const hidden = React.useRef<{ el: HTMLElement; was: string } | null>(null)
 
   /** Back to an empty, zero-height layer once no copy is left. */
   const unclip = () => {
     if (ghosts.current.size > 0 || !sized.current) return
     sized.current.style.removeProperty("height")
     sized.current = null
+  }
+
+  /** The surface scrolls as it did, once no row glides. */
+  const unhide = () => {
+    if (running.current.size > 0 || !hidden.current) return
+    hidden.current.el.style.overflowY = hidden.current.was
+    hidden.current = null
   }
 
   /** Drops the motion in flight, so it never plays against a new layout. */
@@ -369,6 +378,7 @@ export function useRowAnimations({
     for (const ghost of ghosts.current) ghost.remove()
     ghosts.current.clear()
     unclip()
+    unhide()
   }
 
   // Before React touches the rows: where they sit, and copies of the rows
@@ -461,9 +471,18 @@ export function useRowAnimations({
     const { duration, durationFast, ease } = readMotionTokens(table)
     const layer = work.leaving.length > 0 ? motionLayer(table) : null
     const clip = layer ? layerClip(layer, table) : 0
+    // A surface that does not scroll in the new layout: rows gliding from
+    // past its bottom (a shorter table) would flash a scrollbar.
+    const surface = table.closest<HTMLElement>(
+      '[data-slot="data-table-surface"]'
+    )
+    const fits = !!surface && surface.scrollHeight <= surface.clientHeight
     const track = (animation: Animation) => {
       live.add(animation)
-      const done = () => live.delete(animation)
+      const done = () => {
+        live.delete(animation)
+        unhide()
+      }
       animation.finished.then(done, done)
     }
 
@@ -574,6 +593,10 @@ export function useRowAnimations({
           }
         )
       )
+    }
+    if (fits && live.size > 0) {
+      hidden.current = { el: surface, was: surface.style.overflowY }
+      surface.style.overflowY = "hidden"
     }
     if (!layer) return
     layer.style.height = `${clip}px`
