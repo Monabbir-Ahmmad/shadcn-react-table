@@ -1,6 +1,6 @@
 "use client"
 
-import type * as React from "react"
+import * as React from "react"
 
 import { flexRender, type RowData } from "@tanstack/react-table"
 
@@ -178,9 +178,10 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   )
 }
 
-/** One stacked icon layer; only the shown one is visible. */
+/** One stacked icon layer; only the shown one is visible. Layers fade and
+ *  scale between states. */
 const SORT_LAYER_CLASS = cn(
-  "col-start-1 row-start-1 flex items-center justify-center group-data-[animations]/table:transition-[opacity,visibility]",
+  "col-start-1 row-start-1 flex items-center justify-center group-data-[animations]/table:transition-[opacity,visibility,scale]",
   MOTION_TIMING_CLASS
 )
 
@@ -194,6 +195,10 @@ const UNSORTED_ICON_CLASS =
  * (under `[data-animations]`) instead of swapping nodes. With the default
  * icons, one arrow serves both directions and turns 180° for descending.
  * Custom icons are shown as given and only fade.
+ *
+ * The arrow only turns while it shows: clearing the sort keeps its last
+ * direction so it just fades out, and when it shows again it takes its new
+ * direction at once instead of turning while it fades in.
  */
 function SortIndicator({
   sorted,
@@ -203,6 +208,17 @@ function SortIndicator({
   icons: DataTableInstance["dataTable"]["icons"]
 }) {
   const direction = sorted || "none"
+  // The direction before the last change (state, not a ref: it is read
+  // during render). Set during render, as React's "storing information from
+  // previous renders" pattern does.
+  const [seen, setSeen] = React.useState({ direction, from: direction })
+  let from = seen.from
+  if (seen.direction !== direction) {
+    from = seen.direction
+    setSeen({ direction, from })
+  }
+  const turned = (direction === "none" ? from : direction) === "desc"
+  const turns = from !== "none"
   const defaultArrows =
     icons.sortAscending === defaultIcons.sortAscending &&
     icons.sortDescending === defaultIcons.sortDescending
@@ -211,7 +227,10 @@ function SortIndicator({
     <span
       key={key}
       data-shown={shown ? "" : undefined}
-      className={cn(SORT_LAYER_CLASS, !shown && "invisible opacity-0")}
+      className={cn(
+        SORT_LAYER_CLASS,
+        shown ? "scale-100" : "invisible scale-75 opacity-0"
+      )}
     >
       {icon}
     </span>
@@ -234,9 +253,12 @@ function SortIndicator({
           direction !== "none",
           <icons.sortAscending
             className={cn(
-              "size-3.5 shrink-0 group-data-[animations]/table:transition-[rotate]",
-              MOTION_TIMING_CLASS,
-              direction === "desc" && "rotate-180"
+              "size-3.5 shrink-0",
+              turns && [
+                "group-data-[animations]/table:transition-[rotate]",
+                MOTION_TIMING_CLASS,
+              ],
+              turned && "rotate-180"
             )}
           />,
           "arrow"

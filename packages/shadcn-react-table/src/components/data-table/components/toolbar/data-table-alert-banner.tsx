@@ -22,12 +22,16 @@ export function DataTableAlertBanner<TData extends RowData>({
   const selectedCount = enableRowSelection
     ? table.getSelectedRowModel().rows.length
     : 0
+  const totalCount =
+    selectedCount > 0 ? table.getPrePaginatedRowModel().rows.length : 0
+  const text =
+    selectedCount > 0
+      ? localization.rowsSelected(selectedCount, totalCount)
+      : null
   const countRef = React.useRef<HTMLSpanElement>(null)
-  useCountAnimation(countRef, selectedCount)
+  useCountCrossfade(countRef, text)
 
-  if (selectedCount === 0) return null
-
-  const totalCount = table.getPrePaginatedRowModel().rows.length
+  if (text === null) return null
 
   return (
     <div
@@ -41,12 +45,11 @@ export function DataTableAlertBanner<TData extends RowData>({
         getSlotProps(table, "alertBanner", {})
       )}
     >
-      <span
-        key={selectedCount}
-        ref={countRef}
-        data-slot="data-table-selected-count"
-      >
-        {localization.rowsSelected(selectedCount, totalCount)}
+      {/* The box the old count's copy fades out in (see useCountCrossfade). */}
+      <span className="relative">
+        <span ref={countRef} data-slot="data-table-selected-count">
+          {text}
+        </span>
       </span>
       <button
         type="button"
@@ -60,30 +63,53 @@ export function DataTableAlertBanner<TData extends RowData>({
 }
 
 /**
- * Fades the (re-keyed) count in when the number changes. Not when the banner
- * first appears (from 0), and never unless the table animates: the root's
- * `[data-animations]` already folds in `enableAnimations` and reduced motion,
- * so reading it here needs no extra prop or media-query subscription.
+ * Crossfades the count when its text changes: the new text fades in while a
+ * short-lived copy of the old one, laid over it in the same box, fades out
+ * and is removed. Not when the banner first appears (from 0), and never
+ * unless the table animates: the root's `[data-animations]` already folds in
+ * `enableAnimations` and reduced motion, so reading it here needs no extra
+ * prop or media-query subscription.
  */
-function useCountAnimation(
+function useCountCrossfade(
   ref: React.RefObject<HTMLSpanElement | null>,
-  count: number
+  text: string | null
 ) {
-  const prev = React.useRef(count)
+  const prev = React.useRef(text)
+  const copy = React.useRef<HTMLElement | null>(null)
   React.useLayoutEffect(() => {
     const before = prev.current
-    prev.current = count
+    prev.current = text
     const el = ref.current
-    if (!el || before === 0 || before === count) return
+    const box = el?.parentElement
+    if (!el || !box || before === null || before === text) return
     const root = el.closest("[data-animations]")
     if (!root || typeof el.animate !== "function") return
     const { durationFast, ease } = readMotionTokens(root)
-    el.animate(
-      [
-        { opacity: 0, transform: "translateY(4px)" },
-        { opacity: 1, transform: "translateY(0)" },
-      ],
-      { duration: durationFast, easing: ease }
-    )
-  }, [ref, count])
+    copy.current?.remove()
+    const old = document.createElement("span")
+    old.textContent = before
+    old.setAttribute("aria-hidden", "true")
+    old.setAttribute("data-slot", "data-table-selected-count-previous")
+    Object.assign(old.style, {
+      position: "absolute",
+      top: "0",
+      insetInlineStart: "0",
+      whiteSpace: "nowrap",
+      pointerEvents: "none",
+    })
+    box.append(old)
+    copy.current = old
+    const remove = () => {
+      old.remove()
+      if (copy.current === old) copy.current = null
+    }
+    const timing = { duration: durationFast, easing: ease }
+    el.animate([{ opacity: 0 }, { opacity: 1 }], timing)
+    old
+      .animate([{ opacity: 1 }, { opacity: 0 }], {
+        ...timing,
+        fill: "forwards",
+      })
+      .finished.then(remove, remove)
+  }, [ref, text])
 }

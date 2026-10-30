@@ -122,6 +122,37 @@ describe("sort indicator", () => {
     expect(indicator().querySelector("svg.rotate-180")).not.toBeNull()
   })
 
+  it("scales the hidden layers down as they fade", () => {
+    render(<ControlsHarness />)
+    fireEvent.click(sortButton())
+    const layers = [...indicator().children] as HTMLElement[]
+    const hidden = layers.filter((el) => !("shown" in el.dataset))
+    const shown = layers.filter((el) => "shown" in el.dataset)
+    expect(hidden.length).toBeGreaterThan(0)
+    for (const el of hidden) expect(el.classList).toContain("scale-75")
+    for (const el of shown) expect(el.classList).toContain("scale-100")
+    expect(shown[0]!.className).toMatch(/transition-\[[^\]]*scale/)
+  })
+
+  it("keeps the arrow turned while it fades out, then shows it unturned", () => {
+    render(<ControlsHarness />)
+    // The default arrow: the layer after the unsorted icon.
+    const arrow = () => indicator().children[1]!.querySelector("svg")!
+    fireEvent.click(sortButton()) // asc
+    fireEvent.click(sortButton()) // desc
+    expect(arrow().classList).toContain("rotate-180")
+    fireEvent.click(sortButton()) // none: only fades, no turn back
+    expect(indicator().dataset.direction).toBe("none")
+    expect(arrow().classList).toContain("rotate-180")
+    fireEvent.click(sortButton()) // asc again: hidden until now, so it takes
+    // its new turn at once rather than turning while it fades in.
+    expect(indicator().dataset.direction).toBe("asc")
+    expect(arrow().classList).not.toContain("rotate-180")
+    expect(arrow().getAttribute("class")).not.toMatch(/transition-\[rotate\]/)
+    fireEvent.click(sortButton()) // desc: shown, so it turns
+    expect(arrow().getAttribute("class")).toMatch(/transition-\[rotate\]/)
+  })
+
   it("never rotates custom sort icons", () => {
     const Up = ({ className }: { className?: string }) => (
       <svg data-testid="up" className={className} />
@@ -149,21 +180,20 @@ describe("sort indicator", () => {
 })
 
 describe("selected count", () => {
-  it("re-keys the count when it changes", () => {
+  it("keeps one count element and updates its text", () => {
     render(<ControlsHarness />)
     expect(selectedCount()).toBeNull()
     fireEvent.click(rowCheckboxes()[0]!)
     const first = selectedCount()
-    expect(first).not.toBeNull()
+    const was = first!.textContent
     fireEvent.click(rowCheckboxes()[1]!)
-    const second = selectedCount()
-    expect(second).not.toBeNull()
-    expect(second).not.toBe(first)
+    expect(selectedCount()).toBe(first)
+    expect(first!.textContent).not.toBe(was)
   })
 
   it("animates only a change, never the banner appearing", () => {
-    const animate = vi.fn()
-    HTMLElement.prototype.animate = animate
+    const animate = vi.fn(() => ({ finished: new Promise(() => {}) }))
+    HTMLElement.prototype.animate = animate as never
     try {
       render(<ControlsHarness />)
       fireEvent.click(rowCheckboxes()[0]!)
@@ -176,8 +206,8 @@ describe("selected count", () => {
   })
 
   it("never animates with animations off", () => {
-    const animate = vi.fn()
-    HTMLElement.prototype.animate = animate
+    const animate = vi.fn(() => ({ finished: new Promise(() => {}) }))
+    HTMLElement.prototype.animate = animate as never
     try {
       render(<ControlsHarness enableAnimations={false} />)
       fireEvent.click(rowCheckboxes()[0]!)

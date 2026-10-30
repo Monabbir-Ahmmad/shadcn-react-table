@@ -692,6 +692,46 @@ describe("control animations", () => {
     expect(offStyle.rotate).toBe("180deg")
   })
 
+  it("crossfades the selected count in place", async () => {
+    render(<Harness enableRowSelection />)
+    const boxes = () => [
+      ...document.querySelectorAll<HTMLElement>('tbody [role="checkbox"]'),
+    ]
+    fireEvent.click(boxes()[0]!)
+    const count = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-selected-count"]'
+    )!
+    const was = count.textContent
+    const box = count.getBoundingClientRect()
+    fireEvent.click(boxes()[1]!)
+    // The same element shows the new number, fading in…
+    const now = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-selected-count"]'
+    )!
+    expect(now).toBe(count)
+    expect(now.textContent).not.toBe(was)
+    const fadeIn = animating(now, "opacity")
+    expect(fadeIn).toHaveLength(1)
+    expect(timing(fadeIn[0]!).duration).toBe(MOTION_DEFAULTS.durationFast)
+    // …while a copy of the old one fades out over it, without moving it.
+    const old = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-selected-count-previous"]'
+    )!
+    expect(old.textContent).toBe(was)
+    expect(old.getAttribute("aria-hidden")).toBe("true")
+    const fadeOut = animating(old, "opacity")
+    expect(fadeOut).toHaveLength(1)
+    const [from, to] = (fadeOut[0]!.effect as KeyframeEffect).getKeyframes()
+    expect([Number(from!.opacity), Number(to!.opacity)]).toEqual([1, 0])
+    expect(timing(fadeOut[0]!).duration).toBe(MOTION_DEFAULTS.durationFast)
+    const at = old.getBoundingClientRect()
+    expect(Math.abs(at.left - box.left)).toBeLessThan(1)
+    expect(Math.abs(at.top - box.top)).toBeLessThan(1)
+    expect(Math.abs(now.getBoundingClientRect().top - box.top)).toBeLessThan(1)
+    await settle()
+    expect(old.isConnected).toBe(false)
+  })
+
   it("draws the check in when a row is selected", async () => {
     render(<Harness enableRowSelection />)
     const box = document.querySelector<HTMLElement>('tbody [role="checkbox"]')!
