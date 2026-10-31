@@ -11,6 +11,10 @@
 
 ### [View Documentation](https://monabbir-ahmmad.github.io/shadcn-react-table)
 
+<a href="https://monabbir-ahmmad.github.io/shadcn-react-table/media/shadcn-react-table-1.0.mp4">
+  <img src="apps/web/public/media/shadcn-react-table-1.0-poster.jpg" alt="Watch the 1-minute demo of shadcn-react-table" width="720" />
+</a>
+
 </div>
 
 ## About
