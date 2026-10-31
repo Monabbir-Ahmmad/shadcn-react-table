@@ -5,7 +5,7 @@
   "title": "Data Table locale: Portuguese (pt)",
   "description": "The data table's interface text in Portuguese. Add the data-table item first.",
   "meta": {
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "files": [
     {
