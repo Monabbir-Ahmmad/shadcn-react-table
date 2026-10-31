@@ -5,6 +5,7 @@ import {
   DataTable,
   useDataTable,
   type DataTableColumnDef,
+  type UseDataTableOptions,
 } from "@monabbir/shadcn-react-table/components/data-table"
 
 import { Badge } from "@workspace/ui/components/badge"
@@ -288,7 +289,12 @@ const columns: DataTableColumnDef<HeroRow>[] = [
 ]
 
 /** The real table, its state set from the tour's frame. */
-function TourTable({ frame }: { frame: TourFrame }) {
+/** Memoized: the tour's clock must not re-render it between frames. */
+const TourTable = React.memo(function TourTable({
+  frame,
+}: {
+  frame: TourFrame
+}) {
   // Phones: Name and Salary only, so the table fits without scrolling.
   const wide = useMedia("(min-width: 640px)", true)
   // Joined and Rating from large screens up.
@@ -307,7 +313,32 @@ function TourTable({ frame }: { frame: TourFrame }) {
     [savedId, savedText]
   )
 
-  const hidden = new Set(frame.hidden)
+  // Built once per frame: the tour's clock re-renders often, and a fresh
+  // (if equal) state each time would restart the rows' glide every tick.
+  const state = React.useMemo((): UseDataTableOptions<HeroRow>["state"] => {
+    const hidden = new Set(frame.hidden)
+    return {
+      sorting: frame.sorted ? [{ id: "salary", desc: true }] : [],
+      columnFilters: frame.filtered ? [{ id: "status", value: "active" }] : [],
+      showColumnFilters: frame.filterRow,
+      globalFilter: frame.search,
+      showGlobalFilter: frame.search !== "",
+      rowSelection: Object.fromEntries(frame.selected.map((id) => [id, true])),
+      editingCell: frame.edit?.editing
+        ? { rowId: frame.edit.id, columnId: "salary" }
+        : null,
+      grouping: frame.grouped ? ["team"] : [],
+      expanded: true as const,
+      rowPinning: { top: frame.pinned, bottom: [] },
+      density: frame.compact ? ("compact" as const) : ("comfortable" as const),
+      columnVisibility: {
+        team: wide && !hidden.has("team"),
+        status: wide && !hidden.has("status"),
+        joined: large && !hidden.has("joined"),
+        rating: large,
+      },
+    }
+  }, [frame, wide, large])
   const sceneId = TOUR_SCENES[frame.scene]?.id
   const table = useDataTable<HeroRow>({
     data,
@@ -338,27 +369,7 @@ function TourTable({ frame }: { frame: TourFrame }) {
         ),
       },
     },
-    state: {
-      sorting: frame.sorted ? [{ id: "salary", desc: true }] : [],
-      columnFilters: frame.filtered ? [{ id: "status", value: "active" }] : [],
-      showColumnFilters: frame.filtered,
-      globalFilter: frame.search,
-      showGlobalFilter: frame.search !== "",
-      rowSelection: Object.fromEntries(frame.selected.map((id) => [id, true])),
-      editingCell: edit?.editing
-        ? { rowId: edit.id, columnId: "salary" }
-        : null,
-      grouping: frame.grouped ? ["team"] : [],
-      expanded: true,
-      rowPinning: { top: frame.pinned, bottom: [] },
-      density: frame.compact ? "compact" : "comfortable",
-      columnVisibility: {
-        team: wide && !hidden.has("team"),
-        status: wide && !hidden.has("status"),
-        joined: large && !hidden.has("joined"),
-        rating: large,
-      },
-    },
+    state,
   })
 
   return (
@@ -366,7 +377,7 @@ function TourTable({ frame }: { frame: TourFrame }) {
       <DataTable table={table} />
     </DraftContext>
   )
-}
+})
 
 function Person({ row, name }: { row: HeroRow; name: React.ReactNode }) {
   const hue = AVATAR_HUES[Number(row.id.slice(1)) % AVATAR_HUES.length]
