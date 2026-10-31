@@ -58,5 +58,6 @@ graphify-out/
 # Brainstorm mockups
 .superpowers/
 
-# Demo-video pages (tools/demo-video/demo-pages), copied in only while recording
+# Local-only tooling (the demo-video recorder) and the demo pages it copies in
+tools/
 apps/web/app/(demo)/
