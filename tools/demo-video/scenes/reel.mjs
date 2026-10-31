@@ -79,7 +79,7 @@ export default {
       hold: 4200,
     });
 
-    await r.openAs(null);
+    await r.openAs();
     await r.warm(['/reel/', '/reel/big/', '/reel/rtl/']);
     await r.goto('/');
     await r.startCapture();

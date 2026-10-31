@@ -3,16 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
-import {
-  ACCOUNTS,
-  HERE,
-  MAILPIT,
-  clearMail,
-  linkIn,
-  nextTotpStep,
-  totp,
-  waitForMail,
-} from './lib.mjs';
+import { HERE } from './lib.mjs';
 import { SCENE_IDS } from './scenes/index.mjs';
 
 const require = createRequire(import.meta.url);
@@ -71,14 +62,6 @@ function locate(page, target) {
   return target.nth != null ? loc.nth(target.nth) : loc.first();
 }
 
-/** A login: a key in accounts.local.json, or { email, password } (for people a clip creates). */
-const account = (key) => {
-  if (key == null) return null;
-  if (typeof key === 'object') return key;
-  if (!ACCOUNTS[key]) throw new Error(`No account "${key}" in accounts.local.json`);
-  return ACCOUNTS[key];
-};
-
 /** The project's helpers (app.mjs), loaded once. */
 let appModule;
 const app = async () => (appModule ??= await import('./app.mjs'));
@@ -103,8 +86,8 @@ async function callHelpers(r, spec) {
  * pages, goes to `start` and starts capture, all off camera. `warm` and `start` are filled after
  * the helpers ran, so they can use the values the helpers return.
  */
-async function openScene(r, { as, before, warm = [], start = '/' }) {
-  await r.openAs(account(fill(as, r.vars)));
+async function openScene(r, { before, warm = [], start = '/' }) {
+  await r.openAs();
   await callHelpers(r, before);
   await r.warm(fill(warm, r.vars));
   await r.goto(fill(start, r.vars));
@@ -115,7 +98,7 @@ async function openScene(r, { as, before, warm = [], start = '/' }) {
  * Steps whose values are filled inside the step, because they produce values first. `code` is
  * shown verbatim, so JSX like style={{ ... }} is not read as a {{value}}.
  */
-const FILLS_ITSELF = new Set(['switchUser', 'code']);
+const FILLS_ITSELF = new Set(['code']);
 
 const targetOf = (v) => (typeof v === 'string' ? { text: v } : v);
 const textOf = (v) => (typeof v === 'string' ? { text: v } : (v ?? {}));
@@ -246,42 +229,6 @@ const STEPS = {
   },
   /** Runs helpers from app.mjs (see callHelpers). Use hide/show around slow work. */
   call: (r, v) => callHelpers(r, v),
-  clearMail: () => clearMail(),
-  /**
-   * Waits for an email { to, subject }, shows it in the mail catcher unless `show: false`, then
-   * opens the first link matching `follow`; `hold` (ms) pauses on the message first.
-   */
-  mail: async (r, v) => {
-    const wait = waitForMail(v.to ?? null, toMatcher(v.subject), v.timeout ?? TIMEOUT);
-    // `optional: true` carries on without the email when it does not arrive.
-    const msg = v.optional ? await wait.catch(() => null) : await wait;
-    if (!msg) return;
-    if (v.show !== false) {
-      await r.goto(`${MAILPIT}/view/${msg.ID}`);
-      if (v.hold) await r.hold(v.hold);
-    }
-    if (v.follow) await r.goto(linkIn(msg, toMatcher(v.follow)));
-  },
-  /**
-   * Types the authenticator code for `secret` into the target. `fresh: true` first waits off
-   * camera for the next 30-second step, since a code from the last accepted step is refused.
-   */
-  mfaCode: async (r, v) => {
-    const { secret, fresh, delay, ...target } = v;
-    if (fresh) {
-      r.hide();
-      await nextTotpStep();
-      r.show();
-    }
-    await r.type(locate(r.page, target), totp(secret), delay ?? 120);
-  },
-  /** Changes person mid-clip: { as, start, warm, before, badge }. */
-  switchUser: async (r, v) => {
-    r.hide();
-    await openScene(r, v);
-    if (v.badge) r.role(fill(v.badge, r.vars));
-    r.show();
-  },
 };
 
 async function runSteps(r, id, steps) {

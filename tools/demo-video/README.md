@@ -10,7 +10,6 @@ local text-to-speech model reads the voiceover. Not a workspace: it has its own 
 ```sh
 cd tools/demo-video
 npm install                       # once; npx playwright install chromium if Playwright asks
-cp accounts.example.json accounts.local.json
 
 # 1. The demo pages (/reel, /reel/big, /reel/rtl), copied in only while recording. The folder is
 #    git-ignored, so they never ship with the docs site.

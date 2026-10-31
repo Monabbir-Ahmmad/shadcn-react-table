@@ -3,7 +3,7 @@
 // turns into a Remotion timeline. Scenes in scenes/ drive the app through the helpers here.
 import fs from 'fs';
 import path from 'path';
-import { CONFIG, chromium, FE, signIn } from './lib.mjs';
+import { CONFIG, chromium, FE } from './lib.mjs';
 
 export const VIEW = { width: 1600, height: 900 };
 export const DPR = 1.5;
@@ -73,8 +73,8 @@ export async function createRecorder({ outDir, headed = false }) {
       return ctx;
     },
 
-    /** A fresh browser context, signed in as `who` (or signed out when `who` is null). */
-    async openAs(who) {
+    /** A fresh browser context and page. */
+    async openAs() {
       await r.stopCapture();
       if (page) await page.context().close();
       page = await (await r.newContext()).newPage();
@@ -82,7 +82,6 @@ export async function createRecorder({ outDir, headed = false }) {
       page.on('framenavigated', (frame) => {
         if (frame === page.mainFrame()) ev('nav', { url: frame.url() });
       });
-      if (who) await signIn(page, who);
       return page;
     },
 

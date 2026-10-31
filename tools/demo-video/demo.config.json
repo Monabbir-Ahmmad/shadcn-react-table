@@ -1,14 +1,7 @@
 {
   "productName": "shadcn-react-table",
   "frontendUrl": "http://localhost:3000/shadcn-react-table",
-  "mailpitUrl": "http://localhost:8025",
   "heroPath": "/",
-  "signIn": {
-    "path": "/login",
-    "emailLabel": "email",
-    "passwordLabel": "password",
-    "submitButton": "^(sign in|log in)$"
-  },
   "hideSelectors": [
     "nextjs-portal",
     "[data-nextjs-toast]",
