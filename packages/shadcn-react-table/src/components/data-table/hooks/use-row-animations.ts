@@ -587,8 +587,13 @@ export function useRowAnimations({
           {
             duration: durationFast,
             easing: ease,
-            // Starts as the leaving rows fade; hidden until then.
-            delay: arrived.has(key) ? 0 : durationFast / 2,
+            // Starts as the leaving rows fade, hidden until then. With none
+            // leaving (grouping turned on, a filter cleared) there is nothing
+            // to wait for: a delay would leave gaps the other rows glide past.
+            delay:
+              arrived.has(key) || work.leaving.length === 0
+                ? 0
+                : durationFast / 2,
             fill: "backwards",
           }
         )

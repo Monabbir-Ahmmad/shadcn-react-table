@@ -18,6 +18,7 @@ describe("tourFrame", () => {
       expect(tourFrame(i, 0)).toEqual({
         scene: i,
         sorted: false,
+        filterRow: false,
         filtered: false,
         search: "",
         selected: [],
@@ -33,7 +34,10 @@ describe("tourFrame", () => {
   it("switches on only its own feature", () => {
     const after = APPLY_AT + 0.01
     expect(tourFrame(index("sort"), after).sorted).toBe(true)
-    expect(tourFrame(index("filter"), after).filtered).toBe(true)
+    // The filter row opens first; the filter follows a beat later.
+    expect(tourFrame(index("filter"), after).filterRow).toBe(true)
+    expect(tourFrame(index("filter"), after).filtered).toBe(false)
+    expect(tourFrame(index("filter"), 0.5).filtered).toBe(true)
     expect(tourFrame(index("group"), after).grouped).toBe(true)
     expect(tourFrame(index("pin"), after).pinned).toHaveLength(1)
     expect(tourFrame(index("density"), after).compact).toBe(true)

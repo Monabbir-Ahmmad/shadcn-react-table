@@ -38,6 +38,8 @@ export const TOUR_SCENES: readonly TourScene[] = [
 export const SCENE_MS = 3200
 /** When, within its scene (0…1), the scene's feature switches on. */
 export const APPLY_AT = 0.2
+/** The filter applies a beat after its row opens, so each reads alone. */
+const FILTER_AT = 0.42
 
 /** The cell being edited, or that was just edited. */
 export type TourEdit = {
@@ -52,6 +54,8 @@ export type TourEdit = {
 export type TourFrame = {
   scene: number
   sorted: boolean
+  /** The filter row is open. */
+  filterRow: boolean
   filtered: boolean
   search: string
   selected: string[]
@@ -125,7 +129,8 @@ export function tourFrame(sceneIndex: number, t: number): TourFrame {
   return {
     scene,
     sorted: id === "sort" && on,
-    filtered: id === "filter" && on,
+    filterRow: id === "filter" && on,
+    filtered: id === "filter" && p >= FILTER_AT,
     search,
     selected:
       id === "select"
