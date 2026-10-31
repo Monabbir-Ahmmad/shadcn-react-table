@@ -450,6 +450,39 @@ describe("row animations", () => {
     expect(Number(first.opacity)).toBe(0)
   })
 
+  it("fades entering rows in at once when no row leaves", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        onTable={(t) => (table = t)}
+        initialState={{ globalFilter: "Name 1" }}
+      />
+    )
+    await nextFrame()
+    // Rows only come in (as group rows do when grouping turns on): nothing
+    // to wait for, or the rows glide away from blank gaps.
+    act(() => table.setGlobalFilter(""))
+    const entered = bodyRows().find((tr) => tr.dataset.rowId === "r3")!
+    const [fade] = animating(entered, "opacity")
+    expect(timing(fade!).delay).toBe(0)
+  })
+
+  it("fades entering rows in as the leaving ones fade out", async () => {
+    let table!: DataTableInstance<Row>
+    render(
+      <Harness
+        onTable={(t) => (table = t)}
+        initialState={{ globalFilter: "Name 1" }}
+      />
+    )
+    await nextFrame()
+    // Name 1 leaves, Name 2 comes in: it waits for the copy to start fading.
+    act(() => table.setGlobalFilter("Name 2"))
+    const entered = bodyRows().find((tr) => tr.dataset.rowId === "r2")!
+    const [fade] = animating(entered, "opacity")
+    expect(timing(fade!).delay).toBe(MOTION_DEFAULTS.durationFast / 2)
+  })
+
   it("raises gliding rows over the rows they cross, farthest on top", async () => {
     let table!: DataTableInstance<Row>
     render(<Harness data={rows(12)} onTable={(t) => (table = t)} />)
