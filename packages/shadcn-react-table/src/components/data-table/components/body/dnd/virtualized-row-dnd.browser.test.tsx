@@ -85,15 +85,18 @@ describe("row ordering with row virtualization", () => {
       await nextFrame()
     }
 
-    // Hold there until the table has scrolled far past the first window;
-    // the dragged row stays in the DOM all along.
+    // Hold there until the table has scrolled about 70 rows, far past the
+    // first window; the dragged row stays in the DOM all along. The scroll
+    // moves a step per timer tick, so its speed follows the machine's load:
+    // wait on the distance, with a deadline a busy CI runner still meets.
+    const far = rowEl("row-1")!.offsetHeight * 70
     let alwaysRendered = true
-    const deadline = performance.now() + 8000
-    while (surface.scrollTop < 4000 && performance.now() < deadline) {
+    const deadline = performance.now() + 20_000
+    while (surface.scrollTop < far && performance.now() < deadline) {
       await nextFrame()
       if (!rowEl("row-1")?.hasAttribute("data-dragging")) alwaysRendered = false
     }
-    expect(surface.scrollTop).toBeGreaterThanOrEqual(4000)
+    expect(surface.scrollTop).toBeGreaterThanOrEqual(far)
     expect(alwaysRendered).toBe(true)
     // It follows the pointer through the scroll.
     const dragged = rowEl("row-1")!.getBoundingClientRect()
@@ -137,5 +140,5 @@ describe("row ordering with row virtualization", () => {
     await nextFrame()
     expect(document.querySelector("tr[data-dragging]")).toBeNull()
     expect(rowEl("row-1")).toBeNull()
-  })
+  }, 30_000)
 })
