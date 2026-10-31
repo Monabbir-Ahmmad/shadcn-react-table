@@ -1,0 +1,11 @@
+accounts.local.json
+node_modules/
+package-lock.json
+take/
+takes/
+*.mp4
+# Written by prepare.mjs: frame links, timeline.json and downloaded audio.
+remotion/public/
+remotion/out/
+# Synthesized voice lines (voiceover.mjs synth)
+voice/

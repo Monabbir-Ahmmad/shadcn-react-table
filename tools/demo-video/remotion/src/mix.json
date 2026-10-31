@@ -1,0 +1,15 @@
+{
+  "music": 0.16,
+  "musicOnCards": 0.27,
+  "fadeInSeconds": 1.5,
+  "fadeOutSeconds": 3,
+  "effects": {
+    "click": 0.55,
+    "switch": 0.6,
+    "ding": 0.35,
+    "whoosh": 0.4,
+    "tick": 0.5,
+    "nav": 0.15
+  },
+  "navigationWhoosh": false
+}

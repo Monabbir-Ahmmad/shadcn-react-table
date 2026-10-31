@@ -1,0 +1,13 @@
+{
+  "name": "demo-video",
+  "private": true,
+  "description": "Records and renders the product demo video.",
+  "type": "module",
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.80",
+    "@playwright/test": "1.64.1",
+    "ffmpeg-static": "5.3.0",
+    "kokoro-js": "1.2.1",
+    "yaml": "2.8.1"
+  }
+}
