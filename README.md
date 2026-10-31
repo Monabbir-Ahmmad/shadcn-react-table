@@ -11,6 +11,10 @@
 
 ### [View Documentation](https://monabbir-ahmmad.github.io/shadcn-react-table)
 
+<a href="https://monabbir-ahmmad.github.io/shadcn-react-table">
+  <img src=".github/assets/demo.gif" alt="shadcn-react-table demo: sorting, search, column drag and resize, row selection, cell editing, grouping, 100,000 virtualized rows, shadcn styles and right-to-left languages" width="720" />
+</a>
+
 </div>
 
 ## About
