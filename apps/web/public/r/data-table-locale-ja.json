@@ -5,7 +5,7 @@
   "title": "Data Table locale: Japanese (ja)",
   "description": "The data table's interface text in Japanese. Add the data-table item first.",
   "meta": {
-    "version": "1.1.1"
+    "version": "1.1.2"
   },
   "files": [
     {
