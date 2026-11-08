@@ -238,6 +238,10 @@ const SLOT_DESCRIPTIONS = {
     "Grouping drop zone above or below the table (animated in and out).",
   "data-table-search":
     "The global search box beside the search button (slides out of it and back in).",
+  "data-table-facet-filter":
+    "Trigger button of a `DataTableFacetFilter` (dashed border while nothing is picked).",
+  "data-table-reset-filters":
+    "The `DataTableResetFilters` button (rendered only while a column filter is set).",
 }
 const slotValues = new Set()
 // data-slot markers live in .ts/.tsx files spread across the feature subfolders, so

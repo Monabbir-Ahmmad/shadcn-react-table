@@ -2441,6 +2441,20 @@ export const localizationKeys: ApiMember[] = [
     description: "",
   },
   {
+    name: "facetFilterAny",
+    type: "string",
+    required: true,
+    default: "Any",
+    description: "The choice that clears a toolbar facet filter.",
+  },
+  {
+    name: "resetFilters",
+    type: "string",
+    required: true,
+    default: "Reset",
+    description: "The toolbar button that clears every column filter.",
+  },
+  {
     name: "showColumnFilters",
     type: "string",
     required: true,
@@ -3260,6 +3274,14 @@ export const slots: ApiMember[] = [
       "Floating preview of a row dragged inside a DataTableDndProvider.",
   },
   {
+    name: "data-table-facet-filter",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "Trigger button of a `DataTableFacetFilter` (dashed border while nothing is picked).",
+  },
+  {
     name: "data-table-group-zone",
     type: "",
     required: true,
@@ -3319,6 +3341,14 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: "The moving bar inside `data-table-progress`.",
+  },
+  {
+    name: "data-table-reset-filters",
+    type: "",
+    required: true,
+    default: null,
+    description:
+      "The `DataTableResetFilters` button (rendered only while a column filter is set).",
   },
   {
     name: "data-table-search",

@@ -7339,6 +7339,8 @@ See the [Localization guide](/docs/guides/localization) for a full example. The 
 | `filterMode` | `string` | `Filter mode` |  |
 | `changeFilterMode` | `string` | `Change filter mode` |  |
 | `filterPlaceholder` | `(column: string) => string` | `(column) => `Filter ${column}…`` |  |
+| `facetFilterAny` | `string` | `Any` | The choice that clears a toolbar facet filter. |
+| `resetFilters` | `string` | `Reset` | The toolbar button that clears every column filter. |
 | `showColumnFilters` | `string` | `Show filters` |  |
 | `hideColumnFilters` | `string` | `Hide filters` |  |
 | `min` | `string` | `Min` |  |
