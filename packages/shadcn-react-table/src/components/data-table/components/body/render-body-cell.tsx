@@ -3,6 +3,7 @@
 import { flexRender, type RowData } from "@tanstack/react-table"
 import * as React from "react"
 
+import { NON_DATA_COLUMN_IDS } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
 import { SUBSTRING_MODES } from "../../fns/filter-fns"
 import { getEffectiveMode } from "../../helpers/effective-filter-mode"
@@ -99,6 +100,16 @@ export function renderBodyCell<TData extends RowData>(
   if (isGrouping && cell.getIsPlaceholder()) {
     return meta?.renderPlaceholderCell
       ? meta.renderPlaceholderCell({ cell, row, column, table })
+      : null
+  }
+
+  // A group row is synthetic: its `original` is its first leaf's. In TanStack v9 a data column with
+  // no aggregation function ("auto" finding none, or no accessor) is neither aggregated nor a
+  // placeholder there, so falling through would draw that leaf's values on the group's own row.
+  // The injected columns (select, expand, actions…) still render: they act on the group itself.
+  if (isGrouping && row.getIsGrouped() && !NON_DATA_COLUMN_IDS.has(column.id)) {
+    return meta?.renderAggregatedCell
+      ? meta.renderAggregatedCell({ cell, row, column, table })
       : null
   }
 
