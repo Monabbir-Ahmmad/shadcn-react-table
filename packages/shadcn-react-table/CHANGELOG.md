@@ -6,6 +6,12 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 Changes waiting for a release are in [`.changeset/`](../../.changeset), and
 move here when the next version is cut.
 
+## 1.2.0
+
+### Minor Changes
+
+- **New:** `DataTableFacetFilter`, a toolbar filter button — single or multi choice, dashed while empty, naming the pick in a badge — that reads and writes the table's `columnFilters` by id, so a filter needs no visible column (a derived bucket, "raised by me"). Options default to the column's `meta.filterSelectOptions`; per-option `counts` and a controlled `value` / `onValueChange` mode are optional. `DataTableResetFilters` clears every column filter and renders nothing while none is set. Two new localization strings, `facetFilterAny` and `resetFilters`, in every bundled locale.
+
 ## 1.1.2
 
 ### Patch Changes
