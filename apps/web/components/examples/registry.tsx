@@ -17,8 +17,10 @@ import {
   DataTable,
   DataTableConfigProvider,
   DataTableDensityToggle,
+  DataTableFacetFilter,
   DataTableGlobalFilter,
   DataTableProvider,
+  DataTableResetFilters,
   DataTableViewOptions,
   useDataTable,
   type DataTableColumnDef,
@@ -140,6 +142,39 @@ function GlobalSearchExample() {
     getRowId: (row) => row.id,
     enableGlobalFilter: true,
     initialState: { globalFilterMode: "fuzzy", pagination: { pageSize: 10 } },
+  })
+  return <DataTable table={table} />
+}
+
+function FacetFilterExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  // A count beside each status, from the full data set.
+  const statusCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const user of data)
+      counts[user.status] = (counts[user.status] ?? 0) + 1
+    return counts
+  }, [data])
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <div className="flex flex-wrap items-center gap-2">
+        <DataTableFacetFilter table={table} columnId="role" />
+        <DataTableFacetFilter
+          table={table}
+          columnId="status"
+          multiple
+          menuLabel="Show people who are"
+          counts={statusCounts}
+        />
+        <DataTableFacetFilter table={table} columnId="department" multiple />
+        <DataTableResetFilters table={table} />
+      </div>
+    ),
   })
   return <DataTable table={table} />
 }
@@ -1613,6 +1648,14 @@ export const EXAMPLES: ExampleDef[] = [
     description: "Expandable fuzzy search across all columns, with mode menu.",
     category: "Filtering",
     Component: GlobalSearchExample,
+  },
+  {
+    slug: "facet-filter",
+    title: "Toolbar facet filters",
+    description:
+      "Single- and multi-choice filter buttons on the toolbar, with a reset button.",
+    category: "Filtering",
+    Component: FacetFilterExample,
   },
   {
     slug: "advanced-filter",
