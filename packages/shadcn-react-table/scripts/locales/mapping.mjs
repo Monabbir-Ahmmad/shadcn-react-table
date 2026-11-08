@@ -142,6 +142,8 @@ const GAP_KEYS = [
   "toggleRowExpanded",
   "filterMode",
   "filterPlaceholder",
+  "facetFilterAny",
+  "resetFilters",
   "showColumnFilters",
   "hideColumnFilters",
   "pickDate",

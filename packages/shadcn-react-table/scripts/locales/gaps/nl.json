@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Rij uit-/inklappen",
   "filterMode": "Filtermodus",
   "filterPlaceholder": "Filter {column}…",
+  "facetFilterAny": "Alle",
+  "resetFilters": "Herstellen",
   "showColumnFilters": "Toon filters",
   "hideColumnFilters": "Verberg filters",
   "pickDate": "Kies een datum",

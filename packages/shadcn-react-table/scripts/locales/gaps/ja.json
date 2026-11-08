@@ -16,6 +16,8 @@
   "toggleRowExpanded": "行の展開を切り替え",
   "filterMode": "検索モード",
   "filterPlaceholder": "{column}を検索…",
+  "facetFilterAny": "すべて",
+  "resetFilters": "リセット",
   "showColumnFilters": "検索バーを表示",
   "hideColumnFilters": "検索バーを隠す",
   "pickDate": "日付を選択",

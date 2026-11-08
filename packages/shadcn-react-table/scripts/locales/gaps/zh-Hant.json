@@ -16,6 +16,8 @@
   "toggleRowExpanded": "展開/折疊橫列",
   "filterMode": "過濾模式",
   "filterPlaceholder": "過濾 {column}…",
+  "facetFilterAny": "全部",
+  "resetFilters": "重設",
   "showColumnFilters": "顯示過濾條件",
   "hideColumnFilters": "隱藏過濾條件",
   "pickDate": "選擇日期",

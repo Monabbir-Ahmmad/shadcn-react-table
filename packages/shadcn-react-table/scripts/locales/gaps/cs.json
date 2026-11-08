@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Rozbalit/sbalit řádek",
   "filterMode": "Režim filtru",
   "filterPlaceholder": "Filtrovat sloupec {column}…",
+  "facetFilterAny": "Libovolné",
+  "resetFilters": "Obnovit",
   "showColumnFilters": "Zobrazit filtry",
   "hideColumnFilters": "Skrýt filtry",
   "pickDate": "Vybrat datum",

@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Laienda/ahenda rida",
   "filterMode": "Filtri režiim",
   "filterPlaceholder": "Filtreeri {column}…",
+  "facetFilterAny": "Kõik",
+  "resetFilters": "Lähtesta",
   "showColumnFilters": "Näita filtreid",
   "hideColumnFilters": "Peida filtrid",
   "pickDate": "Vali kuupäev",

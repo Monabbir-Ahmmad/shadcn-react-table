@@ -168,4 +168,6 @@ export const dataTableLocalizationRu: DataTableLocalization = {
     "Чтобы взять элемент, нажмите пробел или Enter. Во время перетаскивания перемещайте его клавишами со стрелками. Нажмите пробел или Enter ещё раз, чтобы отпустить элемент, или Escape, чтобы отменить.", // needs review
   dragRowLabel: (position) => `Строка ${position.toLocaleString("ru")}`, // needs review
   noResultsFound: "Результатов не найдено",
+  facetFilterAny: "Любой", // needs review
+  resetFilters: "Сбросить", // needs review
 }

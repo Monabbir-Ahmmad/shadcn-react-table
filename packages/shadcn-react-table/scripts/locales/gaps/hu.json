@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Sor kibontása/összecsukása",
   "filterMode": "Szűrő mód",
   "filterPlaceholder": "{column} szűrése…",
+  "facetFilterAny": "Bármely",
+  "resetFilters": "Visszaállítás",
   "showColumnFilters": "Szűrők mutatása",
   "hideColumnFilters": "Szűrők elrejtése",
   "pickDate": "Dátum kiválasztása",

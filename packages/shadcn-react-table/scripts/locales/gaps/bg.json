@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Разгъни/свий реда",
   "filterMode": "Режим на филтъра",
   "filterPlaceholder": "Филтриране по {column}…",
+  "facetFilterAny": "Всякакви",
+  "resetFilters": "Нулиране",
   "showColumnFilters": "Покажи филтрите",
   "hideColumnFilters": "Скрий филтрите",
   "pickDate": "Изберете дата",

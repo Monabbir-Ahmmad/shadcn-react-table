@@ -169,4 +169,6 @@ export const dataTableLocalizationJa: DataTableLocalization = {
     "項目を持ち上げるには、スペースキーまたは Enter キーを押します。ドラッグ中は矢印キーで移動できます。もう一度スペースキーまたは Enter キーを押すとドロップし、Esc キーを押すとキャンセルします。", // needs review
   dragRowLabel: (position) => `${position.toLocaleString("ja")} 行目`, // needs review
   noResultsFound: "結果なし",
+  facetFilterAny: "すべて", // needs review
+  resetFilters: "リセット", // needs review
 }

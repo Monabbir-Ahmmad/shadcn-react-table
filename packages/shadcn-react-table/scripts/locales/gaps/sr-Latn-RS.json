@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Proširi/skupi red",
   "filterMode": "Režim filtriranja",
   "filterPlaceholder": "Filtriraj {column}…",
+  "facetFilterAny": "Bilo koji",
+  "resetFilters": "Poništi",
   "showColumnFilters": "Prikaži filtere",
   "hideColumnFilters": "Sakrij filtere",
   "pickDate": "Izaberi datum",

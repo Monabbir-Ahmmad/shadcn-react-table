@@ -168,4 +168,6 @@ export const dataTableLocalizationNo: DataTableLocalization = {
     "For å plukke opp et element, trykk mellomrom eller enter. Mens du drar, bruker du piltastene for å flytte det. Trykk mellomrom eller enter igjen for å slippe det, eller trykk escape for å avbryte.", // needs review
   dragRowLabel: (position) => `Rad ${position.toLocaleString("no")}`, // needs review
   noResultsFound: "Ingen resultater funnet",
+  facetFilterAny: "Alle", // needs review
+  resetFilters: "Tilbakestill", // needs review
 }

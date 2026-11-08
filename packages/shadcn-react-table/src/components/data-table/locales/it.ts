@@ -168,4 +168,6 @@ export const dataTableLocalizationIt: DataTableLocalization = {
     "Per prelevare un elemento, premi spazio o invio. Durante il trascinamento, usa i tasti freccia per spostarlo. Premi di nuovo spazio o invio per rilasciarlo, oppure premi esc per annullare.", // needs review
   dragRowLabel: (position) => `Riga ${position.toLocaleString("it")}`, // needs review
   noResultsFound: "Nessun risultato trovato",
+  facetFilterAny: "Qualsiasi", // needs review
+  resetFilters: "Reimposta", // needs review
 }

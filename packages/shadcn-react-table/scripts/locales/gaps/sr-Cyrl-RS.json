@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Прошири/скупи ред",
   "filterMode": "Режим филтрирања",
   "filterPlaceholder": "Филтрирај {column}…",
+  "facetFilterAny": "Било који",
+  "resetFilters": "Поништи",
   "showColumnFilters": "Прикажи филтере",
   "hideColumnFilters": "Сакриј филтере",
   "pickDate": "Изабери датум",

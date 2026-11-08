@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Bentangkan/ciutkan baris",
   "filterMode": "Mode filter",
   "filterPlaceholder": "Filter {column}…",
+  "facetFilterAny": "Semua",
+  "resetFilters": "Atur ulang",
   "showColumnFilters": "Tampilkan filter",
   "hideColumnFilters": "Sembunyikan filter",
   "pickDate": "Pilih tanggal",

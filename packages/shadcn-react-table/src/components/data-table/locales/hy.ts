@@ -168,4 +168,6 @@ export const dataTableLocalizationHy: DataTableLocalization = {
     "Տարրը վերցնելու համար սեղմեք բացատի կամ Enter ստեղնը։ Քաշելիս օգտագործեք սլաքների ստեղները՝ այն տեղափոխելու համար։ Կրկին սեղմեք բացատի կամ Enter ստեղնը՝ այն թողնելու համար, կամ Escape՝ չեղարկելու համար։", // needs review
   dragRowLabel: (position) => `Տող ${position.toLocaleString("hy")}`, // needs review
   noResultsFound: "Արդյունքներ չեն գտնվել",
+  facetFilterAny: "Ցանկացած", // needs review
+  resetFilters: "Վերակայել", // needs review
 }

@@ -16,6 +16,8 @@
   "toggleRowExpanded": "توسيع/طي الصف",
   "filterMode": "وضع التصفية",
   "filterPlaceholder": "تصفية {column}…",
+  "facetFilterAny": "أي",
+  "resetFilters": "إعادة تعيين",
   "showColumnFilters": "إظهار المرشحات",
   "hideColumnFilters": "إخفاء المرشحات",
   "pickDate": "اختر تاريخًا",

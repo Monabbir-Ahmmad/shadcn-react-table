@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Extinde/restrânge linia",
   "filterMode": "Mod filtrare",
   "filterPlaceholder": "Filtrează {column}…",
+  "facetFilterAny": "Oricare",
+  "resetFilters": "Resetează",
   "showColumnFilters": "Afișează filtrele",
   "hideColumnFilters": "Ascunde filtrele",
   "pickDate": "Alege o dată",

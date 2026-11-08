@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Utvid/skjul rad",
   "filterMode": "Filtermodus",
   "filterPlaceholder": "Filtrer {column}…",
+  "facetFilterAny": "Alle",
+  "resetFilters": "Tilbakestill",
   "showColumnFilters": "Vis filter",
   "hideColumnFilters": "Skjul filter",
   "pickDate": "Velg en dato",

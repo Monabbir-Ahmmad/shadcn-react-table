@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Rozwiń/zwiń wiersz",
   "filterMode": "Tryb filtrowania",
   "filterPlaceholder": "Filtruj {column}…",
+  "facetFilterAny": "Dowolne",
+  "resetFilters": "Resetuj",
   "showColumnFilters": "Pokaż filtry",
   "hideColumnFilters": "Ukryj filtry",
   "pickDate": "Wybierz datę",

@@ -16,6 +16,8 @@
   "toggleRowExpanded": "展开/折叠行",
   "filterMode": "过滤模式",
   "filterPlaceholder": "过滤 {column}…",
+  "facetFilterAny": "全部",
+  "resetFilters": "重置",
   "showColumnFilters": "显示过滤条件",
   "hideColumnFilters": "隐藏过滤条件",
   "pickDate": "选择日期",

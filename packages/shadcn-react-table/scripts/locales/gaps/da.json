@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Udvid/skjul række",
   "filterMode": "Filtertilstand",
   "filterPlaceholder": "Filtrér {column}…",
+  "facetFilterAny": "Alle",
+  "resetFilters": "Nulstil",
   "showColumnFilters": "Vis filtre",
   "hideColumnFilters": "Skjul filtre",
   "pickDate": "Vælg en dato",

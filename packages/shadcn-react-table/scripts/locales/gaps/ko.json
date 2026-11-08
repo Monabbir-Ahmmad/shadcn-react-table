@@ -16,6 +16,8 @@
   "toggleRowExpanded": "행 펼치기/접기",
   "filterMode": "필터 모드",
   "filterPlaceholder": "{column} 필터링…",
+  "facetFilterAny": "전체",
+  "resetFilters": "초기화",
   "showColumnFilters": "필터 보이기",
   "hideColumnFilters": "필터 숨기기",
   "pickDate": "날짜 선택",

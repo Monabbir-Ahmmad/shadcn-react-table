@@ -31,6 +31,10 @@ export { DataTableDensityToggle } from "./components/toolbar/controls/density-to
 export { DataTableFullscreenToggle } from "./components/toolbar/controls/fullscreen-toggle"
 export { DataTableFilterToggle } from "./components/toolbar/controls/filter-toggle"
 export { DataTableAdvancedFilterToggle } from "./components/toolbar/controls/advanced-filter-toggle"
+export {
+  DataTableFacetFilter,
+  DataTableResetFilters,
+} from "./components/toolbar/data-table-facet-filter"
 export { DataTableFilterPanel } from "./components/menus/data-table-filter-panel"
 export { DataTableColumnActions } from "./components/menus/data-table-column-actions"
 export { DataTableFilterModeMenu } from "./components/menus/data-table-filter-mode-menu"

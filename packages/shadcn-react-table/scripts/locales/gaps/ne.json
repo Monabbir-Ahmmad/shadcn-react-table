@@ -16,6 +16,8 @@
   "toggleRowExpanded": "पंक्ति विस्तार/संकुचन गर्नुहोस्",
   "filterMode": "फिल्टर प्रणाली",
   "filterPlaceholder": "{column} फिल्टर गर्नुहोस्…",
+  "facetFilterAny": "कुनै पनि",
+  "resetFilters": "रिसेट",
   "showColumnFilters": "फिल्टर देखाउनुहोस्",
   "hideColumnFilters": "फिल्टर लुकाउनुहोस्",
   "pickDate": "मिति छान्नुहोस्",

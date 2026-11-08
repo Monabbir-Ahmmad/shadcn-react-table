@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Zeile ein-/ausklappen",
   "filterMode": "Filtermodus",
   "filterPlaceholder": "{column} filtern…",
+  "facetFilterAny": "Alle",
+  "resetFilters": "Zurücksetzen",
   "showColumnFilters": "Filter anzeigen",
   "hideColumnFilters": "Filter ausblenden",
   "pickDate": "Datum auswählen",

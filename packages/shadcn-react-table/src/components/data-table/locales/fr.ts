@@ -171,4 +171,6 @@ export const dataTableLocalizationFr: DataTableLocalization = {
     "Pour saisir un élément, appuyez sur la barre d'espace ou sur Entrée. Pendant le glissement, utilisez les touches fléchées pour le déplacer. Appuyez à nouveau sur la barre d'espace ou sur Entrée pour le déposer, ou sur Échap pour annuler.", // needs review
   dragRowLabel: (position) => `Ligne ${position.toLocaleString("fr")}`, // needs review
   noResultsFound: "Aucun résultat trouvé",
+  facetFilterAny: "Tous", // needs review
+  resetFilters: "Réinitialiser", // needs review
 }
