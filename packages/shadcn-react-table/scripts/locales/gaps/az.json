@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Sətri genişləndir/yığ",
   "filterMode": "Filter rejimi",
   "filterPlaceholder": "{column} filtri…",
+  "facetFilterAny": "İstənilən",
+  "resetFilters": "Sıfırla",
   "showColumnFilters": "Filterləri göstər",
   "hideColumnFilters": "Filterləri gizlə",
   "pickDate": "Tarix seçin",

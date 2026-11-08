@@ -170,4 +170,6 @@ export const dataTableLocalizationEl: DataTableLocalization = {
     "Για να σηκώσετε ένα στοιχείο, πατήστε το πλήκτρο διαστήματος ή Enter. Κατά τη μεταφορά, χρησιμοποιήστε τα βέλη για να το μετακινήσετε. Πατήστε ξανά διάστημα ή Enter για να το αφήσετε ή Escape για ακύρωση.", // needs review
   dragRowLabel: (position) => `Γραμμή ${position.toLocaleString("el")}`, // needs review
   noResultsFound: "Δεν βρέθηκαν αποτελέσματα",
+  facetFilterAny: "Οποιοδήποτε", // needs review
+  resetFilters: "Επαναφορά", // needs review
 }

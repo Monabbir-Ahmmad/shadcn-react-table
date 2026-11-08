@@ -168,4 +168,6 @@ export const dataTableLocalizationPt: DataTableLocalization = {
     "Para pegar num item, prima Espaço ou Enter. Ao arrastar, use as teclas de seta para o mover. Prima Espaço ou Enter novamente para o largar, ou prima Escape para cancelar.", // needs review
   dragRowLabel: (position) => `Linha ${position.toLocaleString("pt")}`, // needs review
   noResultsFound: "Nenhum resultado encontrado",
+  facetFilterAny: "Qualquer", // needs review
+  resetFilters: "Repor", // needs review
 }

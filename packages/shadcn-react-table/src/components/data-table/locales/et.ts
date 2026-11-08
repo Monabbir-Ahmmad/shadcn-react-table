@@ -168,4 +168,6 @@ export const dataTableLocalizationEt: DataTableLocalization = {
     "Elemendi üleskorjamiseks vajuta tühikuklahvi või sisestusklahvi. Lohistamise ajal liiguta seda nooleklahvidega. Selle mahalaskmiseks vajuta uuesti tühikuklahvi või sisestusklahvi, tühistamiseks vajuta Esc.", // needs review
   dragRowLabel: (position) => `Rida ${position.toLocaleString("et")}`, // needs review
   noResultsFound: "Tulemusi ei leitud",
+  facetFilterAny: "Kõik", // needs review
+  resetFilters: "Lähtesta", // needs review
 }

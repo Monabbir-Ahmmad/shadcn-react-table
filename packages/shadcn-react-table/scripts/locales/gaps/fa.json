@@ -16,6 +16,8 @@
   "toggleRowExpanded": "باز/بسته کردن ردیف",
   "filterMode": "حالت فیلتر",
   "filterPlaceholder": "فیلتر {column}…",
+  "facetFilterAny": "همه",
+  "resetFilters": "بازنشانی",
   "showColumnFilters": "نمایش فیلتر ها",
   "hideColumnFilters": "مخفی کردن فیلتر ها",
   "pickDate": "انتخاب تاریخ",

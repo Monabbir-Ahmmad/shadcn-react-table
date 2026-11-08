@@ -168,4 +168,6 @@ export const dataTableLocalizationDa: DataTableLocalization = {
     "Tryk på mellemrum eller Enter for at samle et element op. Brug piletasterne til at flytte det under træk. Tryk på mellemrum eller Enter igen for at slippe det, eller tryk på Escape for at annullere.", // needs review
   dragRowLabel: (position) => `Række ${position.toLocaleString("da")}`, // needs review
   noResultsFound: "Ingen resultater fundet",
+  facetFilterAny: "Alle", // needs review
+  resetFilters: "Nulstil", // needs review
 }

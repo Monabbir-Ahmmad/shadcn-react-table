@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Развернуть/свернуть строку",
   "filterMode": "Режим фильтра",
   "filterPlaceholder": "Фильтр: {column}…",
+  "facetFilterAny": "Любой",
+  "resetFilters": "Сбросить",
   "showColumnFilters": "Показать фильтры",
   "hideColumnFilters": "Скрыть фильтры",
   "pickDate": "Выберите дату",

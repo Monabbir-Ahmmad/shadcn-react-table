@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Laajenna tai tiivistä rivi",
   "filterMode": "Suodattimen tila",
   "filterPlaceholder": "Suodata {column}…",
+  "facetFilterAny": "Kaikki",
+  "resetFilters": "Nollaa",
   "showColumnFilters": "Näytä suodattimet",
   "hideColumnFilters": "Piilota suodattimet",
   "pickDate": "Valitse päivämäärä",

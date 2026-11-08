@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Satırı Genişlet/Daralt",
   "filterMode": "Filtre Modu",
   "filterPlaceholder": "{column} Filtrele…",
+  "facetFilterAny": "Tümü",
+  "resetFilters": "Sıfırla",
   "showColumnFilters": "Filtreleri Göster",
   "hideColumnFilters": "Filtreleri Gizle",
   "pickDate": "Tarih Seç",

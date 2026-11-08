@@ -62,6 +62,10 @@ export interface DataTableLocalization {
   filterMode: string
   changeFilterMode: string
   filterPlaceholder: (column: string) => string
+  /** The choice that clears a toolbar facet filter. */
+  facetFilterAny: string
+  /** The toolbar button that clears every column filter. */
+  resetFilters: string
   showColumnFilters: string
   hideColumnFilters: string
   min: string
@@ -213,6 +217,8 @@ export const defaultLocalization: DataTableLocalization = {
   filterMode: "Filter mode",
   changeFilterMode: "Change filter mode",
   filterPlaceholder: (column) => `Filter ${column}…`,
+  facetFilterAny: "Any",
+  resetFilters: "Reset",
   showColumnFilters: "Show filters",
   hideColumnFilters: "Hide filters",
   min: "Min",

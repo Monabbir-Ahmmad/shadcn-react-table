@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Բացել/փակել տողը",
   "filterMode": "Զտիչի ռեժիմ",
   "filterPlaceholder": "Զտել {column}…",
+  "facetFilterAny": "Ցանկացած",
+  "resetFilters": "Վերակայել",
   "showColumnFilters": "Ցույց տալ զտիչները",
   "hideColumnFilters": "Թաքցնել զտիչները",
   "pickDate": "Ընտրել ամսաթիվ",

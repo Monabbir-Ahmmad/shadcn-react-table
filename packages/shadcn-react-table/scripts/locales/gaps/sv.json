@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Expandera/fäll ihop rad",
   "filterMode": "Filterläge",
   "filterPlaceholder": "Filtrera {column}…",
+  "facetFilterAny": "Alla",
+  "resetFilters": "Återställ",
   "showColumnFilters": "Visa filter",
   "hideColumnFilters": "Göm filter",
   "pickDate": "Välj ett datum",

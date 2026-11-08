@@ -168,4 +168,6 @@ export const dataTableLocalizationNl: DataTableLocalization = {
     "Druk op spatie of enter om een item op te pakken. Gebruik tijdens het slepen de pijltjestoetsen om het te verplaatsen. Druk nogmaals op spatie of enter om het neer te zetten, of druk op escape om te annuleren.", // needs review
   dragRowLabel: (position) => `Rij ${position.toLocaleString("nl")}`, // needs review
   noResultsFound: "Geen resultaten gevonden",
+  facetFilterAny: "Alle", // needs review
+  resetFilters: "Herstellen", // needs review
 }

@@ -76,6 +76,69 @@ useDataTable({
 })
 ```
 
+## Facet filters
+
+`DataTableFacetFilter` puts a column filter on the toolbar as a button. It is dashed while nothing is picked and names the pick in a badge once something is. It reads and writes the table's `columnFilters` by id, so it works the same with or without the header filter row. `DataTableResetFilters` clears every column filter, and renders nothing while none is set.
+
+```tsx
+useDataTable({
+  renderTopToolbarCustomActions: ({ table }) => (
+    <>
+      {/* one choice; options come from the column's meta.filterSelectOptions */}
+      <DataTableFacetFilter table={table} columnId="role" />
+      {/* several choices, with a heading and a count beside each option */}
+      <DataTableFacetFilter
+        table={table}
+        columnId="status"
+        multiple
+        menuLabel="Show people who are"
+        counts={{ active: 12, pending: 4 }}
+      />
+      <DataTableResetFilters table={table} />
+    </>
+  ),
+})
+```
+
+Example (`facet-filter`):
+
+```tsx
+function FacetFilterExample() {
+  const data = React.useMemo(() => baseUsers, [])
+  const columns = useUserColumns()
+  // A count beside each status, from the full data set.
+  const statusCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const user of data)
+      counts[user.status] = (counts[user.status] ?? 0) + 1
+    return counts
+  }, [data])
+  const table = useDataTable({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageSize: 10 } },
+    renderTopToolbarCustomActions: ({ table }) => (
+      <div className="flex flex-wrap items-center gap-2">
+        <DataTableFacetFilter table={table} columnId="role" />
+        <DataTableFacetFilter
+          table={table}
+          columnId="status"
+          multiple
+          menuLabel="Show people who are"
+          counts={statusCounts}
+        />
+        <DataTableFacetFilter table={table} columnId="department" multiple />
+        <DataTableResetFilters table={table} />
+      </div>
+    ),
+  })
+  return <DataTable table={table} />
+}
+```
+
+Pass `options` to list values the column doesn't define, and `title` to rename the button. For a filter your page keeps outside the table, pass `value` and `onValueChange`; the table's own `columnFilters` are then left alone. Give `DataTableResetFilters` the matching `active` and `onReset` so it clears that filter too.
+
 ## Replacing a whole toolbar
 
 For full control, replace the built-in toolbar entirely. The render slot receives the table instance:
@@ -131,6 +194,8 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 | `data-table-alert-banner` |  |  | Selection alert banner (`data-position="head-overlay"` when it lies over the header row). |
 | `data-table-bottom-toolbar` |  |  | Bottom toolbar (custom actions and/or pagination). |
 | `data-table-pagination` |  |  | Pagination controls. |
+| `data-table-facet-filter` |  |  | Trigger button of a `DataTableFacetFilter` (dashed border while nothing is picked). |
+| `data-table-reset-filters` |  |  | The `DataTableResetFilters` button (rendered only while a column filter is set). |
 
 ```tsx
 <DataTable table={table} className="[&_[data-slot=data-table-toolbar]]:px-2" />

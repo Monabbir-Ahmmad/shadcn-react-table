@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Mở rộng/thu gọn hàng",
   "filterMode": "Chế độ lọc",
   "filterPlaceholder": "Lọc {column}…",
+  "facetFilterAny": "Bất kỳ",
+  "resetFilters": "Đặt lại",
   "showColumnFilters": "Hiện bộ lọc",
   "hideColumnFilters": "Ẩn bộ lọc",
   "pickDate": "Chọn ngày",

@@ -30,6 +30,11 @@ export const EXAMPLE_META: { slug: string; title: string; category: string }[] =
       category: "Filtering",
     },
     {
+      slug: "facet-filter",
+      title: "Toolbar facet filters",
+      category: "Filtering",
+    },
+    {
       slug: "advanced-filter",
       title: "Advanced filter",
       category: "Filtering",

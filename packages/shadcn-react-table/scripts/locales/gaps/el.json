@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Εναλλαγή ανάπτυξης γραμμής",
   "filterMode": "Λειτουργία φίλτρου",
   "filterPlaceholder": "Φιλτράρισμα {column}…",
+  "facetFilterAny": "Οποιοδήποτε",
+  "resetFilters": "Επαναφορά",
   "showColumnFilters": "Εμφάνιση φίλτρων",
   "hideColumnFilters": "Απόκρυψη φίλτρων",
   "pickDate": "Επιλογή ημερομηνίας",

@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Розгорнути/згорнути рядок",
   "filterMode": "Режим фільтрації",
   "filterPlaceholder": "Фільтрувати {column}…",
+  "facetFilterAny": "Будь-який",
+  "resetFilters": "Скинути",
   "showColumnFilters": "Показати фільтри",
   "hideColumnFilters": "Приховати фільтри",
   "pickDate": "Виберіть дату",

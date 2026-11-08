@@ -168,4 +168,6 @@ export const dataTableLocalizationBg: DataTableLocalization = {
     "За да вдигнете елемент, натиснете интервал или Enter. Докато го влачите, използвайте клавишите със стрелки, за да го преместите. Натиснете отново интервал или Enter, за да го пуснете, или Escape за отказ.", // needs review
   dragRowLabel: (position) => `Ред ${position.toLocaleString("bg")}`, // needs review
   noResultsFound: "Няма намерени резултати",
+  facetFilterAny: "Всякакви", // needs review
+  resetFilters: "Нулиране", // needs review
 }

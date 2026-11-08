@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Rozbaliť/zbaliť riadok",
   "filterMode": "Režim filtra",
   "filterPlaceholder": "Filtrovať {column}…",
+  "facetFilterAny": "Ľubovoľné",
+  "resetFilters": "Obnoviť",
   "showColumnFilters": "Zobraziť filtre",
   "hideColumnFilters": "Skryť filtre",
   "pickDate": "Vybrať dátum",

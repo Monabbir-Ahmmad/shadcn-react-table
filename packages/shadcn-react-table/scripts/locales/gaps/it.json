@@ -16,6 +16,8 @@
   "toggleRowExpanded": "Espandi/comprimi riga",
   "filterMode": "Modalità filtro",
   "filterPlaceholder": "Filtra {column}…",
+  "facetFilterAny": "Qualsiasi",
+  "resetFilters": "Reimposta",
   "showColumnFilters": "Mostra filtri",
   "hideColumnFilters": "Nascondi filtri",
   "pickDate": "Scegli una data",

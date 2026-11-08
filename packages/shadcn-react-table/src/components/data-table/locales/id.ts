@@ -169,4 +169,6 @@ export const dataTableLocalizationId: DataTableLocalization = {
     "Untuk mengangkat item, tekan spasi atau enter. Saat menyeret, gunakan tombol panah untuk memindahkannya. Tekan spasi atau enter lagi untuk menjatuhkannya, atau tekan escape untuk membatalkan.", // needs review
   dragRowLabel: (position) => `Baris ${position.toLocaleString("id")}`, // needs review
   noResultsFound: "Tidak ada hasil yang ditemukan",
+  facetFilterAny: "Semua", // needs review
+  resetFilters: "Atur ulang", // needs review
 }

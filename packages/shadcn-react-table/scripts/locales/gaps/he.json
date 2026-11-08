@@ -16,6 +16,8 @@
   "toggleRowExpanded": "הרחב/כווץ שורה",
   "filterMode": "מצב סינון",
   "filterPlaceholder": "סנן {column}…",
+  "facetFilterAny": "הכול",
+  "resetFilters": "איפוס",
   "showColumnFilters": "הצג סינונים",
   "hideColumnFilters": "הסתר סינונים",
   "pickDate": "בחר תאריך",
