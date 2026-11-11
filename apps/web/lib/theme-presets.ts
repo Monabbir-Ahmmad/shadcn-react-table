@@ -158,7 +158,45 @@ export const ACCENTS: ColorPreset[] = [
 ]
 
 // --- Base color presets (the neutral ramp), generated from hue + chroma -----
+// Mist is not one hue, so it carries shadcn's own values (the site's default,
+// as in globals.css); its hue and chroma only tint its swatch.
+const MIST = {
+  light: {
+    "--background": "oklch(1 0 0)",
+    "--foreground": "oklch(0.148 0.004 228.8)",
+    "--card": "oklch(1 0 0)",
+    "--card-foreground": "oklch(0.148 0.004 228.8)",
+    "--popover": "oklch(1 0 0)",
+    "--popover-foreground": "oklch(0.148 0.004 228.8)",
+    "--secondary": "oklch(0.967 0.001 286.375)",
+    "--secondary-foreground": "oklch(0.21 0.006 285.885)",
+    "--muted": "oklch(0.963 0.002 197.1)",
+    "--muted-foreground": "oklch(0.56 0.021 213.5)",
+    "--accent": "oklch(0.963 0.002 197.1)",
+    "--accent-foreground": "oklch(0.218 0.008 223.9)",
+    "--border": "oklch(0.925 0.005 214.3)",
+    "--input": "oklch(0.925 0.005 214.3)",
+  },
+  dark: {
+    "--background": "oklch(0.148 0.004 228.8)",
+    "--foreground": "oklch(0.987 0.002 197.1)",
+    "--card": "oklch(0.218 0.008 223.9)",
+    "--card-foreground": "oklch(0.987 0.002 197.1)",
+    "--popover": "oklch(0.218 0.008 223.9)",
+    "--popover-foreground": "oklch(0.987 0.002 197.1)",
+    "--secondary": "oklch(0.274 0.006 286.033)",
+    "--secondary-foreground": "oklch(0.985 0 0)",
+    "--muted": "oklch(0.275 0.011 216.9)",
+    "--muted-foreground": "oklch(0.723 0.014 214.4)",
+    "--accent": "oklch(0.275 0.011 216.9)",
+    "--accent-foreground": "oklch(0.987 0.002 197.1)",
+    "--border": "oklch(1 0 0 / 10%)",
+    "--input": "oklch(1 0 0 / 15%)",
+  },
+}
+
 export const BASE_COLORS = [
+  { name: "mist", label: "Mist", hue: 214, chroma: 0.008, vars: MIST },
   { name: "neutral", label: "Neutral", hue: 0, chroma: 0 },
   { name: "stone", label: "Stone", hue: 60, chroma: 0.006 },
   { name: "zinc", label: "Zinc", hue: 286, chroma: 0.006 },
@@ -251,7 +289,7 @@ export function themeVars(
   const f = FONTS.find((x) => x.name === prefs.font) ?? FONTS[0]!
   const h = FONTS.find((x) => x.name === prefs.heading)
   return {
-    ...ramp(b.hue, b.chroma)[mode],
+    ...("vars" in b ? b.vars : ramp(b.hue, b.chroma))[mode],
     "--primary": a.primary,
     "--primary-foreground": a.primaryForeground,
     "--ring": a.ring,
