@@ -2,6 +2,8 @@
 
 import type { RowData } from "@tanstack/react-table"
 
+import { Button } from "@workspace/ui/components/button"
+
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
 import type { DataTableColumnDef } from "../core/table-types"
@@ -26,26 +28,27 @@ export function createExpandColumn<TData extends RowData>(
     meta: { enableColumnActions: false },
     header: ({ table }) =>
       dt(table as never).enableExpandAll && table.getCanSomeRowsExpand() ? (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon-xs"
           aria-label={localization.expandAll}
           onClick={table.getToggleAllRowsExpandedHandler()}
-          className="flex items-center justify-center text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40"
         >
           {table.getIsAllRowsExpanded() ? (
-            <icons.expanded className="size-4" />
+            <icons.expanded />
           ) : (
-            <icons.collapsed className="size-4 rtl:rotate-180" />
+            <icons.collapsed className="rtl:rotate-180" />
           )}
-        </button>
+        </Button>
       ) : (
         <span className="sr-only">{localization.toggleRowExpanded}</span>
       ),
     cell: ({ row }) => {
       if (!row.getCanExpand()) return null
       return (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon-xs"
           aria-label={localization.toggleRowExpanded}
           aria-expanded={row.getIsExpanded()}
           onClick={(event) => {
@@ -53,14 +56,13 @@ export function createExpandColumn<TData extends RowData>(
             row.getToggleExpandedHandler()()
           }}
           onDoubleClick={stopPropagation}
-          className="flex items-center justify-center text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40"
         >
           {row.getIsExpanded() ? (
-            <icons.expanded className="size-4" />
+            <icons.expanded />
           ) : (
-            <icons.collapsed className="size-4 rtl:rotate-180" />
+            <icons.collapsed className="rtl:rotate-180" />
           )}
-        </button>
+        </Button>
       )
     },
   }

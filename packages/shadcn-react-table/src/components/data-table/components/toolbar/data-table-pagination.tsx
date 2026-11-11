@@ -99,7 +99,7 @@ export function DataTablePagination<TData extends RowData>({
           >
             <SelectTrigger
               size="sm"
-              className="h-8 w-18"
+              className="w-18"
               aria-label={localization.rowsPerPage}
             >
               <SelectValue
@@ -139,11 +139,10 @@ export function DataTablePagination<TData extends RowData>({
               <Button
                 key={item}
                 variant={item === pageIndex + 1 ? "default" : "outline"}
-                size="icon"
+                size="icon-sm"
                 aria-label={localization.goToPage(item)}
                 aria-current={item === pageIndex + 1 ? "page" : undefined}
                 onClick={() => table.setPageIndex(item - 1)}
-                className="size-8 text-xs tabular-nums"
               >
                 {formatInteger(item, localization.language)}
               </Button>
@@ -236,11 +235,10 @@ function PaginationButton({
       <TooltipTrigger asChild>
         <Button
           variant="outline"
-          size="icon"
+          size="icon-sm"
           aria-label={label}
           onClick={onClick}
           disabled={disabled}
-          className="size-8"
         >
           {children}
         </Button>

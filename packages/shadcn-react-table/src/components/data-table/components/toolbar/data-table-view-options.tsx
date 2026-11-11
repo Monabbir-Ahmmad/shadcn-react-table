@@ -51,7 +51,6 @@ export function DataTableViewOptions<TData extends RowData>({
               variant="outline"
               size="icon"
               aria-label={localization.columnVisibility}
-              className="size-8"
             >
               <icons.columnVisibility />
             </Button>
@@ -69,7 +68,6 @@ export function DataTableViewOptions<TData extends RowData>({
         {hideableColumns.map((column) => (
           <DropdownMenuCheckboxItem
             key={column.id}
-            className="capitalize"
             checked={column.getIsVisible()}
             onCheckedChange={(value) => column.toggleVisibility(!!value)}
             onSelect={(e) => e.preventDefault()}

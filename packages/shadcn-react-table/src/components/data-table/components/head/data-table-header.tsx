@@ -156,7 +156,7 @@ export function DataTableHeader<TData extends RowData>({
           {...mergeProps(
             {
               "aria-rowindex": rowIndex(index),
-              className: "group/th hover:bg-transparent",
+              className: "group/th",
             } as React.ComponentProps<"tr">,
             getSlotProps(table, "headRow", { headerGroup })
           )}
@@ -184,7 +184,6 @@ export function DataTableHeader<TData extends RowData>({
             // Found by the row motion, which fades it in and out.
             data-filter-row=""
             aria-rowindex={rowIndex(headerGroups.length)}
-            className="hover:bg-transparent"
           >
             {enableColumnVirtualization
               ? withHeaderSpacers(

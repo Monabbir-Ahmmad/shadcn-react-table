@@ -172,10 +172,10 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-xs"
               aria-label={localization.columnActions}
               className={cn(
-                "size-7 shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                "shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
                 className
               )}
             >

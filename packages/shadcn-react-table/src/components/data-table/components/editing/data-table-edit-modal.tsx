@@ -102,7 +102,7 @@ export function DataTableEditModal<TData extends RowData>({
         : editingRow?.getValue(column.id)
     return (
       <div key={column.id} className="flex flex-col gap-1.5">
-        <Label className="text-xs">{getColumnLabel(column)}</Label>
+        <Label>{getColumnLabel(column)}</Label>
         <DataTableEditField
           value={value}
           variant={meta?.editVariant}

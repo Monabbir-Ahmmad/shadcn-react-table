@@ -44,15 +44,12 @@ export function MultiSelectFilterField<TData extends RowData, TValue>({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className={cn(FIELD_CLASS, "w-full justify-between px-2 font-normal")}
+          className={cn(FIELD_CLASS, "w-full justify-between")}
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           {selected.length > 0 ? (
             <span className="flex min-w-0 items-center gap-1">
-              <Badge variant="secondary" className="rounded-sm px-1">
-                {selected.length}
-              </Badge>
+              <Badge variant="secondary">{selected.length}</Badge>
               <span className="truncate">{selected.join(", ")}</span>
             </span>
           ) : (
@@ -64,7 +61,7 @@ export function MultiSelectFilterField<TData extends RowData, TValue>({
       </PopoverTrigger>
       <PopoverContent className="w-56 p-0" align="start">
         <Command>
-          <CommandInput placeholder={localization.search} className="h-8" />
+          <CommandInput placeholder={localization.search} />
           <CommandList>
             <CommandEmpty>{localization.noRecordsToDisplay}</CommandEmpty>
             <CommandGroup>
@@ -75,7 +72,6 @@ export function MultiSelectFilterField<TData extends RowData, TValue>({
                     key={option.value}
                     value={option.value}
                     onSelect={() => toggle(option.value)}
-                    className="gap-2"
                   >
                     <Checkbox
                       checked={isSelected}

@@ -2,8 +2,8 @@
 
 import type { RowData } from "@tanstack/react-table"
 
-import { Button } from "@workspace/ui/components/button"
 import { Calendar } from "@workspace/ui/components/calendar"
+import { InputGroupButton } from "@workspace/ui/components/input-group"
 import {
   Popover,
   PopoverContent,
@@ -46,18 +46,13 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
     >
       <Popover>
         <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
+          <InputGroupButton
             size="sm"
-            data-slot="input-group-control"
-            className={cn(
-              GROUP_CONTROL_CLASS,
-              "min-w-0 flex-1 justify-start gap-2 px-2 hover:bg-transparent focus-visible:ring-0 aria-expanded:bg-transparent"
-            )}
+            className={cn(GROUP_CONTROL_CLASS, "min-w-0 flex-1 justify-start")}
             // The visible text is part of the name (WCAG 2.5.3).
             aria-label={`${localization.filterByColumn(getColumnLabel(column))}: ${shown}`}
           >
-            <icons.calendar className="text-muted-foreground" />
+            <icons.calendar />
             {from || to ? (
               <span className="truncate">
                 {from ? formatDate(from, localization.language) : "…"} –{" "}
@@ -68,7 +63,7 @@ export function DateRangeFilterField<TData extends RowData, TValue>({
                 {localization.pickDateRange}
               </span>
             )}
-          </Button>
+          </InputGroupButton>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar

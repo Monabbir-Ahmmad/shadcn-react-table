@@ -86,7 +86,6 @@ export function DataTableFooter<TData extends RowData>({
               "aria-rowindex": enableKeyboardNavigation
                 ? getHeaderRowCount(table) + getDataRowCount(table) + index + 1
                 : undefined,
-              className: "hover:bg-transparent",
             } as React.ComponentProps<"tr">,
             getSlotProps(table, "footerRow", { footerGroup })
           )}

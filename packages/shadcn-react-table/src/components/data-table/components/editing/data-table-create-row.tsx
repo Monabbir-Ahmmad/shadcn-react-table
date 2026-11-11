@@ -51,21 +51,18 @@ export function DataTableCreateRow<TData extends RowData>({
 
   return (
     <>
-      <TableRow
-        data-slot="data-table-create-row"
-        className="bg-muted/30 align-top hover:bg-muted/30"
-      >
+      <TableRow data-slot="data-table-create-row" className="align-top">
         {leafColumns.map((column) => {
           const editable = enableEditing && isColumnEditable(column)
           return (
-            <TableCell key={column.id} className="p-2 align-top">
+            <TableCell key={column.id} className="align-top">
               {editable ? <CreateField column={column} table={table} /> : null}
             </TableCell>
           )
         })}
       </TableRow>
-      <TableRow className="border-b-2 bg-muted/30 hover:bg-muted/30">
-        <TableCell colSpan={leafColumns.length} className="p-2">
+      <TableRow>
+        <TableCell colSpan={leafColumns.length}>
           <div className="flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" onClick={cancelEditing}>
               {localization.cancel}

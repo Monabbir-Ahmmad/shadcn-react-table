@@ -62,7 +62,7 @@ export function DataTableDropToGroupZone<TData extends RowData>({
           const column = table.getColumn(columnId)
           if (!column) return null
           return (
-            <Badge key={columnId} variant="secondary" className="gap-1 pe-1">
+            <Badge key={columnId} variant="secondary">
               {getColumnLabel(column)}
               <button
                 type="button"

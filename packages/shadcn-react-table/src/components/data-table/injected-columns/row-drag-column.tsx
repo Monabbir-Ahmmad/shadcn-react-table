@@ -57,7 +57,7 @@ function RowDragHandle({
     <Button
       type="button"
       variant="ghost"
-      size="icon"
+      size="icon-xs"
       aria-label={label}
       ref={ctx?.setActivatorNodeRef}
       suppressHydrationWarning
@@ -67,10 +67,10 @@ function RowDragHandle({
       onDoubleClick={stopPropagation}
       // touch-none: let dnd-kit's pointer sensor own the touch gesture
       // (otherwise the browser scrolls/selects text before a drag can start on
-      // a phone). size-7 gives a finger-friendly tap target.
-      className="size-7 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
+      // a phone).
+      className="cursor-grab touch-none active:cursor-grabbing"
     >
-      <Icon className="size-4" />
+      <Icon />
     </Button>
   )
 }

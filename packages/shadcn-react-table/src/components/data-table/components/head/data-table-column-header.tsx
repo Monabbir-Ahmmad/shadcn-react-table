@@ -70,12 +70,13 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
             <Button
-              variant="ghost"
-              size="icon"
+              // An active filter shows as the button's secondary variant.
+              variant={hasFilter ? "secondary" : "ghost"}
+              size="icon-xs"
               aria-label={localization.filterByColumn(getColumnLabel(column))}
               className={cn(
-                "size-7 shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
-                hasFilter && "text-primary opacity-100"
+                "shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                hasFilter && "opacity-100"
               )}
             >
               {hasFilter ? <icons.filter /> : <icons.filterOff />}
@@ -86,7 +87,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
           {localization.filterByColumn(getColumnLabel(column))}
         </TooltipContent>
       </Tooltip>
-      <PopoverContent align="start" className="w-64 gap-2">
+      <PopoverContent align="start" className="w-64">
         <span className="text-sm font-medium">
           {localization.filterByColumn(getColumnLabel(column))}
         </span>
@@ -153,10 +154,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
                 <span className="min-w-0 truncate">{labelNode}</span>
                 <SortIndicator sorted={sorted} icons={icons} />
                 {isMultiSort && (
-                  <Badge
-                    variant="secondary"
-                    className="ms-0.5 h-4 min-w-4 shrink-0 justify-center px-1 text-[10px] leading-none tabular-nums"
-                  >
+                  <Badge variant="secondary" className="ms-0.5 shrink-0">
                     {sortIndex + 1}
                   </Badge>
                 )}

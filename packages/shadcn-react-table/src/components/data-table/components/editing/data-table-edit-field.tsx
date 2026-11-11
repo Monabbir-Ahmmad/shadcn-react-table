@@ -10,13 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableFilterOption, EditVariant } from "../../core/types"
 import { stopPropagation } from "../../helpers/stop-propagation"
 import { mergeProps } from "../../helpers/slot-props"
-
-const FIELD_CLASS = "h-8 text-xs font-normal"
 
 /**
  * A controlled inline edit field (text / number / select). The parent owns the
@@ -83,8 +80,7 @@ export function DataTableEditField({
           <SelectTrigger
             {...mergeProps(
               {
-                size: "sm",
-                className: cn(FIELD_CLASS, "w-full px-2"),
+                className: "w-full",
                 "aria-label": ariaLabel,
                 "aria-invalid": !!error,
               } as React.ComponentProps<typeof SelectTrigger>,
@@ -140,7 +136,6 @@ export function DataTableEditField({
               }
             },
             onBlur: () => onCommit?.(),
-            className: FIELD_CLASS,
           } as React.ComponentProps<"input">,
           fieldProps
         )}

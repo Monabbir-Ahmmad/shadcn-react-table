@@ -32,13 +32,7 @@ export function SelectFilterField<TData extends RowData, TValue>({
         onValueChange={(next) => column.setFilterValue(next || undefined)}
       >
         <SelectTrigger
-          size="sm"
-          // Some styles size the small trigger with `data-[size=sm]:h-*`,
-          // which beats a plain `h-8`: match the other filter inputs.
-          className={cn(
-            FIELD_CLASS,
-            "w-full min-w-0 flex-1 px-2 data-[size=sm]:h-8"
-          )}
+          className={cn(FIELD_CLASS, "w-full min-w-0 flex-1")}
           aria-label={localization.filterByColumn(getColumnLabel(column))}
         >
           <SelectValue
@@ -56,10 +50,9 @@ export function SelectFilterField<TData extends RowData, TValue>({
       {value && (
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-xs"
           aria-label={localization.clearFilter}
           onClick={() => column.setFilterValue(undefined)}
-          className="size-7"
         >
           <icons.clear />
         </Button>

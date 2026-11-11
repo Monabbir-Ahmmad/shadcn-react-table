@@ -384,7 +384,7 @@ export function DataTableBody<TData extends RowData>({
   })
 
   const detailRow = (row: DataTableRow<TData>) => (
-    <TableRow {...detailRowProps(row)} className="hover:bg-transparent">
+    <TableRow {...detailRowProps(row)}>
       <TableCell {...detailCellProps(row)}>
         <div className="p-3">{renderDetailPanel?.({ row, table })}</div>
       </TableCell>
@@ -543,7 +543,6 @@ export function DataTableBody<TData extends RowData>({
                       {...detailRowProps(item.row)}
                       data-index={vRow.index}
                       ref={rowVirtualizer.measureElement}
-                      className="hover:bg-transparent"
                     >
                       <TableCell {...detailCellProps(item.row)}>
                         <div className="p-3">
@@ -609,15 +608,18 @@ export function DataTableBody<TData extends RowData>({
               bottomRows.map((row, i) => renderRow(row, bottomOffset + i))}
           </>
         ) : (
-          <TableRow className="hover:bg-transparent">
+          <TableRow>
             <TableCell
               colSpan={visibleColumnCount}
-              className="h-32 text-center text-sm text-muted-foreground"
+              className="h-32 text-center"
             >
-              {renderEmpty?.({ table }) ??
-                (isFiltered(table)
-                  ? localization.noResultsFound
-                  : localization.noRecordsToDisplay)}
+              {renderEmpty?.({ table }) ?? (
+                <span className="text-muted-foreground">
+                  {isFiltered(table)
+                    ? localization.noResultsFound
+                    : localization.noRecordsToDisplay}
+                </span>
+              )}
             </TableCell>
           </TableRow>
         )}

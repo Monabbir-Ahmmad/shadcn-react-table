@@ -173,7 +173,7 @@ function FilterPanelContent<TData extends RowData>({
     .map((part) => part.trim())
 
   return (
-    <DialogContent className="gap-3 sm:max-w-lg">
+    <DialogContent className="sm:max-w-lg">
       <DialogHeader>
         <DialogTitle>{localization.advancedFilters}</DialogTitle>
         <DialogDescription className="sr-only">
@@ -195,7 +195,7 @@ function FilterPanelContent<TData extends RowData>({
               }))
             }
           >
-            <SelectTrigger className="h-8 w-auto min-w-20">
+            <SelectTrigger className="w-auto min-w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -236,7 +236,7 @@ function FilterPanelContent<TData extends RowData>({
                         if (v != null) changeColumn(rule, v)
                       }}
                     >
-                      <SelectTrigger className="h-8 flex-1">
+                      <SelectTrigger className="flex-1">
                         <SelectValue
                           placeholder={localization.advancedFiltersColumn}
                         />
@@ -251,8 +251,8 @@ function FilterPanelContent<TData extends RowData>({
                     </Select>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="size-8 shrink-0 text-muted-foreground"
+                      size="icon-sm"
+                      className="shrink-0"
                       aria-label={localization.removeFilterRule}
                       onClick={() => removeRule(rule.id)}
                     >
@@ -266,7 +266,7 @@ function FilterPanelContent<TData extends RowData>({
                         changeOperator(rule, v as AdvancedFilterOperator)
                       }
                     >
-                      <SelectTrigger className="h-8 w-40 shrink-0">
+                      <SelectTrigger className="w-40 shrink-0">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -350,7 +350,7 @@ function RuleValueInput<TData extends RowData>({
         value={(rule.value as string | undefined) ?? ""}
         onValueChange={(v) => onChange({ value: v })}
       >
-        <SelectTrigger className="h-8 flex-1">
+        <SelectTrigger className="flex-1">
           <SelectValue placeholder={localization.advancedFiltersValue} />
         </SelectTrigger>
         <SelectContent>
@@ -370,7 +370,7 @@ function RuleValueInput<TData extends RowData>({
         value={rule.value === undefined ? "" : String(rule.value)}
         onValueChange={(v) => onChange({ value: v === "true" })}
       >
-        <SelectTrigger className="h-8 flex-1">
+        <SelectTrigger className="flex-1">
           <SelectValue placeholder={localization.advancedFiltersValue} />
         </SelectTrigger>
         <SelectContent>
@@ -387,7 +387,6 @@ function RuleValueInput<TData extends RowData>({
       <div className="flex flex-1 items-center gap-1">
         <Input
           type={type}
-          className="h-8"
           value={(rule.value as string | undefined) ?? ""}
           onChange={(e) => onChange({ value: e.target.value })}
           placeholder={localization.min}
@@ -395,7 +394,6 @@ function RuleValueInput<TData extends RowData>({
         <span className="text-muted-foreground">–</span>
         <Input
           type={type}
-          className="h-8"
           value={(rule.value2 as string | undefined) ?? ""}
           onChange={(e) => onChange({ value2: e.target.value })}
           placeholder={localization.max}
@@ -407,7 +405,7 @@ function RuleValueInput<TData extends RowData>({
   return (
     <Input
       type={type}
-      className="h-8 flex-1"
+      className="flex-1"
       value={(rule.value as string | undefined) ?? ""}
       onChange={(e) => onChange({ value: e.target.value })}
       placeholder={localization.advancedFiltersValue}

@@ -2,7 +2,7 @@
 
 import type { RowData } from "@tanstack/react-table"
 
-import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
 
 import type { DataTableIcons } from "../core/icons"
 import type { DataTableLocalization } from "../core/localization"
@@ -28,8 +28,10 @@ export function RowPinButton<TData extends RowData>({
   const side =
     dt(row.table as never).rowPinningDisplayMode === "bottom" ? "bottom" : "top"
   return (
-    <button
-      type="button"
+    <Button
+      // Pinned: the button's secondary variant.
+      variant={pinned ? "secondary" : "ghost"}
+      size="icon-xs"
       aria-label={pinned ? localization.unpinRow : localization.pinRow}
       aria-pressed={!!pinned}
       onClick={(event) => {
@@ -37,19 +39,15 @@ export function RowPinButton<TData extends RowData>({
         row.pin(pinned ? false : side)
       }}
       onDoubleClick={stopPropagation}
-      className={cn(
-        "flex items-center justify-center text-muted-foreground transition-opacity outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40",
-        pinned && "text-primary",
-        className
-      )}
+      className={className}
     >
       {pinned ? (
-        <icons.pinnedRow className="size-3.5" />
+        <icons.pinnedRow />
       ) : side === "bottom" ? (
-        <icons.pinBottom className="size-3.5" />
+        <icons.pinBottom />
       ) : (
-        <icons.pinTop className="size-3.5" />
+        <icons.pinTop />
       )}
-    </button>
+    </Button>
   )
 }

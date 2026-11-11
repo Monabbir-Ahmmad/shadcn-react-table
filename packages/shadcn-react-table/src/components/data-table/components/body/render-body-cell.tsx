@@ -3,6 +3,8 @@
 import { flexRender, type RowData } from "@tanstack/react-table"
 import * as React from "react"
 
+import { Button } from "@workspace/ui/components/button"
+
 import { NON_DATA_COLUMN_IDS } from "../../core/constants"
 import type { DataTableInstance } from "../../core/types"
 import { SUBSTRING_MODES } from "../../fns/filter-fns"
@@ -55,8 +57,9 @@ export function renderBodyCell<TData extends RowData>(
 
   if (isGrouping && cell.getIsGrouped()) {
     return (
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="sm"
         aria-label={localization.toggleRowExpanded}
         aria-expanded={row.getIsExpanded()}
         onClick={(event) => {
@@ -64,13 +67,13 @@ export function renderBodyCell<TData extends RowData>(
           row.getToggleExpandedHandler()()
         }}
         onDoubleClick={stopPropagation}
-        style={{ paddingInlineStart: `${row.depth * 1}rem` }}
-        className="flex items-center gap-1.5 text-start outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+        // Nesting indent: a margin, so the button keeps its own padding.
+        style={{ marginInlineStart: `${row.depth * 1}rem` }}
       >
         {row.getIsExpanded() ? (
-          <icons.expanded className="size-4 shrink-0 text-muted-foreground" />
+          <icons.expanded />
         ) : (
-          <icons.collapsed className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+          <icons.collapsed className="rtl:rotate-180" />
         )}
         <span className="font-medium">
           {meta?.renderGroupedCell
@@ -83,7 +86,7 @@ export function renderBodyCell<TData extends RowData>(
         <span className="text-xs text-muted-foreground">
           ({row.subRows.length})
         </span>
-      </button>
+      </Button>
     )
   }
 

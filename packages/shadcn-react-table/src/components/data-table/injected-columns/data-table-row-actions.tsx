@@ -90,9 +90,8 @@ function RowActionsCell<TData extends RowData>({
       >
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-xs"
           aria-label={localization.save}
-          className="size-7"
           // As in the edit dialog: no saving while a field is invalid.
           disabled={hasRowDraftErrors(table, row)}
           onClick={() => saveEditedRow(table, row)}
@@ -101,9 +100,8 @@ function RowActionsCell<TData extends RowData>({
         </Button>
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-xs"
           aria-label={localization.cancel}
-          className="size-7"
           onClick={cancelEditing}
         >
           <icons.cancel />
@@ -126,9 +124,8 @@ function RowActionsCell<TData extends RowData>({
       {canInlineEdit && !renderRowActionMenuItems && (
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-xs"
           aria-label={localization.edit}
-          className="size-7"
           onClick={() => beginRowEdit(row)}
         >
           <icons.edit />
@@ -140,9 +137,8 @@ function RowActionsCell<TData extends RowData>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-xs"
               aria-label={localization.rowActions}
-              className="size-7"
             >
               <icons.columnActions />
             </Button>

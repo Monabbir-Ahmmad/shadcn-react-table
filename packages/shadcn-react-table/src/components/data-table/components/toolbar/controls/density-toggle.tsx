@@ -35,7 +35,6 @@ export function DataTableDensityToggle<TData extends RowData>({
           variant="outline"
           size="icon"
           aria-label={label}
-          className="size-8"
           onClick={() =>
             setDensity((prev) => {
               const next =
