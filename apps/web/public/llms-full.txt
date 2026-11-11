@@ -19,24 +19,89 @@ A **shadcn/ui data table** with [Material React Table](https://www.material-reac
 Example (`advanced`):
 
 ```tsx
-function AdvancedExample() {
+function PlaygroundExample() {
   const [data, setData] = React.useState(() => baseUsers)
   const columns = useUserColumns()
+  // Every switch in the Settings menu, starting from the kitchen sink.
+  const defaults = {
+    rowSelection: true,
+    rowNumbers: true,
+    rowPinning: true,
+    rowOrdering: false,
+    detailPanel: false,
+    columnOrdering: true,
+    columnPinning: true,
+    columnResizing: true,
+    grouping: true,
+    columnFilters: true,
+    stickyHeader: true,
+    stickyFooter: true,
+    animations: true,
+    virtualization: false,
+    editing: true,
+  }
+  type Feature = keyof typeof defaults
+  const [features, setFeatures] = React.useState(defaults)
+  const [editMode, setEditMode] = React.useState<EditDisplayMode>("row")
+  // One row per feature: the row is the toggle, the switch shows its state.
+  const toggle = (feature: Feature, label: string) => (
+    <DropdownMenuItem
+      role="menuitemcheckbox"
+      aria-checked={features[feature]}
+      onSelect={(event) => {
+        // Keep the menu open while switching several features.
+        event.preventDefault()
+        setFeatures((prev) => ({ ...prev, [feature]: !prev[feature] }))
+      }}
+    >
+      {label}
+      <Switch
+        size="sm"
+        checked={features[feature]}
+        tabIndex={-1}
+        aria-hidden
+        className="pointer-events-none ms-auto"
+      />
+    </DropdownMenuItem>
+  )
+
   const table = useDataTable({
     data,
     columns,
     getRowId: (row) => row.id,
-    enableRowSelection: true,
     enableMultiSort: true,
-    enableColumnOrdering: true,
-    enableColumnPinning: true,
-    enableColumnResizing: true,
-    enableRowNumbers: true,
-    enableRowPinning: true,
-    enableGrouping: true,
-    enableStickyFooter: true,
-    enableEditing: true,
-    editDisplayMode: "row",
+    enableRowSelection: features.rowSelection,
+    enableRowNumbers: features.rowNumbers,
+    enableRowPinning: features.rowPinning,
+    enableRowOrdering: features.rowOrdering,
+    onRowOrderChange: (activeId, overId) =>
+      setData((prev) => {
+        const from = prev.findIndex((r) => r.id === activeId)
+        const to = prev.findIndex((r) => r.id === overId)
+        const next = [...prev]
+        next.splice(to, 0, ...next.splice(from, 1))
+        return next
+      }),
+    renderDetailPanel: features.detailPanel
+      ? ({ row }) => (
+          <p className="text-sm text-muted-foreground">
+            {row.original.email} · {row.original.city}, {row.original.country}
+          </p>
+        )
+      : undefined,
+    enableColumnOrdering: features.columnOrdering,
+    enableColumnPinning: features.columnPinning,
+    enableColumnResizing: features.columnResizing,
+    enableGrouping: features.grouping,
+    enableColumnFilters: features.columnFilters,
+    enableStickyHeader: features.stickyHeader,
+    enableStickyFooter: features.stickyFooter,
+    enableAnimations: features.animations,
+    // Virtualization scrolls through every row instead of paging them.
+    enableRowVirtualization: features.virtualization,
+    enablePagination: !features.virtualization,
+    enableEditing: features.editing,
+    editDisplayMode: editMode,
     initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
     onEditingRowSave: ({ row, values, exit }) => {
       setData((prev) =>
@@ -46,6 +111,10 @@ function AdvancedExample() {
       )
       exit()
     },
+    onEditingCellSave: ({ row, column, value }) =>
+      setData((prev) =>
+        prev.map((r) => (r.id === row.id ? { ...r, [column.id]: value } : r))
+      ),
     renderRowActions: ({ row }) => (
       <Button
         variant="ghost"
@@ -57,6 +126,74 @@ function AdvancedExample() {
       >
         <RiDeleteBinLine />
       </Button>
+    ),
+    renderTopToolbarCustomActions: () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">
+            <RiSettings3Line />
+            Settings
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Rows</DropdownMenuLabel>
+            {toggle("rowSelection", "Selection")}
+            {toggle("rowNumbers", "Row numbers")}
+            {toggle("rowPinning", "Row pinning")}
+            {toggle("rowOrdering", "Row dragging")}
+            {toggle("detailPanel", "Detail panel")}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Columns</DropdownMenuLabel>
+            {toggle("columnOrdering", "Ordering")}
+            {toggle("columnPinning", "Pinning")}
+            {toggle("columnResizing", "Resizing")}
+            {toggle("grouping", "Grouping")}
+            {toggle("columnFilters", "Column filters")}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Display</DropdownMenuLabel>
+            {toggle("stickyHeader", "Sticky header")}
+            {toggle("stickyFooter", "Sticky footer")}
+            {toggle("animations", "Animations")}
+            {toggle("virtualization", "Virtualization")}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Editing</DropdownMenuLabel>
+            {toggle("editing", "Editing")}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger disabled={!features.editing}>
+                Mode: {editMode}
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuRadioGroup
+                  value={editMode}
+                  onValueChange={(mode) => setEditMode(mode as EditDisplayMode)}
+                >
+                  {(["row", "cell", "modal", "table"] as const).map((mode) => (
+                    <DropdownMenuRadioItem key={mode} value={mode}>
+                      {mode}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={() => {
+              setFeatures(defaults)
+              setEditMode("row")
+            }}
+          >
+            Reset
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     ),
   })
   return <DataTable table={table} />
