@@ -5168,6 +5168,21 @@ The data table is **style-agnostic**. It is built entirely on standard shadcn/ui
 
 > **No table-specific theme:** There is no separate table-specific theme. Whatever your shadcn style and base color are, the table already matches them.
 
+## The card
+
+The whole table — toolbars, table and pagination — sits inside your own shadcn `Card`, so its corners, border, shadow and background match the other cards in your app. Change your `Card` (or your `--radius` and `--card` tokens) and the table follows.
+
+To drop the frame, for example when the table already sits inside a card of yours, override the root through [`slotProps`](/docs/guides/slot-props):
+
+```tsx
+useDataTable({
+  // …
+  slotProps: {
+    root: { className: "rounded-none bg-transparent shadow-none ring-0" },
+  },
+})
+```
+
 ## Design tokens
 
 The only styling the table introduces is two design tokens, injected into your `globals.css` via the registry's `cssVars`:
