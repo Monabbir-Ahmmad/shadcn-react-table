@@ -78,7 +78,7 @@ export function DataTableAlertBanner<TData extends RowData>({
           ref,
           "data-slot": "data-table-alert-banner",
           className:
-            "flex items-center justify-between gap-3 rounded-md border bg-muted px-3 py-2 text-xs font-medium text-muted-foreground",
+            "flex items-center justify-between gap-3 bg-muted px-3 py-2 text-xs font-medium text-muted-foreground",
           role: "status",
         } as React.ComponentProps<"div">,
         getSlotProps(table, "alertBanner", {})

@@ -19,10 +19,20 @@ function followers(el: HTMLElement) {
   return out
 }
 
-/** How far the siblings after `el` sit below where `el` starts. Reads. */
+/** Where an element's margin box starts. Reads. */
+function marginTop(el: HTMLElement) {
+  return (
+    el.getBoundingClientRect().top - parseFloat(getComputedStyle(el).marginTop)
+  )
+}
+
+/**
+ * How far `el` pushes the siblings after it: from where its margin box starts
+ * to where the next one's does (any gap included). Reads.
+ */
 function pushOf(el: HTMLElement, next: HTMLElement | undefined) {
   if (!next) return 0
-  return next.getBoundingClientRect().top - el.getBoundingClientRect().top
+  return marginTop(next) - marginTop(el)
 }
 
 /**

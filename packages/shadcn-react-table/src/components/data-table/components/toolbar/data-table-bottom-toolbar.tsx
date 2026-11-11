@@ -62,7 +62,9 @@ export function DataTableBottomToolbar<TData extends RowData>({
     >
       {customActions != null ? (
         <>
-          <div className="flex items-center gap-2">{customActions}</div>
+          <div className="flex items-center gap-2 py-2 ps-3">
+            {customActions}
+          </div>
           {pagination && <div className="flex-1">{pagination}</div>}
         </>
       ) : (

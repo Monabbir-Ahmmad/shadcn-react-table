@@ -115,7 +115,7 @@ export function DataTableToolbar<TData extends RowData>({
           {
             ref: toolbarRef,
             "data-slot": "data-table-toolbar",
-            className: "flex items-start justify-between gap-3 py-1",
+            className: "flex items-start justify-between gap-3 px-3 py-2",
           } as React.ComponentProps<"div">,
           getSlotProps(table, "topToolbar", {})
         )}

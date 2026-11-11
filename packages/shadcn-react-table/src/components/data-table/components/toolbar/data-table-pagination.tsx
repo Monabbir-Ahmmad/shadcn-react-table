@@ -68,7 +68,8 @@ export function DataTablePagination<TData extends RowData>({
       {...mergeProps(
         {
           "data-slot": "data-table-pagination",
-          className: "flex flex-wrap items-center justify-between gap-4 py-1",
+          className:
+            "flex flex-wrap items-center justify-between gap-4 px-3 py-2",
         } as React.ComponentProps<"div">,
         getSlotProps(table, "pagination", {})
       )}

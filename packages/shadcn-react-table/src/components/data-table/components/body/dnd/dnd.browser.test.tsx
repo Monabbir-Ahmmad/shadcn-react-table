@@ -53,7 +53,7 @@ describe("column reordering", () => {
 
     const grip = screen.getAllByRole("button", { name: /reorder column/i })[0]!
     const width = screen.getByText("Alpha").closest("th")!.offsetWidth
-    await dragPointer(grip, { dx: width * 1.5 })
+    await dragPointer(grip, { dx: width * 1.25 })
     await nextFrame()
 
     expect(headerOrder()).toEqual(["Bravo", "Alpha", "Charlie"])
@@ -93,7 +93,7 @@ describe("column reordering", () => {
         new PointerEvent("pointermove", {
           ...base,
           buttons: 1,
-          clientX: x + (head.offsetWidth * 1.5 * i) / 8,
+          clientX: x + (head.offsetWidth * 1.25 * i) / 8,
           clientY: y,
         })
       )
@@ -119,7 +119,7 @@ describe("column reordering", () => {
       new PointerEvent("pointerup", {
         ...base,
         buttons: 0,
-        clientX: x + head.offsetWidth * 1.5,
+        clientX: x + head.offsetWidth * 1.25,
         clientY: y,
       })
     )
