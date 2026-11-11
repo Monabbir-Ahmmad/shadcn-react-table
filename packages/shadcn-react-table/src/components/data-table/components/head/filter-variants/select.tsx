@@ -52,7 +52,13 @@ export function SelectFilterField<TData extends RowData, TValue>({
           variant="ghost"
           size="icon-xs"
           aria-label={localization.clearFilter}
-          onClick={() => column.setFilterValue(undefined)}
+          onClick={(event) => {
+            column.setFilterValue(undefined)
+            // The button goes with the value: keep focus on the select.
+            event.currentTarget.parentElement
+              ?.querySelector<HTMLElement>('[role="combobox"]')
+              ?.focus()
+          }}
         >
           <icons.clear />
         </Button>

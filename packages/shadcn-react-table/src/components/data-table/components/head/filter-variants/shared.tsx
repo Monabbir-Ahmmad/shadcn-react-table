@@ -146,8 +146,9 @@ export function FilterInputGroup<TData extends RowData, TValue>({
   children: React.ReactNode
 }) {
   const { localization, icons } = dt(table)
+  const groupRef = React.useRef<HTMLDivElement>(null)
   return (
-    <InputGroup className={className}>
+    <InputGroup ref={groupRef} className={className}>
       {modeMenu && (
         <DataTableFilterModeMenu column={column} table={table} addon />
       )}
@@ -157,7 +158,14 @@ export function FilterInputGroup<TData extends RowData, TValue>({
           <InputGroupButton
             size="icon-xs"
             aria-label={clearLabel ?? localization.clearFilter}
-            onClick={onClear}
+            onClick={() => {
+              onClear()
+              // The button goes with the value: keep focus in the field (its
+              // input, or a date filter's picker button).
+              groupRef.current
+                ?.querySelector<HTMLElement>('input, [aria-haspopup="dialog"]')
+                ?.focus()
+            }}
           >
             <icons.clear />
           </InputGroupButton>

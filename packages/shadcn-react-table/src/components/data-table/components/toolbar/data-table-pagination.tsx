@@ -161,7 +161,10 @@ export function DataTablePagination<TData extends RowData>({
           <span className="text-xs font-medium text-muted-foreground tabular-nums">
             {localization.paginationRange(start, end, totalRows)}
           </span>
-          <div className="flex items-center gap-1">
+          <div
+            data-slot="data-table-pagination-buttons"
+            className="flex items-center gap-1"
+          >
             <PaginationButton
               label={localization.goToFirstPage}
               onClick={() => table.setPageIndex(0)}
@@ -230,14 +233,45 @@ function PaginationButton({
   disabled: boolean
   children: React.ReactNode
 }) {
+  const ref = React.useRef<HTMLButtonElement>(null)
+  // Clicked, and focused, just before its own page change.
+  const pressed = React.useRef(false)
+  // A disabled button drops focus to the page: when this click disabled it
+  // (Next onto the last page, First onto the first), move focus to the
+  // nearest button that still works.
+  React.useLayoutEffect(() => {
+    const el = ref.current
+    if (!pressed.current || !disabled || !el) return
+    pressed.current = false
+    const buttons = [
+      ...(el
+        .closest('[data-slot="data-table-pagination-buttons"]')
+        ?.querySelectorAll<HTMLButtonElement>("button") ?? []),
+    ]
+    const at = buttons.indexOf(el)
+    const nearest = buttons
+      .filter((button) => !button.disabled)
+      .sort(
+        (a, b) =>
+          Math.abs(buttons.indexOf(a) - at) - Math.abs(buttons.indexOf(b) - at)
+      )[0]
+    nearest?.focus()
+  }, [disabled])
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
+          ref={ref}
           variant="outline"
           size="icon-sm"
           aria-label={label}
-          onClick={onClick}
+          onClick={() => {
+            pressed.current = document.activeElement === ref.current
+            onClick()
+          }}
+          onBlur={() => {
+            pressed.current = false
+          }}
           disabled={disabled}
         >
           {children}
