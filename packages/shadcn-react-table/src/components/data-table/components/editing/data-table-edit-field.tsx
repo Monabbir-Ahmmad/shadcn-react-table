@@ -33,6 +33,7 @@ export function DataTableEditField({
   options,
   error,
   ariaLabel,
+  id,
   autoFocus,
   fieldProps,
 }: {
@@ -49,6 +50,8 @@ export function DataTableEditField({
   options?: DataTableFilterOption[]
   error?: string
   ariaLabel: string
+  /** For a `<label htmlFor>` naming the field. */
+  id?: string
   autoFocus?: boolean
 }) {
   if (variant === "select") {
@@ -81,6 +84,7 @@ export function DataTableEditField({
             {...mergeProps(
               {
                 className: "w-full",
+                id,
                 "aria-label": ariaLabel,
                 "aria-invalid": !!error,
               } as React.ComponentProps<typeof SelectTrigger>,
@@ -115,6 +119,7 @@ export function DataTableEditField({
             type: variant === "number" ? "number" : "text",
             inputMode: variant === "number" ? "decimal" : undefined,
             value: value == null ? "" : String(value),
+            id,
             "aria-label": ariaLabel,
             "aria-invalid": !!error,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) =>

@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { DataTable } from "../../core/data-table"
@@ -103,5 +109,20 @@ describe("edit dialog keys", () => {
     fireEvent.change(field("Mason"), { target: { value: "" } })
     fireEvent.keyDown(field(""), { key: "Enter" })
     expect(onEditingRowSave).not.toHaveBeenCalled()
+  })
+})
+
+describe("edit dialog", () => {
+  it("ties each label to its field", () => {
+    editRow({ editDisplayMode: "modal" })
+    const dialog = screen.getByRole("dialog")
+    for (const [text, value] of [
+      ["Name", "Mason"],
+      ["City", "Oslo"],
+    ] as const) {
+      const label = within(dialog).getByText(text, { selector: "label" })
+      expect(label.getAttribute("for")).toBe(field(value).id)
+      expect(field(value).id).not.toBe("")
+    }
   })
 })
