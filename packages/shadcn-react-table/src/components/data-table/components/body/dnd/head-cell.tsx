@@ -210,7 +210,7 @@ export function ColumnDragHandle({
     <Button
       type="button"
       variant="ghost"
-      size="icon"
+      size="icon-xs"
       aria-label={label}
       ref={setActivatorNodeRef}
       // dnd-kit injects an aria-describedby id that can differ between the
@@ -220,10 +220,10 @@ export function ColumnDragHandle({
       {...listeners}
       // touch-none: let dnd-kit's pointer sensor own the touch gesture
       // (otherwise the browser scrolls/selects text before a drag can start on
-      // a phone). size-7 matches the actions menu for a finger-friendly target.
-      className="size-7 shrink-0 cursor-grab touch-none text-muted-foreground opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
+      // a phone).
+      className="shrink-0 cursor-grab touch-none opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
     >
-      <Icon className="size-3.5" />
+      <Icon />
     </Button>
   )
 }

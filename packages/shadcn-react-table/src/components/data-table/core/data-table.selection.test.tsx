@@ -69,14 +69,59 @@ describe("shift-click range selection", () => {
 })
 
 describe("single row selection", () => {
-  it("shows radio buttons and keeps one row selected", () => {
+  it("shows a checkbox per row and keeps one row selected", () => {
     const { table } = mount({ enableMultiRowSelection: false })
-    expect(screen.queryAllByRole("checkbox")).toHaveLength(0)
-    const radios = screen.getAllByRole("radio", { name: "Select row" })
-    expect(radios).toHaveLength(5)
-    fireEvent.click(radios[0]!)
-    fireEvent.click(radios[2]!)
+    // No select-all box: one row at a time.
+    expect(
+      screen.queryAllByRole("checkbox", { name: /select all/i })
+    ).toHaveLength(0)
+    const boxes = screen.getAllByRole("checkbox", { name: "Select row" })
+    expect(boxes).toHaveLength(5)
+    fireEvent.click(boxes[0]!)
+    fireEvent.click(boxes[2]!)
     expect(selected(table())).toEqual(["3"])
-    expect(radios[2]!.getAttribute("aria-checked")).toBe("true")
+    expect(boxes[0]!.getAttribute("aria-checked")).toBe("false")
+    expect(boxes[2]!.getAttribute("aria-checked")).toBe("true")
+  })
+})
+
+describe("group row selection", () => {
+  type Member = { id: string; team: string; name: string }
+  const members: Member[] = [
+    { id: "1", team: "A", name: "Ava" },
+    { id: "2", team: "A", name: "Liam" },
+    { id: "3", team: "B", name: "Noah" },
+  ]
+
+  function Grouped() {
+    const table = useDataTable<Member>({
+      columns: [
+        { accessorKey: "team", header: "Team" },
+        { accessorKey: "name", header: "Name" },
+      ],
+      data: members,
+      getRowId: (row) => row.id,
+      enableRowSelection: true,
+      enableGrouping: true,
+      initialState: { grouping: ["team"], expanded: true },
+    })
+    return <DataTable table={table} />
+  }
+
+  /** The selection box in the row whose text includes `text`. */
+  const boxIn = (text: string) =>
+    screen
+      .getByText(text)
+      .closest("tr")!
+      .querySelector<HTMLElement>('[role="checkbox"]')!
+
+  it("shows a group as partly checked, then checked, as its rows are", () => {
+    render(<Grouped />)
+    const group = () => boxIn("(2)")
+    expect(group().getAttribute("aria-checked")).toBe("false")
+    fireEvent.click(boxIn("Ava"))
+    expect(group().getAttribute("aria-checked")).toBe("mixed")
+    fireEvent.click(boxIn("Liam"))
+    expect(group().getAttribute("aria-checked")).toBe("true")
   })
 })

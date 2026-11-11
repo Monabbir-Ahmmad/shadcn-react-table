@@ -211,7 +211,7 @@ export const EXAMPLE_META: { slug: string; title: string; category: string }[] =
     },
     {
       slug: "advanced",
-      title: "Advanced (kitchen sink)",
+      title: "Playground",
       category: "Data",
     },
     {

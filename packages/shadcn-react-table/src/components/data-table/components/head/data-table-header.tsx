@@ -28,6 +28,7 @@ import {
   getColumnDragStyle,
   getColumnPinningClass,
   getColumnPinningStyle,
+  getStickySectionClass,
   getWidthStyle,
 } from "../../utils/column-styles"
 import { DataTableHeadCell } from "../body/dnd"
@@ -139,7 +140,12 @@ export function DataTableHeader<TData extends RowData>({
         {
           // Forwarding the exposed DOM ref object as a JSX ref.
           ref: refs.tableHeadRef,
-          className: cn(enableStickyHeader && "sticky top-0 z-20 bg-card"),
+          className: cn(
+            enableStickyHeader && [
+              "sticky top-0 z-20 bg-card",
+              getStickySectionClass("head"),
+            ]
+          ),
         } as React.ComponentProps<"thead">,
         getSlotProps(table, "head", {})
       )}
@@ -150,7 +156,7 @@ export function DataTableHeader<TData extends RowData>({
           {...mergeProps(
             {
               "aria-rowindex": rowIndex(index),
-              className: "group/th hover:bg-transparent",
+              className: "group/th",
             } as React.ComponentProps<"tr">,
             getSlotProps(table, "headRow", { headerGroup })
           )}
@@ -178,7 +184,6 @@ export function DataTableHeader<TData extends RowData>({
             // Found by the row motion, which fades it in and out.
             data-filter-row=""
             aria-rowindex={rowIndex(headerGroups.length)}
-            className="hover:bg-transparent"
           >
             {enableColumnVirtualization
               ? withHeaderSpacers(

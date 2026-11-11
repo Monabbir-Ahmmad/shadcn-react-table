@@ -743,12 +743,12 @@ export function useDataTable<TData extends RowData>(
       }
 
       // Measure the full dataset (not just virtualized-visible rows) from raw
-      // values. Headers render uppercase, so match that for measurement.
+      // values.
       const values = table.getRowModel().rows.map((row) => {
         const value = row.getValue(columnId)
         return value == null ? "" : String(value)
       })
-      const headerText = getColumnLabel(column).toUpperCase()
+      const headerText = getColumnLabel(column)
 
       // Reserve room beside the label for the header affordances that actually
       // render (sort indicator, drag grip, column-actions trigger, popover

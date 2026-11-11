@@ -74,7 +74,7 @@ describe("DataTableFacetFilter", () => {
     expect(button.className).not.toContain("border-dashed")
   })
 
-  it("is dashed with no badge while nothing is picked", () => {
+  it("shows no badge while nothing is picked", () => {
     render(
       <Table
         toolbar={(table) => (
@@ -83,7 +83,6 @@ describe("DataTableFacetFilter", () => {
       />
     )
     const button = facet()
-    expect(button.className).toContain("border-dashed")
     expect(button.textContent).not.toContain("Open")
   })
 

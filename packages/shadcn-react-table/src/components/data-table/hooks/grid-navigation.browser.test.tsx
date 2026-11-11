@@ -78,6 +78,60 @@ async function settle() {
 }
 
 describe("keyboard navigation", () => {
+  it("keeps Tab between the fields of a row being edited", async () => {
+    render(
+      <Table rowCount={3} colCount={3} enableEditing editDisplayMode="row" />
+    )
+    await settle()
+    screen.getAllByRole("button", { name: "Edit" })[0]!.click()
+    await settle()
+    const first = screen.getByDisplayValue("r1c0")
+    first.focus()
+    await userEvent.keyboard("{Tab}")
+    expect(document.activeElement).toBe(screen.getByDisplayValue("r1c1"))
+  })
+
+  it("is a single Tab stop even with controls in its cells", async () => {
+    render(
+      <>
+        <button type="button">before</button>
+        <Table
+          rowCount={5}
+          colCount={3}
+          enableRowSelection
+          enableEditing
+          editDisplayMode="row"
+        />
+        <button type="button">after</button>
+      </>
+    )
+    await settle()
+    screen.getByRole("button", { name: "before" }).focus()
+    // Into the grid: one stop, on a cell (the header's own controls first).
+    for (let i = 0; i < 40; i++) {
+      await userEvent.keyboard("{Tab}")
+      if (document.activeElement?.closest("tbody")) break
+    }
+    expect(document.activeElement?.matches("[data-cell-row]")).toBe(true)
+    // Out of it with the next Tab: no checkbox or Edit button in between.
+    await userEvent.keyboard("{Tab}")
+    expect(document.activeElement?.textContent).toBe("after")
+  })
+
+  it("outlines the focused cell inside its own edges", async () => {
+    render(<Table rowCount={3} colCount={3} />)
+    await settle()
+    focusCell("r1c0")
+    await userEvent.keyboard("[ArrowDown]")
+    const cell = document.activeElement as HTMLElement
+    expect(cell.textContent).toBe("r2c0")
+    // Inside: the neighbouring cells paint over anything drawn outside it.
+    const style = getComputedStyle(cell)
+    expect(style.outlineStyle).toBe("solid")
+    expect(style.outlineWidth).toBe("2px")
+    expect(style.outlineOffset).toBe("-2px")
+  })
+
   it("moves between cells with arrows, Home and End", async () => {
     render(<Table rowCount={5} colCount={4} />)
     await settle()

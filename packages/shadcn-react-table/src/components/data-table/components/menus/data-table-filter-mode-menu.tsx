@@ -2,6 +2,8 @@
 
 import type { RowData } from "@tanstack/react-table"
 
+import { Button } from "@workspace/ui/components/button"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +23,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
-import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../core/types"
 import { modeOptionsForVariant, type FilterMode } from "../../fns/filter-fns"
@@ -78,23 +79,18 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
   const current = getEffectiveMode(column, table)
 
   const trigger = addon ? (
-    <InputGroupButton
-      size="icon-xs"
-      aria-label={localization.changeFilterMode}
-      className="text-muted-foreground"
-    >
-      <icons.filter className="size-3.5" />
+    <InputGroupButton size="icon-xs" aria-label={localization.changeFilterMode}>
+      <icons.filter />
     </InputGroupButton>
   ) : (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      size="icon-sm"
       aria-label={localization.changeFilterMode}
-      className={cn(
-        "flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 aria-expanded:text-foreground"
-      )}
+      className="shrink-0"
     >
-      <icons.filter className="size-3.5" />
-    </button>
+      <icons.filter />
+    </Button>
   )
 
   const menu = (
@@ -139,9 +135,7 @@ export function DataTableFilterModeMenu<TData extends RowData, TValue>({
   )
 
   return addon ? (
-    <InputGroupAddon align="inline-start" className="py-0">
-      {menu}
-    </InputGroupAddon>
+    <InputGroupAddon align="inline-start">{menu}</InputGroupAddon>
   ) : (
     menu
   )

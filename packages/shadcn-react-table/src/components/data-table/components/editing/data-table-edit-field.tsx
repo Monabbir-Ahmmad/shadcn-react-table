@@ -10,30 +10,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableFilterOption, EditVariant } from "../../core/types"
 import { stopPropagation } from "../../helpers/stop-propagation"
 import { mergeProps } from "../../helpers/slot-props"
 
-const FIELD_CLASS =
-  "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
-
 /**
  * A controlled inline edit field (text / number / select). The parent owns the
  * draft value; this renders the input, surfaces validation errors, and wires
  * Enter (commit) / Escape (cancel) / blur (commit) for text inputs; select
- * commits on pick with the picked value.
+ * commits on pick with the picked value. A field among several (a row or a
+ * dialog) takes `onSubmit` instead of `onCommit`: Enter submits them all,
+ * while moving between them or picking an option does not.
  */
 export function DataTableEditField({
   value,
   onChange,
   onCommit,
+  onSubmit,
   onCancel,
   variant = "text",
   options,
   error,
   ariaLabel,
+  id,
   autoFocus,
   fieldProps,
 }: {
@@ -42,11 +42,16 @@ export function DataTableEditField({
   value: unknown
   onChange: (value: unknown) => void
   onCommit?: (value?: unknown) => void
+  /** Enter in a text field, without committing on blur: saves the row or
+   *  dialog this field is one of. */
+  onSubmit?: () => void
   onCancel?: () => void
   variant?: EditVariant
   options?: DataTableFilterOption[]
   error?: string
   ariaLabel: string
+  /** For a `<label htmlFor>` naming the field. */
+  id?: string
   autoFocus?: boolean
 }) {
   if (variant === "select") {
@@ -78,8 +83,8 @@ export function DataTableEditField({
           <SelectTrigger
             {...mergeProps(
               {
-                size: "sm",
-                className: cn(FIELD_CLASS, "w-full px-2"),
+                className: "w-full",
+                id,
                 "aria-label": ariaLabel,
                 "aria-invalid": !!error,
               } as React.ComponentProps<typeof SelectTrigger>,
@@ -114,6 +119,7 @@ export function DataTableEditField({
             type: variant === "number" ? "number" : "text",
             inputMode: variant === "number" ? "decimal" : undefined,
             value: value == null ? "" : String(value),
+            id,
             "aria-label": ariaLabel,
             "aria-invalid": !!error,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -128,13 +134,13 @@ export function DataTableEditField({
               if (e.key === "Enter") {
                 e.preventDefault()
                 onCommit?.()
+                onSubmit?.()
               } else if (e.key === "Escape") {
                 e.preventDefault()
                 onCancel?.()
               }
             },
             onBlur: () => onCommit?.(),
-            className: FIELD_CLASS,
           } as React.ComponentProps<"input">,
           fieldProps
         )}

@@ -50,7 +50,7 @@ export function DataTableDropToGroupZone<TData extends RowData>({
       })}
       data-slot="data-table-group-zone"
       className={cn(
-        "flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground transition-colors",
+        "mx-3 my-2 flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground transition-colors",
         isOver && "border-primary bg-muted text-foreground"
       )}
     >
@@ -62,11 +62,7 @@ export function DataTableDropToGroupZone<TData extends RowData>({
           const column = table.getColumn(columnId)
           if (!column) return null
           return (
-            <Badge
-              key={columnId}
-              variant="secondary"
-              className="gap-1 rounded-sm pe-1 normal-case"
-            >
+            <Badge key={columnId} variant="secondary">
               {getColumnLabel(column)}
               <button
                 type="button"

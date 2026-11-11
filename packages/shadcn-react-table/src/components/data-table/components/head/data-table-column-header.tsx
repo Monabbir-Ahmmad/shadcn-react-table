@@ -59,6 +59,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
   const { column } = header
   const { localization, icons } = dt(table)
   const controls = headerControlsOptionsFromTable(table)
+  const sortHintId = React.useId()
   const align = column.columnDef.meta?.align ?? "left"
 
   const showFilterPopover = shouldShowColumnFilterButton(column, controls)
@@ -69,12 +70,13 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
             <Button
-              variant="ghost"
-              size="icon"
+              // An active filter shows as the button's secondary variant.
+              variant={hasFilter ? "secondary" : "ghost"}
+              size="icon-xs"
               aria-label={localization.filterByColumn(getColumnLabel(column))}
               className={cn(
-                "size-7 shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
-                hasFilter && "text-primary opacity-100"
+                "shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                hasFilter && "opacity-100"
               )}
             >
               {hasFilter ? <icons.filter /> : <icons.filterOff />}
@@ -85,8 +87,8 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
           {localization.filterByColumn(getColumnLabel(column))}
         </TooltipContent>
       </Tooltip>
-      <PopoverContent align="start" className="w-64 gap-2">
-        <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+      <PopoverContent align="start" className="w-64">
+        <span className="text-sm font-medium">
           {localization.filterByColumn(getColumnLabel(column))}
         </span>
         <DataTableColumnFilter header={header} table={table} />
@@ -136,33 +138,37 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
       className={cn("group/th flex items-center gap-0.5", ALIGN_CLASS[align])}
     >
       {canSort ? (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={column.getToggleSortingHandler()}
-              aria-label={sortTooltip}
-              className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground motion-reduce:transition-none"
-              data-sorted={!!sorted}
-            >
-              <span className="min-w-0 truncate">{labelNode}</span>
-              <SortIndicator sorted={sorted} icons={icons} />
-              {isMultiSort && (
-                <Badge
-                  variant="secondary"
-                  className="ms-0.5 h-4 min-w-4 shrink-0 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
-                >
-                  {sortIndex + 1}
-                </Badge>
-              )}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{sortTooltip}</TooltipContent>
-        </Tooltip>
+        <>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={column.getToggleSortingHandler()}
+                // Named by its label: screen readers read that name as every
+                // body cell's column header. What a click does is its
+                // description (the header cell's aria-sort tells the order).
+                aria-describedby={sortHintId}
+                className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                data-sorted={!!sorted}
+              >
+                <span className="min-w-0 truncate">{labelNode}</span>
+                <SortIndicator sorted={sorted} icons={icons} />
+                {isMultiSort && (
+                  <Badge variant="secondary" className="ms-0.5 shrink-0">
+                    {sortIndex + 1}
+                  </Badge>
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{sortTooltip}</TooltipContent>
+          </Tooltip>
+          {/* Hidden, but still read as the description it is referenced by. */}
+          <span id={sortHintId} hidden>
+            {sortTooltip}
+          </span>
+        </>
       ) : (
-        <span className="min-w-0 truncate px-0 text-xs font-medium tracking-wider uppercase">
-          {labelNode}
-        </span>
+        <span className="min-w-0 truncate">{labelNode}</span>
       )}
 
       {dragHandle}

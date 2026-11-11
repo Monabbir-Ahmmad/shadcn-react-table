@@ -26,6 +26,7 @@ import {
   getColumnDragStyle,
   getColumnPinningClass,
   getColumnPinningStyle,
+  getStickySectionClass,
   getWidthStyle,
 } from "../../utils/column-styles"
 import type { DataTableHeader } from "../../core/table-types"
@@ -66,7 +67,12 @@ export function DataTableFooter<TData extends RowData>({
         {
           // Forwarding the exposed DOM ref object as a JSX ref.
           ref: refs.tableFooterRef,
-          className: cn(enableStickyFooter && "sticky bottom-0 z-20"),
+          className: cn(
+            enableStickyFooter && [
+              "sticky bottom-0 z-20",
+              getStickySectionClass("foot"),
+            ]
+          ),
         } as React.ComponentProps<"tfoot">,
         getSlotProps(table, "footer", {})
       )}
@@ -80,7 +86,6 @@ export function DataTableFooter<TData extends RowData>({
               "aria-rowindex": enableKeyboardNavigation
                 ? getHeaderRowCount(table) + getDataRowCount(table) + index + 1
                 : undefined,
-              className: "hover:bg-transparent",
             } as React.ComponentProps<"tr">,
             getSlotProps(table, "footerRow", { footerGroup })
           )}

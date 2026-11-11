@@ -21,6 +21,7 @@ import { DataTableEditField } from "./data-table-edit-field"
 import { dt } from "../../core/internal"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import { getEditSelectOptions } from "../../helpers/edit-select-options"
+import { hasRowDraftErrors } from "./row-draft"
 
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any
@@ -54,6 +55,8 @@ export function DataTableEditModal<TData extends RowData>({
     state.editingRowId,
     state.isCreating,
   ])
+  // Ties each field to its label.
+  const idBase = React.useId()
 
   // `table.getRow` throws when the id is gone (row deleted / refetched while
   // the dialog is open); look it up without throwing and bail out below.
@@ -77,13 +80,7 @@ export function DataTableEditModal<TData extends RowData>({
     .getAllLeafColumns()
     .filter((column) => isColumnEditable(column, editingRow ?? undefined))
 
-  const hasErrors = editableColumns.some((column) => {
-    const value =
-      column.id in rowDraft
-        ? rowDraft[column.id]
-        : editingRow?.getValue(column.id)
-    return column.columnDef.meta?.validate?.(value) != null
-  })
+  const hasErrors = hasRowDraftErrors(table, editingRow)
 
   const submit = () => {
     if (hasErrors) return
@@ -107,14 +104,19 @@ export function DataTableEditModal<TData extends RowData>({
         : editingRow?.getValue(column.id)
     return (
       <div key={column.id} className="flex flex-col gap-1.5">
-        <Label className="text-xs">{getColumnLabel(column)}</Label>
+        <Label htmlFor={`${idBase}-${column.id}`}>
+          {getColumnLabel(column)}
+        </Label>
         <DataTableEditField
+          id={`${idBase}-${column.id}`}
           value={value}
           variant={meta?.editVariant}
           options={getEditSelectOptions(column, table, editingRow)}
           error={meta?.validate?.(value)}
           ariaLabel={getColumnLabel(column)}
           onChange={(next) => setRowDraftValue(column.id, next)}
+          // Enter saves the dialog (Escape is the dialog's own).
+          onSubmit={submit}
           fieldProps={getSlotProps(
             table,
             "editField",
@@ -141,11 +143,25 @@ export function DataTableEditModal<TData extends RowData>({
         row: editingRow,
       })
 
+  // Changed from what the row holds (blank and missing count as the same).
+  const isDirty = editableColumns.some((column) => {
+    if (!(column.id in rowDraft)) return false
+    const original = editingRow?.getValue(column.id)
+    return !Object.is(rowDraft[column.id] ?? "", original ?? "")
+  })
+
   return (
     <Dialog open onOpenChange={(next) => !next && cancelEditing()}>
       <DialogContent
         {...mergeProps(
-          { className: "sm:max-w-lg" } as React.ComponentProps<"div">,
+          {
+            className: "sm:max-w-lg",
+            // A stray click outside does not throw changes away; Cancel and
+            // Escape still do.
+            onInteractOutside: (event: Event) => {
+              if (isDirty) event.preventDefault()
+            },
+          } as React.ComponentProps<typeof DialogContent>,
           getSlotProps(table, "editDialog", {
             row: editingRow ?? undefined,
             isCreating,

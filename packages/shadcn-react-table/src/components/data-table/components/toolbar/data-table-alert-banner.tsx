@@ -56,6 +56,24 @@ function useSelectionBanner<TData extends RowData>(
 }
 
 /**
+ * Clears the selection. The banner (with this button) goes with it, which would
+ * drop focus to the page: focus moves to the header's select-all checkbox, or
+ * the first row's checkbox when there is none (single selection).
+ */
+function clearSelection<TData extends RowData>(
+  table: DataTableInstance<TData>
+) {
+  const { tableHeadRef, tableContainerRef } = dt(table).refs
+  table.resetRowSelection()
+  const target =
+    tableHeadRef.current?.querySelector<HTMLElement>('[role="checkbox"]') ??
+    tableContainerRef.current?.querySelector<HTMLElement>(
+      'tbody [role="checkbox"]'
+    )
+  target?.focus()
+}
+
+/**
  * Selection alert banner shown between the toolbar and the table when any rows
  * are selected: a muted strip with the localized count and a Clear action.
  * It slides in, and fades out with the last count it showed before it goes
@@ -78,7 +96,7 @@ export function DataTableAlertBanner<TData extends RowData>({
           ref,
           "data-slot": "data-table-alert-banner",
           className:
-            "flex items-center justify-between gap-3 rounded-md border bg-muted px-3 py-2 text-xs font-medium text-muted-foreground",
+            "flex items-center justify-between gap-3 bg-muted px-3 py-2 text-xs font-medium text-muted-foreground",
           role: "status",
         } as React.ComponentProps<"div">,
         getSlotProps(table, "alertBanner", {})
@@ -92,8 +110,8 @@ export function DataTableAlertBanner<TData extends RowData>({
       </span>
       <button
         type="button"
-        onClick={() => table.resetRowSelection()}
-        className="font-semibold tracking-wide text-foreground underline-offset-4 hover:underline"
+        onClick={() => clearSelection(table)}
+        className="font-semibold text-foreground underline-offset-4 hover:underline"
       >
         {localization.clearSelection}
       </button>
@@ -292,8 +310,8 @@ export function DataTableHeadOverlayBanner<TData extends RowData>({
         </span>
         <button
           type="button"
-          onClick={() => table.resetRowSelection()}
-          className="ms-auto shrink-0 font-semibold tracking-wide text-foreground underline-offset-4 hover:underline"
+          onClick={() => clearSelection(table)}
+          className="ms-auto shrink-0 font-semibold text-foreground underline-offset-4 hover:underline"
         >
           {localization.clearSelection}
         </button>

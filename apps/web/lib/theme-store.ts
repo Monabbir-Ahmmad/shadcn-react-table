@@ -14,9 +14,9 @@ const KEY = "shadcn-react-table-theme"
 
 export const DEFAULT_PREFS: ThemePrefs = {
   accent: "lime",
-  base: "neutral",
-  font: "raleway",
-  heading: "serif",
+  base: "mist",
+  font: "geist",
+  heading: "geist",
   radius: "0rem",
   menuAccent: "subtle",
   icons: "lucide",

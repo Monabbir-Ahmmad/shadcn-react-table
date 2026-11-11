@@ -9,7 +9,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
-import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../../core/types"
 import { dt } from "../../../core/internal"
@@ -34,21 +33,19 @@ export function DataTableAdvancedFilterToggle<TData extends RowData>({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="outline"
+          // Open or holding rules: the button's secondary variant.
+          variant={
+            showAdvancedFilterPanel || count > 0 ? "secondary" : "outline"
+          }
           size="icon"
           aria-label={localization.advancedFilters}
           aria-pressed={showAdvancedFilterPanel}
           onClick={() => setShowAdvancedFilterPanel((prev) => !prev)}
-          className={cn(
-            "relative size-8",
-            (showAdvancedFilterPanel || count > 0) && "bg-muted text-foreground"
-          )}
+          className="relative"
         >
           <icons.advancedFilter />
           {count > 0 && (
-            <Badge className="absolute -end-1.5 -top-1.5 size-4 justify-center rounded-full p-0 text-[10px] tabular-nums">
-              {count}
-            </Badge>
+            <Badge className="absolute -end-2 -top-2">{count}</Badge>
           )}
         </Button>
       </TooltipTrigger>

@@ -29,8 +29,8 @@ const SORT_INDICATOR_WIDTH = 20
 // controls-only. A coarse constant: the exact (density-dependent) padding isn't
 // knowable without the DOM, and over-reserving a few px is harmless.
 const LABEL_AND_PADDING_MIN = 56
-// Rough width of one uppercase, letter-spaced header character at the header's
-// text-xs scale. Deterministic (no canvas) so the SSR and client size vars
+// Rough width of one header character at the table's text-sm scale (on the
+// wide side: over-reserving is harmless). Deterministic (no canvas) so the SSR and client size vars
 // agree — a canvas measurement would differ between them and warn on hydration.
 const HEADER_CHAR_WIDTH = 8.5
 // Horizontal cell padding reserved around the header label.

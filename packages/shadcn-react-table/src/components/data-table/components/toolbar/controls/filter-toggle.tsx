@@ -8,7 +8,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
-import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableInstance } from "../../../core/types"
 import { dt } from "../../../core/internal"
@@ -28,15 +27,12 @@ export function DataTableFilterToggle<TData extends RowData>({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="outline"
+          // Shown: the button's secondary variant.
+          variant={showColumnFilters ? "secondary" : "outline"}
           size="icon"
           aria-label={label}
           aria-pressed={showColumnFilters}
           onClick={() => setShowColumnFilters((prev) => !prev)}
-          className={cn(
-            "size-8",
-            showColumnFilters && "bg-muted text-foreground"
-          )}
         >
           <icons.filter />
         </Button>

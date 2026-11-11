@@ -2,126 +2,81 @@
 
 import * as React from "react"
 
-import { cn } from "@workspace/ui/lib/utils"
-import { MOTION_TIMING_CLASS } from "../../core/motion"
+import { Checkbox } from "@workspace/ui/components/checkbox"
+
 import { mergeProps } from "../../helpers/slot-props"
 
-/**
- * A glyph path that draws itself in (stroke-dashoffset 1 → 0 over a
- * `pathLength` of 1). Only showing transitions; hiding is instant.
- */
-function GlyphPath({ d, shown }: { d: string; shown: boolean }) {
-  return (
-    <path
-      d={d}
-      pathLength={1}
-      strokeDasharray={1}
-      className={
-        shown
-          ? cn(
-              "transition-[stroke-dashoffset] [stroke-dashoffset:0]",
-              MOTION_TIMING_CLASS
-            )
-          : "opacity-0 [stroke-dashoffset:1]"
-      }
-    />
-  )
-}
+/** A click, as either library's checkbox hands it over. */
+type CheckboxClick = React.MouseEvent<HTMLElement>
 
 interface SelectionCheckboxProps extends Omit<
-  React.ComponentProps<"button">,
-  "onChange" | "type" | "role" | "aria-checked"
+  React.ComponentProps<typeof Checkbox>,
+  "checked" | "onCheckedChange" | "onClick"
 > {
   checked?: boolean
   indeterminate?: boolean
   /** Called with the new value and the click (for its modifier keys). */
-  onCheckedChange?: (
-    checked: boolean,
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => void
-  /** A radio button (single-row selection) instead of a checkbox. */
+  onCheckedChange?: (checked: boolean, event: CheckboxClick) => void
+  /** Single-row selection: a click only ever selects (another row's click
+   *  moves the selection), like a radio button. */
   variant?: "checkbox" | "radio"
 }
 
 /**
- * Selection checkbox that renders a minus glyph for the indeterminate
- * (some-but-not-all) state — the visual MRT uses for partial select-all.
+ * Which library the installed shadcn `Checkbox` is built on, once one has
+ * rendered: Radix draws a `<button>`, Base UI a `<span>`. Shared by every
+ * table on the page; until known, Radix is assumed.
+ */
+let library: "radix" | "base" | null = null
+
+/**
+ * The selection checkbox: the installed shadcn `Checkbox`, so it looks like
+ * every other checkbox in the app. The change goes through the click, not
+ * `onCheckedChange`, so the caller gets the event's modifier keys (shift-click
+ * range selection).
  *
- * Implemented as a styled `role="checkbox"` button (no headless primitive) so
- * the data table carries no direct dependency on a specific primitive library
- * and renders identically whether the consumer's shadcn setup is Radix- or
- * Base-UI-based. Mirrors the shadcn `Checkbox` styling so it blends in.
- *
- * The check / indeterminate glyphs are inline SVG (not the swappable `icons`
- * system, nor an icon-library import) so a selection checkbox never depends on
- * a particular icon package — it renders the same even if a consumer overrides
- * every table icon or doesn't install Lucide.
+ * "Partly checked" (the select-all box when some rows are selected) is spelled
+ * differently by the two libraries shadcn builds on: Radix takes
+ * `checked="indeterminate"`, Base UI a separate `indeterminate` prop (an
+ * unknown prop would reach Radix's `<button>` as a stray attribute). So the
+ * checkbox learns which one rendered it and passes the state its way.
  */
 function SelectionCheckbox({
-  className,
   indeterminate = false,
   checked = false,
   onCheckedChange,
   variant = "checkbox",
   ...props
 }: SelectionCheckboxProps) {
-  const active = checked || indeterminate
-  const radio = variant === "radio"
+  const [seen, setSeen] = React.useState(library)
+  const detect = React.useCallback((el: HTMLElement | null) => {
+    if (!el || library) return
+    library = el.tagName === "SPAN" ? "base" : "radix"
+    setSeen(library)
+  }, [])
+
+  // Each library types only its own spelling: assert, as for TooltipProvider.
+  const state = (
+    seen === "base"
+      ? { checked: checked && !indeterminate, indeterminate }
+      : { checked: indeterminate ? "indeterminate" : checked }
+  ) as Partial<React.ComponentProps<typeof Checkbox>>
+
   return (
-    <button
+    <Checkbox
       {...mergeProps(
+        props as React.ComponentProps<typeof Checkbox>,
         {
-          type: "button",
-          role: radio ? "radio" : "checkbox",
-          "data-slot": radio ? "radio" : "checkbox",
-          "aria-checked": indeterminate ? "mixed" : checked,
-          // A radio only ever selects; another row's radio moves it.
-          onClick: (event: React.MouseEvent<HTMLButtonElement>) =>
-            onCheckedChange?.(radio ? true : !checked, event),
-          className: cn(
-            "peer relative flex size-4.5 shrink-0 items-center justify-center border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
-            radio ? "rounded-full" : "rounded-none",
-            active && !radio
-              ? "border-primary bg-primary text-primary-foreground"
-              : active
-                ? "border-primary text-primary"
-                : "border-input"
-          ),
-        } as React.ComponentProps<"button">,
-        { ...props, className }
+          ...state,
+          ref: detect,
+          onClick: (event: CheckboxClick) => {
+            // The table owns the state: skip the checkbox's own toggle.
+            event.preventDefault()
+            onCheckedChange?.(variant === "radio" ? true : !checked, event)
+          },
+        } as React.ComponentProps<typeof Checkbox>
       )}
-    >
-      {active && radio && (
-        <span aria-hidden="true" className="size-2 rounded-full bg-current" />
-      )}
-      {!radio && (
-        // Always mounted (hidden while unchecked) so checking transitions it
-        // in when the table animates — never on mount, e.g. a row scrolled
-        // into a virtual window or a leaving row's copy.
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          data-shown={active ? "" : undefined}
-          className={cn(
-            "size-3.5",
-            active
-              ? cn(
-                  "scale-100 opacity-100 transition-[opacity,scale]",
-                  MOTION_TIMING_CLASS
-                )
-              : "invisible scale-75 opacity-0"
-          )}
-          aria-hidden="true"
-        >
-          <GlyphPath d="M20 6 9 17l-5-5" shown={checked && !indeterminate} />
-          <GlyphPath d="M5 12h14" shown={indeterminate} />
-        </svg>
-      )}
-    </button>
+    />
   )
 }
 

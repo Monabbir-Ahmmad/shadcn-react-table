@@ -968,11 +968,14 @@ describe("filter row and density glide", () => {
     let table!: DataTableInstance<Row>
     render(<Harness onTable={(t) => (table = t)} />)
     await nextFrame()
+    const head = document.querySelector("thead")!
+    const headWas = head.getBoundingClientRect().height
     const was = tops()
     act(() => table.setDensity("compact"))
-    // Every row below the first moved (each row above it got shorter), and
-    // starts where it was.
-    expect(running()).toBe(bodyRows().length - 1)
+    // Every row moved (the header and each row above it got shorter; the
+    // first row only when the header did), and starts where it was.
+    const headShrank = head.getBoundingClientRect().height < headWas - 0.1
+    expect(running()).toBe(bodyRows().length - (headShrank ? 0 : 1))
     for (const tr of bodyRows()) {
       const top = tr.getBoundingClientRect().top
       expect(Math.abs(top - was.get(tr.dataset.rowId!)!)).toBeLessThan(1)
@@ -1339,20 +1342,6 @@ describe("control animations", () => {
     expect(Math.abs(now.getBoundingClientRect().top - box.top)).toBeLessThan(1)
     await settle()
     expect(old.isConnected).toBe(false)
-  })
-
-  it("draws the check in when a row is selected", async () => {
-    render(<Harness enableRowSelection />)
-    const box = document.querySelector<HTMLElement>('tbody [role="checkbox"]')!
-    fireEvent.click(box)
-    const glyph = box.querySelector("svg")!
-    const path = glyph.querySelector("path")!
-    expect(getComputedStyle(glyph).transitionDuration).toBe(
-      `${MOTION_DEFAULTS.duration / 1000}s`
-    )
-    expect(animating(path, "strokeDashoffset")).toHaveLength(1)
-    await settle()
-    expect(getComputedStyle(path).strokeDashoffset).toBe("0px")
   })
 })
 

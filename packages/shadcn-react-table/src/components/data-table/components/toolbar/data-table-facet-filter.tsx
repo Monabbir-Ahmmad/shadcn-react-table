@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { cn } from "@workspace/ui/lib/utils"
 
 import type { DataTableFilterOption, DataTableInstance } from "../../core/types"
 import { dt } from "../../core/internal"
@@ -107,11 +106,7 @@ export function DataTableFacetFilter<TData extends RowData>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          data-slot="data-table-facet-filter"
-          className={cn(picked.length === 0 && "border-dashed")}
-        >
+        <Button variant="outline" data-slot="data-table-facet-filter">
           {/* The list-filter glyph: the funnel (`icons.filter`) toggles the header filter row. */}
           <icons.advancedFilter data-icon="inline-start" />
           {label}

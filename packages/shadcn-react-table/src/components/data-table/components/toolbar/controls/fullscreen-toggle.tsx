@@ -31,7 +31,6 @@ export function DataTableFullscreenToggle<TData extends RowData>({
           aria-label={label}
           aria-pressed={isFullscreen}
           onClick={() => setIsFullscreen((prev) => !prev)}
-          className="size-8"
         >
           {isFullscreen ? <icons.fullscreenExit /> : <icons.fullscreenEnter />}
         </Button>

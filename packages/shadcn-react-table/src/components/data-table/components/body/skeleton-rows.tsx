@@ -76,7 +76,7 @@ export function SkeletonRows<TData extends RowData>({
   return (
     <>
       {Array.from({ length: Math.max(1, rowCount) }, (_, rowIndex) => (
-        <TableRow key={rowIndex} className="hover:bg-transparent">
+        <TableRow key={rowIndex}>
           {virtualColumns ? (
             <TableCell colSpan={columns.length} className={padding}>
               <Skeleton className="h-4 w-full" />

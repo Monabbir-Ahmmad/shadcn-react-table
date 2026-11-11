@@ -45,6 +45,6 @@ export const htmlFontClassName = cn(
 
 /** Defaults the customizer can override on `<html>`. */
 export const htmlFontStyle = {
-  "--font-sans": "var(--font-raleway)",
-  "--font-heading": "var(--font-noto-serif)",
+  "--font-sans": "var(--font-geist)",
+  "--font-heading": "var(--font-geist)",
 } as CSSProperties

@@ -61,3 +61,29 @@ describe("a group row's other cells", () => {
     expect(groupRow().textContent).toContain("2 items")
   })
 })
+
+describe("a group row's grouped cell", () => {
+  function Grouped() {
+    const table = useDataTable<Item>({
+      columns: [
+        {
+          accessorKey: "group",
+          header: "Group",
+          // A custom cell that places the value it is handed.
+          cell: ({ renderedCellValue }) => <b>{renderedCellValue}</b>,
+        },
+        { accessorKey: "label", header: "Label" },
+      ],
+      data: items,
+      getRowId: (row) => row.id,
+      enableGrouping: true,
+      initialState: { grouping: ["group"], expanded: true },
+    })
+    return <DataTable table={table} />
+  }
+
+  it("hands a custom cell the group's value as renderedCellValue", () => {
+    render(<Grouped />)
+    expect(groupRow().querySelector("b")?.textContent).toBe("Fruit")
+  })
+})

@@ -61,6 +61,28 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
   const hasFilter = column.getFilterValue() != null
   const [open, setOpen] = React.useState(false)
 
+  // Hiding the column takes this menu and its button with it, which would
+  // drop focus to the page: focus moves to the next column's menu button (the
+  // previous one for the last column) once the header has re-rendered.
+  const hideColumn = () => {
+    const visible = table.getVisibleLeafColumns()
+    const at = visible.findIndex((c) => c.id === column.id)
+    const neighbor = visible[at + 1] ?? visible[at - 1]
+    column.toggleVisibility(false)
+    if (!neighbor) return
+    const head = dt(table).refs.tableHeadRef
+    requestAnimationFrame(() => {
+      const th = head.current?.querySelector(
+        `th[data-column-id="${CSS.escape(neighbor.id)}"]`
+      )
+      const target =
+        th?.querySelector<HTMLElement>(
+          `button[aria-label="${CSS.escape(localization.columnActions)}"]`
+        ) ?? th?.querySelector<HTMLElement>("button")
+      target?.focus()
+    })
+  }
+
   const internalMenuItems = (
     <>
       {canSort && (
@@ -111,7 +133,7 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
       {canHide && (
         <>
           {(canSort || canFilter) && <DropdownMenuSeparator />}
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+          <DropdownMenuItem onClick={() => hideColumn()}>
             <icons.hide />
             {localization.hideColumn}
           </DropdownMenuItem>
@@ -172,10 +194,10 @@ export function DataTableColumnActions<TData extends RowData, TValue>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-xs"
               aria-label={localization.columnActions}
               className={cn(
-                "size-7 shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
+                "shrink-0 opacity-70 transition-opacity group-hover/th:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100",
                 className
               )}
             >

@@ -4,6 +4,7 @@ import { DndContext } from "@dnd-kit/core"
 import { type RowData } from "@tanstack/react-table"
 import * as React from "react"
 
+import { Card } from "@workspace/ui/components/card"
 import { Table, TableCaption } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -110,9 +111,10 @@ function assignRef<T>(ref: React.Ref<T> | undefined, el: T | null) {
 
 /**
  * Renders a data table from an instance produced by {@link useDataTable}.
- * Vertical stack: top toolbar → alert banner → drop-to-group zone → bordered
- * surface (sticky header, optional filter row, body, optional sticky footer) →
- * pagination. Wires DnD column/row ordering, pinning, resizing, grouping,
+ * A card (the app's own shadcn `Card`, so it takes the app's radius, border
+ * and color) holding a vertical stack: top toolbar → alert banner →
+ * drop-to-group zone → scroll surface (sticky header, optional filter row,
+ * body, optional sticky footer) → pagination. Wires DnD column/row ordering, pinning, resizing, grouping,
  * expansion, and detail panels.
  */
 export function DataTable<TData extends RowData>({
@@ -414,11 +416,16 @@ export function DataTable<TData extends RowData>({
               // stays pinned to the visible bottom. Neutralize the shadcn
               // <Table> wrapper's own overflow so it doesn't become a second
               // (unbounded) scroll container that breaks sticky positioning.
-              "relative overflow-auto rounded-md border bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
+              "relative overflow-auto bg-card text-card-foreground *:data-[slot=table-container]:overflow-visible",
+              // Lines between the surface and the toolbars around it. The
+              // negative margin tucks a line under the card's edge (its
+              // overflow clips it) when nothing sits on that side.
+              "-my-px border-y",
               // No scroll anchoring: on a sort or filter the browser would
               // follow one reordered row and scroll the table after it.
               "[overflow-anchor:none]",
-              "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
+              // Inside the edge: the card clips anything drawn outside it.
+              "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50",
               // MRT-parity default bound: with a sticky header the surface
               // caps near the viewport height, so tall content (long groups,
               // trees, detail panels) scrolls internally under the pinned
@@ -427,7 +434,10 @@ export function DataTable<TData extends RowData>({
               // out.
               enableStickyHeader &&
                 "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
-              enableRowVirtualization && "max-h-150"
+              enableRowVirtualization && "max-h-150",
+              // Full screen: the surface takes the room the toolbars leave
+              // and scrolls inside it, so they stay in view.
+              isFullscreen && "max-h-none min-h-0 flex-1"
             ),
           } as React.ComponentProps<"div">,
           getSlotProps(table, "surface", {})
@@ -449,9 +459,11 @@ export function DataTable<TData extends RowData>({
           />
         )}
         {showProgressBars && (
+          // A zero-height strip stuck to the top-left of the visible area, so
+          // the bar stays in view however far the rows are scrolled.
           <div
             data-slot="data-table-progress"
-            className="absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden bg-primary/20"
+            className="sticky start-0 top-0 z-30 h-0"
             role="presentation"
           >
             {/* @keyframes can't go in an inline style attribute, so the rule
@@ -463,13 +475,15 @@ export function DataTable<TData extends RowData>({
                 "@keyframes data-table-progress{from{transform:translateX(-100%)}to{transform:translateX(400%)}}@media (prefers-reduced-motion:reduce){[data-slot=data-table-progress-bar]{animation:none!important}}"
               }
             </style>
-            <div
-              data-slot="data-table-progress-bar"
-              className="h-full w-1/3 bg-primary"
-              style={{
-                animation: "data-table-progress 1.1s ease-in-out infinite",
-              }}
-            />
+            <div className="absolute inset-x-0 top-0 h-0.5 overflow-hidden bg-primary/20">
+              <div
+                data-slot="data-table-progress-bar"
+                className="h-full w-1/3 bg-primary"
+                style={{
+                  animation: "data-table-progress 1.1s ease-in-out infinite",
+                }}
+              />
+            </div>
           </div>
         )}
 
@@ -578,7 +592,7 @@ export function DataTable<TData extends RowData>({
 
   return (
     <DataTableProvider table={table}>
-      <div
+      <Card
         {...mergeProps(
           // The ref is forwarded to the element, not read during render.
           // eslint-disable-next-line react-hooks/refs
@@ -586,12 +600,18 @@ export function DataTable<TData extends RowData>({
             ref: paperRef,
             "data-slot": "data-table",
             className: cn(
+              // The app's card, minus its content spacing: the parts inside
+              // set their own. It clips them to its corners: not every
+              // style's card does that on its own, and the square header and
+              // the surface's tucked-away lines rely on it.
+              "relative w-full gap-0 overflow-hidden py-0",
               // The timing of this table's own controls (nearest root wins).
-              "relative flex w-full flex-col gap-2",
               MOTION_ROOT_CLASS,
               DENSITY_PADDING_VARS,
+              // Edge to edge: no frame, whether the style draws it as a ring
+              // or a border.
               isFullscreen &&
-                "fixed inset-0 z-50 gap-2 overflow-auto bg-background p-4"
+                "fixed inset-0 z-50 rounded-none border-0 shadow-none ring-0"
             ),
             "data-density": density,
             "data-animations": animate ? "" : undefined,
@@ -656,7 +676,7 @@ export function DataTable<TData extends RowData>({
         <BottomToolbarRegion table={table} config={dt(table)} />
 
         <DataTableEditModal table={table} />
-      </div>
+      </Card>
     </DataTableProvider>
   )
 }

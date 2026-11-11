@@ -81,7 +81,7 @@ export function createRowNumberColumn<TData extends RowData>(
             localization={localization}
             icons={icons}
             className={cn(
-              "absolute inset-0 opacity-0 group-hover/rownum:opacity-100 focus-visible:opacity-100",
+              "absolute inset-0 m-auto opacity-0 group-hover/rownum:opacity-100 focus-visible:opacity-100",
               pinned && "opacity-100"
             )}
           />

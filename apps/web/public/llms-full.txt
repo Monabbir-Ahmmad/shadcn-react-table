@@ -19,24 +19,89 @@ A **shadcn/ui data table** with [Material React Table](https://www.material-reac
 Example (`advanced`):
 
 ```tsx
-function AdvancedExample() {
+function PlaygroundExample() {
   const [data, setData] = React.useState(() => baseUsers)
   const columns = useUserColumns()
+  // Every switch in the Settings menu, starting from the kitchen sink.
+  const defaults = {
+    rowSelection: true,
+    rowNumbers: true,
+    rowPinning: true,
+    rowOrdering: false,
+    detailPanel: false,
+    columnOrdering: true,
+    columnPinning: true,
+    columnResizing: true,
+    grouping: true,
+    columnFilters: true,
+    stickyHeader: true,
+    stickyFooter: true,
+    animations: true,
+    virtualization: false,
+    editing: true,
+  }
+  type Feature = keyof typeof defaults
+  const [features, setFeatures] = React.useState(defaults)
+  const [editMode, setEditMode] = React.useState<EditDisplayMode>("row")
+  // One row per feature: the row is the toggle, the switch shows its state.
+  const toggle = (feature: Feature, label: string) => (
+    <DropdownMenuItem
+      role="menuitemcheckbox"
+      aria-checked={features[feature]}
+      onSelect={(event) => {
+        // Keep the menu open while switching several features.
+        event.preventDefault()
+        setFeatures((prev) => ({ ...prev, [feature]: !prev[feature] }))
+      }}
+    >
+      {label}
+      <Switch
+        size="sm"
+        checked={features[feature]}
+        tabIndex={-1}
+        aria-hidden
+        className="pointer-events-none ms-auto"
+      />
+    </DropdownMenuItem>
+  )
+
   const table = useDataTable({
     data,
     columns,
     getRowId: (row) => row.id,
-    enableRowSelection: true,
     enableMultiSort: true,
-    enableColumnOrdering: true,
-    enableColumnPinning: true,
-    enableColumnResizing: true,
-    enableRowNumbers: true,
-    enableRowPinning: true,
-    enableGrouping: true,
-    enableStickyFooter: true,
-    enableEditing: true,
-    editDisplayMode: "row",
+    enableRowSelection: features.rowSelection,
+    enableRowNumbers: features.rowNumbers,
+    enableRowPinning: features.rowPinning,
+    enableRowOrdering: features.rowOrdering,
+    onRowOrderChange: (activeId, overId) =>
+      setData((prev) => {
+        const from = prev.findIndex((r) => r.id === activeId)
+        const to = prev.findIndex((r) => r.id === overId)
+        const next = [...prev]
+        next.splice(to, 0, ...next.splice(from, 1))
+        return next
+      }),
+    renderDetailPanel: features.detailPanel
+      ? ({ row }) => (
+          <p className="text-sm text-muted-foreground">
+            {row.original.email} · {row.original.city}, {row.original.country}
+          </p>
+        )
+      : undefined,
+    enableColumnOrdering: features.columnOrdering,
+    enableColumnPinning: features.columnPinning,
+    enableColumnResizing: features.columnResizing,
+    enableGrouping: features.grouping,
+    enableColumnFilters: features.columnFilters,
+    enableStickyHeader: features.stickyHeader,
+    enableStickyFooter: features.stickyFooter,
+    enableAnimations: features.animations,
+    // Virtualization scrolls through every row instead of paging them.
+    enableRowVirtualization: features.virtualization,
+    enablePagination: !features.virtualization,
+    enableEditing: features.editing,
+    editDisplayMode: editMode,
     initialState: { showColumnFilters: true, pagination: { pageSize: 10 } },
     onEditingRowSave: ({ row, values, exit }) => {
       setData((prev) =>
@@ -46,6 +111,10 @@ function AdvancedExample() {
       )
       exit()
     },
+    onEditingCellSave: ({ row, column, value }) =>
+      setData((prev) =>
+        prev.map((r) => (r.id === row.id ? { ...r, [column.id]: value } : r))
+      ),
     renderRowActions: ({ row }) => (
       <Button
         variant="ghost"
@@ -57,6 +126,74 @@ function AdvancedExample() {
       >
         <RiDeleteBinLine />
       </Button>
+    ),
+    renderTopToolbarCustomActions: () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">
+            <RiSettings3Line />
+            Settings
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Rows</DropdownMenuLabel>
+            {toggle("rowSelection", "Selection")}
+            {toggle("rowNumbers", "Row numbers")}
+            {toggle("rowPinning", "Row pinning")}
+            {toggle("rowOrdering", "Row dragging")}
+            {toggle("detailPanel", "Detail panel")}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Columns</DropdownMenuLabel>
+            {toggle("columnOrdering", "Ordering")}
+            {toggle("columnPinning", "Pinning")}
+            {toggle("columnResizing", "Resizing")}
+            {toggle("grouping", "Grouping")}
+            {toggle("columnFilters", "Column filters")}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Display</DropdownMenuLabel>
+            {toggle("stickyHeader", "Sticky header")}
+            {toggle("stickyFooter", "Sticky footer")}
+            {toggle("animations", "Animations")}
+            {toggle("virtualization", "Virtualization")}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Editing</DropdownMenuLabel>
+            {toggle("editing", "Editing")}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger disabled={!features.editing}>
+                Mode: {editMode}
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuRadioGroup
+                  value={editMode}
+                  onValueChange={(mode) => setEditMode(mode as EditDisplayMode)}
+                >
+                  {(["row", "cell", "modal", "table"] as const).map((mode) => (
+                    <DropdownMenuRadioItem key={mode} value={mode}>
+                      {mode}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={() => {
+              setFeatures(defaults)
+              setEditMode("row")
+            }}
+          >
+            Reset
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     ),
   })
   return <DataTable table={table} />
@@ -1833,7 +1970,7 @@ enableRowSelection: (row) => row.original.status !== "archived"
 
 ## single-selection
 
-For single selection, add `enableMultiRowSelection: false`. The checkboxes become radio buttons and the select-all checkbox goes away.
+For single selection, add `enableMultiRowSelection: false`. Checking a row unchecks the one before it, and the select-all checkbox goes away.
 
 Example (`single-selection`):
 
@@ -4200,7 +4337,6 @@ function AnimationsExample() {
 - **Selection banner and grouping drop zone:** the "N selected" banner and the drop zone slide and fade in and out, and the table below glides to make room.
 - **Detail panels:** a panel opens from the top down while the rows below glide. It closes from the bottom up.
 - **Sort arrow:** the sort icon fades and scales between states. The default arrow also turns around for descending order, and when the sort is cleared it fades out without turning back. A custom sort icon never turns.
-- **Selection checkbox:** the tick draws itself in.
 - **Selected count:** the old "N selected" text fades out as the new one fades in, in the same place.
 
 A row that glides past others is drawn above them, and the row that moves farthest is on top. Motion pauses while a row is being dragged, while a cell or row is being edited and while a new row is being created. Starting an edit stops any row or column motion still running.
@@ -5167,6 +5303,21 @@ return <DataTable table={table} />
 The data table is **style-agnostic**. It is built entirely on standard shadcn/ui primitive APIs, and those primitives are declared as registry dependencies. When you run `shadcn add`, the CLI installs those primitives in *your* configured style (Sera, Vega, Nova, Luma, …) and base color — so the table simply inherits your existing look with nothing to override.
 
 > **No table-specific theme:** There is no separate table-specific theme. Whatever your shadcn style and base color are, the table already matches them.
+
+## The card
+
+The whole table — toolbars, table and pagination — sits inside your own shadcn `Card`, so its corners, border, shadow and background match the other cards in your app. Change your `Card` (or your `--radius` and `--card` tokens) and the table follows.
+
+To drop the frame, for example when the table already sits inside a card of yours, override the root through [`slotProps`](/docs/guides/slot-props):
+
+```tsx
+useDataTable({
+  // …
+  slotProps: {
+    root: { className: "rounded-none bg-transparent shadow-none ring-0" },
+  },
+})
+```
 
 ## Design tokens
 
@@ -6956,7 +7107,7 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 
 - Selecting rows updates a polite status banner; loading is announced the same way.
 - Full screen is a modal dialog: focus stays inside, the page doesn't scroll behind it, and Escape leaves it with focus still in the table.
-- Single selection uses radio buttons, multiple selection checkboxes (with a mixed state for "some selected").
+- Selection uses checkboxes, with a mixed state on select-all for "some selected". With single selection, checking a row unchecks the one before it.
 
 ## Motion and language
 
@@ -7101,7 +7252,7 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 | `enableBottomToolbar` | `boolean` | `true` | Shows the toolbar below the table (pagination, custom actions). Default `true`. |
 | `enableDensityToggle` | `boolean` | `true` | Show the density toggle in the toolbar. Default true. |
 | `enableFullscreenToggle` | `boolean` | `true` | Show the full-screen toggle in the toolbar. Default true. |
-| `enableToolbarInternalActions` | `boolean` | `true` | Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control. |
+| `enableToolbarInternalActions` | `boolean` | `true` | Show the toolbar's internal icon-action cluster (search, filters, column visibility, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control. |
 | `enableKeyboardNavigation` | `boolean` | `true` | Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`. |
 | `enableAnimations` | `boolean` | `true` | Animate the table: rows glide when their order changes, fade in and out when they enter or leave the data, detail panels open and close smoothly, and the sort arrow, selection checkboxes and selected count transition. Always off when the user prefers reduced motion. Retime it with the CSS variables `--dt-motion-duration`, `--dt-motion-duration-fast` and `--dt-motion-ease` on the table. |
 | `title` | `React.ReactNode` |  | Heading shown at the start of the top toolbar. |
@@ -7325,7 +7476,7 @@ table.dataTable.refs.searchInputRef.current?.focus()
 | `enableBottomToolbar` | `boolean` |  | Shows the toolbar below the table (pagination, custom actions). Default `true`. |
 | `enableDensityToggle` | `boolean` |  | Show the density toggle in the toolbar. Default true. |
 | `enableFullscreenToggle` | `boolean` |  | Show the full-screen toggle in the toolbar. Default true. |
-| `enableToolbarInternalActions` | `boolean` |  | Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control. |
+| `enableToolbarInternalActions` | `boolean` |  | Show the toolbar's internal icon-action cluster (search, filters, column visibility, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control. |
 | `enableKeyboardNavigation` | `boolean` |  | Cell keyboard navigation with a single Tab stop: arrow keys, Home/End, PageUp/PageDown, Enter or F2 to activate a cell, Ctrl+C to copy it. Also makes the table an ARIA grid. Default `true`. |
 | `enableAnimations` | `boolean` |  | Animate the table: rows glide when their order changes, fade in and out when they enter or leave the data, detail panels open and close smoothly, and the sort arrow, selection checkboxes and selected count transition. Always off when the user prefers reduced motion. Retime it with the CSS variables `--dt-motion-duration`, `--dt-motion-duration-fast` and `--dt-motion-ease` on the table. |
 | `title` | `React.ReactNode` |  | Heading shown at the start of the top toolbar. |

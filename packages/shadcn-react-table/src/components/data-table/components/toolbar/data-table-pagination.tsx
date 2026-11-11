@@ -68,13 +68,14 @@ export function DataTablePagination<TData extends RowData>({
       {...mergeProps(
         {
           "data-slot": "data-table-pagination",
-          className: "flex flex-wrap items-center justify-between gap-4 py-1",
+          className:
+            "flex flex-wrap items-center justify-between gap-4 px-3 py-2",
         } as React.ComponentProps<"div">,
         getSlotProps(table, "pagination", {})
       )}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xs font-medium tracking-wide text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground">
           {localization.rowsPerPage}
         </span>
         {phone ? (
@@ -98,7 +99,7 @@ export function DataTablePagination<TData extends RowData>({
           >
             <SelectTrigger
               size="sm"
-              className="h-8 w-18"
+              className="w-18"
               aria-label={localization.rowsPerPage}
             >
               <SelectValue
@@ -138,11 +139,10 @@ export function DataTablePagination<TData extends RowData>({
               <Button
                 key={item}
                 variant={item === pageIndex + 1 ? "default" : "outline"}
-                size="icon"
+                size="icon-sm"
                 aria-label={localization.goToPage(item)}
                 aria-current={item === pageIndex + 1 ? "page" : undefined}
                 onClick={() => table.setPageIndex(item - 1)}
-                className="size-8 text-xs tabular-nums"
               >
                 {formatInteger(item, localization.language)}
               </Button>
@@ -158,10 +158,13 @@ export function DataTablePagination<TData extends RowData>({
         </div>
       ) : (
         <div className="flex items-center gap-3">
-          <span className="text-xs font-medium tracking-wide text-muted-foreground tabular-nums">
+          <span className="text-xs font-medium text-muted-foreground tabular-nums">
             {localization.paginationRange(start, end, totalRows)}
           </span>
-          <div className="flex items-center gap-1">
+          <div
+            data-slot="data-table-pagination-buttons"
+            className="flex items-center gap-1"
+          >
             <PaginationButton
               label={localization.goToFirstPage}
               onClick={() => table.setPageIndex(0)}
@@ -230,16 +233,46 @@ function PaginationButton({
   disabled: boolean
   children: React.ReactNode
 }) {
+  const ref = React.useRef<HTMLButtonElement>(null)
+  // Clicked, and focused, just before its own page change.
+  const pressed = React.useRef(false)
+  // A disabled button drops focus to the page: when this click disabled it
+  // (Next onto the last page, First onto the first), move focus to the
+  // nearest button that still works.
+  React.useLayoutEffect(() => {
+    const el = ref.current
+    if (!pressed.current || !disabled || !el) return
+    pressed.current = false
+    const buttons = [
+      ...(el
+        .closest('[data-slot="data-table-pagination-buttons"]')
+        ?.querySelectorAll<HTMLButtonElement>("button") ?? []),
+    ]
+    const at = buttons.indexOf(el)
+    const nearest = buttons
+      .filter((button) => !button.disabled)
+      .sort(
+        (a, b) =>
+          Math.abs(buttons.indexOf(a) - at) - Math.abs(buttons.indexOf(b) - at)
+      )[0]
+    nearest?.focus()
+  }, [disabled])
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
+          ref={ref}
           variant="outline"
-          size="icon"
+          size="icon-sm"
           aria-label={label}
-          onClick={onClick}
+          onClick={() => {
+            pressed.current = document.activeElement === ref.current
+            onClick()
+          }}
+          onBlur={() => {
+            pressed.current = false
+          }}
           disabled={disabled}
-          className="size-8"
         >
           {children}
         </Button>

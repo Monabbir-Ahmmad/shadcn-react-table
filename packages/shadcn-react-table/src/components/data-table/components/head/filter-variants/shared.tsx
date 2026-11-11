@@ -10,7 +10,6 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@workspace/ui/components/input-group"
-import { cn } from "@workspace/ui/lib/utils"
 
 import { dt } from "../../../core/internal"
 import type {
@@ -25,12 +24,15 @@ export interface FilterFieldProps<TData extends RowData, TValue> {
   table: DataTableInstance<TData>
 }
 
-export const FIELD_CLASS =
-  "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
+/**
+ * A filter field sits in a header cell, whose medium weight would carry into
+ * it; this puts back the field's own normal weight. Everything else about the
+ * field is the installed shadcn component's.
+ */
+export const FIELD_CLASS = "font-normal"
 
-/** The control inside a `FilterInputGroup` (the group carries the height). */
-export const GROUP_CONTROL_CLASS =
-  "h-full text-xs font-normal tracking-normal normal-case"
+/** The control inside a `FilterInputGroup`. */
+export const GROUP_CONTROL_CLASS = FIELD_CLASS
 
 /**
  * Each bound's group in a min–max pair. The groups size from their content
@@ -144,21 +146,28 @@ export function FilterInputGroup<TData extends RowData, TValue>({
   children: React.ReactNode
 }) {
   const { localization, icons } = dt(table)
+  const groupRef = React.useRef<HTMLDivElement>(null)
   return (
-    <InputGroup className={cn("h-8 rounded-sm", className)}>
+    <InputGroup ref={groupRef} className={className}>
       {modeMenu && (
         <DataTableFilterModeMenu column={column} table={table} addon />
       )}
       {children}
       {onClear && (
-        <InputGroupAddon align="inline-end" className="py-0">
+        <InputGroupAddon align="inline-end">
           <InputGroupButton
             size="icon-xs"
             aria-label={clearLabel ?? localization.clearFilter}
-            onClick={onClear}
-            className="text-muted-foreground"
+            onClick={() => {
+              onClear()
+              // The button goes with the value: keep focus in the field (its
+              // input, or a date filter's picker button).
+              groupRef.current
+                ?.querySelector<HTMLElement>('input, [aria-haspopup="dialog"]')
+                ?.focus()
+            }}
           >
-            <icons.clear className="size-3.5" />
+            <icons.clear />
           </InputGroupButton>
         </InputGroupAddon>
       )}
@@ -166,20 +175,16 @@ export function FilterInputGroup<TData extends RowData, TValue>({
   )
 }
 
-/** A muted, dashed field shown for valueless modes (empty / not empty), with
- *  the mode menu inside so the mode can be changed back. */
+/** A field showing the mode's name for valueless modes (empty / not empty),
+ *  with the mode menu inside so the mode can be changed back. */
 export function ValuelessLabel<TData extends RowData, TValue>({
   column,
   table,
   label,
 }: FilterFieldProps<TData, TValue> & { label: string }) {
   return (
-    <FilterInputGroup
-      column={column}
-      table={table}
-      className="border-dashed border-border"
-    >
-      <InputGroupText className="min-w-0 px-2 text-xs">
+    <FilterInputGroup column={column} table={table}>
+      <InputGroupText className="min-w-0">
         <span className="truncate">{label}</span>
       </InputGroupText>
     </FilterInputGroup>

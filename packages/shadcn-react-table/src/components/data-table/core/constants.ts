@@ -47,17 +47,18 @@ export const DISPLAY_COLUMN_IDS = NON_DATA_COLUMN_IDS
  * scrolled content), so the row's own background would be hidden; instead the
  * row publishes its tint as `--row-tint` and {@link BODY_CELL_CLASS} layers it
  * over the card. Mirrors shadcn's row states: hover / open menu → muted/50,
- * selected → primary/20 (kept under hover), dragging → muted.
+ * selected → muted (a shade deeper under hover), dragging → muted.
  */
 export const BODY_ROW_CLASS =
-  "group [--row-tint:transparent] hover:[--row-tint:color-mix(in_oklab,var(--muted)_50%,transparent)] has-aria-expanded:[--row-tint:color-mix(in_oklab,var(--muted)_50%,transparent)] data-[state=selected]:[--row-tint:color-mix(in_oklab,var(--primary)_20%,transparent)] data-[state=selected]:hover:[--row-tint:color-mix(in_oklab,var(--primary)_20%,transparent)] data-[dragging=true]:[--row-tint:var(--muted)]!"
+  "group [--row-tint:transparent] hover:[--row-tint:color-mix(in_oklab,var(--muted)_50%,transparent)] has-aria-expanded:[--row-tint:color-mix(in_oklab,var(--muted)_50%,transparent)] data-[state=selected]:[--row-tint:var(--muted)] data-[state=selected]:hover:[--row-tint:color-mix(in_oklab,var(--muted),var(--foreground)_5%)] data-[dragging=true]:[--row-tint:var(--muted)]!"
 
 /**
  * Body-cell background: the row's `--row-tint` painted over an opaque card
- * fill, plus the selected row's 2px accent bar on its first cell.
+ * fill, plus the selected row's 2px accent bar on its first cell's outer
+ * edge (the right one in right-to-left).
  */
 export const BODY_CELL_CLASS =
-  "bg-card bg-[linear-gradient(var(--row-tint),var(--row-tint))] group-data-[state=selected]:first:shadow-[inset_2px_0_0_0_var(--primary)]"
+  "bg-card bg-[linear-gradient(var(--row-tint),var(--row-tint))] group-data-[state=selected]:first:shadow-[inset_2px_0_0_0_var(--primary)] rtl:group-data-[state=selected]:first:shadow-[inset_-2px_0_0_0_var(--primary)]"
 
 /**
  * Footer-cell background: opaque card fill with the muted footer tint painted

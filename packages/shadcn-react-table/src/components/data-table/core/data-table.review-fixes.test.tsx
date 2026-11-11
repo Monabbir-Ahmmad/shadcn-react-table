@@ -173,14 +173,14 @@ describe("review fixes", () => {
     ])
   })
 
-  it("keeps a radio selected when it is clicked again", () => {
+  it("keeps a single-selection row selected when it is clicked again", () => {
     const { table } = mount({
       enableRowSelection: true,
       enableMultiRowSelection: false,
     })
-    const radio = screen.getAllByRole("radio")[1]!
-    fireEvent.click(radio)
-    fireEvent.click(radio)
+    const box = screen.getAllByRole("checkbox", { name: "Select row" })[1]!
+    fireEvent.click(box)
+    fireEvent.click(box)
     expect(table().getState().rowSelection).toEqual({ "2": true })
   })
 })

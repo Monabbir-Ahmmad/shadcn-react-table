@@ -245,14 +245,11 @@ export function DataTableGlobalFilter<TData extends RowData>({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="outline"
+          // Open: the button's secondary variant.
+          variant={expanded ? "secondary" : "outline"}
           size="icon"
           aria-label={localization.search}
           aria-expanded={expanded}
-          className={cn(
-            "size-8",
-            expanded && "bg-accent text-accent-foreground"
-          )}
           onClick={toggle}
         >
           <icons.search />
@@ -278,8 +275,8 @@ export function DataTableGlobalFilter<TData extends RowData>({
 
   function renderBox() {
     return (
-      <InputGroup className="h-8 w-auto shrink-0 rounded-md border-border bg-background ps-1 pe-1 focus-within:border-ring">
-        <InputGroupAddon align="inline-start" className="py-0">
+      <InputGroup className="w-auto shrink-0">
+        <InputGroupAddon align="inline-start">
           {enableGlobalFilterModes ? (
             <DropdownMenu>
               <Tooltip>
@@ -288,9 +285,8 @@ export function DataTableGlobalFilter<TData extends RowData>({
                     <InputGroupButton
                       size="icon-xs"
                       aria-label={localization.globalFilterMode}
-                      className="text-muted-foreground"
                     >
-                      <icons.search className="size-3.5" />
+                      <icons.search />
                     </InputGroupButton>
                   </DropdownMenuTrigger>
                 </TooltipTrigger>
@@ -329,7 +325,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <icons.search className="ms-1 size-3.5 shrink-0 text-muted-foreground" />
+            <icons.search />
           )}
         </InputGroupAddon>
         <InputGroupInput
@@ -342,21 +338,19 @@ export function DataTableGlobalFilter<TData extends RowData>({
                 setValue(e.target.value),
               placeholder: localization.searchPlaceholder,
               "aria-label": localization.search,
-              className:
-                "h-7 w-40 flex-none px-1 text-xs font-normal tracking-normal normal-case shadow-none sm:w-56",
+              className: "w-40 flex-none sm:w-56",
             } as React.ComponentProps<"input">,
             getSlotProps(table, "searchInput", {})
           )}
         />
         {value && (
-          <InputGroupAddon align="inline-end" className="py-0">
+          <InputGroupAddon align="inline-end">
             <InputGroupButton
               size="icon-xs"
               aria-label={localization.clearSearch}
               onClick={clear}
-              className="text-muted-foreground"
             >
-              <icons.clear className="size-3.5" />
+              <icons.clear />
             </InputGroupButton>
           </InputGroupAddon>
         )}

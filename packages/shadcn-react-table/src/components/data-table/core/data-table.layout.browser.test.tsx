@@ -171,7 +171,7 @@ describe("pinned rows", () => {
 
 /** The table's `border` colour, as the row borders draw it. */
 const borderColor = () =>
-  getComputedStyle(document.querySelector("thead tr")!).borderBottomColor
+  getComputedStyle(document.querySelector("tbody tr")!).borderBottomColor
 
 /**
  * Checks the divider a pinned edge cell draws in its pseudo-element: a 1px
@@ -489,5 +489,137 @@ describe("filter row", () => {
       // Same bottom edge: the underlines line up.
       expect(box.bottom).toBeCloseTo(text.bottom, 0)
     }
+  })
+})
+
+describe("card", () => {
+  function CardTable({ fullscreen = false }: { fullscreen?: boolean }) {
+    const table = useDataTable<Row>({
+      columns,
+      data,
+      getRowId: (row) => row.id,
+      initialState: { isFullscreen: fullscreen, pagination: { pageSize: 5 } },
+    })
+    return <DataTable table={table} />
+  }
+  const root = () =>
+    document.querySelector<HTMLElement>('[data-slot="data-table"]')!
+
+  it("fills the screen with no frame in full screen", async () => {
+    render(<CardTable fullscreen />)
+    await nextFrame()
+    const style = getComputedStyle(root())
+    expect(style.borderTopWidth).toBe("0px")
+    // No ring or shadow drawn: every layer Tailwind composes is zero-sized.
+    expect(style.boxShadow.replace(/\([^)]*\)/g, "")).not.toMatch(
+      /(^|\s)-?[1-9][\d.]*px/
+    )
+    // The toolbars stay in view and the surface takes the rest of the room.
+    const pagination = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-pagination"]'
+    )!
+    expect(
+      Math.abs(pagination.getBoundingClientRect().bottom - window.innerHeight)
+    ).toBeLessThan(2)
+    const surface = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-surface"]'
+    )!
+    expect(getComputedStyle(surface).maxHeight).toBe("none")
+  })
+})
+
+describe("sticky header and footer dividers", () => {
+  const withFooters: DataTableColumnDef<Row>[] = columns.map((c) => ({
+    ...c,
+    footer: `F ${String(c.header)}`,
+  }))
+
+  function Sticky({ sticky = true }: { sticky?: boolean }) {
+    const table = useDataTable<Row>({
+      slotProps: { surface: { className: "max-h-[300px]" } },
+      columns: withFooters,
+      data,
+      getRowId: (row) => row.id,
+      enablePagination: false,
+      enableStickyHeader: sticky,
+      enableStickyFooter: sticky,
+    })
+    return (
+      <div style={{ width: 600 }}>
+        <DataTable table={table} />
+      </div>
+    )
+  }
+
+  /** The 1px line a sticky section's edge row draws along the edge facing
+   *  the body: an inset shadow on each of its cells, in the border color. */
+  function expectLine(section: Element, edge: "bottom" | "top") {
+    const rows = section.querySelectorAll(":scope > tr")
+    const row = edge === "bottom" ? rows[rows.length - 1]! : rows[0]!
+    for (const cell of row.children) {
+      const shadow = getComputedStyle(cell).boxShadow
+      expect(shadow).toContain("inset")
+      expect(shadow).toContain(
+        edge === "bottom" ? "0px -1px 0px 0px" : "0px 1px 0px 0px"
+      )
+      expect(shadow).toContain(borderColor())
+    }
+  }
+
+  it("keep their line against the body while it scrolls under them", async () => {
+    render(<Sticky />)
+    const head = document.querySelector("thead")!
+    const foot = document.querySelector("tfoot")!
+    const surface = surfaceOf(head)
+    act(() => {
+      surface.scrollTop = 500
+    })
+    await nextFrame()
+    // Collapsed table borders stay where the rows started; these lines are
+    // the cells' own, so they move with them.
+    expectLine(head, "bottom")
+    expectLine(foot, "top")
+  })
+
+  it("draw no extra line when they don't stick", async () => {
+    render(<Sticky sticky={false} />)
+    await nextFrame()
+    for (const cell of document.querySelectorAll("thead th, tfoot > tr > *"))
+      expect(getComputedStyle(cell).boxShadow).toBe("none")
+  })
+})
+
+describe("progress bar", () => {
+  function Loading() {
+    const table = useDataTable<Row>({
+      slotProps: { surface: { className: "max-h-[300px]" } },
+      columns,
+      data,
+      getRowId: (row) => row.id,
+      enablePagination: false,
+      showProgressBars: true,
+    })
+    return (
+      <div style={{ width: 600 }}>
+        <DataTable table={table} />
+      </div>
+    )
+  }
+
+  it("stays at the top of the visible area while the rows scroll", async () => {
+    render(<Loading />)
+    const bar = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-progress"]'
+    )!
+    const surface = surfaceOf(bar)
+    act(() => {
+      surface.scrollTop = 800
+      surface.scrollLeft = 200
+    })
+    await nextFrame()
+    const at = bar.getBoundingClientRect()
+    const box = surface.getBoundingClientRect()
+    expect(at.top).toBeCloseTo(box.top + surface.clientTop, 0)
+    expect(at.left).toBeCloseTo(box.left + surface.clientLeft, 0)
   })
 })

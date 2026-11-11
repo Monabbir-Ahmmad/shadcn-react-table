@@ -127,7 +127,7 @@ describe("body re-renders", () => {
     }
     render(<Caller onRender={onRender} />)
     const before = onRender.mock.calls.length
-    fireEvent.click(screen.getByRole("button", { name: /sort by name/i }))
+    fireEvent.click(screen.getByRole("button", { name: "Name" }))
     fireEvent.click(
       screen.getAllByRole("checkbox", { name: /select row/i })[0]!
     )
@@ -159,7 +159,7 @@ describe("body re-renders", () => {
     }
     render(<Caller onRender={onRender} />)
     const before = onRender.mock.calls.length
-    fireEvent.click(screen.getByRole("button", { name: /sort by name/i }))
+    fireEvent.click(screen.getByRole("button", { name: "Name" }))
     expect(onRender).toHaveBeenCalledTimes(before)
     fireEvent.click(
       screen.getAllByRole("checkbox", { name: /select row/i })[1]!

@@ -47,7 +47,6 @@ function AnimationsExample() {
 - **Selection banner and grouping drop zone:** the "N selected" banner and the drop zone slide and fade in and out, and the table below glides to make room.
 - **Detail panels:** a panel opens from the top down while the rows below glide. It closes from the bottom up.
 - **Sort arrow:** the sort icon fades and scales between states. The default arrow also turns around for descending order, and when the sort is cleared it fades out without turning back. A custom sort icon never turns.
-- **Selection checkbox:** the tick draws itself in.
 - **Selected count:** the old "N selected" text fades out as the new one fades in, in the same place.
 
 A row that glides past others is drawn above them, and the row that moves farthest is on top. Motion pauses while a row is being dragged, while a cell or row is being edited and while a new row is being created. Starting an edit stops any row or column motion still running.
