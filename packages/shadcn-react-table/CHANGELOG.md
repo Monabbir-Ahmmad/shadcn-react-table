@@ -6,6 +6,25 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 Changes waiting for a release are in [`.changeset/`](../../.changeset), and
 move here when the next version is cut.
 
+## 1.3.0
+
+### Minor Changes
+
+- **Changed:** Row selection now uses your installed shadcn `Checkbox`, so it looks and animates exactly like the other checkboxes in your app (the table's own drawn-in tick is gone). Single-row selection (`enableMultiRowSelection: false`) shows checkboxes too instead of radio buttons: checking a row unchecks the one before it. If you query the row controls by role, use `checkbox` instead of `radio`.
+- **Changed:** The whole table — top toolbar, table and pagination/bottom toolbar — now sits inside your app's own shadcn `Card`, so its corners, border, shadow and background match the rest of your app. The toolbars are padded inside the card with a line between them and the table, and the selection banner is a full-width strip. In full screen the card fills the screen edge to edge, and the table scrolls between the toolbars. `card` is now a registry dependency (`shadcn add` installs it in your style if you don't have it). To drop the frame, pass `slotProps.root: { className: "rounded-none bg-transparent shadow-none ring-0" }`.
+
+### Patch Changes
+
+- **Fixed:** In the edit dialog, each label is now tied to its field (clicking a label focuses the field), and a click outside the dialog no longer throws away changes you've made — Cancel and Escape still close it. With nothing changed, an outside click closes it as before.
+- **Fixed:** A grouped row's selection checkbox now shows its rows' selection: partly checked when some of them are selected and checked when all are (it showed unchecked).
+- **Fixed:** A custom `cell` on the grouped column now gets `renderedCellValue` in its group rows too, so a cell like `<Badge>{renderedCellValue}</Badge>` shows the group's value there instead of an empty badge.
+- **Fixed:** Keyboard focus no longer drops to the page when the control you used goes away or turns off: clearing a column filter keeps focus in the filter, "Clear selection" moves it to the select-all checkbox, "Hide column" moves it to the next column's menu button, and paging onto the first or last page moves it to the nearest page button that still works.
+- **Changed:** The table no longer forces its own look over your shadcn styles. Column headers take your `TableHead` typography instead of small uppercase muted text; the search box, filter inputs, edit fields and badges keep your input and badge styling; the selection checkbox matches the stock shadcn checkbox size, corners and border; and a selected row uses shadcn's `muted` row color (a shade deeper on hover) instead of a strong primary tint. The selected row's accent bar now sits on the outer edge in right-to-left tables too.
+- **Fixed:** The loading/saving progress bar now stays at the top of the visible area when the rows are scrolled (it scrolled out of view with the first row).
+- **Fixed:** In row edit mode, Enter now saves the row and Escape cancels it (both did nothing), and the row's Save button is disabled while a field fails validation, as in the edit dialog. Enter also saves the edit dialog. The keyboard focus outline on a body cell is now drawn inside the cell, so the cells around it no longer cover it. A sortable column's header is now named by its label for screen readers, with the sort action as its description, instead of "Sort by … ascending" or "Clear sort". The line between a sticky header or footer and the body now stays in place while the rows scroll under it.
+- **Changed:** Every control in the table is now your installed shadcn component at one of its own sizes and variants, with no look of the table's own on top. Toolbar buttons use `size="icon"` (the same height as the search box), header and row buttons `size="icon-xs"`, and pagination `size="icon-sm"`; an active toggle, filter or pinned row shows as the `secondary` variant instead of a custom color. Filter fields, edit fields and the advanced filter's fields keep your input and select height. The expand, expand-all, group-row, row-pin and filter-mode buttons are now shadcn `Button`s (the expand buttons were 16px tap targets). Header rows, the empty-state row and the create row no longer turn off or replace your `TableRow` hover and colors.
+- **Fixed:** With keyboard navigation on, the table body is now a single Tab stop as documented: the checkboxes, buttons and links in its cells are reached with the arrow keys and Enter/F2 instead of one Tab each. A row being edited still lets Tab move between its fields and Save/Cancel.
+
 ## 1.2.0
 
 ### Minor Changes
