@@ -81,6 +81,8 @@ export function renderBodyCell<TData extends RowData>(
             : flexRender(column.columnDef.cell, {
                 ...cell.getContext(),
                 table,
+                // As in any other cell: a custom cell places the value with it.
+                renderedCellValue: cell.getValue() as React.ReactNode,
               })}
         </span>
         <span className="text-xs text-muted-foreground">
