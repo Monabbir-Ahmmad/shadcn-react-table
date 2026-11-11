@@ -69,14 +69,18 @@ describe("shift-click range selection", () => {
 })
 
 describe("single row selection", () => {
-  it("shows radio buttons and keeps one row selected", () => {
+  it("shows a checkbox per row and keeps one row selected", () => {
     const { table } = mount({ enableMultiRowSelection: false })
-    expect(screen.queryAllByRole("checkbox")).toHaveLength(0)
-    const radios = screen.getAllByRole("radio", { name: "Select row" })
-    expect(radios).toHaveLength(5)
-    fireEvent.click(radios[0]!)
-    fireEvent.click(radios[2]!)
+    // No select-all box: one row at a time.
+    expect(
+      screen.queryAllByRole("checkbox", { name: /select all/i })
+    ).toHaveLength(0)
+    const boxes = screen.getAllByRole("checkbox", { name: "Select row" })
+    expect(boxes).toHaveLength(5)
+    fireEvent.click(boxes[0]!)
+    fireEvent.click(boxes[2]!)
     expect(selected(table())).toEqual(["3"])
-    expect(radios[2]!.getAttribute("aria-checked")).toBe("true")
+    expect(boxes[0]!.getAttribute("aria-checked")).toBe("false")
+    expect(boxes[2]!.getAttribute("aria-checked")).toBe("true")
   })
 })

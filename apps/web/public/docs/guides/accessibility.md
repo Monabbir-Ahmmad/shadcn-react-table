@@ -29,7 +29,7 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 
 - Selecting rows updates a polite status banner; loading is announced the same way.
 - Full screen is a modal dialog: focus stays inside, the page doesn't scroll behind it, and Escape leaves it with focus still in the table.
-- Single selection uses radio buttons, multiple selection checkboxes (with a mixed state for "some selected").
+- Selection uses checkboxes, with a mixed state on select-all for "some selected". With single selection, checking a row unchecks the one before it.
 
 ## Motion and language
 

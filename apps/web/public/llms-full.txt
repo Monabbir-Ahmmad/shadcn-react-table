@@ -1833,7 +1833,7 @@ enableRowSelection: (row) => row.original.status !== "archived"
 
 ## single-selection
 
-For single selection, add `enableMultiRowSelection: false`. The checkboxes become radio buttons and the select-all checkbox goes away.
+For single selection, add `enableMultiRowSelection: false`. Checking a row unchecks the one before it, and the select-all checkbox goes away.
 
 Example (`single-selection`):
 
@@ -4200,7 +4200,6 @@ function AnimationsExample() {
 - **Selection banner and grouping drop zone:** the "N selected" banner and the drop zone slide and fade in and out, and the table below glides to make room.
 - **Detail panels:** a panel opens from the top down while the rows below glide. It closes from the bottom up.
 - **Sort arrow:** the sort icon fades and scales between states. The default arrow also turns around for descending order, and when the sort is cleared it fades out without turning back. A custom sort icon never turns.
-- **Selection checkbox:** the tick draws itself in.
 - **Selected count:** the old "N selected" text fades out as the new one fades in, in the same place.
 
 A row that glides past others is drawn above them, and the row that moves farthest is on top. Motion pauses while a row is being dragged, while a cell or row is being edited and while a new row is being created. Starting an edit stops any row or column motion still running.
@@ -6971,7 +6970,7 @@ Rows and columns that aren't rendered (virtualization) are scrolled into view as
 
 - Selecting rows updates a polite status banner; loading is announced the same way.
 - Full screen is a modal dialog: focus stays inside, the page doesn't scroll behind it, and Escape leaves it with focus still in the table.
-- Single selection uses radio buttons, multiple selection checkboxes (with a mixed state for "some selected").
+- Selection uses checkboxes, with a mixed state on select-all for "some selected". With single selection, checking a row unchecks the one before it.
 
 ## Motion and language
 

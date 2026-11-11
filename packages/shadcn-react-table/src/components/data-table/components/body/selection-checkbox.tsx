@@ -2,35 +2,11 @@
 
 import * as React from "react"
 
-import { cn } from "@workspace/ui/lib/utils"
-import { MOTION_TIMING_CLASS } from "../../core/motion"
-import { mergeProps } from "../../helpers/slot-props"
-
-/**
- * A glyph path that draws itself in (stroke-dashoffset 1 → 0 over a
- * `pathLength` of 1). Only showing transitions; hiding is instant.
- */
-function GlyphPath({ d, shown }: { d: string; shown: boolean }) {
-  return (
-    <path
-      d={d}
-      pathLength={1}
-      strokeDasharray={1}
-      className={
-        shown
-          ? cn(
-              "transition-[stroke-dashoffset] [stroke-dashoffset:0]",
-              MOTION_TIMING_CLASS
-            )
-          : "opacity-0 [stroke-dashoffset:1]"
-      }
-    />
-  )
-}
+import { Checkbox } from "@workspace/ui/components/checkbox"
 
 interface SelectionCheckboxProps extends Omit<
-  React.ComponentProps<"button">,
-  "onChange" | "type" | "role" | "aria-checked"
+  React.ComponentProps<typeof Checkbox>,
+  "checked" | "onCheckedChange" | "onClick"
 > {
   checked?: boolean
   indeterminate?: boolean
@@ -39,90 +15,35 @@ interface SelectionCheckboxProps extends Omit<
     checked: boolean,
     event: React.MouseEvent<HTMLButtonElement>
   ) => void
-  /** A radio button (single-row selection) instead of a checkbox. */
+  /** Single-row selection: a click only ever selects (another row's click
+   *  moves the selection), like a radio button. */
   variant?: "checkbox" | "radio"
 }
 
 /**
- * Selection checkbox that renders a minus glyph for the indeterminate
- * (some-but-not-all) state — the visual MRT uses for partial select-all.
- *
- * Implemented as a styled `role="checkbox"` button (no headless primitive) so
- * the data table carries no direct dependency on a specific primitive library
- * and renders identically whether the consumer's shadcn setup is Radix- or
- * Base-UI-based. Mirrors the stock shadcn `Checkbox` look (size, corners,
- * input border, focus ring) so it blends in.
- *
- * The check / indeterminate glyphs are inline SVG (not the swappable `icons`
- * system, nor an icon-library import) so a selection checkbox never depends on
- * a particular icon package — it renders the same even if a consumer overrides
- * every table icon or doesn't install Lucide.
+ * The selection checkbox: the installed shadcn `Checkbox`, so it looks like
+ * every other checkbox in the app. Indeterminate (some-but-not-all, on the
+ * select-all box) is the checkbox's own `"indeterminate"` state. The change
+ * goes through the click, not `onCheckedChange`, so the caller gets the
+ * event's modifier keys (shift-click range selection).
  */
 function SelectionCheckbox({
-  className,
   indeterminate = false,
   checked = false,
   onCheckedChange,
   variant = "checkbox",
   ...props
 }: SelectionCheckboxProps) {
-  const active = checked || indeterminate
-  const radio = variant === "radio"
   return (
-    <button
-      {...mergeProps(
-        {
-          type: "button",
-          role: radio ? "radio" : "checkbox",
-          "data-slot": radio ? "radio" : "checkbox",
-          "aria-checked": indeterminate ? "mixed" : checked,
-          // A radio only ever selects; another row's radio moves it.
-          onClick: (event: React.MouseEvent<HTMLButtonElement>) =>
-            onCheckedChange?.(radio ? true : !checked, event),
-          className: cn(
-            "peer relative flex size-4 shrink-0 items-center justify-center border shadow-xs transition-shadow outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
-            radio ? "rounded-full" : "rounded-[4px]",
-            active && !radio
-              ? "border-primary bg-primary text-primary-foreground"
-              : active
-                ? "border-primary text-primary dark:bg-input/30"
-                : "border-input dark:bg-input/30"
-          ),
-        } as React.ComponentProps<"button">,
-        { ...props, className }
-      )}
-    >
-      {active && radio && (
-        <span aria-hidden="true" className="size-2 rounded-full bg-current" />
-      )}
-      {!radio && (
-        // Always mounted (hidden while unchecked) so checking transitions it
-        // in when the table animates — never on mount, e.g. a row scrolled
-        // into a virtual window or a leaving row's copy.
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          data-shown={active ? "" : undefined}
-          className={cn(
-            "size-3.5",
-            active
-              ? cn(
-                  "scale-100 opacity-100 transition-[opacity,scale]",
-                  MOTION_TIMING_CLASS
-                )
-              : "invisible scale-75 opacity-0"
-          )}
-          aria-hidden="true"
-        >
-          <GlyphPath d="M20 6 9 17l-5-5" shown={checked && !indeterminate} />
-          <GlyphPath d="M5 12h14" shown={indeterminate} />
-        </svg>
-      )}
-    </button>
+    <Checkbox
+      {...props}
+      checked={indeterminate ? "indeterminate" : checked}
+      onClick={(event) => {
+        // The table owns the state: skip the checkbox's own toggle.
+        event.preventDefault()
+        onCheckedChange?.(variant === "radio" ? true : !checked, event)
+      }}
+    />
   )
 }
 

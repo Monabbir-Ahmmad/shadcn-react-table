@@ -1343,20 +1343,6 @@ describe("control animations", () => {
     await settle()
     expect(old.isConnected).toBe(false)
   })
-
-  it("draws the check in when a row is selected", async () => {
-    render(<Harness enableRowSelection />)
-    const box = document.querySelector<HTMLElement>('tbody [role="checkbox"]')!
-    fireEvent.click(box)
-    const glyph = box.querySelector("svg")!
-    const path = glyph.querySelector("path")!
-    expect(getComputedStyle(glyph).transitionDuration).toBe(
-      `${MOTION_DEFAULTS.duration / 1000}s`
-    )
-    expect(animating(path, "strokeDashoffset")).toHaveLength(1)
-    await settle()
-    expect(getComputedStyle(path).strokeDashoffset).toBe("0px")
-  })
 })
 
 describe("toolbar motion", () => {
