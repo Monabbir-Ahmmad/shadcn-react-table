@@ -231,6 +231,8 @@ const SLOT_DESCRIPTIONS = {
   "data-table-bottom-toolbar":
     "Bottom toolbar (custom actions and/or pagination).",
   "data-table-pagination": "Pagination controls.",
+  "data-table-pagination-buttons":
+    "The first / previous / next / last page buttons.",
   "data-table-create-row": 'Inline create row (createDisplayMode: "row").',
   "data-table-drag-preview":
     "Floating preview of a row dragged inside a DataTableDndProvider.",

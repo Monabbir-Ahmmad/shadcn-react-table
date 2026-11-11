@@ -926,7 +926,7 @@ export const useDataTableOptions: ApiMember[] = [
     required: false,
     default: "true",
     description:
-      "Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control.",
+      "Show the toolbar's internal icon-action cluster (search, filters, column visibility, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control.",
   },
   {
     name: "enableKeyboardNavigation",
@@ -1960,7 +1960,7 @@ export const dataTableOptions: ApiMember[] = [
     required: true,
     default: null,
     description:
-      "Show the toolbar's internal icon-action cluster (search, filters, column visibility, export, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control.",
+      "Show the toolbar's internal icon-action cluster (search, filters, column visibility, density, full screen). Default true. Hides the whole cluster at once; use the per-item flags for finer control.",
   },
   {
     name: "enableKeyboardNavigation",
@@ -3327,6 +3327,13 @@ export const slots: ApiMember[] = [
     required: true,
     default: null,
     description: "Pagination controls.",
+  },
+  {
+    name: "data-table-pagination-buttons",
+    type: "",
+    required: true,
+    default: null,
+    description: "The first / previous / next / last page buttons.",
   },
   {
     name: "data-table-progress",
