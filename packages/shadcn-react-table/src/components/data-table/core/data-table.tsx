@@ -434,7 +434,10 @@ export function DataTable<TData extends RowData>({
               // out.
               enableStickyHeader &&
                 "max-h-[clamp(350px,calc(100dvh-200px),9999px)]",
-              enableRowVirtualization && "max-h-150"
+              enableRowVirtualization && "max-h-150",
+              // Full screen: the surface takes the room the toolbars leave
+              // and scrolls inside it, so they stay in view.
+              isFullscreen && "max-h-none min-h-0 flex-1"
             ),
           } as React.ComponentProps<"div">,
           getSlotProps(table, "surface", {})
@@ -594,13 +597,17 @@ export function DataTable<TData extends RowData>({
             "data-slot": "data-table",
             className: cn(
               // The app's card, minus its content spacing: the parts inside
-              // set their own.
-              "relative w-full gap-0 py-0",
+              // set their own. It clips them to its corners: not every
+              // style's card does that on its own, and the square header and
+              // the surface's tucked-away lines rely on it.
+              "relative w-full gap-0 overflow-hidden py-0",
               // The timing of this table's own controls (nearest root wins).
               MOTION_ROOT_CLASS,
               DENSITY_PADDING_VARS,
+              // Edge to edge: no frame, whether the style draws it as a ring
+              // or a border.
               isFullscreen &&
-                "fixed inset-0 z-50 overflow-auto rounded-none shadow-none ring-0"
+                "fixed inset-0 z-50 rounded-none border-0 shadow-none ring-0"
             ),
             "data-density": density,
             "data-animations": animate ? "" : undefined,

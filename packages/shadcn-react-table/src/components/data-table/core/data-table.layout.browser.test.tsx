@@ -491,3 +491,39 @@ describe("filter row", () => {
     }
   })
 })
+
+describe("card", () => {
+  function CardTable({ fullscreen = false }: { fullscreen?: boolean }) {
+    const table = useDataTable<Row>({
+      columns,
+      data,
+      getRowId: (row) => row.id,
+      initialState: { isFullscreen: fullscreen, pagination: { pageSize: 5 } },
+    })
+    return <DataTable table={table} />
+  }
+  const root = () =>
+    document.querySelector<HTMLElement>('[data-slot="data-table"]')!
+
+  it("fills the screen with no frame in full screen", async () => {
+    render(<CardTable fullscreen />)
+    await nextFrame()
+    const style = getComputedStyle(root())
+    expect(style.borderTopWidth).toBe("0px")
+    // No ring or shadow drawn: every layer Tailwind composes is zero-sized.
+    expect(style.boxShadow.replace(/\([^)]*\)/g, "")).not.toMatch(
+      /(^|\s)-?[1-9][\d.]*px/
+    )
+    // The toolbars stay in view and the surface takes the rest of the room.
+    const pagination = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-pagination"]'
+    )!
+    expect(
+      Math.abs(pagination.getBoundingClientRect().bottom - window.innerHeight)
+    ).toBeLessThan(2)
+    const surface = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-surface"]'
+    )!
+    expect(getComputedStyle(surface).maxHeight).toBe("none")
+  })
+})
