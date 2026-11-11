@@ -131,7 +131,7 @@ export function DataTableToolbar<TData extends RowData>({
             />
           )}
           {title != null && (
-            <div className="text-sm font-semibold tracking-wide">{title}</div>
+            <div className="text-sm font-semibold">{title}</div>
           )}
           {renderTopToolbarCustomActions?.({ table })}
         </div>

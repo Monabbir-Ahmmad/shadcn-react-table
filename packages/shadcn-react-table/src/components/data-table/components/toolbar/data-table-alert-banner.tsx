@@ -93,7 +93,7 @@ export function DataTableAlertBanner<TData extends RowData>({
       <button
         type="button"
         onClick={() => table.resetRowSelection()}
-        className="font-semibold tracking-wide text-foreground underline-offset-4 hover:underline"
+        className="font-semibold text-foreground underline-offset-4 hover:underline"
       >
         {localization.clearSelection}
       </button>
@@ -293,7 +293,7 @@ export function DataTableHeadOverlayBanner<TData extends RowData>({
         <button
           type="button"
           onClick={() => table.resetRowSelection()}
-          className="ms-auto shrink-0 font-semibold tracking-wide text-foreground underline-offset-4 hover:underline"
+          className="ms-auto shrink-0 font-semibold text-foreground underline-offset-4 hover:underline"
         >
           {localization.clearSelection}
         </button>

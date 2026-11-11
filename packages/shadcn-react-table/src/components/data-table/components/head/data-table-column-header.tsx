@@ -87,7 +87,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
         </TooltipContent>
       </Tooltip>
       <PopoverContent align="start" className="w-64 gap-2">
-        <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        <span className="text-sm font-medium">
           {localization.filterByColumn(getColumnLabel(column))}
         </span>
         <DataTableColumnFilter header={header} table={table} />
@@ -147,7 +147,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
                 // body cell's column header. What a click does is its
                 // description (the header cell's aria-sort tells the order).
                 aria-describedby={sortHintId}
-                className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 data-[sorted=true]:text-foreground motion-reduce:transition-none"
+                className="-mx-1.5 flex min-w-0 items-center gap-1 rounded-sm px-1.5 py-1 outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
                 data-sorted={!!sorted}
               >
                 <span className="min-w-0 truncate">{labelNode}</span>
@@ -155,7 +155,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
                 {isMultiSort && (
                   <Badge
                     variant="secondary"
-                    className="ms-0.5 h-4 min-w-4 shrink-0 justify-center rounded-sm px-1 text-[10px] leading-none tabular-nums"
+                    className="ms-0.5 h-4 min-w-4 shrink-0 justify-center px-1 text-[10px] leading-none tabular-nums"
                   >
                     {sortIndex + 1}
                   </Badge>
@@ -170,9 +170,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
           </span>
         </>
       ) : (
-        <span className="min-w-0 truncate px-0 text-xs font-medium tracking-wider uppercase">
-          {labelNode}
-        </span>
+        <span className="min-w-0 truncate">{labelNode}</span>
       )}
 
       {dragHandle}

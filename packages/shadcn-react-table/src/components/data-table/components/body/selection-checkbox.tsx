@@ -50,7 +50,8 @@ interface SelectionCheckboxProps extends Omit<
  * Implemented as a styled `role="checkbox"` button (no headless primitive) so
  * the data table carries no direct dependency on a specific primitive library
  * and renders identically whether the consumer's shadcn setup is Radix- or
- * Base-UI-based. Mirrors the shadcn `Checkbox` styling so it blends in.
+ * Base-UI-based. Mirrors the stock shadcn `Checkbox` look (size, corners,
+ * input border, focus ring) so it blends in.
  *
  * The check / indeterminate glyphs are inline SVG (not the swappable `icons`
  * system, nor an icon-library import) so a selection checkbox never depends on
@@ -79,13 +80,13 @@ function SelectionCheckbox({
           onClick: (event: React.MouseEvent<HTMLButtonElement>) =>
             onCheckedChange?.(radio ? true : !checked, event),
           className: cn(
-            "peer relative flex size-4.5 shrink-0 items-center justify-center border bg-transparent transition-shadow outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
-            radio ? "rounded-full" : "rounded-none",
+            "peer relative flex size-4 shrink-0 items-center justify-center border shadow-xs transition-shadow outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+            radio ? "rounded-full" : "rounded-[4px]",
             active && !radio
               ? "border-primary bg-primary text-primary-foreground"
               : active
-                ? "border-primary text-primary"
-                : "border-input"
+                ? "border-primary text-primary dark:bg-input/30"
+                : "border-input dark:bg-input/30"
           ),
         } as React.ComponentProps<"button">,
         { ...props, className }

@@ -278,7 +278,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
 
   function renderBox() {
     return (
-      <InputGroup className="h-8 w-auto shrink-0 rounded-md border-border bg-background ps-1 pe-1 focus-within:border-ring">
+      <InputGroup className="h-8 w-auto shrink-0 ps-1 pe-1">
         <InputGroupAddon align="inline-start" className="py-0">
           {enableGlobalFilterModes ? (
             <DropdownMenu>
@@ -343,7 +343,7 @@ export function DataTableGlobalFilter<TData extends RowData>({
               placeholder: localization.searchPlaceholder,
               "aria-label": localization.search,
               className:
-                "h-7 w-40 flex-none px-1 text-xs font-normal tracking-normal normal-case shadow-none sm:w-56",
+                "h-7 w-40 flex-none px-1 text-xs font-normal shadow-none sm:w-56",
             } as React.ComponentProps<"input">,
             getSlotProps(table, "searchInput", {})
           )}

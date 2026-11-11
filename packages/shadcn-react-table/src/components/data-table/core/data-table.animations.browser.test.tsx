@@ -968,11 +968,14 @@ describe("filter row and density glide", () => {
     let table!: DataTableInstance<Row>
     render(<Harness onTable={(t) => (table = t)} />)
     await nextFrame()
+    const head = document.querySelector("thead")!
+    const headWas = head.getBoundingClientRect().height
     const was = tops()
     act(() => table.setDensity("compact"))
-    // Every row below the first moved (each row above it got shorter), and
-    // starts where it was.
-    expect(running()).toBe(bodyRows().length - 1)
+    // Every row moved (the header and each row above it got shorter; the
+    // first row only when the header did), and starts where it was.
+    const headShrank = head.getBoundingClientRect().height < headWas - 0.1
+    expect(running()).toBe(bodyRows().length - (headShrank ? 0 : 1))
     for (const tr of bodyRows()) {
       const top = tr.getBoundingClientRect().top
       expect(Math.abs(top - was.get(tr.dataset.rowId!)!)).toBeLessThan(1)

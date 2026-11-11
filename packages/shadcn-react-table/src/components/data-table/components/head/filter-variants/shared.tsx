@@ -25,12 +25,10 @@ export interface FilterFieldProps<TData extends RowData, TValue> {
   table: DataTableInstance<TData>
 }
 
-export const FIELD_CLASS =
-  "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
+export const FIELD_CLASS = "h-8 text-xs font-normal"
 
 /** The control inside a `FilterInputGroup` (the group carries the height). */
-export const GROUP_CONTROL_CLASS =
-  "h-full text-xs font-normal tracking-normal normal-case"
+export const GROUP_CONTROL_CLASS = "h-full text-xs font-normal"
 
 /**
  * Each bound's group in a min–max pair. The groups size from their content
@@ -145,7 +143,7 @@ export function FilterInputGroup<TData extends RowData, TValue>({
 }) {
   const { localization, icons } = dt(table)
   return (
-    <InputGroup className={cn("h-8 rounded-sm", className)}>
+    <InputGroup className={cn("h-8", className)}>
       {modeMenu && (
         <DataTableFilterModeMenu column={column} table={table} addon />
       )}

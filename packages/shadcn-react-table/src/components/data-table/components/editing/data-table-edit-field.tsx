@@ -16,8 +16,7 @@ import type { DataTableFilterOption, EditVariant } from "../../core/types"
 import { stopPropagation } from "../../helpers/stop-propagation"
 import { mergeProps } from "../../helpers/slot-props"
 
-const FIELD_CLASS =
-  "h-8 rounded-sm text-xs font-normal tracking-normal normal-case"
+const FIELD_CLASS = "h-8 text-xs font-normal"
 
 /**
  * A controlled inline edit field (text / number / select). The parent owns the

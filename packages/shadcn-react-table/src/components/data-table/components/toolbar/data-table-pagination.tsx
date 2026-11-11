@@ -75,7 +75,7 @@ export function DataTablePagination<TData extends RowData>({
       )}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xs font-medium tracking-wide text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground">
           {localization.rowsPerPage}
         </span>
         {phone ? (
@@ -159,7 +159,7 @@ export function DataTablePagination<TData extends RowData>({
         </div>
       ) : (
         <div className="flex items-center gap-3">
-          <span className="text-xs font-medium tracking-wide text-muted-foreground tabular-nums">
+          <span className="text-xs font-medium text-muted-foreground tabular-nums">
             {localization.paginationRange(start, end, totalRows)}
           </span>
           <div className="flex items-center gap-1">
