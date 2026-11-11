@@ -1330,7 +1330,7 @@ export interface UseDataTableOptions<TData extends RowData> extends Omit<
   /** Show the full-screen toggle in the toolbar. Default true. */
   enableFullscreenToggle?: boolean
   /** Show the toolbar's internal icon-action cluster (search, filters, column
-   *  visibility, export, density, full screen). Default true. Hides the whole
+   *  visibility, density, full screen). Default true. Hides the whole
    *  cluster at once; use the per-item flags for finer control. */
   enableToolbarInternalActions?: boolean
   /** Cell keyboard navigation with a single Tab stop: arrow keys, Home/End,

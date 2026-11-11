@@ -459,9 +459,11 @@ export function DataTable<TData extends RowData>({
           />
         )}
         {showProgressBars && (
+          // A zero-height strip stuck to the top-left of the visible area, so
+          // the bar stays in view however far the rows are scrolled.
           <div
             data-slot="data-table-progress"
-            className="absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden bg-primary/20"
+            className="sticky start-0 top-0 z-30 h-0"
             role="presentation"
           >
             {/* @keyframes can't go in an inline style attribute, so the rule
@@ -473,13 +475,15 @@ export function DataTable<TData extends RowData>({
                 "@keyframes data-table-progress{from{transform:translateX(-100%)}to{transform:translateX(400%)}}@media (prefers-reduced-motion:reduce){[data-slot=data-table-progress-bar]{animation:none!important}}"
               }
             </style>
-            <div
-              data-slot="data-table-progress-bar"
-              className="h-full w-1/3 bg-primary"
-              style={{
-                animation: "data-table-progress 1.1s ease-in-out infinite",
-              }}
-            />
+            <div className="absolute inset-x-0 top-0 h-0.5 overflow-hidden bg-primary/20">
+              <div
+                data-slot="data-table-progress-bar"
+                className="h-full w-1/3 bg-primary"
+                style={{
+                  animation: "data-table-progress 1.1s ease-in-out infinite",
+                }}
+              />
+            </div>
           </div>
         )}
 

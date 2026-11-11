@@ -588,3 +588,38 @@ describe("sticky header and footer dividers", () => {
       expect(getComputedStyle(cell).boxShadow).toBe("none")
   })
 })
+
+describe("progress bar", () => {
+  function Loading() {
+    const table = useDataTable<Row>({
+      slotProps: { surface: { className: "max-h-[300px]" } },
+      columns,
+      data,
+      getRowId: (row) => row.id,
+      enablePagination: false,
+      showProgressBars: true,
+    })
+    return (
+      <div style={{ width: 600 }}>
+        <DataTable table={table} />
+      </div>
+    )
+  }
+
+  it("stays at the top of the visible area while the rows scroll", async () => {
+    render(<Loading />)
+    const bar = document.querySelector<HTMLElement>(
+      '[data-slot="data-table-progress"]'
+    )!
+    const surface = surfaceOf(bar)
+    act(() => {
+      surface.scrollTop = 800
+      surface.scrollLeft = 200
+    })
+    await nextFrame()
+    const at = bar.getBoundingClientRect()
+    const box = surface.getBoundingClientRect()
+    expect(at.top).toBeCloseTo(box.top + surface.clientTop, 0)
+    expect(at.left).toBeCloseTo(box.left + surface.clientLeft, 0)
+  })
+})
