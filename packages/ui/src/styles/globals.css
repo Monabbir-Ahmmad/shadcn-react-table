@@ -3,8 +3,8 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-@source "../../../apps/**/*.{ts,tsx}";
-@source "../../../components/**/*.{ts,tsx}";
+@source "../../../../apps/**/*.{ts,tsx}";
+@source "../../../shadcn-react-table/src/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
 :root {
