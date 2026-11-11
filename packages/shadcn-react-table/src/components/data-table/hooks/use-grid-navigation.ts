@@ -23,6 +23,12 @@ export const GridSyncContext = React.createContext<(() => void) | null>(null)
 
 const EDITABLE = new Set(["INPUT", "TEXTAREA", "SELECT"])
 
+/** An editor's field: its row keeps its controls in the Tab order. */
+const EDITOR = 'input, textarea, select, [role="combobox"]'
+
+/** Marks a cell control the grid took out of the Tab order. */
+const ROVING = "data-grid-roving"
+
 /** Frames to wait for a scrolled-to cell to render before giving up. */
 const MAX_FOCUS_FRAMES = 30
 
@@ -79,7 +85,15 @@ export function useGridNavigation<T extends HTMLElement>({
   // their own (see MemoRow), so they ask for this through `scheduleSync`.
   const sync = () => {
     const root = ref.current
-    if (!enabled || !root) return
+    if (!root) return
+    if (!enabled) {
+      // Navigation off: the controls are Tab stops again.
+      for (const el of root.querySelectorAll<HTMLElement>(`[${ROVING}]`)) {
+        el.removeAttribute(ROVING)
+        el.removeAttribute("tabindex")
+      }
+      return
+    }
     // The focused element unmounted and focus fell to the page: an inline
     // editor closed, save/cancel buttons went away, the row was deleted, or it
     // scrolled out of a virtual window. Put focus back at the same cell
@@ -105,7 +119,18 @@ export function useGridNavigation<T extends HTMLElement>({
     const cells = root.querySelectorAll<HTMLElement>("[data-cell-row]")
     if (cells.length === 0) return
     const stop = findCell(root, activeCellRef.current) ?? cells[0]!
-    for (const cell of cells) cell.tabIndex = cell === stop ? 0 : -1
+    for (const cell of cells) {
+      cell.tabIndex = cell === stop ? 0 : -1
+      // The grid is one Tab stop: the controls in its cells (checkboxes, row
+      // buttons, links) are reached with the arrow keys and Enter/F2, not Tab.
+      // A row being edited keeps Tab between its fields and Save/Cancel.
+      if (cell.parentElement?.querySelector(EDITOR)) continue
+      for (const control of cell.querySelectorAll<HTMLElement>(FOCUSABLE)) {
+        if (control.hasAttribute(ROVING)) continue
+        control.setAttribute(ROVING, "")
+        control.tabIndex = -1
+      }
+    }
   }
   React.useLayoutEffect(sync)
 
