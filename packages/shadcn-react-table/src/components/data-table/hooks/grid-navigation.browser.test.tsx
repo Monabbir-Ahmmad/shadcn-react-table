@@ -78,6 +78,20 @@ async function settle() {
 }
 
 describe("keyboard navigation", () => {
+  it("outlines the focused cell inside its own edges", async () => {
+    render(<Table rowCount={3} colCount={3} />)
+    await settle()
+    focusCell("r1c0")
+    await userEvent.keyboard("[ArrowDown]")
+    const cell = document.activeElement as HTMLElement
+    expect(cell.textContent).toBe("r2c0")
+    // Inside: the neighbouring cells paint over anything drawn outside it.
+    const style = getComputedStyle(cell)
+    expect(style.outlineStyle).toBe("solid")
+    expect(style.outlineWidth).toBe("2px")
+    expect(style.outlineOffset).toBe("-2px")
+  })
+
   it("moves between cells with arrows, Home and End", async () => {
     render(<Table rowCount={5} colCount={4} />)
     await settle()

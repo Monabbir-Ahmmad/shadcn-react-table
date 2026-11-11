@@ -21,6 +21,7 @@ import { DataTableEditField } from "./data-table-edit-field"
 import { dt } from "../../core/internal"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import { getEditSelectOptions } from "../../helpers/edit-select-options"
+import { hasRowDraftErrors } from "./row-draft"
 
 /**
  * Edit/create dialog for `editDisplayMode: "modal"` (and the create form in any
@@ -77,13 +78,7 @@ export function DataTableEditModal<TData extends RowData>({
     .getAllLeafColumns()
     .filter((column) => isColumnEditable(column, editingRow ?? undefined))
 
-  const hasErrors = editableColumns.some((column) => {
-    const value =
-      column.id in rowDraft
-        ? rowDraft[column.id]
-        : editingRow?.getValue(column.id)
-    return column.columnDef.meta?.validate?.(value) != null
-  })
+  const hasErrors = hasRowDraftErrors(table, editingRow)
 
   const submit = () => {
     if (hasErrors) return
@@ -115,6 +110,8 @@ export function DataTableEditModal<TData extends RowData>({
           error={meta?.validate?.(value)}
           ariaLabel={getColumnLabel(column)}
           onChange={(next) => setRowDraftValue(column.id, next)}
+          // Enter saves the dialog (Escape is the dialog's own).
+          onSubmit={submit}
           fieldProps={getSlotProps(
             table,
             "editField",

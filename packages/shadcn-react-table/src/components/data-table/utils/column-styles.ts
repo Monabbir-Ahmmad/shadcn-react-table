@@ -86,6 +86,22 @@ export function getRowPinningClass(position: "top" | "bottom"): string {
     : "after:pointer-events-none after:absolute after:inset-x-0 after:-top-2 after:z-10 after:h-[calc(--spacing(2)+1px)] after:border-b after:border-border after:bg-gradient-to-t after:from-border/60 after:to-transparent after:bg-clip-padding"
 }
 
+/**
+ * Divider class for the sticky header (`"head"`) or footer (`"foot"`): a 1px
+ * line along the edge that faces the body, drawn as an inset shadow on that
+ * edge's cells so it moves with them. The line the shadcn primitive draws
+ * there is a collapsed table border, which stays where the rows started
+ * instead of sticking, so the body would scroll under the section with no
+ * line between them. That border turns transparent: it keeps its width, so
+ * the rows keep their heights. (A pseudo-element on the section itself would
+ * shift the body by half a pixel.)
+ */
+export function getStickySectionClass(section: "head" | "foot"): string {
+  return section === "head"
+    ? "[&>tr:last-child]:border-b-transparent [&>tr:last-child>*]:shadow-[inset_0_-1px_0_0_var(--border)]"
+    : "border-t-transparent [&>tr:first-child>*]:shadow-[inset_0_1px_0_0_var(--border)]"
+}
+
 /** Column ids go into CSS custom-property names; ASCII punctuation and spaces
  *  (dots, slashes…) would make `var()` invalid. Non-ASCII letters are valid
  *  name characters, so ids like `fødsel` and `fådsel` stay distinct. */

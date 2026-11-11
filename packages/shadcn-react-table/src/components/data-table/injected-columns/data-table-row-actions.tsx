@@ -15,6 +15,10 @@ import type { DataTableInstance } from "../core/types"
 import type { DataTableColumnDef, DataTableRow } from "../core/table-types"
 import { stopPropagation } from "../helpers/stop-propagation"
 import { dt } from "../core/internal"
+import {
+  hasRowDraftErrors,
+  saveEditedRow,
+} from "../components/editing/row-draft"
 
 export const ROW_ACTIONS_COLUMN_ID = "cn-row-actions"
 
@@ -68,10 +72,7 @@ function RowActionsCell<TData extends RowData>({
     getCanEditRow,
     editDisplayMode,
     editingRowId,
-    rowDraft,
-    onEditingRowSave,
     beginRowEdit,
-    cancelEdit,
     cancelEditing,
     renderRowActions,
     renderRowActionMenuItems,
@@ -92,14 +93,9 @@ function RowActionsCell<TData extends RowData>({
           size="icon"
           aria-label={localization.save}
           className="size-7"
-          onClick={() =>
-            onEditingRowSave?.({
-              row,
-              values: rowDraft,
-              table,
-              exit: cancelEdit,
-            })
-          }
+          // As in the edit dialog: no saving while a field is invalid.
+          disabled={hasRowDraftErrors(table, row)}
+          onClick={() => saveEditedRow(table, row)}
         >
           <icons.save />
         </Button>

@@ -297,7 +297,7 @@ export function DataTableBody<TData extends RowData>({
               isAutoHeight && "align-top wrap-break-word whitespace-normal",
               getColumnPinningClass(cell.column),
               enableKeyboardNavigation &&
-                "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:-outline-offset-2 focus-visible:outline-none"
+                "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring/50"
             ),
           } as React.ComponentProps<"td">,
           getSlotProps(

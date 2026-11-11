@@ -21,6 +21,7 @@ import { dt } from "../../core/internal"
 import { ALIGN_CELL } from "../../core/constants"
 import { getSlotProps } from "../../helpers/slot-props"
 import { getEditSelectOptions } from "../../helpers/edit-select-options"
+import { saveEditedRow } from "./row-draft"
 
 /**
  * Resolves a leaf data cell's interactive content: an inline editor when this
@@ -213,6 +214,9 @@ function RowDraftEditor<TData extends RowData>({
       error={error}
       ariaLabel={getColumnLabel(column)}
       onChange={(next) => cn.setRowDraftValue(column.id, next)}
+      // Enter saves the row, Escape leaves it as it was.
+      onSubmit={() => saveEditedRow(table, cell.row)}
+      onCancel={cn.cancelEditing}
       fieldProps={getSlotProps(
         table,
         "editField",
