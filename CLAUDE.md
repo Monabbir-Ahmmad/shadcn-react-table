@@ -73,7 +73,7 @@ pnpm dlx shadcn@latest add <component> -c apps/web
 
 Components land in `packages/ui/src/components/` (the `@workspace/ui` package, not `apps/web`). The `apps/web/components.json` `ui` alias is wired to `@workspace/ui/components`, so the shadcn CLI writes there even when targeting the web app. Import with `import { Foo } from "@workspace/ui/components/foo"`.
 
-shadcn config (both `components.json` files agree): `style: radix-sera`, `baseColor: neutral`, `iconLibrary: remixicon`, RSC + TSX enabled, CSS variables on. The single source-of-truth stylesheet is `packages/ui/src/styles/globals.css`.
+shadcn config (both `components.json` files agree): `style: radix-maia`, `baseColor: mist`, `iconLibrary: lucide`, RSC + TSX enabled, CSS variables on. The single source-of-truth stylesheet is `packages/ui/src/styles/globals.css`.
 
 ## Architecture
 
