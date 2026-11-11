@@ -84,3 +84,44 @@ describe("single row selection", () => {
     expect(boxes[2]!.getAttribute("aria-checked")).toBe("true")
   })
 })
+
+describe("group row selection", () => {
+  type Member = { id: string; team: string; name: string }
+  const members: Member[] = [
+    { id: "1", team: "A", name: "Ava" },
+    { id: "2", team: "A", name: "Liam" },
+    { id: "3", team: "B", name: "Noah" },
+  ]
+
+  function Grouped() {
+    const table = useDataTable<Member>({
+      columns: [
+        { accessorKey: "team", header: "Team" },
+        { accessorKey: "name", header: "Name" },
+      ],
+      data: members,
+      getRowId: (row) => row.id,
+      enableRowSelection: true,
+      enableGrouping: true,
+      initialState: { grouping: ["team"], expanded: true },
+    })
+    return <DataTable table={table} />
+  }
+
+  /** The selection box in the row whose text includes `text`. */
+  const boxIn = (text: string) =>
+    screen
+      .getByText(text)
+      .closest("tr")!
+      .querySelector<HTMLElement>('[role="checkbox"]')!
+
+  it("shows a group as partly checked, then checked, as its rows are", () => {
+    render(<Grouped />)
+    const group = () => boxIn("(2)")
+    expect(group().getAttribute("aria-checked")).toBe("false")
+    fireEvent.click(boxIn("Ava"))
+    expect(group().getAttribute("aria-checked")).toBe("mixed")
+    fireEvent.click(boxIn("Liam"))
+    expect(group().getAttribute("aria-checked")).toBe("true")
+  })
+})

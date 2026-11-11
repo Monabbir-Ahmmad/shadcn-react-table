@@ -152,7 +152,14 @@ export function createSelectionColumn<TData extends RowData>(
             })}
             aria-label={localization.selectRow}
             variant={single ? "radio" : "checkbox"}
-            checked={row.getIsSelected()}
+            // A group row stands for its rows: checked when all of them
+            // are, partly checked when some are.
+            checked={row.getIsSelected() || row.getIsAllSubRowsSelected()}
+            indeterminate={
+              !row.getIsSelected() &&
+              !row.getIsAllSubRowsSelected() &&
+              row.getIsSomeSelected()
+            }
             disabled={!row.getCanSelect()}
             onCheckedChange={(value, event) =>
               toggleRow(
