@@ -44,7 +44,7 @@ See [Column filtering](/docs/guides/column-filtering) for where highlighting app
 
 ## Density and dark mode
 
-Density vertical padding is controlled by the component itself, not by a CSS variable. Dark mode is whatever your app's theme provider sets — for example `next-themes` toggling the `.dark` class. The table reads the same tokens in either mode.
+Density padding (rows and toolbars) is controlled by the component itself, not by your theme. Dark mode is whatever your app's theme provider sets — for example `next-themes` toggling the `.dark` class. The table reads the same tokens in either mode.
 
 ## Retheming
 

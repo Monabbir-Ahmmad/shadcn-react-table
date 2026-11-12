@@ -162,6 +162,9 @@ export function usePresence<T extends HTMLElement = HTMLElement>(
         left: `${at.left}px`,
         width: `${at.width}px`,
         margin: "0",
+        // Its spacing may transition (with the density): dropping it must
+        // not glide.
+        transition: "none",
       })
     }
     el.style.pointerEvents = "none"

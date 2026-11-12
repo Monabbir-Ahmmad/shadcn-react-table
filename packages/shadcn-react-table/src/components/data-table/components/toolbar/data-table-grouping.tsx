@@ -25,6 +25,8 @@ export function DataTableDropToGroupZone<TData extends RowData>({
   table,
   presenceRef,
   leaving = false,
+  flushTop = false,
+  flushBottom = false,
 }: {
   table: DataTableInstance<TData>
   /** Receives the zone's element as well, for its enter and exit motion
@@ -32,6 +34,11 @@ export function DataTableDropToGroupZone<TData extends RowData>({
   presenceRef?: React.Ref<HTMLDivElement>
   /** It is fading out: it no longer takes a drop. */
   leaving?: boolean
+  /** The top toolbar or pagination sits above it: its padding already spaces
+   *  them, so the zone drops its own top margin. */
+  flushTop?: boolean
+  /** The bottom toolbar sits below it: the same, for its bottom margin. */
+  flushBottom?: boolean
 }) {
   const { localization, icons } = dt(table)
   const grouping = table.getState().grouping
@@ -50,7 +57,14 @@ export function DataTableDropToGroupZone<TData extends RowData>({
       })}
       data-slot="data-table-group-zone"
       className={cn(
-        "mx-3 my-2 flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground transition-colors",
+        // The toolbars' padding all round (set by the density). The margin
+        // moves with the table's motion timing, as the toolbars' padding does.
+        "m-(--dt-toolbar-p) flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground [transition:color_150ms,background-color_150ms,border-color_150ms,margin_var(--dt-ctl-duration,0ms)_var(--dt-ctl-ease,ease)]",
+        // A selection banner shown right next to it has no padding of its own.
+        flushTop &&
+          "mt-0 [[data-slot=data-table-alert-banner]+&]:mt-(--dt-toolbar-p)",
+        flushBottom &&
+          "mb-0 has-[+[data-slot=data-table-alert-banner]]:mb-(--dt-toolbar-p)",
         isOver && "border-primary bg-muted text-foreground"
       )}
     >

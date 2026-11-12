@@ -9,6 +9,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { DataTableInstance } from "../../core/types"
 import { DataTablePagination } from "./data-table-pagination"
 import { dt } from "../../core/internal"
+import { MOTION_TIMING_CLASS } from "../../core/motion"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 interface DataTableBottomToolbarProps<TData extends RowData> {
@@ -62,7 +63,12 @@ export function DataTableBottomToolbar<TData extends RowData>({
     >
       {customActions != null ? (
         <>
-          <div className="flex items-center gap-2 py-2 ps-3">
+          <div
+            className={cn(
+              "flex items-center gap-2 py-(--dt-toolbar-p) ps-(--dt-toolbar-p) transition-[padding]",
+              MOTION_TIMING_CLASS
+            )}
+          >
             {customActions}
           </div>
           {pagination && <div className="flex-1">{pagination}</div>}

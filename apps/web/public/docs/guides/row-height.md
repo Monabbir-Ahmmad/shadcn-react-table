@@ -111,5 +111,5 @@ For each row: `getRowHeight(row)` wins unless it returns `null`/`undefined`, the
 ## Related
 
 - [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
-- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows and the padding around the toolbars.
 - [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.

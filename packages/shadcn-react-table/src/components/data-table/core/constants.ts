@@ -15,10 +15,11 @@ export const DENSITY_ORDER: Density[] = ["comfortable", "compact", "spacious"]
  *  density, so changing it re-renders no row. */
 export const CELL_PADDING_Y = "py-(--dt-cell-py)"
 
-/** Sets `--dt-cell-py` on the table root from its `data-density`
+/** Sets `--dt-cell-py` and `--dt-toolbar-p` (the toolbars' padding and the
+ *  drop-to-group zone's margin) on the table root from its `data-density`
  *  (comfortable, compact, spacious). */
 export const DENSITY_PADDING_VARS =
-  "[--dt-cell-py:calc(var(--spacing)*2.5)] data-[density=compact]:[--dt-cell-py:calc(var(--spacing)*1)] data-[density=spacious]:[--dt-cell-py:calc(var(--spacing)*4)]"
+  "[--dt-cell-py:calc(var(--spacing)*2.5)] [--dt-toolbar-p:calc(var(--spacing)*4)] data-[density=compact]:[--dt-cell-py:calc(var(--spacing)*1)] data-[density=compact]:[--dt-toolbar-p:calc(var(--spacing)*3)] data-[density=spacious]:[--dt-cell-py:calc(var(--spacing)*4)] data-[density=spacious]:[--dt-toolbar-p:calc(var(--spacing)*5)]"
 
 /** Horizontal alignment → text-align utility, applied to body cells. */
 export const ALIGN_CELL = {
