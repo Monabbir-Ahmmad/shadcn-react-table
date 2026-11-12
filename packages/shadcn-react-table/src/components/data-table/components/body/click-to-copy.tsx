@@ -28,6 +28,9 @@ export function ClickToCopy({
   children: React.ReactNode
 }) {
   const [copied, setCopied] = React.useState(false)
+  // Always controlled (switching between the two warns): open on hover or
+  // focus as usual, and held open while "Copied" shows.
+  const [open, setOpen] = React.useState(false)
   const timer = React.useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
   )
@@ -43,7 +46,7 @@ export function ClickToCopy({
   }
 
   return (
-    <Tooltip open={copied || undefined}>
+    <Tooltip open={copied || open} onOpenChange={setOpen}>
       <TooltipTrigger asChild>
         <button
           type="button"
