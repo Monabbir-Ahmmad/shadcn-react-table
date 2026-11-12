@@ -14,7 +14,11 @@ import {
 import { DataTableGlobalFilter } from "./data-table-global-filter"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { dt } from "../../core/internal"
-import { isEditingOrCreating, useAnimationsActive } from "../../core/motion"
+import {
+  isEditingOrCreating,
+  MOTION_TIMING_CLASS,
+  useAnimationsActive,
+} from "../../core/motion"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 import { useLayoutGlide } from "../../hooks/use-layout-glide"
 
@@ -115,7 +119,7 @@ export function DataTableToolbar<TData extends RowData>({
           {
             ref: toolbarRef,
             "data-slot": "data-table-toolbar",
-            className: "flex items-start justify-between gap-3 p-4",
+            className: `flex items-start justify-between gap-3 p-(--dt-toolbar-p) transition-[padding] ${MOTION_TIMING_CLASS}`,
           } as React.ComponentProps<"div">,
           getSlotProps(table, "topToolbar", {})
         )}

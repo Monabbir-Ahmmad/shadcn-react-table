@@ -57,11 +57,14 @@ export function DataTableDropToGroupZone<TData extends RowData>({
       })}
       data-slot="data-table-group-zone"
       className={cn(
-        // The card's spacing all round, the same as the toolbars' padding.
-        "m-4 flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground transition-colors",
+        // The toolbars' padding all round (set by the density). The margin
+        // moves with the table's motion timing, as the toolbars' padding does.
+        "m-(--dt-toolbar-p) flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground [transition:color_150ms,background-color_150ms,border-color_150ms,margin_var(--dt-ctl-duration,0ms)_var(--dt-ctl-ease,ease)]",
         // A selection banner shown right next to it has no padding of its own.
-        flushTop && "mt-0 [[data-slot=data-table-alert-banner]+&]:mt-4",
-        flushBottom && "mb-0 has-[+[data-slot=data-table-alert-banner]]:mb-4",
+        flushTop &&
+          "mt-0 [[data-slot=data-table-alert-banner]+&]:mt-(--dt-toolbar-p)",
+        flushBottom &&
+          "mb-0 has-[+[data-slot=data-table-alert-banner]]:mb-(--dt-toolbar-p)",
         isOver && "border-primary bg-muted text-foreground"
       )}
     >

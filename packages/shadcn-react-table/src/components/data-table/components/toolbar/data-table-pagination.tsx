@@ -20,6 +20,7 @@ import {
 import type { DataTableInstance } from "../../core/types"
 import { formatInteger } from "../../helpers/format-integer"
 import { dt } from "../../core/internal"
+import { MOTION_TIMING_CLASS } from "../../core/motion"
 import { getSlotProps, mergeProps } from "../../helpers/slot-props"
 
 interface DataTablePaginationProps<TData extends RowData> {
@@ -68,8 +69,7 @@ export function DataTablePagination<TData extends RowData>({
       {...mergeProps(
         {
           "data-slot": "data-table-pagination",
-          className:
-            "flex flex-wrap items-center justify-between gap-4 p-4",
+          className: `flex flex-wrap items-center justify-between gap-4 p-(--dt-toolbar-p) transition-[padding] ${MOTION_TIMING_CLASS}`,
         } as React.ComponentProps<"div">,
         getSlotProps(table, "pagination", {})
       )}
