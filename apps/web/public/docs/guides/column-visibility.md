@@ -61,6 +61,6 @@ Set `meta.visibleInShowHideMenu: false` to keep a column out of the show / hide 
 
 ## Related
 
-- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows and the padding around the toolbars.
 - [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 - [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).

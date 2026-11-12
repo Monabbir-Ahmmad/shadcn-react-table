@@ -1,6 +1,6 @@
 # Density
 
-Density controls the vertical padding of table rows. The data table ships three densities: `"comfortable"` (the default), `"compact"`, and `"spacious"`. A toolbar button cycles through them, so end users can pick the row height that suits them.
+Density controls the vertical padding of table rows and the padding around the toolbars. The data table ships three densities: `"comfortable"` (the default), `"compact"`, and `"spacious"`. A toolbar button cycles through them, so end users can pick the row height that suits them.
 
 Example (`density`):
 

@@ -1559,7 +1559,7 @@ Set `meta.visibleInShowHideMenu: false` to keep a column out of the show / hide 
 
 ## Related
 
-- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows and the padding around the toolbars.
 - [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 - [Column options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/column-options): Per-column configuration lives on the standard TanStack columnDef.meta object, which the table augments with the fields below (fully typed wherever meta is read).
 
@@ -4213,7 +4213,7 @@ return <DataTable table={table} />
 
 # Density
 
-Density controls the vertical padding of table rows. The data table ships three densities: `"comfortable"` (the default), `"compact"`, and `"spacious"`. A toolbar button cycles through them, so end users can pick the row height that suits them.
+Density controls the vertical padding of table rows and the padding around the toolbars. The data table ships three densities: `"comfortable"` (the default), `"compact"`, and `"spacious"`. A toolbar button cycles through them, so end users can pick the row height that suits them.
 
 Example (`density`):
 
@@ -4674,7 +4674,7 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 ## Related
 
 - [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
-- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows and the padding around the toolbars.
 - [Global search](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/global-search): An expandable global search box appears in the toolbar by default (enableGlobalFilter: true).
 - [Export](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/export): The table ships no built-in export — the same stance as Material React Table — so the block carries no CSV or spreadsheet dependencies.
 
@@ -5344,7 +5344,7 @@ See [Column filtering](/docs/guides/column-filtering) for where highlighting app
 
 ## Density and dark mode
 
-Density vertical padding is controlled by the component itself, not by a CSS variable. Dark mode is whatever your app's theme provider sets — for example `next-themes` toggling the `.dark` class. The table reads the same tokens in either mode.
+Density padding (rows and toolbars) is controlled by the component itself, not by your theme. Dark mode is whatever your app's theme provider sets — for example `next-themes` toggling the `.dark` class. The table reads the same tokens in either mode.
 
 ## Retheming
 
@@ -6658,7 +6658,7 @@ For each row: `getRowHeight(row)` wins unless it returns `null`/`undefined`, the
 ## Related
 
 - [Virtualization](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/virtualization): Virtualization renders only the cells currently in view, keeping large tables fast.
-- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows and the padding around the toolbars.
 - [useDataTable options](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/api/use-data-table): useDataTable(options) accepts everything TanStack's TableOptions accepts (controlled state, on*Change, manual* flags, getRowId, getSubRows, initialState, …; column pinning in state/initialState keeps the left/right shape) plus the data-table options below.
 
 ---

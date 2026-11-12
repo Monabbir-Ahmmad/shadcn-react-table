@@ -204,6 +204,6 @@ Every toolbar slot exposes a `data-slot` attribute, so you can target it with a 
 ## Related
 
 - [State management](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/state): The data table keeps all of its state in TanStack Table's store: the standard table state (sorting, filters, selection…) and its own UI state (density, editing, filter modes…).
-- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows.
+- [Density](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/density): Density controls the vertical padding of table rows and the padding around the toolbars.
 - [Global search](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/global-search): An expandable global search box appears in the toolbar by default (enableGlobalFilter: true).
 - [Export](https://monabbir-ahmmad.github.io/shadcn-react-table/docs/guides/export): The table ships no built-in export — the same stance as Material React Table — so the block carries no CSV or spreadsheet dependencies.

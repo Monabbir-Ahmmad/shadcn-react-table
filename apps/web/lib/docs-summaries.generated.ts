@@ -56,7 +56,7 @@ export const DOCS_SUMMARIES: Record<string, string> = {
   "/docs/guides/event-listeners":
     "The data table exposes click handlers for rows and cells so you can react to user interaction.",
   "/docs/guides/density":
-    "Density controls the vertical padding of table rows.",
+    "Density controls the vertical padding of table rows and the padding around the toolbars.",
   "/docs/guides/animations":
     "The table animates rows, columns, detail panels, the toolbar and a few controls so changes are easy to follow.",
   "/docs/guides/sticky":
