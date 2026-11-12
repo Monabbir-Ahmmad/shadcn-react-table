@@ -6,6 +6,13 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 Changes waiting for a release are in [`.changeset/`](../../.changeset), and
 move here when the next version is cut.
 
+## 1.3.1
+
+### Patch Changes
+
+- **Fixed:** Click-to-copy cells no longer log a "Tooltip is changing from uncontrolled to controlled" warning when you copy a value.
+- **Changed:** The top and bottom toolbars have a bit more padding, and it now follows the density: tighter when compact, roomier when spacious. The "drag a column here to group by it" box sits evenly between the toolbar and the table at every density.
+
 ## 1.3.0
 
 ### Minor Changes
