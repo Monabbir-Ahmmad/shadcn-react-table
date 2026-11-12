@@ -69,7 +69,7 @@ export function DataTablePagination<TData extends RowData>({
         {
           "data-slot": "data-table-pagination",
           className:
-            "flex flex-wrap items-center justify-between gap-4 px-3 py-2",
+            "flex flex-wrap items-center justify-between gap-4 p-4",
         } as React.ComponentProps<"div">,
         getSlotProps(table, "pagination", {})
       )}

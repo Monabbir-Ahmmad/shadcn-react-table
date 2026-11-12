@@ -157,6 +157,9 @@ export function DataTable<TData extends RowData>({
     localization,
     renderCaption,
     renderTopToolbar,
+    enableBottomToolbar,
+    renderBottomToolbar,
+    renderBottomToolbarCustomActions,
   } = dt(table)
   // The grid modes size every column from the size vars (fixed layout).
   const isGridLayout = layoutMode === "grid" || layoutMode === "grid-no-grow"
@@ -393,6 +396,12 @@ export function DataTable<TData extends RowData>({
           config={dt(table)}
           presenceRef={zoneTop.ref}
           leaving={zoneTop.leaving}
+          flushTop={
+            renderTopToolbar != null ||
+            enableTopToolbar ||
+            (enablePagination &&
+              (positionPagination === "top" || positionPagination === "both"))
+          }
         />
       )}
 
@@ -585,6 +594,14 @@ export function DataTable<TData extends RowData>({
           config={dt(table)}
           presenceRef={zoneBottom.ref}
           leaving={zoneBottom.leaving}
+          flushBottom={
+            renderBottomToolbar != null ||
+            (enableBottomToolbar &&
+              (renderBottomToolbarCustomActions != null ||
+                (enablePagination &&
+                  (positionPagination === "bottom" ||
+                    positionPagination === "both"))))
+          }
         />
       )}
     </>
@@ -627,6 +644,9 @@ export function DataTable<TData extends RowData>({
           { ...props, className, onKeyDown: onKeyDownProp }
         )}
       >
+        {/* First, out of the flow: the drop zones' spacing keys off the
+            banners right next to them. */}
+        {dndScope && <TableDropTarget tableKey={dndKey} />}
         <div role="status" aria-live="polite" className="sr-only">
           {isLoading ? localization.loading : ""}
         </div>
@@ -653,10 +673,7 @@ export function DataTable<TData extends RowData>({
 
         <DndKeyContext.Provider value={dndScope ? dndKey : null}>
           {dndScope ? (
-            <>
-              <TableDropTarget tableKey={dndKey} />
-              {dndContent}
-            </>
+            dndContent
           ) : (
             <DndContext
               sensors={sensors}
