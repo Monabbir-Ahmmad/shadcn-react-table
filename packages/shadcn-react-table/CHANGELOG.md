@@ -6,6 +6,16 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 Changes waiting for a release are in [`.changeset/`](../../.changeset), and
 move here when the next version is cut.
 
+## 1.4.0
+
+### Minor Changes
+
+- **Changed:** `useDataTable` returns a new `table` object on every render, over the same table underneath, so a component compiled by React Compiler now shows new data and options instead of keeping the old rows on screen. An effect or memo that lists `table` as a dependency now runs on every render: depend on the values it reads instead. Don't spread `table`, since its fields are read through the prototype. A row drop's `table` and `over.table` are still the `table` your latest render got.
+
+### Patch Changes
+
+- **Fixed:** Infinite scroll now calls `onLoadMore` when the rows arrive after the first render, as with `useInfiniteQuery`, and when they come back after a search, a filter or a new query showed no row.
+
 ## 1.3.1
 
 ### Patch Changes
