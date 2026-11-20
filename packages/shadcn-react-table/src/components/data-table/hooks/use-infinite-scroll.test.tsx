@@ -62,22 +62,25 @@ type Props = Parameters<typeof useInfiniteScroll>[0]
 function setup(overrides: Partial<Props> = {}) {
   const onLoadMore = vi.fn()
   const scrollRef = { current: document.createElement("div") }
-  const sentinelRef = { current: document.createElement("div") }
   const base: Props = {
     enabled: true,
     hasNextPage: true,
     isFetchingNextPage: false,
     onLoadMore,
     scrollRef,
-    sentinelRef,
     ...overrides,
   }
   const view = renderHook((props: Props) => useInfiniteScroll(props), {
     initialProps: base,
   })
+  /** Hands the hook a sentinel node, as React does when it mounts one. */
+  const attach = (node: HTMLElement | null) =>
+    act(() => view.result.current(node))
+  const sentinel = document.createElement("div")
+  attach(sentinel)
   const rerenderWith = (partial: Partial<Props>) =>
     view.rerender({ ...base, ...partial })
-  return { onLoadMore, view, rerenderWith }
+  return { onLoadMore, view, rerenderWith, attach, sentinel }
 }
 
 describe("useInfiniteScroll", () => {
@@ -133,5 +136,30 @@ describe("useInfiniteScroll", () => {
   it("passes the threshold through as the observer rootMargin", () => {
     setup({ threshold: 300 })
     expect(latestObserver().options?.rootMargin).toContain("300px")
+  })
+
+  it("does not observe until a sentinel is attached", () => {
+    const { attach } = setup()
+    MockIntersectionObserver.instances = []
+    attach(null)
+    expect(MockIntersectionObserver.instances).toHaveLength(0)
+  })
+
+  it("observes a sentinel that mounts after the first render", () => {
+    const { attach, onLoadMore } = setup()
+    attach(null)
+    const late = document.createElement("div")
+    attach(late)
+    expect(latestObserver().observed.has(late)).toBe(true)
+    act(() => latestObserver().trigger(true))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+  })
+
+  it("stops watching the old sentinel when a new one replaces it", () => {
+    const { attach, sentinel } = setup()
+    const first = latestObserver()
+    attach(document.createElement("div"))
+    expect(first.observed.has(sentinel)).toBe(false)
+    expect(latestObserver()).not.toBe(first)
   })
 })

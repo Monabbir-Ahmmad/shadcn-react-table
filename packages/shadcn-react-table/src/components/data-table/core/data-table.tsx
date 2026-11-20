@@ -313,15 +313,13 @@ export function DataTable<TData extends RowData>({
 
   // Infinite scroll: observe a bottom sentinel against the scroll surface and
   // ask the consumer to append the next chunk when it nears the viewport.
-  const sentinelRef = React.useRef<HTMLDivElement>(null)
-  useInfiniteScroll({
+  const sentinelRef = useInfiniteScroll({
     enabled: enableInfiniteScroll,
     hasNextPage,
     isFetchingNextPage,
     onLoadMore,
     threshold: infiniteScrollThreshold,
     scrollRef: gridRef,
-    sentinelRef,
   })
 
   const hasRows =
