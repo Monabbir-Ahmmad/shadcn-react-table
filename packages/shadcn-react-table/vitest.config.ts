@@ -1,4 +1,6 @@
+import { transformAsync } from "@babel/core"
 import { playwright } from "@vitest/browser-playwright"
+import reactCompiler from "babel-plugin-react-compiler"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
 import { defineConfig } from "vitest/config"
@@ -10,6 +12,27 @@ const uiPostcss = fileURLToPath(
   new URL("../ui/postcss.config.mjs", import.meta.url)
 )
 
+// Runs React Compiler over the components under test/react-compiler, as a
+// consumer's app build would, so tests can check the table under it.
+const compiledFixtures = /\/test\/react-compiler\/.*\.tsx$/
+
+const reactCompilerFixtures = {
+  name: "react-compiler-fixtures",
+  enforce: "pre" as const,
+  async transform(code: string, id: string) {
+    if (!compiledFixtures.test(id)) return null
+    const result = await transformAsync(code, {
+      filename: id,
+      babelrc: false,
+      configFile: false,
+      parserOpts: { plugins: ["jsx", "typescript"] },
+      plugins: [[reactCompiler, { panicThreshold: "all_errors" }]],
+      sourceMaps: true,
+    })
+    return result?.code ? { code: result.code, map: result.map } : null
+  },
+}
+
 export default defineConfig({
   test: {
     // Windows intermittently fails file reads ("UNKNOWN: unknown error,
@@ -19,6 +42,7 @@ export default defineConfig({
     projects: [
       {
         extends: true,
+        plugins: [reactCompilerFixtures],
         test: {
           name: "unit",
           environment: "jsdom",

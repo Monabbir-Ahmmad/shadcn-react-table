@@ -7058,6 +7058,14 @@ The component that calls `useDataTable` doesn't re-render when the table's state
 
 Event handlers, effects and the table's own render options can call `table.getState()` directly.
 
+## Don't rely on `table` keeping its identity
+
+`useDataTable` returns a new `table` object on every render, over the same table underneath. That's how `<DataTable>` gets new data and options when your app builds with React Compiler, which skips an element whose props keep their identity.
+
+- An effect or memo that lists `table` as a dependency runs again on every render. Depend on the values it reads instead.
+- Don't spread `table` (`{ ...table }`): its fields and methods are read through the prototype.
+- Tables the block hands back, like a row drop's `over.table`, are the `table` your latest render got, so `over.table === doneTable` works.
+
 ## Control only what you need
 
 Pass `initialState` for starting values, and `state` + `on…Change` only for the slices your app owns (the URL, a server query). Everything else can stay inside the table.

@@ -9,6 +9,7 @@ import { Table, TableCaption } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { getSlotProps, mergeProps } from "../helpers/slot-props"
+import { toStableInstance } from "../helpers/stable-instance"
 
 import { DataTableBody } from "../components/body/data-table-body"
 import { DataTableRowMotion } from "../components/body/row-motion"
@@ -118,6 +119,15 @@ function assignRef<T>(ref: React.Ref<T> | undefined, el: T | null) {
  * expansion, and detail panels.
  */
 export function DataTable<TData extends RowData>({
+  table,
+  ...props
+}: DataTableProps<TData>) {
+  // The caller's handle is new on every render; the table works on the
+  // long-lived instance behind it, so its subscriptions and memos hold.
+  return <DataTableRoot table={toStableInstance(table)} {...props} />
+}
+
+function DataTableRoot<TData extends RowData>({
   table,
   className,
   ref: refProp,

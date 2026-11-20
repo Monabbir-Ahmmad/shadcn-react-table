@@ -20,6 +20,7 @@ import {
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import * as React from "react"
 
+import { toCallerTable } from "../helpers/stable-instance"
 import { NON_DATA_COLUMN_IDS } from "./constants"
 import { dt } from "./internal"
 import type { DataTableRow } from "./table-types"
@@ -222,10 +223,14 @@ export function DataTableDndProvider({
           ? { type: "zone", id: over.zoneId! }
           : {
               type: "table",
-              table: entries.current.get(over.tableKey!)!.table,
+              table: toCallerTable(entries.current.get(over.tableKey!)!.table),
               rowId: over.type === "row" ? over.rowId : undefined,
             }
-      dt(table).onRowDragEnd?.({ row, table, over: target as never })
+      dt(table).onRowDragEnd?.({
+        row,
+        table: toCallerTable(table),
+        over: target as never,
+      })
       return
     }
     if (over.tableKey === source.tableKey) entry.handleDragEnd(event)
