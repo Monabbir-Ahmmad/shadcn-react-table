@@ -28,8 +28,10 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
+    "@types/babel__core": "^7.20.5",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -37,6 +39,7 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "axe-core": "^4.14.0",
+    "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.39.5",
     "jsdom": "^29.1.1",
     "playwright": "^1.64.1",

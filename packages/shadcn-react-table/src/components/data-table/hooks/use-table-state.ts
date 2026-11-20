@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { toStableInstance } from "../helpers/stable-instance"
 import type { DataTableState } from "../helpers/table-state"
 
 /** The table, as far as store subscriptions need it. */
@@ -39,9 +40,12 @@ export function shallowEqual(a: unknown, b: unknown): boolean {
  * the state changes.
  */
 export function useTableState<T>(
-  table: StoreTable,
+  tableOrHandle: StoreTable,
   selector: (state: DataTableState) => T
 ): T {
+  // A handle from `useDataTable` is new on every render of its caller; keep
+  // the subscription on the instance behind it.
+  const table = toStableInstance(tableOrHandle)
   const selectorRef = React.useRef(selector)
   const cacheRef = React.useRef<{ value: T } | null>(null)
   // eslint-disable-next-line react-hooks/refs
@@ -72,9 +76,10 @@ export function useTableState<T>(
  * which must not depend on the component re-rendering.
  */
 export function useTableStateListener(
-  table: StoreTable,
+  tableOrHandle: StoreTable,
   listener: () => void
 ): void {
+  const table = toStableInstance(tableOrHandle)
   const listenerRef = React.useRef(listener)
   React.useLayoutEffect(() => {
     listenerRef.current = listener

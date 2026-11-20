@@ -5,6 +5,7 @@ import * as React from "react"
 
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 
+import { toStableInstance } from "../helpers/stable-instance"
 import type { DataTableInstance } from "./types"
 
 const DataTableContext = React.createContext<DataTableInstance<never> | null>(
@@ -25,7 +26,7 @@ export function DataTableProvider<TData extends RowData>({
 }) {
   return (
     <DataTableContext.Provider
-      value={table as unknown as DataTableInstance<never>}
+      value={toStableInstance(table) as unknown as DataTableInstance<never>}
     >
       {/* Radix names the open delay `delayDuration`; Base UI's provider names
           it `delay`. Both ignore foreign props, so passing both (via an

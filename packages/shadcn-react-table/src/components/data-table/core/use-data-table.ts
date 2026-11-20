@@ -27,6 +27,7 @@ import {
   type HeaderControlsOptions,
 } from "../helpers/header-controls"
 import { measureColumnWidth } from "../helpers/measure-column-width"
+import { toCallerHandle } from "../helpers/stable-instance"
 import { toDataTableState } from "../helpers/table-state"
 import { useAdvancedFilter } from "../hooks/use-advanced-filter"
 import { useColumnFilterModes } from "../hooks/use-column-filter-modes"
@@ -963,5 +964,9 @@ export function useDataTable<TData extends RowData>(
     ;(table as unknown as Record<string, unknown>)[key] = config[key]
   }
 
-  return table
+  // One instance for the hook's lifetime, but a new handle over it for the
+  // caller on every render, so a caller compiled by React Compiler still
+  // passes new data and options down to <DataTable>.
+  // eslint-disable-next-line react-hooks/refs
+  return toCallerHandle(table)
 }
