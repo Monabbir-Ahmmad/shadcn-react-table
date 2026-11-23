@@ -6,6 +6,13 @@ see the [updating guide](https://monabbir-ahmmad.github.io/shadcn-react-table/do
 Changes waiting for a release are in [`.changeset/`](../../.changeset), and
 move here when the next version is cut.
 
+## 1.4.1
+
+### Patch Changes
+
+- **Fixed:** The first and last column sit as far from the table's edge as the toolbars' content, by the density's toolbar padding, instead of a cell's 8px.
+- **Fixed:** With rows grouped, the pagination's "start–end of total" counts records only: a group's heading row no longer counts as a row.
+
 ## 1.4.0
 
 ### Minor Changes
