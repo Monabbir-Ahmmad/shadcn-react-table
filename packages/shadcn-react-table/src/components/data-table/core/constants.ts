@@ -18,6 +18,14 @@ export const CELL_PADDING_Y = "py-(--dt-cell-py)"
 /** Sets `--dt-cell-py` and `--dt-toolbar-p` (the toolbars' padding and the
  *  drop-to-group zone's margin) on the table root from its `data-density`
  *  (comfortable, compact, spacious). */
+/** Pads the first and last cell of every header, body and footer row by the
+ *  toolbars' padding (`--dt-toolbar-p`), so the edge columns line up with the
+ *  toolbars instead of sitting a primitive cell's 8px from the border. Only
+ *  the table's own rows: a table in a detail panel keeps its own. A column
+ *  virtualization spacer keeps its inline `padding: 0`. */
+export const EDGE_CELL_PADDING =
+  "[&>*>tr>:first-child]:ps-(--dt-toolbar-p) [&>*>tr>:last-child]:pe-(--dt-toolbar-p)"
+
 export const DENSITY_PADDING_VARS =
   "[--dt-cell-py:calc(var(--spacing)*2.5)] [--dt-toolbar-p:calc(var(--spacing)*4)] data-[density=compact]:[--dt-cell-py:calc(var(--spacing)*1)] data-[density=compact]:[--dt-toolbar-p:calc(var(--spacing)*3)] data-[density=spacious]:[--dt-cell-py:calc(var(--spacing)*4)] data-[density=spacious]:[--dt-toolbar-p:calc(var(--spacing)*5)]"
 
