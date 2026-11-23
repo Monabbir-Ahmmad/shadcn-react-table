@@ -52,7 +52,7 @@ import { useColumnGrow } from "../hooks/use-column-grow"
 import { type DataTableInstance } from "./types"
 import { dt } from "./internal"
 import { DataTableProvider } from "./table-context"
-import { DENSITY_PADDING_VARS } from "./constants"
+import { DENSITY_PADDING_VARS, EDGE_CELL_PADDING } from "./constants"
 import {
   isEditingOrCreating,
   MOTION_ROOT_CLASS,
@@ -526,7 +526,7 @@ function DataTableRoot<TData extends RowData>({
                 ...columnSizeVars,
                 ...(tableWidth ? { width: tableWidth } : null),
               },
-              className: cn(useSizeVars && "table-fixed"),
+              className: cn(useSizeVars && "table-fixed", EDGE_CELL_PADDING),
             } as React.ComponentProps<"table">,
             getSlotProps(table, "table", {})
           )}

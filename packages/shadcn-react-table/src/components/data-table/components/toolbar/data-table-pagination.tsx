@@ -47,6 +47,44 @@ function usePhone() {
 }
 
 /**
+ * The "start–end of total" range. With rows grouped and the groups' rows
+ * paginated with them, it counts data rows only: a group's heading row is not
+ * a record, so "of n" is the number of records.
+ */
+export function pageRange<TData extends RowData>(
+  table: DataTableInstance<TData>
+): { start: number; end: number; totalRows: number } {
+  const { pageIndex, pageSize } = table.getState().pagination
+  const first = pageIndex * pageSize
+  const grouped =
+    table.getState().grouping.length > 0 &&
+    table.options.paginateExpandedRows !== false &&
+    !table.options.manualPagination
+  if (!grouped) {
+    const totalRows = table.getRowCount()
+    return {
+      start: totalRows === 0 ? 0 : first + 1,
+      end: Math.min(first + pageSize, totalRows),
+      totalRows,
+    }
+  }
+  let before = 0
+  let onPage = 0
+  let totalRows = 0
+  table.getPrePaginatedRowModel().rows.forEach((row, index) => {
+    if (row.getIsGrouped()) return
+    totalRows += 1
+    if (index < first) before += 1
+    else if (index < first + pageSize) onPage += 1
+  })
+  return {
+    start: onPage === 0 ? 0 : before + 1,
+    end: before + onPage,
+    totalRows,
+  }
+}
+
+/**
  * Bottom toolbar. Left: rows-per-page select (the native picker on phones). Right: MRT-style "start–end of
  * total" range label + first/prev/next/last icon buttons. Works in client and
  * manual/server pagination (counts come from the table instance).
@@ -60,9 +98,7 @@ export function DataTablePagination<TData extends RowData>({
   if (paginationDisplayMode === "custom") return null
 
   const { pageIndex, pageSize } = table.getState().pagination
-  const totalRows = table.getRowCount()
-  const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1
-  const end = Math.min((pageIndex + 1) * pageSize, totalRows)
+  const { start, end, totalRows } = pageRange(table)
 
   return (
     <div
